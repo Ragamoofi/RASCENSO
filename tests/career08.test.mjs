@@ -38,7 +38,7 @@ test('Títulos guardan competición, temporada, club y no se pierden',()=>{
 function awaitTransfer(s){return {...s,phase:'season'};}
 test('Legados generan perfil emergente y existen fotografías de archivo para ciertos nombres',()=>{
  let s=newCareer({name:'ADN',seed:'dna08'});while(s.phase==='draft')s=acceptDraft(s,0);
- const dna=archetypeFor(s);assert.ok(dna.name);assert.equal(s.footballDNA.name,dna.name);assert.ok(legendPhoto('Lionel Messi')?.includes('commons.wikimedia.org'));assert.equal(legendPhoto('Jugador no identificado'),null);
+ const dna=archetypeFor(s);assert.ok(dna.name);assert.equal(s.footballDNA.name,dna.name);assert.match(legendPhoto('Lionel Messi'),/assets\/portraits\/lionel-messi\.png/);assert.equal(legendPhoto('Jugador no identificado'),null);
 });
 test('Autoretirada sigue funcionando con dos escenas por temporada',()=>{
  let s=start('retirement08');s=simulateToRetirement(s);assert.equal(s.phase,'retired');assert.ok(s.history.length>=18);

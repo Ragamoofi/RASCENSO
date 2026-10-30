@@ -1,24 +1,9 @@
-/* Fotos de licencia abierta cuando están verificadas; silueta original si falta la foto.
- * Los datos del draft son originales e ilustrativos, nunca fichas oficiales.
- */
-const photoFiles={
- 'Lionel Messi':'Lionel Messi WC2022.jpg',
- 'Cristiano Ronaldo':'Cristiano Ronaldo 2018.jpg',
- 'Ronaldo Nazário':'Ronaldo Nazário.jpg',
- 'Andrés Iniesta':'Andres Iniesta 2018 (edited).jpg',
- 'Xavi Hernández':'2012 2013 - 06 Xavi Hernández.jpg',
- 'Ronaldinho':'Ronaldinho in 2019.jpg',
- 'Luka Modrić':'Luka Modric.jpg',
- 'Mohamed Salah':'Mohamed Salah 2018.jpg',
- 'Neymar':'Neymar 2018.jpg',
- 'Erling Haaland':'Erling Haaland 2023.jpg',
- 'Robert Lewandowski':'Robert Lewandowski 2018.jpg',
- 'Harry Kane':'Harry Kane 2018.jpg',
- 'Vinícius Júnior':'Vinicius Junior WC2022.jpg',
- 'Kevin De Bruyne':'2021-12-07 Fußball, Männer, UEFA Champions League, RB Leipzig - Manchester City FC 1DX 2723 by Stepro (cropped).jpg'
-};
-export function legendPhoto(name){const file=photoFiles[name];return file?`https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(file)}?width=500`:null;}
-export function legendPhotoCredit(name){return photoFiles[name]?`https://commons.wikimedia.org/wiki/File:${encodeURIComponent(photoFiles[name].replaceAll(' ','_'))}`:null;}
+import { DRAFT_REFERENTS } from './draft09.mjs';
+/* PNG locales de fotos con licencias verificadas o ilustraciones de respaldo */
+const KNOWN = new Set(DRAFT_REFERENTS.map(x=>x.name));
+const slug = name => String(name).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+export function legendPhoto(name){return KNOWN.has(name)?`./assets/portraits/${slug(name)}.png`:null;}
+export function legendPhotoCredit(){return './assets/MEDIA_CREDITS.html';}
 export function legendIllustration(name,tier='figura'){
  let seed=7;for(const c of name)seed=(seed*33+c.charCodeAt(0))%360;
  const palette={icono:['#cfa57b','#65435d'],figura:['#7cb9de','#263d6e'],profesional:['#91b2a5','#34485b']}[tier]||['#8bb4cf','#253f59'];

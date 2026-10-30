@@ -11,7 +11,7 @@ assert.match(root.innerHTML,/playing-layout/);
 assert.match(root.innerHTML,/right-tabs/);
 assert.match(root.innerHTML,/playing-layout/);
 assert.match(root.innerHTML,/standing-row/);
-assert.match(root.innerHTML,/ALFA 1.1/);
+assert.match(root.innerHTML,/ALFA 1.2/);
 assert.match(root.innerHTML,/assets\/crests\/.*\.png/);
 assert.doesNotMatch(root.innerHTML,/director-dock|Copiar contexto y abrir ChatGPT|Importar respuesta/);
 assert.doesNotMatch(root.innerHTML,/preseason-bar/);

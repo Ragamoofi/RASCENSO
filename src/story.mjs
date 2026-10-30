@@ -1,3 +1,4 @@
+import { outletFor } from './media12.mjs';
 /* RASCENSO: escenas narrativas originales. Sin IA ni servicios externos.
  * Los personajes mantienen vínculos, el jugador decide y su respuesta se guarda.
  * Este motor no finge interpretar libremente cada frase; elige una intención explícita.
@@ -283,7 +284,9 @@ export function storyDetail(s,id){
 }
 export function sceneFor(s){
  const entry=catalog[s.pendingEvent]||catalog.coach;
- const speaker=s.relationships?.[entry.actor]||initialRelationships(s.country)[entry.actor];
+ const relationship=s.relationships?.[entry.actor]||initialRelationships(s.country)[entry.actor];
+ const club=findClub(s.clubId);const outlet=entry.actor==='press'?outletFor({...s,clubCountry:club?.countryCode||club?.id?.slice(0,2).toUpperCase()},s.pendingEvent):null;
+ const speaker=outlet?{...relationship,name:outlet.name,role:'PRENSA DEPORTIVA · NOTICIA SIMULADA'}:relationship;
  const match=(s.pendingEvent==='derby'||s.pendingEvent==='rival')?matchContext(s,findClub):null;
  if(s.pendingEvent==='derby'&&match){return {id:s.pendingEvent,title:`Lo que dejó el encuentro ante ${match.opponentName}`,tag:'PARTIDO DE TU TEMPORADA',place:'Camarín · Balance deportivo',actor:entry.actor,speaker,
   paragraphs:[`Fecha ${match.round}: ${match.homeName} ${match.score} ${match.awayName}. Tu equipo terminó con una ${match.result}.`,`El entrenador y los compañeros analizan las decisiones de ese partido, ya disputado, para corregir el siguiente.`],

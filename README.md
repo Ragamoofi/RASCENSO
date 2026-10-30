@@ -133,3 +133,11 @@ Documentación oficial relevante: https://developers.openai.com/siwc/quickstart 
 - Variaciones coherentes en los comentarios de cierre de temporada; no se inventan resultados, fichajes ni convocatorias.
 - Se conserva el formato actual de guardados, sin reiniciar partidas.
 - **ChatGPT:** no se incorporó un falso inicio de sesión. El uso de la suscripción desde GitHub Pages requiere autorización/configuración que RASCENSO no tiene; no se solicitó API ni credenciales.
+
+
+## Alfa 1.2 — Fotografías, prensa y competiciones
+- 78 PNG en el draft: fotografía real con licencia reutilizable verificada o ilustración de respaldo. El despliegue registra autor, licencia y fuente en `assets/MEDIA_CREDITS.html`.
+- Distintivos PNG para 13 competiciones. Logos reconocibles cuando la licencia encontrada permite uso; en otros casos aparece insignia original. Las marcas pertenecen a sus titulares.
+- En la vitrina y el Mundo aparecen imágenes licenciadas de copas internacionales. Algunas copas aún NO forman parte del motor jugable.
+- Medios deportivos de cada país se citan solo como simulación narrativa. **Ningún titular o entrevista es una publicación real ni implica colaboración del medio**.
+- Sin cambios en los guardados ni en el progreso deportivo de partidas existentes.

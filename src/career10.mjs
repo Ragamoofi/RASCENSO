@@ -1,3 +1,4 @@
+import { outletFor, pressHeadline } from './media12.mjs';
 /* RASCENSO 1.0: contexto deportivo verificable y recapitulación de temporada.
  * No inventa rivales ni resultados y nunca reescribe los partidos simulados.
  */
@@ -81,6 +82,11 @@ export function seasonReview(s, getClub){
   `La evaluación es clara: el equipo tiene herramientas, pero necesita más regularidad.`,
   `No quiero grandes discursos. Quiero que aprendamos de lo que dejó esta campaña.`,
   `Lo que conseguimos este año tiene valor, aunque todavía haya objetivos pendientes.`])};
+ if(voice.speaker==='Prensa deportiva'){
+  const clubRef=getClub(a.clubId);
+  const outlet=outletFor({...s,clubCountry:clubRef?.countryCode||clubRef?.id?.slice(0,2).toUpperCase()},'resumen-'+a.year);
+  voice={...voice,speaker:outlet.name,headline:pressHeadline({...s,clubName:club},outlet,'cierre'),fictional:true};
+ }
  const alternate=position&&position>=12?`La clasificación exige mejorar: ${club} terminó ${position}°.`:
   `El equipo terminó ${position||'sin posición registrada'}° en ${a.leagueName||'su competición'}.`;
  const summary=[`${starts} partidos, ${goals} goles y ${assists} asistencias.`,alternate,
