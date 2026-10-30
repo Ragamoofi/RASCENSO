@@ -49,3 +49,11 @@ test('Partidas antiguas se conservan y contratos antiguos se recalibran sin alte
  assert.equal(migrated.version,6);assert.equal(migrated.contract.currency,'EUR');
  assert.ok(migrated.contract.salary>10000);assert.equal(migrated.history.length,old.history.length);
 });
+
+test('Al recuperar una carrera anterior de 89 OVR se reemplazan ofertas antiguas sin tocar historial',()=>{
+ const old={...high('saved89'),version:5,phase:'transfer',offers:[{id:'bo-1',name:'Bolívar',level:73,salary:2500}]};
+ const fresh=migrateCareer(old);
+ assert.equal(fresh.phase,'transfer');assert.ok(fresh.offers.length);
+ assert.ok(fresh.offers.every(o=>o.prestige>=79));
+ assert.equal(fresh.history.length,old.history.length);assert.equal(fresh.ovr,89);
+});

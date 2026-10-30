@@ -86,6 +86,12 @@ export function migrateCareer(s){
   // Datos v1-v5: antes el sueldo eran créditos sin moneda definida. No convertir temporadas históricas ficticiamente.
   const club=marketClub(migrated.clubId);
   if(club&&migrated.contract&&migrated.contract.salary<9000&&!migrated.contract.currency){migrated.contract={...migrated.contract,salary:annualSalary(club,migrated.ovr||60),currency:'EUR',estimated:true};}
+  // Guardados pre-0.7 con ofertas en pantalla: reemplazar únicamente propuestas antiguas por el mercado nuevo.
+  // No cambia club, historial, contratos ya aceptados ni decisiones del jugador.
+  if(s.version<6&&s.phase==='transfer'){
+   migrated.market={canStay:true,reason:'normal',renewal:null,source:'migration',searches:0,focus:'balanced'};
+   migrated.offers=buildTransferOffers(migrated,{attempt:0});
+  }
   return migrated;
 }
 export function careerYear(s){return (s.startYear??START_YEAR)+(s.age-(s.startAge??16));}
