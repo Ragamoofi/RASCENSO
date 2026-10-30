@@ -32,6 +32,7 @@ jobs:
           test -s src/experience.mjs
           test -s src/career08.mjs
           test -s src/legend-art.mjs
+          test -s src/career10.mjs
           test -s assets/trophies/league.png
           for file in assets/logos-{1..4}.json; do test -s "$file"; done
   deploy:

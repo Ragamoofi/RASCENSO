@@ -106,3 +106,13 @@ Las fotografías enlazadas provienen de distintas páginas de Wikimedia Commons:
 
 ### Compatibilidad de guardados
 Se mantienen los identificadores, estadísticas y estados previos. Las nuevas agendas se guardan en `seasonAgenda` y `careerMoments`; son opcionales y no cambian las temporadas anteriores.
+
+## RASCENSO 1.0 — Director de Carrera y cierre anual
+
+- **Resultados narrativos verificables:** los eventos de partidos destacados y clásicos nombran el rival, la fecha, el resultado, y los minutos sacados del historial `lastSeason.playerMatches`; una escena posterior al campeonato ya no habla de un partido todavía por jugar.
+- **Balance después de cada campaña:** el primer panel de eventos muestra clasificación, media inicial/final, partidos, goles, asistencias, lesiones y títulos, con un comentario ficticio del entrenador o la prensa generado según los datos. La recapitulación no modifica ningún marcador.
+- **Director de Carrera (versión manual, sin costo adicional):** chat auxiliar en la zona central que crea un prompt con contexto de tu partida, permite copiarlo y abrir ChatGPT, e importar de regreso la respuesta pegada. El registro del chat se guarda localmente y no cambia el motor, ni llama APIs, ni exige claves. Si el portapapeles falla aparece el texto para copiarlo manualmente.
+- **Integración oficial pendiente:** Sign in with ChatGPT para páginas web requiere aprobación y un servicio de autenticación seguro. GitHub Pages no puede ofrecer automáticamente esa función solo con el código público. No se almacenan contraseñas ni tokens de ChatGPT en RASCENSO.
+- **Compatibilidad:** los guardados anteriores se conservan; `recapPending` solo se activa para temporadas simuladas después de actualizar.
+
+Documentación oficial relevante: https://developers.openai.com/siwc/quickstart y https://developers.openai.com/siwc/token-sharing-open-source.

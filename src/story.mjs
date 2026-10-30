@@ -4,6 +4,7 @@
  */
 import { COUNTRIES } from './countries.mjs';
 import { STORY_09 } from './story09.mjs';
+import { matchContext } from './career10.mjs';
 
 const findClub=id=>COUNTRIES.flatMap(c=>c.clubs).find(c=>c.id===id);
 const clubName=id=>findClub(id)?.name||'tu club';
@@ -204,13 +205,15 @@ Object.assign(catalog.fan_home,{
   opt('Ganarme la confianza de la hinchada','Dejarlo todo cada vez que juegues.','«La grada reconocerá tu esfuerzo».',{coach:3,reputation:3},'Empiezas a construir tu propia historia con estos colores.')]
 });
 Object.assign(catalog.rival,{
- tag:'PARTIDO CLAVE',place:'Vestuario · Charla técnica',title:()=>`Se aproxima un partido decisivo`,
- paragraphs:s=>[`Hay presión por sumar puntos. El rival conoce bien al equipo y el entrenador pide inteligencia para resolver el partido.`],
- speech:()=>`«Podemos intentar dominar desde el primer minuto o esperar nuestra oportunidad. ¿Qué enfoque defiendes?»`,
+ tag:'PARTIDO DESTACADO',place:'Vestuario · Análisis del encuentro',actor:'coach',
+ title:s=>{const m=matchContext(s,findClub);return m?`Lo que dejó el partido ante ${m.opponentName}`:'Análisis de un partido importante';},
+ paragraphs:s=>{const m=matchContext(s,findClub);return m?[`En la fecha ${m.round} jugaste contra ${m.opponentName}. El marcador fue ${m.homeName} ${m.score} ${m.awayName}: ${m.result} para tu equipo.`,`Fue un encuentro ante ${m.context}. ${m.played?`Disputaste ${m.minutes} minutos, marcaste ${m.goals} goles y diste ${m.assists} asistencias.`:'Esta vez no tuviste minutos en cancha.'}`]:['El cuerpo técnico revisa una jornada de la temporada con el plantel.'];},
+ speech:s=>`«Ya sabemos lo que ocurrió en la cancha. ¿Qué conclusión sacas para el siguiente desafío?»`,
  options:()=>[
-  opt('Presión alta desde el inicio','Buscar recuperar cerca del área rival.','«Vamos a apretar juntos entonces».',{coach:3,teammate:3},'Te comprometiste con un planteamiento agresivo.'),
-  opt('Control del balón','Apostar por circulación y paciencia.','«Mantengamos las líneas juntas y la pelota en nuestros pies».',{coach:5},'El cuerpo técnico valora tu criterio.'),
-  opt('Buscar el contragolpe','Atacar rápido los espacios libres.','«Atentos a la transición, puede ser nuestra arma».',{reputation:2,teammate:2},'El equipo entiende tu propuesta ofensiva.')]
+  opt('Revisar los errores','Analizar la jugada y corregir decisiones','«Vamos a trabajar los detalles».',{coach:4},'Te llevas un aprendizaje deportivo.'),
+  opt('Pedir más responsabilidad','Prepararte para asumir un rol mayor','«Tendrás que demostrarlo».',{coach:2,reputation:2},'El técnico escuchó tu petición.'),
+  opt('Reconocer el esfuerzo colectivo','Valorar el trabajo del plantel','«Así crecemos como equipo».',{teammate:4},'El vestuario se sintió reconocido.')
+ ]
 });
 
 Object.assign(catalog,{
@@ -256,7 +259,11 @@ export const STORY_IDS=Object.keys(catalog);
 export function sceneFor(s){
  const entry=catalog[s.pendingEvent]||catalog.coach;
  const speaker=s.relationships?.[entry.actor]||initialRelationships(s.country)[entry.actor];
- return {id:s.pendingEvent,title:entry.title(s),tag:entry.tag,place:entry.place,actor:entry.actor,speaker,paragraphs:entry.paragraphs(s),speech:entry.speech(s),options:entry.options(s)};
+ const match=(s.pendingEvent==='derby'||s.pendingEvent==='rival')?matchContext(s,findClub):null;
+ if(s.pendingEvent==='derby'&&match){return {id:s.pendingEvent,title:`Lo que dejó el encuentro ante ${match.opponentName}`,tag:'PARTIDO DE TU TEMPORADA',place:'Camarín · Balance deportivo',actor:entry.actor,speaker,
+  paragraphs:[`Fecha ${match.round}: ${match.homeName} ${match.score} ${match.awayName}. Tu equipo terminó con una ${match.result}.`,`El entrenador y los compañeros analizan las decisiones de ese partido, ya disputado, para corregir el siguiente.`],
+  speech:'«Ahora que sabemos cómo terminó, ¿qué debemos mejorar para el próximo encuentro?»',options:entry.options(s)};}
+ return {id:s.pendingEvent,title:entry.title(s),tag:entry.tag,place:entry.place,actor:entry.actor,speaker,paragraphs:entry.paragraphs(s),speech:entry.speech(s),options:entry.options(s),match};
 }
 export function chooseScene(s,roll){
  if(s.fanClubId && s.clubId===s.fanClubId && !s.storyFlags?.playedForFan) return 'fan_home';
