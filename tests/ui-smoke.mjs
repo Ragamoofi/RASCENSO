@@ -13,6 +13,6 @@ assert.match(root.innerHTML,/playing-layout/);
 assert.match(root.innerHTML,/standing-row/);
 assert.match(root.innerHTML,/ALFA 1.0/);
 assert.match(root.innerHTML,/assets\/crests\/.*\.png/);
-assert.match(root.innerHTML,/director-dock/);
+assert.doesNotMatch(root.innerHTML,/director-dock|Copiar contexto y abrir ChatGPT|Importar respuesta/);
 assert.doesNotMatch(root.innerHTML,/preseason-bar/);
 console.log('Interfaz RASCENSO 1.0: tres columnas, tabla, agenda variable y navegación presentes. Tamaño:',root.innerHTML.length,'caracteres.');

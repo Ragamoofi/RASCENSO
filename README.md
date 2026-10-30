@@ -116,3 +116,10 @@ Se mantienen los identificadores, estadísticas y estados previos. Las nuevas ag
 - **Compatibilidad:** los guardados anteriores se conservan; `recapPending` solo se activa para temporadas simuladas después de actualizar.
 
 Documentación oficial relevante: https://developers.openai.com/siwc/quickstart y https://developers.openai.com/siwc/token-sharing-open-source.
+
+
+## Corrección de experiencia (1.0.1)
+
+- Se retira el panel de intercambio manual con ChatGPT (copiar, abrir otra pestaña y pegar), porque no proporcionaba un chat realmente integrado.
+- Se conservan las escenas futbolísticas, los resúmenes anuales y todas las partidas; no se borran posibles textos guardados localmente del panel anterior.
+- Un chat con IA solo deberá anunciarse como integrado cuando disponga de autenticación autorizada, conexión real y validación de consecuencias.

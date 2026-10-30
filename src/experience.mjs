@@ -6,7 +6,7 @@ import { flag, badge, CATALOG_COUNT } from './assets.mjs';
 import { annualSalaryLabel, playerDemand, clubPrestige } from './market.mjs';
 import { ENVIRONMENTS, PUBLIC_IMAGES, RISK_PROFILES, DEVELOPMENT_PATHS, PREPARATIONS, archetypeFor } from './career08.mjs';
 import { legendPhoto, legendIllustration } from './legend-art.mjs';
-import { seasonReview, matchContext, chatPrompt } from './career10.mjs';
+import { seasonReview, matchContext } from './career10.mjs';
 import { getSeasonAgenda } from './agenda09.mjs';
 import { POSITIONS, ATTRS, ORIGINS, PERSONALITIES, STYLES, DREAMS, newCareer, getClub, getCountry, migrateCareer, careerYear, draftChoices, acceptDraft, rerollDraft, choosePreparation, academyOffers, signAcademy, advanceSeason, simulatedStandings, eventInfo, resolveEvent, finishEvent, autoResolveEvent, chooseTransfer, chooseSeasonPlan, SEASON_PLANS, chooseSeasonAgenda, openAgentMarket, askAgentForMore, retireFromMarket, simulateToRetirement, totals } from './engine.mjs';
 const ROOT=document.getElementById('app');
@@ -17,11 +17,6 @@ const short=x=>String(x||'').length>20?String(x).slice(0,18)+'…':x;
 const pick=(arr,id)=>arr.find(x=>x.id===id)?.name||'—';
 const countryName=c=>getCountry(c)?.name||c;
 let state=null,tab='carrera',wizard=0,showHistory=false,message='',showNew=false,rightTab='standings';
-let directorOpen=localStorage.getItem('rascenso-director-open')!=='no';
-let directorDraft='',directorPromptBuffer='',directorMode='ask';
-const directorStore=()=>state?'rascenso-director-v1:'+encodeURIComponent(String(state.seed||state.name).slice(0,100)):null;
-function directorLog(){try{return JSON.parse(localStorage.getItem(directorStore()))||[];}catch{return [];}}
-function directorRecord(who,text){const clean=String(text||'').trim().slice(0,3000);if(!clean)return;const log=directorLog();log.push({who,text:clean,year:careerYear(state)});localStorage.setItem(directorStore(),JSON.stringify(log.slice(-24)));}
 
 const draft={name:'',country:'CL',age:'17',position:'DC',number:'9',foot:'Derecha',city:'',origin:'barrio',personality:'disciplinado',style:'equilibrado',dream:'seleccion',fanClubId:'',mode:'Clásico',environment:'sin_contactos',publicImage:'reservado',riskProfile:'calculador',developmentPath:'tecnica'};
 function load(){
@@ -44,7 +39,7 @@ function button(label,action,cls='main',more=''){return `<button type="button" c
 const opt=(value,label,active)=>`<option value="${h(value)}" ${active===value?'selected':''}>${h(label)}</option>`;
 function select(label,name,items,value){return `<label class="field"><span>${label}</span><select name="${name}">${items.map(([v,l])=>opt(String(v),l,String(value))).join('')}</select></label>`;}
 function branding(){return `<a class="brand" href="./" aria-label="RASCENSO"><span class="brand-symbol">R<span class="brand-arrow">↗</span></span><span class="brand-text"><strong>RASCENSO</strong><small>DEL BARRIO A LA HISTORIA</small></span></a>`;}
-function header(){return `<header class="site-head">${branding()}<nav class="main-nav">${state?['carrera','historial','mundo'].map(t=>`<button class="navtab ${tab===t?'selected':''}" data-action="nav" data-tab="${t}">${{carrera:'Mi carrera',historial:'Historial',mundo:'Mundo'}[t]}</button>`).join(''):'<span class="navtab selected">Tu historia empieza hoy</span>'}</nav><div class="head-controls"><span class="build">ALFA 1.0 · DIRECTOR DE CARRERA</span>${state?`<span class="head-name">${h(state.name)}</span>${button('⋯','tools','ghost')}`:`<span class="live"><i></i> MODO CARRERA</span>`}</div></header>`;}
+function header(){return `<header class="site-head">${branding()}<nav class="main-nav">${state?['carrera','historial','mundo'].map(t=>`<button class="navtab ${tab===t?'selected':''}" data-action="nav" data-tab="${t}">${{carrera:'Mi carrera',historial:'Historial',mundo:'Mundo'}[t]}</button>`).join(''):'<span class="navtab selected">Tu historia empieza hoy</span>'}</nav><div class="head-controls"><span class="build">ALFA 1.0 · CARRERA</span>${state?`<span class="head-name">${h(state.name)}</span>${button('⋯','tools','ghost')}`:`<span class="live"><i></i> MODO CARRERA</span>`}</div></header>`;}
 function shell(content,extra=''){ROOT.innerHTML=`<div class="app-shell">${header()}<main class="view ${state?'playing':''}">${content}</main><footer class="site-foot"><span>RASCENSO · Una creación de Ragamoofi</span><span>${CATALOG_COUNT} clubes disponibles · 13 ligas verificadas al inicio de 2026</span></footer>${extra}</div>${message?`<div class="notification" role="alert">${h(message)}</div>`:''}`;}
 function featureIcon(name){return {glory:'★',home:'⌂',academy:'⚑',form:'◉',tactic:'♟',news:'◎',league:'▥'}[name]||'✦';}
 function createSteps(){return ['Identidad','Raíces','Futbolista','Mentalidad','Sueños','Resumen'].map((s,i)=>`<button type="button" class="creation-step ${wizard===i?'active':wizard>i?'past':''}" data-action="step" data-index="${i}"><span>0${i+1}</span>${s}</button>`).join('');}
@@ -72,8 +67,7 @@ function table(){const club=getClub(state.clubId),competition=getCompetitionForC
  return `<aside class="right-rail"><section class="table-card"><div class="side-top"><span class="section-label">EL CAMPEONATO</span>${flag(club?.countryCode||state.country)}</div><h2>Tabla de posiciones</h2><div class="competition-heading"><b>${h(competition?.name||'Liga de referencia')}</b><small>${competition?.verified?'PARTICIPANTES 2026 VERIFICADOS':'FORMATO DE REFERENCIA · NO OFICIAL'}</small></div><div class="right-tabs"><button class="${rightTab==='standings'?'active':''}" data-action="right-tab" data-id="standings">CLASIFICACIÓN</button><button class="${rightTab==='matches'?'active':''}" data-action="right-tab" data-id="matches">MIS PARTIDOS</button></div>${rightTab==='matches'?gameHtml:body}</section><section class="news-card"><span class="section-label">TU CARRERA EN CIFRAS</span><div class="career-kpis">${[['Temporadas',state.history.length],['Títulos',state.trophies.length],['Clubes',new Set(state.history.map(x=>x.clubId)).size||1]].map(([k,v])=>`<div><b>${n(v)}</b><small>${k}</small></div>`).join('')}</div></section>${trophyGallery()}</aside>`;
 }
 function trophyGallery(){const raw=state.trophyRecords?.length?state.trophyRecords:(state.trophies||[]).map((x,i)=>({title:String(x),year:state.history?.[i]?.year||'—',clubId:state.history?.[i]?.clubId||state.clubId,kind:'league'}));const ordered=[...raw].sort((a,b)=>(Number(b.year)||0)-(Number(a.year)||0));return `<section class="trophy-showcase"><div class="rail-heading"><span>VITRINA DE TÍTULOS</span><strong>${ordered.length}</strong></div><div class="trophy-grid">${ordered.length?ordered.slice(0,18).map((t,i)=>{const kind=/mundial|world|selecci[oó]n/i.test(t.title)?'world':/libertadores|champions/i.test(t.title)?'continental':/copa/i.test(t.title)?'cup':'league';return `<div class="trophy-unit" title="${h(`${t.title} · ${t.year} · ${getClub(t.clubId)?.name||''}`)}"><img src="./assets/trophies/${kind}.png" alt="Trofeo ilustrativo"><span>${h(t.year)}</span></div>`}).join(''):'<p>Tu primer título tendrá su lugar acá.</p>'}</div></section>`;}
-function directorDock(){const history=directorLog();return `<section class="director-dock ${directorOpen?'open':'closed'}"><button type="button" class="director-head" data-action="director-toggle" aria-expanded="${directorOpen}"><span>✦ DIRECTOR DE CARRERA</span><small>Tu historia + ChatGPT · intercambio manual sin API</small><b>${directorOpen?'▾':'▴'}</b></button>${directorOpen?`<div class="director-body"><div class="director-messages">${history.length?history.slice(-5).map(m=>`<div class="director-msg ${m.who==='user'?'mine':'reply'}"><b>${m.who==='user'?'Tú':'Respuesta importada'} · ${h(m.year)}</b><span>${h(m.text)}</span></div>`).join(''):'<p>Usa tu ChatGPT habitual para conversar sobre la carrera. Copiamos el contexto, pero las respuestas no cambian resultados ni estadísticas automáticamente.</p>'}</div><textarea id="director-input" rows="2" maxlength="1200" placeholder="${directorMode==='answer'?'Pega aquí la respuesta del chat de ChatGPT…':'¿Qué quieres conversar con el Director de Carrera?'}">${h(directorDraft)}</textarea><div class="director-actions"><button type="button" data-action="director-open-chat">Copiar contexto y abrir ChatGPT ↗</button><button type="button" data-action="director-import">${directorMode==='answer'?'Guardar respuesta':'Importar respuesta'}</button><button type="button" data-action="director-clear" title="Borrar conversación del panel">Limpiar</button></div>${directorPromptBuffer?`<textarea class="director-fallback" readonly aria-label="Contexto preparado para copiar">${h(directorPromptBuffer)}</textarea>`:''}</div>`:''}</section>`;}
-function frame(center){const club=getClub(state.clubId);return `<div class="playing-layout">${playerCard()}<div class="center-rail"><div class="career-heading"><div><span class="section-label">TEMPORADA ${h(careerYear(state))} · ${flag(club?.countryCode||state.country)} ${h(getCompetitionForCareer(state)?.name||club?.country||countryName(state.country))}</span><h1>${h(club?.name||'Tu carrera comienza aquí')}</h1></div><span class="year-pill">${h(state.age)} AÑOS · ${h(state.position)}</span></div>${center}${directorDock()}</div>${table()}</div>`;}
+function frame(center){const club=getClub(state.clubId);return `<div class="playing-layout">${playerCard()}<div class="center-rail"><div class="career-heading"><div><span class="section-label">TEMPORADA ${h(careerYear(state))} · ${flag(club?.countryCode||state.country)} ${h(getCompetitionForCareer(state)?.name||club?.country||countryName(state.country))}</span><h1>${h(club?.name||'Tu carrera comienza aquí')}</h1></div><span class="year-pill">${h(state.age)} AÑOS · ${h(state.position)}</span></div>${center}</div>${table()}</div>`;}
 function season(){
  const c=getClub(state.clubId),x=state.lastSeason;
  const agenda=getSeasonAgenda(state);
@@ -106,7 +100,7 @@ function gather(){document.querySelectorAll('#creation-form [name]').forEach(el=
 function begin(){gather();if(!draft.name.trim()){wizard=0;render();document.querySelector('[name="name"]')?.focus();return;}const number=Number(draft.number);if(number<1||number>99){wizard=0;render();return;}try{mutate(newCareer({...draft,seed:`${Date.now()}-${Math.random().toString(36).slice(2)}`}));}catch(e){alert(e.message);}}
 function download(){const data=JSON.stringify(state,null,2);const url=URL.createObjectURL(new Blob([data],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=`rascenso-${state.name.toLowerCase().replace(/[^a-z0-9]+/g,'-')}-${Date.now()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 ROOT.addEventListener('change',e=>{if(e.target.closest('#creation-form')){gather();if(e.target.name==='country')draft.fanClubId='';render();}if(e.target.id==='import-file'){const file=e.target.files?.[0];if(!file)return;file.text().then(x=>{let data=migrateCareer(JSON.parse(x));if(!data)throw Error('Archivo incompatible');if(!confirm('¿Reemplazar la partida actual por este guardado?'))return;showNew=false;mutate(data);}).catch(err=>alert(`Error al importar: ${err.message}`));}});
-ROOT.addEventListener('input',e=>{if(e.target.id==='director-input')directorDraft=e.target.value;if(e.target.closest('#creation-form')&&e.target.name)draft[e.target.name]=e.target.value;});
+ROOT.addEventListener('input',e=>{if(e.target.closest('#creation-form')&&e.target.name)draft[e.target.name]=e.target.value;});
 ROOT.addEventListener('submit',e=>{if(e.target.id==='creation-form'){e.preventDefault();wizard===5?begin():((gather(),wizard++,render()));}});
 ROOT.addEventListener('click',e=>{
  const a=e.target.closest('[data-action]');if(!a||a.disabled)return;
@@ -131,23 +125,6 @@ ROOT.addEventListener('click',e=>{
  if(action==='event-finish')return mutate(finishEvent(state));
  if(action==='transfer')return mutate(chooseTransfer(state,a.dataset.id));
  if(action==='stay')return mutate(chooseTransfer(state));
- if(action==='director-toggle'){directorOpen=!directorOpen;localStorage.setItem('rascenso-director-open',directorOpen?'yes':'no');render();return;}
- if(action==='director-clear'){if(!confirm('¿Limpiar solo el historial del Director de Carrera? Tu partida no se modifica.'))return;localStorage.removeItem(directorStore());render();return;}
- if(action==='director-open-chat'){
-  directorDraft=document.getElementById('director-input')?.value||'';
-  directorPromptBuffer=chatPrompt(state,getClub,directorDraft);
-  const opened=window.open('https://chatgpt.com/','_blank','noopener,noreferrer');
-  if(navigator.clipboard?.writeText){navigator.clipboard.writeText(directorPromptBuffer).then(()=>{
-    directorRecord('user',directorDraft||'Conversar sobre mi carrera');directorDraft='';directorPromptBuffer='';render();
-  }).catch(()=>{render();});}else render();
-  return;
- }
- if(action==='director-import'){
-   if(directorMode==='ask'){directorDraft='';directorMode='answer';render();document.getElementById('director-input')?.focus();return;}
-   const reply=document.getElementById('director-input')?.value||'';
-   if(reply.trim())directorRecord('assistant',reply);
-   directorDraft='';directorMode='ask';render();return;
- }
  if(action==='right-tab'){rightTab=a.dataset.id==='matches'?'matches':'standings';render();return;}
  if(action==='nav'){tab=a.dataset.tab;render();return;}
  if(action==='tools'){showNew=true;render();return;}
