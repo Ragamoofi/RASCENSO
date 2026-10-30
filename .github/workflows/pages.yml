@@ -33,8 +33,11 @@ jobs:
       - name: Preparar publicación
         run: |
           mkdir -p _site/src
-          cp index.html style.css favicon.svg .nojekyll _site/
+          cp index.html style.css experience.css favicon.svg .nojekyll _site/
           cp src/*.mjs _site/src/
+          cp -R assets _site/assets
+          test -s _site/experience.css
+          test -s _site/assets/logos-1.json
       - uses: actions/upload-pages-artifact@v4
         with:
           path: _site
