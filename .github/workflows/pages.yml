@@ -30,6 +30,7 @@ jobs:
           test -s index.html
           test -s experience.css
           test -s src/experience.mjs
+          test -s src/archetypes17.mjs
           test -s src/career08.mjs
           test -s src/legend-art.mjs
           test -s src/career10.mjs

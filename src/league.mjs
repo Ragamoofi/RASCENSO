@@ -1,3 +1,4 @@
+import { profileMatchEffects } from './archetypes17.mjs';
 /* Motor de liga ORIGINAL de RASCENSO. Cada punto nace de un partido simulado.
  * No utiliza ni reproduce el código de Copero.
  */
@@ -77,9 +78,9 @@ export function playLeague(state){
  const r=rand(`${state.seed}|liga-original-v1|${year}|${state.clubId}|${state.seasonPlan||'equilibrio'}`);
  const plan=state.seasonPlan||'equilibrio';
  const trust=bound(state.coachTrust??50,0,100);
- const prep=preparationEffects(state),traits=identitySeasonEffects(state),agenda=seasonAgendaEffects(state);
+ const prep=preparationEffects(state),traits=identitySeasonEffects(state),agenda=seasonAgendaEffects(state),profile=profileMatchEffects(state);
  const own=teams[state.clubId];const role=roleOf(state,own.level);
- const playRate=bound(({Titular:.88,'Rotación':.62,Suplente:.35,Reserva:.14})[role]+(trust-50)/320-(state.age<=18?.08:0)+prep.minutes+traits.minutes+(agenda.minutes||0),.04,.98);
+ const playRate=bound(({Titular:.88,'Rotación':.62,Suplente:.35,Reserva:.14})[role]+(trust-50)/320-(state.age<=18?.08:0)+prep.minutes+traits.minutes+(agenda.minutes||0)+profile.minutes,.04,.98);
  const fixtureList=league?.format==='argentina-zones'&&league.zones
   ?(()=>{const za=selected.filter(c=>league.zones.A.includes(c.id)),zb=selected.filter(c=>league.zones.B.includes(c.id));
     const a=calendar(za).filter(f=>f.round<=15),b=calendar(zb).filter(f=>f.round<=15);
@@ -89,7 +90,7 @@ export function playLeague(state){
     return [...first,...second,...inter];
    })()
   :calendar(selected);
- const injuryRoll=r();const prone=(state.injuryProfile==='fragil'?.085:state.injuryProfile==='resistente'?.025:.05)*prep.injury*traits.injury*(agenda.injury||1);
+ const injuryRoll=r();const prone=(state.injuryProfile==='fragil'?.085:state.injuryProfile==='resistente'?.025:.05)*prep.injury*traits.injury*(agenda.injury||1)*profile.injury;
  const injuryWeeks=injuryRoll<prone+Math.max(0,state.age-29)*.008?(2+Math.floor(r()*11)):0;
  const absence=injuryWeeks?new Set(Array.from({length:Math.min(injuryWeeks,fixtureList.length)},(_,i)=>Math.floor((r()*.7+.1)*fixtureList.length)+i).map(x=>x%Math.max(1,fixtureList.length))):new Set();
  const rows=Object.fromEntries(selected.map(t=>[t.id,{id:t.id,name:t.name,level:t.level,played:0,wins:0,draws:0,losses:0,for:0,against:0,gd:0,points:0}]));

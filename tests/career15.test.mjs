@@ -20,7 +20,7 @@ test('valor de mercado responde a media, edad, rendimiento y club',()=>{
  assert.ok(contract.remaining>=0);
 });
 test('cada puesto tiene una jugada en partido de la simulación y se resuelve una sola vez',()=>{
- for(const [pos,kind] of [['DC','penal'],['MC','pase'],['POR','atajada'],['DFC','corte'],['EI','libre']]){
+ for(const [pos,kind] of [['DC','penal'],['MC','pase'],['POR','atajada'],['DFC','corte'],['EI','pase']]){
   const s=start('actions-'+pos,pos);
   const moment=seasonMoment(s);
   assert.ok(moment,`Sin jugada para ${pos}`);assert.equal(moment.type,kind);

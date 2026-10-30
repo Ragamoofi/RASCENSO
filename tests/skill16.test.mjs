@@ -33,7 +33,9 @@ test('mejor ejecución concede mayor probabilidad que un disparo claramente desv
 test('las partidas antiguas sin medidor siguen siendo reproducibles y válidas',()=>{
  const s=start('compat16','MC'),m=seasonMoment(s);
  const old=playCareerMoment(s,1),legacy=solveMoment(s,m,1,null);
- assert.deepEqual(old.clutchMoment,legacy.clutchMoment);
+ const {fixturePreview,...withoutPreview}=old.clutchMoment;
+ assert.deepEqual(withoutPreview,legacy.clutchMoment);
+ assert.ok(fixturePreview&&/^\d+-\d+$/.test(fixturePreview.score));
  const next=advanceSeason(old);
  assert.equal(next.lastSeason.clutchMoment.timing,null);
  assert.equal(next.lastSeason.clutchMoment.type,'pase');

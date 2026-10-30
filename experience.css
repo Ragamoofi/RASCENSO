@@ -246,3 +246,27 @@
 .archive-highlights h3{font-size:14px;color:#f3bb89;margin:0 0 9px}
 .archive-highlights p{color:#c9dff0;font-size:11px;margin:5px 0}
 .archive-highlights b{color:#f3bb89}
+
+/* 1.7 · Tarjeta de economía sin recuadro superpuesto */
+.profile-card .player-economy{display:flex!important;flex-direction:column!important;gap:5px!important;align-items:stretch;margin:10px 17px 4px!important;padding:8px 0!important;background:transparent!important;border:0!important;border-top:1px solid #d9e4ed61!important;border-bottom:1px solid #d9e4ed61!important;border-radius:0!important;box-shadow:none!important;grid-template-columns:none!important}
+.profile-card .player-economy>div{display:flex;flex-direction:row;align-items:baseline;justify-content:space-between;gap:6px;min-height:13px}
+.profile-card .player-economy small{color:#ecf5ff;font-size:10px;font-weight:500;letter-spacing:0;text-transform:none}
+.profile-card .player-economy strong{font-size:10px;font-weight:800;color:#fff;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;text-align:right}
+.profile-card .card-crest{height:151px!important;padding-top:52px!important}
+.profile-card .player-club{min-height:54px}
+/* El creador utiliza una silueta deportiva original en vez de una letra gigante */
+.poster-shape{display:none!important}.poster-athlete{position:relative;margin:8px auto 10px;width:155px;height:183px;overflow:hidden;background:radial-gradient(ellipse at 50% 48%,#79a1d542,#102c4a22 60%,transparent);border-radius:80px 80px 16px 16px}
+.poster-glow{position:absolute;width:160px;height:160px;border-radius:50%;left:0;top:8px;border:1px solid #b7d6fc48;box-shadow:inset 0 0 28px #7aa8cf30}
+.poster-head{position:absolute;width:46px;height:49px;left:55px;top:18px;border-radius:48% 48% 43% 43%;background:linear-gradient(145deg,#b2cae0,#47688d);box-shadow:0 7px 15px #091e3980}
+.poster-body{position:absolute;top:71px;left:23px;width:109px;height:127px;border-radius:37% 37% 7px 7px;background:linear-gradient(125deg,#648dbd,#23496e 55%,#1c3c61);border:1px solid #9ec5e97a;transform:perspective(140px) rotateX(-7deg)}
+.poster-body:before{content:'';position:absolute;left:49%;top:0;bottom:0;width:2px;background:#d8e9fd54}
+.poster-number{position:absolute;top:97px;left:0;right:0;text-align:center;font:900 49px 'Barlow Condensed',sans-serif;color:#ecf6ff;text-shadow:0 2px 10px #0f253e}
+.poster-role{margin:7px auto 4px;font-size:11px;font-weight:900;color:#f6bc88;text-transform:uppercase;letter-spacing:.05em}
+.class-descriptor{display:flex;flex-direction:column;gap:3px;margin:11px 0;padding:12px 16px;background:#122d46;border-left:3px solid #e6a474;border-radius:6px}.class-descriptor span{color:#f6bd92;letter-spacing:.1em;font-size:9px;font-weight:900}.class-descriptor strong{color:#fff;font-size:15px}.class-descriptor small{color:#bdcfdd;font-size:10px}
+/* Una única fuente de verdad: la aguja se mueve y se lee mediante requestAnimationFrame */
+.clutch-meter-track .clutch-needle{animation:none!important;left:0%;transform:translateX(-50%);z-index:3;will-change:left}
+.clutch-live-indicator{font-size:10px;color:#c9dfed;text-align:right}.clutch-live-indicator b{color:#f9cc89;font-size:13px;font-variant-numeric:tabular-nums}
+.clutch-result .clutch-score{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;margin:6px 0;border-radius:7px;padding:8px;background:#092237a8;text-align:center}.clutch-score span{font-size:11px;font-weight:700}.clutch-score b{font:900 28px 'Barlow Condensed',sans-serif;letter-spacing:.05em;color:#fff}
+.clutch-result .clutch-score-note{font-size:9px;color:#d8e7ef}
+.recap-clutch{display:grid;gap:7px;background:#153c53;border-left:3px solid #e5ae76;padding:14px;margin:8px 0;border-radius:6px}.recap-clutch span{font-weight:900;color:#f9ba89;font-size:10px}.recap-clutch strong{font-size:17px;color:white}.recap-clutch small{font-size:11px;color:#d3e5f1}
+@media(max-width:750px){.poster-athlete{height:150px;transform:scale(.82);margin:-8px auto}.profile-card .player-economy{margin:8px 9px!important}}

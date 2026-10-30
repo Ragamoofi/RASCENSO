@@ -1,3 +1,4 @@
+import { classFor, profileMatchEffects } from './archetypes17.mjs';
 /* RASCENSO 1.5 — jugadas originales, reproducibles y sin APIs externas.
    El juego simula la temporada; el usuario puede influir en UN lance especial al año.
 */
@@ -13,9 +14,9 @@ export function upcomingMoment(s,playerMatches,getClub){
  const favorites=choices.filter(x=>x.ctx.classic||x.m.round>=Math.max(10,Math.round(playerMatches.length*.70)));
  const pool=favorites.length?favorites:choices;
  const selected=pool[hash(`${s.seed}:${s.age}:${s.clubId}:momento15`)%pool.length];
- const type=roles[s.position]||'pase';const y=(s.startYear||2026)+(s.age-(s.startAge||16));
+ const type=classFor(s)?.moment||roles[s.position]||'pase';const y=(s.startYear||2026)+(s.age-(s.startAge||16));
  const i=hash(`${s.seed}:${y}:${selected.m.round}:${type}`);
- return {year:y,home:selected.m.home,away:selected.m.away,round:selected.m.round,rival:selected.ctx.rival,club:selected.ctx.club,homeName:selected.ctx.home,awayName:selected.ctx.away,classic:selected.ctx.classic,tag:selected.ctx.tag,type,aim:i%3,pressure:55+i%31};
+ return {year:y,home:selected.m.home,away:selected.m.away,round:selected.m.round,rival:selected.ctx.rival,club:selected.ctx.club,homeName:selected.ctx.home,awayName:selected.ctx.away,classic:selected.ctx.classic,tag:selected.ctx.tag,type,aim:i%3,pressure:55+i%31+profileMatchEffects(s).pressure};
 }
 export const ZONES=['Izquierda','Centro','Derecha'];
 // Centro de la ventana de ejecución. La ventana se ve durante el desafío;

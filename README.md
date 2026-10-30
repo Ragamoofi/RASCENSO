@@ -174,3 +174,12 @@ La simulación de la temporada sigue siendo por campaña completa. Los minijuego
 - Las partidas 1.5 se conservan: jugadas antiguas sin valor `timing` siguen siendo válidas y sus probabilidades no se alteran.
 - El expediente compartible es una imagen PNG de 1400×1000 con escudos de hasta doce clubes y miniaturas de siete trofeos, títulos y fechas.
 - Marca visible actualizada para evitar mostrar una versión antigua a pesar de desplegar código nuevo.
+
+
+## Alfa 1.7 — Identidad del futbolista
+
+- Clases específicas para cada una de las doce posiciones (múltiples perfiles), fortaleza y debilidad elegibles. Ajustes pequeños a los atributos del draft y a minutos, presión y clase de jugada especial. No altera retroactivamente atributos históricos.
+- Tarjeta de carrera: valor, sueldo y contrato como líneas tipográficas sin caja superpuesta. Creador: silueta original en lugar de letra gigante.
+- Minijuego: el medidor usa `requestAnimationFrame` tanto para dibujar la posición real de la aguja como para evaluar el resultado; no depende de una animación CSS que puede quedar desincronizada.
+- Al ejecutar muestra gol, fallo, atajada o corte y un **marcador proyectado** reproducible para el rival y fecha; al simular, el resumen anual confirma el marcador definitivo. Si cambias decisiones de la temporada entre ambos pasos, el resultado podrá variar.
+- El formato de guardado sigue en versión 8 y migra perfiles antiguos con un valor predeterminado válido.
