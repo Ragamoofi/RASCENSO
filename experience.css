@@ -220,3 +220,29 @@
 @media(max-width:720px){.profile-card{height:auto!important}.archive-stats{grid-template-columns:repeat(4,1fr)}.archive-columns{grid-template-columns:1fr}.clutch-choices button{gap:4px}.player-economy{grid-template-columns:1fr}}
 
 .match-context-line{margin:8px 3px 0;font-size:10px;color:#bad1e6}.fixture-feature .match-context-line{line-height:1.4}
+
+/* RASCENSO 1.6 — JUGADAS VIVAS: control de precisión en tiempo real. */
+.clutch-step-label{font-size:10px;font-weight:900;color:#f4bd91;letter-spacing:.1em;margin:8px 0 6px}
+.clutch-timing{background:#0b2239;border:1px solid #51748c;border-radius:9px;padding:13px;margin-top:9px;display:grid;gap:9px}
+.clutch-timing-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.clutch-timing-top strong{color:#f2b884;font-size:10px;letter-spacing:.06em}
+.clutch-timing-top small{color:#b8d0e6;font-size:10px}
+.clutch-meter-track{position:relative;height:37px;overflow:hidden;border:1px solid #6b89a0;border-radius:7px;background:repeating-linear-gradient(90deg,#284763 0 9.7%,#142e46 9.7% 10%);margin:4px 8px}
+.clutch-perfect-window{position:absolute;top:0;bottom:0;width:18%;background:linear-gradient(90deg,#4bbf7180,#edc07eac,#4bbf7180);border-left:2px solid #eed4a0;border-right:2px solid #eed4a0}
+.clutch-needle{position:absolute;top:-2px;bottom:-2px;left:0%;width:4px;background:#fff8d0;box-shadow:0 0 10px #fff7cd,0 0 17px #f7ac64;animation:clutch-sweep 2.4s linear infinite}
+@keyframes clutch-sweep{0%,100%{left:0%}50%{left:100%}}
+.clutch-timing-actions{display:flex;gap:8px;align-items:stretch}
+.clutch-timing-actions button{padding:12px 16px;border-radius:7px;cursor:pointer;background:#1a3c58;border:1px solid #507292;color:#e2efff;font-weight:700}
+.clutch-timing-actions .clutch-hit-button{flex:1;background:#e6a775;border-color:#ffc99f;color:#152839;font-weight:900}
+.clutch-hit-button small{display:block;font-size:9px;opacity:.7}
+.clutch-result small{display:block;line-height:1.45}
+@media(max-width:650px){.clutch-timing-top{align-items:start;flex-direction:column}.clutch-timing-actions button{padding:10px 8px}}
+@media(prefers-reduced-motion:reduce){.clutch-needle{animation-duration:4.8s}}
+
+.career-highlight-list{display:grid;gap:6px;max-height:178px;overflow:auto;margin:8px 0 15px}
+.career-highlight-list>div{display:flex;gap:12px;align-items:baseline;padding:9px 12px;border-radius:7px;background:#203c58;font-size:11px;color:#d9e9f6}
+.career-highlight-list>div b{color:#f0b684;flex:none}
+.archive-highlights{padding:12px 16px;margin:10px 0;background:#122d46;border:1px solid #426180;border-radius:9px}
+.archive-highlights h3{font-size:14px;color:#f3bb89;margin:0 0 9px}
+.archive-highlights p{color:#c9dff0;font-size:11px;margin:5px 0}
+.archive-highlights b{color:#f3bb89}

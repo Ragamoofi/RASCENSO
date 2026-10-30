@@ -166,3 +166,11 @@ Esta actualización **profundiza** las competiciones simuladas, pero no reproduc
 ### Limitaciones conocidas
 
 La simulación de la temporada sigue siendo por campaña completa. Los minijuegos son lances de elección de objetivo y probabilidad, no físicos ni en tiempo real; se prevé profundizarlos. La portada final muestra hasta 10 clubes y los últimos 5 títulos en el PNG, mientras la pantalla contiene más detalles. Algunas edades muy avanzadas pueden requerir varias búsquedas de oferta antes del retiro.
+
+
+## 1.6 — Jugadas Vivas
+
+- Los cinco momentos futbolísticos por posición pasan a dos fases: dirección y ejecución mediante medidor animado. Se puede detener con botón o barra espaciadora. La ventana ideal, la dificultad, el atributo y la decisión quedan reflejados en la probabilidad; el motor mantiene una tirada reproducible para evitar manipulación tras recargar.
+- Las partidas 1.5 se conservan: jugadas antiguas sin valor `timing` siguen siendo válidas y sus probabilidades no se alteran.
+- El expediente compartible es una imagen PNG de 1400×1000 con escudos de hasta doce clubes y miniaturas de siete trofeos, títulos y fechas.
+- Marca visible actualizada para evitar mostrar una versión antigua a pesar de desplegar código nuevo.

@@ -18,7 +18,17 @@ export function upcomingMoment(s,playerMatches,getClub){
  return {year:y,home:selected.m.home,away:selected.m.away,round:selected.m.round,rival:selected.ctx.rival,club:selected.ctx.club,homeName:selected.ctx.home,awayName:selected.ctx.away,classic:selected.ctx.classic,tag:selected.ctx.tag,type,aim:i%3,pressure:55+i%31};
 }
 export const ZONES=['Izquierda','Centro','Derecha'];
-export function solveMoment(s,match,zone){
+// Centro de la ventana de ejecución. La ventana se ve durante el desafío;
+// el usuario gana precisión deteniendo el cursor cerca de ella.
+export function timingTarget(match){
+ return 23+hash(`${match.year}:${match.round}:${match.home}:${match.away}:${match.type}:precision16`)%55;
+}
+export function timingQuality(match,timing){
+ if(timing===null||timing===undefined)return {distance:null,bonus:0,grade:'Clásico'};
+ const distance=Math.abs(Math.max(0,Math.min(100,Number(timing)))-timingTarget(match));
+ return {distance,bonus:Math.max(-27,Math.min(23,Math.round(23-distance*.9))),grade:distance<=7?'Excelente':distance<=16?'Buena':distance<=28?'Ajustada':'Desviada'};
+}
+export function solveMoment(s,match,zone,timing=null){
  if(s.phase!=='season'||s.clutchMoment||!match||![0,1,2].includes(zone))return s;
  const attr=s.attributes||{};
  const skill=({penal:attr.shot,libre:attr.shot,pase:attr.pass,corte:attr.defense,atajada:attr.defense})[match.type]||s.ovr||60;
@@ -26,9 +36,11 @@ export function solveMoment(s,match,zone){
  const challenge=match.pressure||65;
  const distance=Math.abs(zone-match.aim);
  const chance=distance===0?Math.max(35,Math.min(96,precision+22-challenge*.35)):distance===1?Math.max(12,Math.min(75,precision-18-challenge*.38)):Math.max(4,Math.min(37,precision-41-challenge*.4));
+ const quality=timingQuality(match,timing);
+ const finalChance=Math.max(3,Math.min(97,Math.round(chance+quality.bonus)));
  const roll=hash(`${s.seed}:${s.age}:${s.clubId}:${match.round}:${zone}`)%100;
- const success=roll<chance;
- return {...s,clutchMoment:{...match,zone,success,chance,roll},careerMoments:[...(s.careerMoments||[]),{year:match.year,kind:'on-field',text:`${MOMENT_NAMES[match.type]} ante ${match.rival}: ${success?'éxito':'fallo'} (${ZONES[zone]})`}].slice(-120)};
+ const success=roll<finalChance;
+ return {...s,clutchMoment:{...match,zone,success,chance:finalChance,roll,timing:timing===null?null:Math.round(timing),timingTarget:timingTarget(match),timingGrade:quality.grade},careerMoments:[...(s.careerMoments||[]),{year:match.year,kind:'on-field',text:`${MOMENT_NAMES[match.type]} ante ${match.rival}: ${success?'éxito':'fallo'} (${ZONES[zone]} · ${quality.grade})`}].slice(-120)};
 }
 export function momentScoreDelta(moment,fixture,plays){
  if(!moment?.success||!plays||moment.home!==fixture.home||moment.away!==fixture.away||moment.round!==fixture.round)return null;

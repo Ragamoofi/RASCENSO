@@ -125,7 +125,10 @@ export function playLeague(state){
    if(plays){matches++;minutes+=gameMinutes;const forGoals=home.id===state.clubId?gh:ga;const against=home.id===state.clubId?ga:gh;
     const scoringChance={attack:.36,middle:.16,defense:.036,goalkeeper:0}[skillGroup]*(plan==='ataque'?1.18:plan==='defensa'?.82:1)*(state.style==='goleador'?1.10:1)*prep.goals*traits.goals*(agenda.goals||1)*gameMinutes/90;
     const assistingChance={attack:.21,middle:.32,defense:.08,goalkeeper:.01}[skillGroup]*(plan==='ataque'?1.12:1)*(state.style==='creador'?1.15:1)*prep.assists*(agenda.assists||1)*gameMinutes/90;
-    for(let k=0;k<forGoals;k++){if(r()<scoringChance)g++;else if(r()<assistingChance)a++;}
+    // La jugada decisiva agrega exactamente UNA acción atribuida al jugador;
+    // no debe entrar también al reparto aleatorio de los goles ordinarios.
+    const regularGoals=Math.max(0,forGoals-(clutch?.attack?1:0));
+    for(let k=0;k<regularGoals;k++){if(r()<scoringChance)g++;else if(r()<assistingChance)a++;}
     if(clutch?.attack){if(clutch.type==='pase')a++;else g++;}
     userGoals+=g;userAssists+=a;
     if(skillGroup==='goalkeeper'){goalsConceded+=against;if(against===0){cleanSheets++;clean=1;}}

@@ -163,7 +163,7 @@ export function choosePreparation(s,id){
  return {...s,preparation:{year,id},careerMoments:[...(s.careerMoments||[]),{year,kind:'preseason',text:`Pretemporada: ${PREPARATIONS.find(p=>p.id===id).name}`}].slice(-80)};
 }
 export function seasonMoment(s){if(s.phase!=='season'||s.clutchMoment)return null;return upcomingMoment(s,playLeague(s).playerMatches,getClub);}
-export function playCareerMoment(s,choice){const moment=seasonMoment(s);return moment?solveMoment(s,moment,Number(choice)):s;}
+export function playCareerMoment(s,choice,timing=null){const moment=seasonMoment(s);return moment?solveMoment(s,moment,Number(choice),timing):s;}
 export function advanceSeason(s){
  if(s.phase!=='season')return s;
  const club=getClub(s.clubId);if(!club)return s;
