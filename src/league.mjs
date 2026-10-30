@@ -4,6 +4,7 @@
 import { COUNTRIES } from './countries.mjs';
 import { identitySeasonEffects, preparationEffects } from './career08.mjs';
 import { seasonAgendaEffects } from './agenda09.mjs';
+import { momentScoreDelta } from './moments15.mjs';
 import { VERIFIED_LEAGUES, getInauguralLeague } from './leagues2026.mjs';
 const bound=(v,a,b)=>Math.max(a,Math.min(b,v));
 function rand(seed){let h=2166136261;for(const c of String(seed)){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return ()=>{h+=0x6d2b79f5;let t=Math.imul(h^(h>>>15),1|h);t^=t+Math.imul(t^(t>>>7),61|t);return ((t^(t>>>14))>>>0)/4294967296;};}
@@ -109,6 +110,9 @@ export function playLeague(state){
   let gh=goals(lambdaHome,r),ga=goals(lambdaAway,r);
   if(plays&&plan==='ataque'){if(r()<.18){if(home.id===state.clubId)gh=Math.min(8,gh+1);else ga=Math.min(8,ga+1);}}
   if(plays&&plan==='defensa'){if(r()<.20){if(home.id===state.clubId)ga=Math.max(0,ga-1);else gh=Math.max(0,gh-1);}}
+  const clutch=momentScoreDelta(state.clutchMoment,f,plays);
+  if(clutch?.attack){if(f.home===state.clubId)gh=Math.min(9,gh+1);else ga=Math.min(9,ga+1);}
+  if(clutch?.defend){if(f.home===state.clubId)ga=Math.max(0,ga-1);else gh=Math.max(0,gh-1);}
   const homeRow=rows[f.home],awayRow=rows[f.away];
   for(const row of [homeRow,awayRow])row.played++;
   homeRow.for+=gh;homeRow.against+=ga;awayRow.for+=ga;awayRow.against+=gh;
@@ -122,6 +126,7 @@ export function playLeague(state){
     const scoringChance={attack:.36,middle:.16,defense:.036,goalkeeper:0}[skillGroup]*(plan==='ataque'?1.18:plan==='defensa'?.82:1)*(state.style==='goleador'?1.10:1)*prep.goals*traits.goals*(agenda.goals||1)*gameMinutes/90;
     const assistingChance={attack:.21,middle:.32,defense:.08,goalkeeper:.01}[skillGroup]*(plan==='ataque'?1.12:1)*(state.style==='creador'?1.15:1)*prep.assists*(agenda.assists||1)*gameMinutes/90;
     for(let k=0;k<forGoals;k++){if(r()<scoringChance)g++;else if(r()<assistingChance)a++;}
+    if(clutch?.attack){if(clutch.type==='pase')a++;else g++;}
     userGoals+=g;userAssists+=a;
     if(skillGroup==='goalkeeper'){goalsConceded+=against;if(against===0){cleanSheets++;clean=1;}}
    }

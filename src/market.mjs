@@ -56,7 +56,7 @@ function performance(state){
  const score=clamp((production/games)*(isAttack?22:12)-3,0,23);
  return score+(last.leaguePosition<=3?4:0)+(last.international?3:0);
 }
-export function playerDemand(state){return clamp((state.ovr||60)+(performance(state)-9)*.32+((state.reputation||0)-35)*.036,51,98);}
+export function playerDemand(state){const age=state.age||20;const veteran=Math.max(0,age-32)*1.55;return clamp((state.ovr||60)+(performance(state)-9)*.32+((state.reputation||0)-35)*.036-veteran,42,98);}
 function eligibleClubs(state){return CLUBS.filter(c=>c.id!==state.clubId&&(!validLeagueCountry.has(c.countryCode)||!!getInauguralLeague(c.id)));}
 function weightClub(state,c,focus){
  const prestige=clubPrestige(c),demand=playerDemand(state),gap=prestige-demand;
@@ -66,6 +66,7 @@ function weightClub(state,c,focus){
  if(demand<76&&gap>20)return 0;
  if(gap<-12||gap>16)return 0;
  let w=Math.exp(-Math.pow((gap+(elite?1:2))/10,2));
+ if(state.age>=38){const years=state.age-37;w*=clamp(1-years*.065,.10,.95);if(prestige>=82)w*=clamp(1-years*.09,.04,.92);if(c.countryCode===state.country)w*=1.5;}
  const recent=(state.history||[]).length;
  if(recent<3&&c.countryCode!==state.country)w*=.30;
  if(focus==='international'&&c.countryCode===state.country)w*=.14;
@@ -84,18 +85,19 @@ export function buildTransferOffers(state,{attempt=0,focus='balanced',forced=fal
  const r=random(seed),demand=playerDemand(state);
  const selected=[];
  const weighted=eligibleClubs(state).map(c=>({c,w:weightClub(state,c,focus)})).filter(x=>x.w>.00001);
- const count=demand>=84?3:2+Math.floor(r()*2);
+ let count=demand>=84?3:2+Math.floor(r()*2);
+ if(state.age>=38){const probability=clamp(.94-(state.age-38)*.095-(state.ovr<58?.18:0),0,.95);count=Array.from({length:3},()=>r()<probability).filter(Boolean).length;}
  for(let k=0;k<count&&weighted.length;k++){
   const total=weighted.reduce((a,x)=>a+x.w,0);let roll=r()*total;
   let index=weighted.findIndex(x=>(roll-=x.w)<=0);if(index<0)index=weighted.length-1;
   const {c}=weighted.splice(index,1)[0];const prestige=clubPrestige(c);const gap=prestige-demand;
   const kind=state.age<=23&&gap<-3&&r()<.12?'loan':'transfer';
   const role=gap>7?'Rotación':gap<-5?'Titular':r()<.22?'Rotación':'Titular';
-  const years=kind==='loan'?1:2+Math.floor(r()*3);
+  const years=kind==='loan'?1:state.age>=36?1+(r()<.20?1:0):2+Math.floor(r()*3);
   const salary=annualSalary(c,state.ovr,role,seed+':'+k);
   selected.push({...c,prestige,kind,role,years,salary,fee:Math.round((state.ovr||60)*90000*(prestige/85)),project:gap>6?'Competencia por minutos':gap<-5?'Jugador importante':'Pieza de primer equipo'});
  }
- if(forced&&!selected.length){
+ if(forced&&!selected.length&&state.age<37){
   const possible=eligibleClubs(state).filter(c=>clubPrestige(c)>=demand-25).sort((a,b)=>Math.abs(clubPrestige(a)-demand)-Math.abs(clubPrestige(b)-demand));
   if(possible[0]){const c=possible[0];selected.push({...c,prestige:clubPrestige(c),kind:'transfer',role:'Rotación',years:2,salary:annualSalary(c,state.ovr,'Rotación'),project:'Oportunidad para continuar'});}
  }
@@ -109,11 +111,13 @@ export function evaluateClubFuture(state){
  const r=random(`${state.seed}:club-policy07:${state.age}:${state.clubId}`);
  const underperform=(state.lastSeason?.matches||0)<10&&state.age>=22;
  const surplus=state.ovr>=86&&clubPrestige(club)<77;
- const nonrenew=expiring&&(underperform||trust<27||r()<.09);
+ const senior=state.age>=38;
+ const veteranRisk=senior?clamp(.08+(state.age-38)*.092+(state.ovr<60?.22:0)-(trust>75?.08:0),0,.98):0;
+ const nonrenew=expiring&&(underperform||trust<27||r()<.09||senior&&r()<veteranRisk);
  const placed=state.age<=23&&!expiring&&trust<33&&r()<.42;
  const listed=!expiring&&(surplus&&r()<.25||trust<20&&r()<.25);
  let reason=nonrenew?'released':placed?'loan-request':listed?'listed':expiring?'renewal':'normal';
  const canStay=!nonrenew&&!placed&&!listed;
- const renewal=canStay&&expiring?{ends:year+2+Math.floor(r()*3),salary:annualSalary(club,state.ovr,trust>=52?'Titular':'Rotación',year)}:null;
+ const renewal=canStay&&expiring?{ends:year+(senior?1:2+Math.floor(r()*3)),salary:annualSalary(club,state.ovr,trust>=52?'Titular':'Rotación',year)}:null;
  return {canStay,reason,renewal};
 }

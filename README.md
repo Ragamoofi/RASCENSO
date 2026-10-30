@@ -151,3 +151,18 @@ Esta actualización **profundiza** las competiciones simuladas, pero no reproduc
 - **Determinismo**: rendimiento individual, minutos y estadísticas del usuario no alteran el sorteo de resultados de las demás selecciones durante sus clasificatorias.
 
 **Pendientes conocidos**: todavía faltan reglamentos y cupos exactos de cada federación; ligas menores siguen usando un catálogo de referencia; no hay encuentros manuales fecha por fecha ni plantillas individuales reales. Las ventanas de calendario no representan fechas oficiales y el Mundial tiene 32 selecciones en vez del formato real. Estos puntos no se anuncian como terminados.
+
+
+## 1.5 — Carrera sin límite fijo, expediente y momentos especiales
+
+- Eliminada la jubilación automática a los 40: la continuidad dependerá de renovaciones, rendimiento y ofertas simuladas. Los veteranos pueden bajar de categoría o volver a su país; no se garantiza empleo perpetuo.
+- Tarjeta de jugador: valor de mercado orientativo en EUR que varía por OVR, edad, club y forma, contrato y salario mensual estimado. Todos los salarios y valores son ficticios.
+- Una jugada opcional por temporada, ligada a un partido del calendario que el jugador efectivamente disputó (penal, tiro libre, pase, corte o atajada según la posición). Elegir zona resuelve una prueba probabilística determinista; el éxito modifica el marcador registrado y la estadística correspondiente. No es todavía un minijuego en tiempo real.
+- Archivo final completo con insignias, temporadas, títulos, selección y estadísticas; botón para crear un póster PNG local sin APIs ni pagos, junto al guardado JSON existente.
+- Mejor contexto deportivo en escenas de entrenador, prensa y rivales: se identifican encuentros realmente disputados, sus marcadores y rivales.
+- Guardados v1–v8 migrables y verificados mediante pruebas automáticas.
+- Inspiración de género: se revisó Gambeta (gambetaoficial.ar) para identificar el valor de los lances jugables; todo el código, reglas y visuales añadidos son originales.
+
+### Limitaciones conocidas
+
+La simulación de la temporada sigue siendo por campaña completa. Los minijuegos son lances de elección de objetivo y probabilidad, no físicos ni en tiempo real; se prevé profundizarlos. La portada final muestra hasta 10 clubes y los últimos 5 títulos en el PNG, mientras la pantalla contiene más detalles. Algunas edades muy avanzadas pueden requerir varias búsquedas de oferta antes del retiro.

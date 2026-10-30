@@ -33,11 +33,11 @@ test('Simulación determinista',()=>{
  assert.deepEqual(a.lastSeason,b.lastSeason);
  assert(a.lastSeason.matches>=0&&a.lastSeason.matches<=42);
 });
-test('Avanza desde un club local hasta retiro a los 40 con 24 temporadas',()=>{
+test('Carrera veterana continúa más allá de los 40 hasta que termina el contrato o el mercado',()=>{
  let s=makeStarted('CL','full-run');
  s=simulateToRetirement(s);
- assert.equal(s.phase,'retired');assert.equal(s.age,40);
- assert.equal(s.history.length,24);
+ assert.equal(s.phase,'retired');assert.ok(s.age>40&&s.age<75);
+ assert.ok(s.history.length>24);
  assert(s.history.every(x=>x.matches>=0&&x.goals>=0&&x.assists>=0));
 });
 
@@ -60,7 +60,7 @@ test('Origen, personalidad y estilo quedan registrados y afectan la progresión'
 });
 test('Las partidas previas pueden migrarse sin borrar estadísticas',()=>{
  const prev={...newCareer({name:'Veterano',country:'CL',seed:'prev'}),version:1,phase:'season',clubId:'x',age:25,history:[{matches:28,goals:6}],ovr:70};
- const updated=migrateCareer(prev);assert.equal(updated.version,7);assert.equal(updated.history[0].goals,6);assert.equal(updated.name,'Veterano');
+ const updated=migrateCareer(prev);assert.equal(updated.version,8);assert.equal(updated.history[0].goals,6);assert.equal(updated.name,'Veterano');
  assert.equal(migrateCareer(null),null);
 });
 
@@ -103,7 +103,7 @@ test('Fichar por el club favorito dispara escena especial y marca la memoria',()
 test('Migrar una partida v2 conserva temporada y añade relaciones y bitácora',()=>{
  const original=makeStarted('CL','migracion');const v2={...original,version:2};
  delete v2.relationships;delete v2.storyLog;delete v2.fanClubId;
- const m=migrateCareer(v2);assert.equal(m.version,7);assert(m.relationships.coach);assert.deepEqual(m.storyLog,[]);
+ const m=migrateCareer(v2);assert.equal(m.version,8);assert(m.relationships.coach);assert.deepEqual(m.storyLog,[]);
  assert.equal(m.history.length,original.history.length);
 });
 
