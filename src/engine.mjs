@@ -1,4 +1,5 @@
 import { COUNTRIES } from './countries.mjs';
+import { initialRelationships, chooseScene, sceneFor, resultOfScene } from './story.mjs';
 
 export const START_YEAR = 2026;
 export const ORIGINS = [
@@ -44,15 +45,6 @@ const LEGENDS = [
  ['Mia Hamm',[91,91,88,91,54,79,4,4]],['Iker Casillas',[64,20,71,51,98,82,2,3]],
 ].map(([name,values])=>({name,values}));
 
-export const EVENTS = [
- {id:'coach',title:'El técnico te exige un salto',body:'El entrenador te propone una semana de trabajo especial. Podrías mejorar, pero te costará recuperación.',options:[['Entrenar al máximo',2,-2,1],['Mantener la rutina',0,1,0]]},
- {id:'press',title:'La prensa te busca',body:'Después de tu última temporada, un periodista te pregunta si te ves en un equipo más grande.',options:[['Hablar de tus ambiciones',0,0,2],['Dar crédito al equipo',0,2,0]]},
- {id:'team',title:'Un compañero necesita ayuda',body:'Un juvenil está pasando un mal momento y te pide que lo acompañes tras el entrenamiento.',options:[['Ayudarlo',0,2,1],['Concentrarte en lo tuyo',1,-1,0]]},
- {id:'recovery',title:'Molestias físicas',body:'El cuerpo médico te recomienda bajar el ritmo. Quieres recuperar tu mejor estado cuanto antes.',options:[['Descansar y recuperarte',0,2,0],['Exigirte igualmente',1,-2,1]]},
- {id:'captain',title:'Una decisión en el vestuario',body:'El grupo espera que des tu opinión sobre un conflicto entre compañeros.',options:[['Intervenir y mediar',0,2,1],['No involucrarte',0,-1,0]]},
- {id:'role',title:'Te proponen otro rol',body:'El entrenador cree que puedes aportar desde una función distinta, aunque tengas que ceder protagonismo.',options:[['Aceptar y adaptarte',1,1,0],['Defender tu posición',0,-1,1]]},
-];
-
 const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
 function hash(x){ let h=2166136261;for(const c of String(x)){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0; }
 function rng(seed){let a=hash(seed);return ()=>{a=(a+0x6D2B79F5)|0;let t=Math.imul(a^(a>>>15),1|a);t^=t+Math.imul(t^(t>>>7),61|t);return ((t^(t>>>14))>>>0)/4294967296;};}
@@ -60,15 +52,18 @@ function choose(arr,r){return arr[Math.floor(r()*arr.length)];}
 export function getCountry(code){return COUNTRIES.find(c=>c.code===code);}
 export function getClub(id){for(const c of COUNTRIES){const club=c.clubs.find(x=>x.id===id);if(club)return {...club,country:c.name,countryCode:c.code,league:c.league,region:c.confederation};}return null;}
 function validSelection(value,options,defaultId){return options.some(x=>x.id===value)?value:defaultId;}
-export function newCareer({name,number=9,foot='Derecha',country='CL',position='DC',mode='Clásico',age=16,city='',origin='barrio',personality='disciplinado',style='equilibrado',dream='seleccion',story='',seed=Date.now()}){
+export function newCareer({name,number=9,foot='Derecha',country='CL',position='DC',mode='Clásico',age=16,city='',origin='barrio',personality='disciplinado',style='equilibrado',dream='seleccion',story='',fanClubId='',seed=Date.now()}){
   const safeName=String(name||'').trim().slice(0,44);
   if(!getCountry(country)||!POSITIONS.some(p=>p[0]===position)||!safeName)throw Error('Revisa el nombre, la nacionalidad y la posición.');
   const firstAge=clamp(Math.round(Number(age)||16),16,19);
   const originId=validSelection(origin,ORIGINS,'barrio');
   const personalityId=validSelection(personality,PERSONALITIES,'disciplinado');
-  return {version:2,seed:String(seed),phase:'draft',name:safeName,number:clamp(Number(number)||9,1,99),foot:foot==='Izquierda'?'Izquierda':'Derecha', country,position,mode:mode==='Purista'?'Purista':'Clásico',
+  const relationships=initialRelationships(country);
+  if(originId==='cantera')relationships.coach.trust=60;
+  return {version:3,seed:String(seed),phase:'draft',name:safeName,number:clamp(Number(number)||9,1,99),foot:foot==='Izquierda'?'Izquierda':'Derecha', country,position,mode:mode==='Purista'?'Purista':'Clásico',
     age:firstAge,startAge:firstAge,startYear:START_YEAR,city:String(city||'').trim().slice(0,40),origin:originId,personality:personalityId,
     style:validSelection(style,STYLES,'equilibrado'),dream:validSelection(dream,DREAMS,'seleccion'),story:String(story||'').trim().slice(0,180),
+    fanClubId:getClub(fanClubId)?fanClubId:null,storyFlags:{playedForFan:false},storyLog:[],relationships,sceneBeat:0,sceneChoice:null,scenePlayerText:'',
     draftIndex:0,draftRerolls:0,attributes:{},draftSources:[],clubId:null,ovr:null,potential:null,
     form:70,morale:originId==='barrio'?75:70,reputation:originId==='academia'?4:0,
     coachTrust:originId==='cantera'?60:50,
@@ -76,9 +71,15 @@ export function newCareer({name,number=9,foot='Derecha',country='CL',position='D
 }
 export function migrateCareer(s){
   if(!s||typeof s!=='object'||!['draft','academy','season','event','transfer','retired'].includes(s.phase)||!getCountry(s.country))return null;
-  if(s.version===2)return s;
-  if(s.version!==1)return null;
-  return {...s,version:2,startAge:16,startYear:START_YEAR,city:'',origin:'barrio',personality:'disciplinado',style:'equilibrado',dream:'seleccion',story:'',coachTrust:50};
+  if(![1,2,3].includes(s.version))return null;
+  const v1=s.version===1?{...s,startAge:16,startYear:START_YEAR,city:'',origin:'barrio',personality:'disciplinado',style:'equilibrado',dream:'seleccion',story:'',coachTrust:50}:s;
+  const rel=v1.relationships||initialRelationships(v1.country);
+  const safeRel={...rel,coach:{...rel.coach,trust:v1.coachTrust??rel.coach?.trust??50}};
+  const migrated={...v1,version:3,fanClubId:getClub(v1.fanClubId)?v1.fanClubId:null,
+    storyFlags:v1.storyFlags||{playedForFan:!!(v1.fanClubId&&v1.history?.some(h=>h.clubId===v1.fanClubId))},
+    storyLog:Array.isArray(v1.storyLog)?v1.storyLog:[],relationships:safeRel,
+    sceneBeat:v1.sceneBeat||0,sceneChoice:v1.sceneChoice??null,scenePlayerText:v1.scenePlayerText||''};
+  return migrated;
 }
 export function careerYear(s){return (s.startYear??START_YEAR)+(s.age-(s.startAge??16));}
 export function currentDraft(s){
@@ -112,7 +113,7 @@ export function academyOffers(s){
   const count=Math.min(3,available.length);const chosen=[];while(chosen.length<count){const at=Math.floor(r()*available.length);chosen.push(available.splice(at,1)[0]);}
   return chosen.map(club=>getClub(club.id));
 }
-export function signAcademy(s,id){if(s.phase!=='academy'||!academyOffers(s).some(x=>x.id===id))return s;return {...s,phase:'season',clubId:id,decisions:[...s.decisions,{age:s.age,text:`Primer contrato: ${getClub(id).name}`} ]};}
+export function signAcademy(s,id){if(s.phase!=='academy'||!academyOffers(s).some(x=>x.id===id))return s;return {...s,phase:'event',clubId:id,pendingEvent:id===s.fanClubId?'fan_home':'arrival',sceneBeat:0,decisions:[...s.decisions,{age:s.age,text:`Primer contrato: ${getClub(id).name}`} ]};}
 function positionGroup(p){if(p==='POR')return 'goalkeeper';if(['DC','EI','ED'].includes(p))return 'attack';if(['MCO','MC','MI','MD'].includes(p))return 'create';return 'defense';}
 export function advanceSeason(s){
   if(s.phase!=='season'||s.age>=40)return s;
@@ -145,22 +146,29 @@ export function advanceSeason(s){
   const worldCupResult=worldCup?choose(['Fase de grupos','Octavos de final','Cuartos de final','Semifinal','Final'],r):null;
   const seasonal={age:s.age,year:careerYear(s),clubId:club.id,club:club.name,country:club.country,ovrBefore:s.ovr,ovrAfter:ovr,role,matches,goals,assists,cleanSheets,goalsConceded,international,
     injuryWeeks:injury,leaguePosition,titles,worldCupResult};
-  const event=EVENTS[Math.floor(r()*EVENTS.length)];
-  return {...s,age:s.age+1,ovr,coachTrust:clamp((s.coachTrust??50)+(matches>20?2:-2),0,100),history:[...s.history,seasonal],trophies:[...s.trophies,...titles],lastSeason:seasonal,pendingEvent:event.id,phase:s.age===39?'retired':'event'};
+  const eventId=chooseScene(s,r);
+  const coachTrust=clamp((s.coachTrust??50)+(matches>20?2:-2),0,100);
+  const relationships={...s.relationships,coach:{...s.relationships.coach,trust:coachTrust}};
+  const flags={...(s.storyFlags||{})};
+  if(s.fanClubId&&s.clubId===s.fanClubId)flags.playedForFan=true;
+  return {...s,age:s.age+1,ovr,coachTrust,relationships,history:[...s.history,seasonal],trophies:[...s.trophies,...titles],lastSeason:seasonal,pendingEvent:eventId,storyFlags:flags,sceneBeat:0,sceneChoice:null,scenePlayerText:'',phase:s.age===39?'retired':'event'};
 }
-export function eventInfo(s){return EVENTS.find(e=>e.id===s.pendingEvent)||null;}
-export function resolveEvent(s,option){
-  if(s.phase!=='event')return s;
-  const event=eventInfo(s), choice=event?.options[option];if(!choice)return s;
-  const rapport=event.id==='coach'||event.id==='role'||event.id==='team'? (option===0?4:-3):0;
-  const loyaltyBoost=s.personality==='leal'&&event.id==='team'&&option===0?3:0;
-  const reputationBoost=s.personality==='carismatico'&&event.id==='press'&&option===0?2:0;
-  const next={...s,ovr:clamp(s.ovr+choice[1],40,s.potential),morale:clamp(s.morale+(choice[2]*4)+loyaltyBoost,0,100),reputation:clamp(s.reputation+choice[3]+reputationBoost,0,100),coachTrust:clamp((s.coachTrust??50)+rapport,0,100),
-    decisions:[...s.decisions,{age:s.age,text:`${event.title}: ${choice[0]}`}],pendingEvent:null};
+export function eventInfo(s){if(s.phase!=='event')return null;return sceneFor(s);}
+export function resolveEvent(s,option,playerText=''){
+  if(s.phase!=='event'||(s.sceneBeat||0)!==0)return s;
+  const event=sceneFor(s);
+  if(!Number.isInteger(option)||option<0||option>=event.options.length)return s;
+  return resultOfScene(s,event,option,playerText);
+}
+export function finishEvent(s){
+  if(s.phase!=='event'||s.sceneBeat!==1)return s;
+  const hadFanScene=s.pendingEvent==='fan_home';
+  const flags=hadFanScene?{...s.storyFlags,playedForFan:true}:s.storyFlags;
+  const next={...s,phase:'season',pendingEvent:null,sceneBeat:0,sceneChoice:null,scenePlayerText:'',storyFlags:flags};
   const offers=transferOffers(next);
-  if(offers.length)return {...next,offers,phase:'transfer'};
-  return {...next,phase:'season',offers:[]};
+  return offers.length?{...next,offers,phase:'transfer'}:{...next,offers:[]};
 }
+export function autoResolveEvent(s){if(s.phase!=='event')return s;const first=(s.sceneBeat||0)===0?resolveEvent(s,0):s;return finishEvent(first);}
 export function transferOffers(s){
   if(s.history.length<2)return [];
   const r=rng(`${s.seed}:transfers:${s.age}:${s.clubId}`);
@@ -177,13 +185,19 @@ export function chooseTransfer(s,id=null){
   if(s.phase!=='transfer')return s;
   const offer=s.offers.find(o=>o.id===id);
   if(id&& !offer)return s;
-  return {...s,phase:'season',clubId:offer?.id||s.clubId,coachTrust:offer?47:clamp((s.coachTrust??50)+3,0,100),offers:[],decisions:[...s.decisions,{age:s.age,text:offer?`Fichaste por ${offer.name} (${offer.country})`:`Continuaste en ${getClub(s.clubId).name}`}]};
+  const nextClubId=offer?.id||s.clubId;
+  const joinedFan=!!(offer&&s.fanClubId===nextClubId&&s.clubId!==nextClubId);
+  const leftFan=!!(offer&&s.fanClubId===s.clubId&&s.clubId!==nextClubId);
+  const rel={...s.relationships,coach:{...s.relationships.coach,trust:offer?47:clamp(s.relationships.coach.trust+3,0,100)}};
+  return {...s,phase:joinedFan||leftFan?'event':'season',pendingEvent:joinedFan?'fan_home':leftFan?'fan_departure':null,
+    sceneBeat:0,clubId:nextClubId,relationships:rel,coachTrust:rel.coach.trust,offers:[],
+    decisions:[...s.decisions,{age:s.age,text:offer?`Fichaste por ${offer.name} (${offer.country})`:`Continuaste en ${getClub(s.clubId).name}`}]};
 }
 export function simulateToRetirement(state){
   let s=state;
   for(let k=0;k<100&&s.phase!=='retired';k++){
     if(s.phase==='season')s=advanceSeason(s);
-    else if(s.phase==='event')s=resolveEvent(s,0);
+    else if(s.phase==='event')s=autoResolveEvent(s);
     else if(s.phase==='transfer'){
       const current=getClub(s.clubId);
       const best=[...s.offers].sort((a,b)=>b.level-a.level).find(c=>c.level>current.level+3&&c.level<=s.ovr+7);
