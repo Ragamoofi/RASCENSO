@@ -12,7 +12,7 @@ export function enhanceLegendImages(root){
    if(!src||!src.startsWith('https://upload.wikimedia.org/')||card.dataset.photoResolved)return;
    card.dataset.photoResolved='1';
    const img=new Image();img.className='legend-real-photo legend-network-photo';img.alt='';
-   img.loading='lazy';img.decoding='async';img.referrerPolicy='no-referrer';
+   img.loading='eager';img.decoding='async';img.referrerPolicy='no-referrer';
    img.addEventListener('load',()=>{
     if(card.isConnected)card.querySelector('.legend-photo-backdrop')?.appendChild(img);
    },{once:true});
