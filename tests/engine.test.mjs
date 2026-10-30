@@ -13,19 +13,19 @@ test('50 nacionalidades con tres clubes reales semilla como mínimo',()=>{
  assert.equal(COUNTRIES.length,50);assert(COUNTRIES.every(c=>c.clubs.length>=3));
  assert(COUNTRIES.every(c=>c.clubs.every(x=>x.id&&x.name&&Number.isFinite(x.level))));
 });
-test('Chile ofrece tres clubes del país y nunca clubes extranjeros al iniciar',()=>{
+test('Chile puede recibir ofertas nacionales e internacionales al iniciar',()=>{
  const s=makeStarted();assert.equal(s.phase,'season');
  assert.equal(getCountry(s.country).name,'Chile');
  const d=newCareer({name:'X',country:'CL',position:'POR',seed:'test-49'});
  assert.equal(academyOffers(d).length,3);
- assert(academyOffers(d).every(c=>c.countryCode==='CL'));
+ assert(academyOffers(d).some(c=>c.countryCode==='CL'));assert(academyOffers(d).some(c=>c.countryCode!=='CL'));
 });
 test('Draft completa ocho atributos, OVR y potencial',()=>{
  let s=newCareer({name:'Prueba',country:'CL',position:'POR',seed:'same'});
  let count=0;while(s.phase==='draft'){assert(currentDraft(s));s=acceptDraft(s);count++;}
  assert.equal(count,8);assert.equal(Object.keys(s.attributes).length,8);
  assert(s.potential>s.ovr);assert.equal(academyOffers(s).length,3);
- assert(academyOffers(s).every(c=>c.countryCode==='CL'));
+ assert(academyOffers(s).some(c=>c.countryCode==='CL'));
 });
 test('Simulación determinista',()=>{
  const a=advanceSeason(makeStarted('CL','same-seed'));
@@ -41,12 +41,12 @@ test('Carrera veterana continúa más allá de los 40 hasta que termina el contr
  assert(s.history.every(x=>x.matches>=0&&x.goals>=0&&x.assists>=0));
 });
 
-test('Cada uno de los 50 países devuelve exactamente tres ofertas propias',()=>{
+test('Cada uno de los 50 países devuelve tres ofertas, con al menos una nacional',()=>{
  for(const c of COUNTRIES){
   const s=newCareer({name:'Prueba',country:c.code,position:'MC',seed:`territorio-${c.code}`});
   const offers=academyOffers(s);
   assert.equal(offers.length,3,`Faltan ofertas en ${c.name}`);
-  assert(offers.every(o=>o.countryCode===c.code),`Club extranjero en ${c.name}`);
+  assert(offers.some(o=>o.countryCode===c.code),`Falta una oferta nacional en ${c.name}`);
   assert.equal(new Set(offers.map(o=>o.id)).size,3,`Club repetido en ${c.name}`);
  }
 });
@@ -156,4 +156,24 @@ test('Plan deportivo se elige antes de jugar y modifica los resultados reproduci
  const state={phase:'season',seasonPlan:'equilibrio'};assert.equal(chooseSeasonPlan(state,'ataque').seasonPlan,'ataque');assert.equal(chooseSeasonPlan(state,'inventado').seasonPlan,'equilibrio');
  const pl={seed:'planes2026',startYear:2026,startAge:17,age:24,clubId:'cl-1',country:'CL',ovr:76,coachTrust:66,position:'DC',style:'goleador'};
  assert.notDeepEqual(playLeague({...pl,seasonPlan:'ataque'}).fixtureResults,playLeague({...pl,seasonPlan:'defensa'}).fixtureResults);
+});
+
+test('El jugador solo puede cambiar tres veces las cartas de legado',async()=>{
+ const {rerollDraft}=await import('../src/engine.mjs');
+ let s=newCareer({name:'Legado',seed:'tres-cambios'});
+ for(let i=0;i<3;i++)s=rerollDraft(s);
+ assert.equal(s.draftRerolls,3);assert.deepEqual(rerollDraft(s),s);
+});
+test('Contrato inicial mostrado y firmado es el mismo; los atributos sobreviven la temporada',async()=>{
+ const {academyContractOffer}=await import('../src/engine.mjs');
+ let s=newCareer({name:'Carrera',seed:'stats-persistentes'});
+ while(s.phase==='draft')s=acceptDraft(s,0);
+ const club=academyOffers(s)[0];const contract=academyContractOffer(s,club);
+ const starting={...s.attributes};s=signAcademy(s,club.id);
+ assert.deepEqual(s.contract,contract);assert(s.contract.salary>=9000);
+ s=autoResolveEvent(s);const next=advanceSeason(s);
+ assert.deepEqual(next.lastSeason.attributesBefore,starting);
+ assert.deepEqual(next.lastSeason.attributesAfter,next.attributes);
+ assert.equal(Object.keys(next.attributes).length,8);
+ assert(Object.values(next.attributes).every(x=>Number.isFinite(x)));
 });

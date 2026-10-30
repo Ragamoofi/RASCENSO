@@ -51,7 +51,7 @@ export function badge(club, size=''){
  const c=typeof club==='string'?COUNTRIES.flatMap(x=>x.clubs).find(x=>x.id===club):club;
  const name=c?.name||'Club',code=c?.countryCode||c?.id?.slice(0,2).toUpperCase()||'CL';
  const id=c?.id||'';const known=COUNTRIES.find(x=>x.code===code);
- const src=id?`./assets/crests/${encodeURIComponent(id)}.png`:null;
+ const src=id==='cl-1'?'https://assets.footylogos.com/logos/colo-colo/colo-colo-logo-footylogos.svg':(id?`./assets/crests/${encodeURIComponent(id)}.png`:null);
  const accent=hue(name);
  return `<span class="team-badge ${size}" data-team-id="${id}" style="--badge-hue:${accent}" title="${name.replaceAll('"','&quot;')}"><span class="badge-fallback">${letters(name)}</span>${src?`<img class="badge-img" src="${src}" loading="lazy" alt="Escudo de ${name.replaceAll('&','&amp;').replaceAll('"','&quot;')}" decoding="async" onerror="this.remove()">`:''}</span>`;
 }

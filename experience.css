@@ -356,3 +356,33 @@
 .kit-country-seal small{font-size:9px;letter-spacing:.15em;color:#b9d5ef;font-weight:800}
 .poster-kit-wrap.has-official-kit .country-kit{position:relative;z-index:1;height:265px;width:245px;object-fit:contain;filter:drop-shadow(0 15px 20px #071326c5)}
 .poster-kit-wrap .kit-badge{z-index:2}
+/* 1.8.2 — Legados claros, contratos de inicio y atributos persistentes */
+.legend-card .legend-stat-feature{display:none!important}
+.legend-card .legend-content{padding:0 17px 16px}
+.legend-card .legend-content h2{margin-bottom:2px!important;font-size:clamp(24px,2.15vw,32px)!important}
+.legend-gift{display:flex;justify-content:flex-end;align-items:baseline;gap:9px;margin:1px 0 9px;padding:6px 9px;background:#0c213bdc;border:1px solid #6c8ba891;border-radius:7px;max-width:100%}
+.legend-gift span{text-align:right;text-transform:uppercase;font-size:10px;letter-spacing:.09em;color:#dbedff;font-weight:850}
+.legend-gift strong{font:900 25px/1 'Barlow Condensed',sans-serif;color:#f1b17c;min-width:22px;text-align:right}
+.academy-card{justify-content:flex-start;padding:19px 19px 17px;gap:5px}
+.academy-card>small{margin:8px 0 2px}
+.academy-card h2{margin:2px 0 3px}
+.academy-card p{margin:3px 0 8px}
+.academy-contract{width:100%;background:#10273f;border:1px solid #456888;border-radius:9px;text-align:left;padding:13px 14px;margin:3px 0 12px}
+.contract-title{font-size:9px;letter-spacing:.16em;color:#e2a377;font-weight:900}
+.contract-money{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:8px 0;border-bottom:1px solid #486987;padding-bottom:9px}
+.contract-money small{font-size:9px;color:#bdd4ed;font-weight:800}
+.contract-money strong{font:900 25px/1 'Barlow Condensed',sans-serif;color:#fff}
+.contract-rows{display:grid;gap:5px}.contract-rows span{display:flex;justify-content:space-between;gap:7px;font-size:11px;color:#b4cee8}.contract-rows b{color:#f3d0ac;text-align:right}
+.academy-card .action{margin-top:auto;width:100%}
+.career-attributes{padding:12px 13px}.career-attributes .rail-heading{margin-bottom:10px}
+.career-attributes-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.career-attribute{display:flex;align-items:center;gap:5px;min-width:0;padding:7px 8px;border:1px solid #355774;border-radius:7px;background:#0e243d}
+.career-attribute span{font-size:10px;color:#b5d1ed;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.career-attribute strong{font:900 21px/1 'Barlow Condensed',sans-serif;color:#fff}
+.career-attribute small{font-size:9px;font-weight:900}.stat-up{color:#7cddb7}.stat-down{color:#eaa18e}
+.left-rail .facts{display:block!important;padding:10px 12px;min-height:0}
+.facts summary{cursor:pointer;margin-bottom:0;list-style:none;display:flex}
+.facts[open] summary{margin-bottom:12px}
+.facts summary::-webkit-details-marker{display:none}
+@media(min-width:1001px){.left-rail{overflow-y:auto;scrollbar-width:thin;scrollbar-color:#345777 transparent}}
+@media(max-width:700px){.academy-contract{padding:10px}.academy-card{gap:3px}.contract-money strong{font-size:22px}.legend-gift{justify-content:space-between}}
