@@ -1,6 +1,6 @@
 # RASCENSO · Del barrio a la historia
 
-**Alfa 0.8 — Identidad y vida de carrera** · 30 de octubre de 2026 · © Ragamoofi.
+**Alfa 0.9 — Carrera Viva** · 30 de octubre de 2026 · © Ragamoofi.
 
 Sitio oficial de prueba: https://ragamoofi.github.io/RASCENSO/
 
@@ -90,3 +90,19 @@ Se muestran desde Wikimedia Commons (sitio externo, bajo la licencia individual 
 - [Luka Modrić](https://commons.wikimedia.org/wiki/File:Luka_Modric.jpg)
 
 La disponibilidad de estas fotos depende del servicio externo. El resto de leyendas utiliza un fondo abstracto original hasta contar con archivos y atribuciones verificadas. Las imágenes del juego no implican relación comercial con los deportistas.
+
+
+## Alfa 0.9 · Carrera Viva (30-10-2026)
+
+- Draft de **78 referentes** (íconos históricos, figuras y futbolistas profesionales), cifras ficticias no oficiales. Las opciones de menor media pueden aumentar el margen de evolución del personaje.
+- **14 fotografías de referencia** con URL a Wikimedia Commons cuando están disponibles. Todos los demás futbolistas disponen de una ilustración vectorial propia de reemplazo; no se presentan como retratos reales. Las imágenes externas pueden fallar o dejar de estar disponibles, pero las cartas siguen visibles.
+- **20 contextos de temporada** con tres decisiones cada uno, consecuencias acotadas para minutos, salud física, moral, confianza y producción deportiva. Sustituyen la antigua barra repetitiva de pretemporada. La opción de no intervenir se mantiene.
+- **15 escenas futbolísticas adicionales**, incluyendo minutos, ojeadores, liderazgo y futuro contractual, y selección que evita repetir sucesivamente los eventos registrados. Los eventos narrativos duran entre 2 y 3 escenas según la temporada.
+- Mejoras conservadoras de emparejamiento de nombres para escudos PNG: se requiere correspondencia muy alta y sin ambigüedad; cuando falta un logo oficial se mantiene un emblema provisional.
+- **Propuesta de integración de IA** en `IA-RASCENSO-ARQUITECTURA.md`. Solo se incluyeron el protocolo y su validador (`src/ai-bridge.mjs`); no se conectó ninguna API todavía.
+
+### Fotos y licencias
+Las fotografías enlazadas provienen de distintas páginas de Wikimedia Commons: para créditos de autor y licencia exacta, consulta cada página `File:` enlazada desde `src/legend-art.mjs` usando la función `legendPhotoCredit()`. No se descargan ni redistribuyen fotografías en el repositorio. La utilización futura, especialmente comercial, requiere revisar las condiciones y atribuciones de cada archivo. Los escudos de equipos son marcas de sus titulares.
+
+### Compatibilidad de guardados
+Se mantienen los identificadores, estadísticas y estados previos. Las nuevas agendas se guardan en `seasonAgenda` y `careerMoments`; son opcionales y no cambian las temporadas anteriores.

@@ -1,5 +1,8 @@
 import { COUNTRIES } from './countries.mjs';
 import { identityTraits, identitySeasonEffects, preparationEffects, PREPARATIONS, archetypeFor } from './career08.mjs';
+import { DRAFT_REFERENTS, DRAFT_TIERS, draftPotentialAdjustment } from './draft09.mjs';
+import { chooseSeasonAgenda, seasonAgendaEffects } from './agenda09.mjs';
+export { chooseSeasonAgenda } from './agenda09.mjs';
 
 import { initialRelationships, chooseScene, sceneFor, resultOfScene } from './story.mjs';
 import { playLeague, leagueParticipants, getCompetitionForCareer, nextLeagueRosters } from './league.mjs';
@@ -38,17 +41,6 @@ export const POSITIONS = [
   ['MCO','Mediapunta'],['EI','Extremo izquierdo'],['ED','Extremo derecho'],['DC','Delantero centro']
 ];
 export const ATTRS = [['pace','Ritmo'],['shot','Tiro'],['pass','Pase'],['dribble','Regate'],['defense','Defensa'],['physical','Físico'],['skills','Filigranas'],['weak','Pierna mala']];
-const LEGENDS = [
- ['Ronaldo Nazário',[92,98,76,95,27,87,5,4]],['Zinedine Zidane',[75,84,98,96,67,79,5,5]],
- ['Lionel Messi',[89,96,94,99,35,67,5,4]],['Cristiano Ronaldo',[94,98,78,92,40,95,5,4]],
- ['Pelé',[95,97,88,95,45,88,5,5]],['Marta',[91,92,88,96,37,76,5,4]],
- ['Andrés Iniesta',[77,77,97,95,68,70,4,4]],['Xavi Hernández',[68,73,99,94,70,67,4,4]],
- ['Ronaldinho',[91,91,91,99,30,80,5,4]],['Paolo Maldini',[81,51,80,74,99,90,3,4]],
- ['Sergio Ramos',[77,78,71,70,96,95,3,3]],['Kaká',[91,90,88,93,42,78,4,4]],
- ['Luka Modrić',[77,76,97,93,79,73,4,4]],['Thierry Henry',[96,96,83,92,45,84,4,4]],
- ['Roberto Carlos',[94,88,84,85,92,91,4,4]],['Manuel Neuer',[68,29,83,69,96,89,2,4]],
- ['Mia Hamm',[91,91,88,91,54,79,4,4]],['Iker Casillas',[64,20,71,51,98,82,2,3]],
-].map(([name,values])=>({name,values}));
 
 const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
 function hash(x){ let h=2166136261;for(const c of String(x)){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0; }
@@ -105,18 +97,22 @@ export function draftChoices(s) {
   const unfilled=ATTRS.filter(([key])=>!(key in s.attributes));
   const order=[...unfilled];for(let i=order.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[order[i],order[j]]=[order[j],order[i]];}
   const source=[];
-  const used=new Set();
+  const used=new Set((s.draftSources||[]).map(x=>x.legend));
   const important = ['pace','shot','pass','dribble','defense','physical'];
+  // Una opción por nivel: la mejor cifra no siempre ofrece el mayor potencial.
+  const tiers=['icono','figura','profesional'];
+  const slots=tiers.map(t=>DRAFT_REFERENTS.filter(x=>x.tier===t&&!used.has(x.name)));
   for(let i=0;i<3;i++){
     const [key,label]=order[i%order.length];
-    let idx=Math.floor(r()*LEGENDS.length);
-    for(let j=0;j<LEGENDS.length&&used.has(idx);j++)idx=(idx+1)%LEGENDS.length;
-    used.add(idx);
-    const legend=LEGENDS[idx];
-    const value=legend.values[ATTRS.findIndex(a=>a[0]===key)];
+    const pool=slots[i].length?slots[i]:DRAFT_REFERENTS.filter(x=>x.tier===tiers[i]);
+    const player=pool[Math.floor(r()*pool.length)];
+    used.add(player.name);
+    const value=player.values[ATTRS.findIndex(a=>a[0]===key)];
     const weight=important.includes(key)?WEIGHTS[s.position][important.indexOf(key)]:.08;
     const fit=weight>=.26?'CLAVE PARA TU PUESTO':weight>=.16?'COMPLEMENTO FUERTE':'PERFIL ALTERNATIVO';
-    source.push({legend:legend.name,key,label,value,fit,hidden:s.mode==='Purista',archetype:archetypeFor({...s,attributes:{...s.attributes,[key]:value}}).name});
+    source.push({legend:player.name,key,label,value,fit,tier:player.tier,development:player.ceiling,
+      tierLabel:DRAFT_TIERS[player.tier].label,tierDetail:DRAFT_TIERS[player.tier].detail,
+      hidden:s.mode==='Purista',archetype:archetypeFor({...s,attributes:{...s.attributes,[key]:value}}).name});
   }
   return source;
 }
@@ -130,14 +126,14 @@ export function acceptDraft(s, index=0){
   const choices=draftChoices(s);
   const d=choices[Number.isInteger(index)&&index>=0&&index<choices.length?index:0];
   const attributes={...s.attributes,[d.key]:d.value};
-  const draftSources=[...s.draftSources,{legend:d.legend,attribute:d.key,value:d.value}];
+  const draftSources=[...s.draftSources,{legend:d.legend,attribute:d.key,value:d.value,tier:d.tier}];
   if(s.draftIndex<7)return {...s,draftIndex:s.draftIndex+1,attributes,draftSources};
   const vals=['pace','shot','pass','dribble','defense','physical'];
   const weighted=vals.reduce((sum,k,i)=>sum+(attributes[k]??50)*WEIGHTS[s.position][i],0);
   const bonus=((attributes.skills||2)+(attributes.weak||2)-4)*.5;
   // El talento del draft representa el techo; el OVR inicial es una valoración independiente.
   const talent=clamp(Math.round(weighted+bonus*.75),60,97);
-  const potential=clamp(talent+Math.floor(rng(`${s.seed}:potential`)()*7)-3,68,97);
+  const potential=clamp(talent+Math.floor(rng(`${s.seed}:potential`)()*7)-3+draftPotentialAdjustment(draftSources),68,97);
   const ovr=clamp(Math.round(59+(potential-65)*.23+rng(`${s.seed}:base`)()*5),55,Math.min(72,potential-5));
   return {...s,phase:'academy',draftIndex:8,attributes,draftSources,ovr,potential,footballDNA:archetypeFor({...s,attributes,draftSources})};
 }
@@ -176,12 +172,12 @@ export function advanceSeason(s){
  const games=league.playerMatches.length||1;
  const share=minutes/(games*90);
  const injuryFactor=injuryWeeks>0?.56:1;
- const prep=preparationEffects(s),identity=identitySeasonEffects(s);
+ const prep=preparationEffects(s),identity=identitySeasonEffects(s),agenda=seasonAgendaEffects(s);
  const gap=Math.max(0,s.potential-s.ovr);
  const breakout=s.age===(profile==='temprano'?19:profile==='tardio'?25:21)&&r()<.25?3:0;
  const declineStart=profile==='tardio'?33:profile==='temprano'?30:31;
  const decline=s.age>=declineStart?Math.max(1,Math.round(.6+(s.age-declineStart)*.65)):0;
- const growth=gap*.22*ageFactor*Math.max(.18,Math.min(1.12,share*1.55))*injuryFactor+breakout+prep.growth+(r()-.5)*1.4-decline;
+ const growth=gap*.22*ageFactor*Math.max(.18,Math.min(1.12,share*1.55))*injuryFactor+breakout+prep.growth+(agenda.growth||0)+(r()-.5)*1.4-decline;
  const ovr=clamp(Math.round(s.ovr+growth),49,99);
  const titles=[];
  if(leaguePosition===1)titles.push(league.league);
@@ -222,7 +218,8 @@ export function finishEvent(s){
  }
  if(next.history.length===0)return next;
  // Segunda escena contextual por campaña, sin repetir el primer contrato ni escenas de hinchas.
- if((next.annualScenes||0)<1 && next.history.length>0 && !['arrival','fan_home','fan_departure'].includes(s.pendingEvent)){
+ const extraScenes=rng(`${next.seed}:scene-amount:${careerYear(next)}`)()<.55?1:2;
+ if((next.annualScenes||0)<extraScenes && next.history.length>0 && !['arrival','fan_home','fan_departure'].includes(s.pendingEvent)){
   const r=rng(`${next.seed}:second-scene:${careerYear(next)}:${next.clubId}`);
   let another=chooseScene({...next,lastSeason:next.lastSeason},r);
   if(another===s.pendingEvent)another=chooseScene(next,()=>.97);

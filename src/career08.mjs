@@ -54,7 +54,7 @@ export function archetypeFor(s){const attrs=s.attributes||{};
  const unique=new Set((s.draftSources||[]).map(x=>x.legend)).size;
  return {name:chosen,diversity:unique,signature:Math.round(Math.max(pace,shot,pass,dribble,defense,physical)),bond:unique<=4?'Identidad definida':unique>=7?'Talento versátil':'Equilibrio de legados'};
 }
-export function preparationEffects(s){const id=s.preparation?.year===((s.startYear||2026)+s.age-(s.startAge||16))?s.preparation.id:'equilibrio';return {
+export function preparationEffects(s){const id=s.preparation?.year===((s.startYear||2026)+s.age-(s.startAge||16))?s.preparation.id:'none';return {
  id, goals:id==='definicion'?1.16:1, assists:id==='creacion'?1.20:1,
  minutes:id==='tactica'?.08:id==='caracter'?.025:0,
  injury:id==='fisico'?.60:id==='equilibrio'?.82:1,

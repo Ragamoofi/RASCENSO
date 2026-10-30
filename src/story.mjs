@@ -3,6 +3,7 @@
  * Este motor no finge interpretar libremente cada frase; elige una intención explícita.
  */
 import { COUNTRIES } from './countries.mjs';
+import { STORY_09 } from './story09.mjs';
 
 const findClub=id=>COUNTRIES.flatMap(c=>c.clubs).find(c=>c.id===id);
 const clubName=id=>findClub(id)?.name||'tu club';
@@ -250,6 +251,7 @@ Object.assign(catalog,{
  opt('No buscar la cinta todavía','Consolidar tu rendimiento antes de liderar.','«Conocer tus límites también es madurez».',{morale:3,coach:2},'La confianza crece sin presión extra.')]
  }
 });
+Object.assign(catalog,STORY_09);
 export const STORY_IDS=Object.keys(catalog);
 export function sceneFor(s){
  const entry=catalog[s.pendingEvent]||catalog.coach;
@@ -258,14 +260,19 @@ export function sceneFor(s){
 }
 export function chooseScene(s,roll){
  if(s.fanClubId && s.clubId===s.fanClubId && !s.storyFlags?.playedForFan) return 'fan_home';
- if(s.lastSeason?.matches<12)return roll()<.52?'rotation':'coach';
- if(s.lastSeason?.injuryWeeks>=6)return 'injury';
- if(s.fanClubId&&s.clubId!==s.fanClubId&&roll()<.28)return 'fan_press';
- if(s.publicImage==='referente'&&roll()<.35)return 'captaincy';
- if(s.dream==='europa'&&roll()<.27)return 'scouting';
- if(s.coachTrust<45&&roll()<.5)return 'rotation';
- if((s.lastSeason?.goals||0)>=12&&roll()<.4)return 'milestone';
- return ['coach','teammate','press','agent','rival','milestone','scouting','derby','rotation','captaincy'][Math.floor(roll()*10)];
+ // Primero atender consecuencias fuertes y luego evitar escenas repetidas de temporadas anteriores.
+ const recent=(s.storyLog||[]).slice(-5).map(x=>x.id).filter(Boolean);
+ const conditional=[];
+ if((s.lastSeason?.injuryWeeks||0)>=6)conditional.push('injury','recovery');
+ if((s.lastSeason?.matches||99)<12)conditional.push('rotation','bench','loan_talk');
+ if(s.fanClubId&&s.clubId!==s.fanClubId)conditional.push('fan_press','fan_club_rumor');
+ if((s.lastSeason?.goals||0)>=12)conditional.push('milestone','nomination');
+ if((s.coachTrust||50)<45)conditional.push('coach','tactical_room','bench');
+ if(s.dream==='europa')conditional.push('scouting','scout');
+ const all=[...STORY_IDS.filter(id=>!['arrival','fan_home','fan_departure','family'].includes(id)&&(!catalog[id].eligible||catalog[id].eligible(s))),...conditional].filter((id,i,a)=>!!catalog[id]&&a.indexOf(id)===i);
+ const pool=all.filter(id=>!recent.includes(id));
+ const options=pool.length?pool:all;
+ return options[Math.floor(roll()*options.length)]||'coach';
 }
 export function resultOfScene(s,scene,index,playerText=''){
  const o=scene.options[index]||scene.options[0];const effect=o.effect||{};
@@ -276,7 +283,7 @@ export function resultOfScene(s,scene,index,playerText=''){
    morale:x((s.morale??70)+(effect.morale||0),0,100),reputation:x((s.reputation??0)+(effect.reputation||0),0,100),
    sceneBeat:1,sceneChoice:index,scenePlayerText:String(playerText||'').trim().slice(0,240),
    decisions:[...s.decisions,{age:s.age,text:`${scene.title}: ${o.title}`}],
-   storyLog:[...(s.storyLog||[]),{year:(s.startYear||2026)+(s.age-(s.startAge||16)),title:scene.title,tag:scene.tag,actor:scene.speaker.name,choice:o.title,words:String(playerText||'').trim().slice(0,240),result:o.impact,club:clubName(s.clubId)}].slice(-100)};
+   storyLog:[...(s.storyLog||[]),{year:(s.startYear||2026)+(s.age-(s.startAge||16)),id:scene.id,title:scene.title,tag:scene.tag,actor:scene.speaker.name,choice:o.title,words:String(playerText||'').trim().slice(0,240),result:o.impact,club:clubName(s.clubId)}].slice(-100)};
  return newState;
 }
 export function sceneOutcome(s){const scene=sceneFor(s);return scene.options[s.sceneChoice??0]||scene.options[0];}

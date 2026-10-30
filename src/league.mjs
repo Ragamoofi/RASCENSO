@@ -3,6 +3,7 @@
  */
 import { COUNTRIES } from './countries.mjs';
 import { identitySeasonEffects, preparationEffects } from './career08.mjs';
+import { seasonAgendaEffects } from './agenda09.mjs';
 import { VERIFIED_LEAGUES, getInauguralLeague } from './leagues2026.mjs';
 const bound=(v,a,b)=>Math.max(a,Math.min(b,v));
 function rand(seed){let h=2166136261;for(const c of String(seed)){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return ()=>{h+=0x6d2b79f5;let t=Math.imul(h^(h>>>15),1|h);t^=t+Math.imul(t^(t>>>7),61|t);return ((t^(t>>>14))>>>0)/4294967296;};}
@@ -75,9 +76,9 @@ export function playLeague(state){
  const r=rand(`${state.seed}|liga-original-v1|${year}|${state.clubId}|${state.seasonPlan||'equilibrio'}`);
  const plan=state.seasonPlan||'equilibrio';
  const trust=bound(state.coachTrust??50,0,100);
- const prep=preparationEffects(state),traits=identitySeasonEffects(state);
+ const prep=preparationEffects(state),traits=identitySeasonEffects(state),agenda=seasonAgendaEffects(state);
  const own=teams[state.clubId];const role=roleOf(state,own.level);
- const playRate=bound(({Titular:.88,'Rotación':.62,Suplente:.35,Reserva:.14})[role]+(trust-50)/320-(state.age<=18?.08:0)+prep.minutes+traits.minutes,.04,.98);
+ const playRate=bound(({Titular:.88,'Rotación':.62,Suplente:.35,Reserva:.14})[role]+(trust-50)/320-(state.age<=18?.08:0)+prep.minutes+traits.minutes+(agenda.minutes||0),.04,.98);
  const fixtureList=league?.format==='argentina-zones'&&league.zones
   ?(()=>{const za=selected.filter(c=>league.zones.A.includes(c.id)),zb=selected.filter(c=>league.zones.B.includes(c.id));
     const a=calendar(za).filter(f=>f.round<=15),b=calendar(zb).filter(f=>f.round<=15);
@@ -87,7 +88,7 @@ export function playLeague(state){
     return [...first,...second,...inter];
    })()
   :calendar(selected);
- const injuryRoll=r();const prone=(state.injuryProfile==='fragil'?.085:state.injuryProfile==='resistente'?.025:.05)*prep.injury*traits.injury;
+ const injuryRoll=r();const prone=(state.injuryProfile==='fragil'?.085:state.injuryProfile==='resistente'?.025:.05)*prep.injury*traits.injury*(agenda.injury||1);
  const injuryWeeks=injuryRoll<prone+Math.max(0,state.age-29)*.008?(2+Math.floor(r()*11)):0;
  const absence=injuryWeeks?new Set(Array.from({length:Math.min(injuryWeeks,fixtureList.length)},(_,i)=>Math.floor((r()*.7+.1)*fixtureList.length)+i).map(x=>x%Math.max(1,fixtureList.length))):new Set();
  const rows=Object.fromEntries(selected.map(t=>[t.id,{id:t.id,name:t.name,level:t.level,played:0,wins:0,draws:0,losses:0,for:0,against:0,gd:0,points:0}]));
@@ -118,8 +119,8 @@ export function playLeague(state){
   if(isOwn){
    let g=0,a=0,clean=0;
    if(plays){matches++;minutes+=gameMinutes;const forGoals=home.id===state.clubId?gh:ga;const against=home.id===state.clubId?ga:gh;
-    const scoringChance={attack:.36,middle:.16,defense:.036,goalkeeper:0}[skillGroup]*(plan==='ataque'?1.18:plan==='defensa'?.82:1)*(state.style==='goleador'?1.10:1)*prep.goals*traits.goals*gameMinutes/90;
-    const assistingChance={attack:.21,middle:.32,defense:.08,goalkeeper:.01}[skillGroup]*(plan==='ataque'?1.12:1)*(state.style==='creador'?1.15:1)*prep.assists*gameMinutes/90;
+    const scoringChance={attack:.36,middle:.16,defense:.036,goalkeeper:0}[skillGroup]*(plan==='ataque'?1.18:plan==='defensa'?.82:1)*(state.style==='goleador'?1.10:1)*prep.goals*traits.goals*(agenda.goals||1)*gameMinutes/90;
+    const assistingChance={attack:.21,middle:.32,defense:.08,goalkeeper:.01}[skillGroup]*(plan==='ataque'?1.12:1)*(state.style==='creador'?1.15:1)*prep.assists*(agenda.assists||1)*gameMinutes/90;
     for(let k=0;k<forGoals;k++){if(r()<scoringChance)g++;else if(r()<assistingChance)a++;}
     userGoals+=g;userAssists+=a;
     if(skillGroup==='goalkeeper'){goalsConceded+=against;if(against===0){cleanSheets++;clean=1;}}
