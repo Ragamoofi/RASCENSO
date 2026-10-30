@@ -214,3 +214,15 @@ La simulación de la temporada sigue siendo por campaña completa. Los minijuego
 - Las camisetas conceptuales dejaron de mostrarse en el creador. La vista usa la identidad del país y, si existe un kit real aportado, carga la camiseta PNG/WebP.
 - Para incorporar camisetas: subir los archivos a `assets/kits/official/`, y registrar `{\"CL\":\"chile-home-2026.png\"}` en `assets/kits/official/catalog.json`. El catálogo por defecto está vacío hasta tener material verificable.
 - No se modifican atributos ni partidas guardadas.
+
+## Actualización de carrera — 1.8.2
+
+- Tres cambios de propuesta disponibles durante el draft de 8 legados.
+- Las cartas muestran el atributo del referente debajo del nombre, separado de los valores iniciales del futbolista juvenil.
+- Los ocho atributos propios (`pace`, `shot`, `pass`, `dribble`, `defense`, `physical`, `skills` y `weak`) se guardan y evolucionan en cada temporada según minutos, edad, puesto, potencial y desarrollo.
+- Resumen visual de atributos con variaciones en la tarjeta del futbolista; las partidas antiguas conservan sus valores guardados.
+- Las tres ofertas del primer contrato pueden ser de clubes nacionales y extranjeros, priorizando proyectos modestos o divisiones de ascenso; solo un 3,5 % de las carreras incluye una propuesta extraordinaria de un gigante.
+- Contrato inicial visible en cada tarjeta con duración, rol y sueldo mensual/anual. Se firma exactamente lo ofrecido.
+- Escudo de Colo-Colo: enlace directo a la versión vectorial identificable de FootyLogos (sujeto a conectividad del usuario).
+
+La generación y los valores económicos son ficticios, propios de la simulación, sin pretender reproducir contratos reales.
