@@ -16,3 +16,5 @@
 @media(min-width:980px){.mainlayout.withside:has(.storyframe){grid-template-columns:minmax(0,1.75fr) minmax(275px,.77fr);align-items:start}}
 @media(max-width:740px){.storybody{padding:21px}.scene-top{padding:12px 17px;font-size:8px}.story-scene-backdrop{height:115px}.relationship-list{grid-template-columns:1fr}.supporterintro{align-items:flex-start}.storysidebar{grid-template-columns:1fr}}
 @media(max-width:500px){.storybody{padding:17px}.storybody h2{font-size:31px}.dialogue-card{padding:12px;gap:10px}.portrait{width:38px;min-width:38px;height:38px}.scene-choice{padding:12px}.supporterintro{padding:14px}.scene-actions .btn{width:100%}}
+
+.fan-later{background:#193a2c;border:1px solid #4b735a;border-radius:8px;padding:14px;margin:16px 0}.fan-later summary{font-weight:700;color:#e0edb1}.later-supporter{display:flex;flex-direction:column;gap:13px;padding-top:13px}.later-supporter p{color:#bad3bd;font-size:11px;line-height:1.6}.later-supporter select{width:100%;padding:11px;background:#102a21;color:#f1f5e9;border:1px solid #628765;border-radius:6px}.later-supporter .btn{align-self:flex-start}
