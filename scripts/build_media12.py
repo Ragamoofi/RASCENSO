@@ -33,10 +33,10 @@ OVERRIDE={
 }
 LOGOS={
  'CL1':None,'CL2':None,'BR1':'Campeonato Brasileiro Série A logo.svg',
- 'BR2':'Campeonato Brasileiro Série B logo.svg','AR1':'Logo Liga Profesional de Fútbol de Argentina.svg',
+ 'BR2':'Campeonato Brasileiro Série B logo (2025).svg','AR1':'Logo Liga Profesional de Fútbol de Argentina.svg',
  'EN1':'Premier League.svg','ES1':'LaLiga logo 2023.svg','DE1':'Bundesliga logo.svg',
- 'IT1':'Serie A.svg','FR1':'Ligue1 logo 2024.svg',
- 'NL1':'Eredivisie logo.svg','PT1':'Liga Portugal logo.svg','SC1':'Scottish Premiership logo.svg'
+ 'IT1':'Serie A.svg','FR1':"Ligue 1 McDonald's logo.svg",
+ 'NL1':'VriendenLoterij Eredivisie Logo.png','PT1':'Liga Portugal Betclic logo.svg','SC1':'Scottish Premiership logo.svg'
 }
 CUPS={
  'libertadores':'Conmebol Copa Libertadores Trophy45013.png',
@@ -90,23 +90,26 @@ def fallback(path,label,kind):
  im.save(path,'PNG',optimize=True)
 
 def get_pagephotos():
- pages={}
- for group in chunks(list(set(OVERRIDE.get(n,n) for n in NAMES)),30):
-  q=api('en.wikipedia.org',dict(action='query',format='json',redirects=1,prop='pageimages',piprop='thumbnail|name',pithumbsize=520,titles='|'.join(group)))
-  for p in (q or {}).get('query',{}).get('pages',{}).values():
-   if p.get('pageimage') and p.get('thumbnail',{}).get('source'):
-    pages[p.get('title','').casefold()]=p
- # Exact title aliases through query redirects; mapping may not match result article canonical.
+ # MediaWiki normaliza y redirige nombres; asociar cada título a su página correcta.
  mapped={}
- for name in NAMES:
-  title=OVERRIDE.get(name,name)
-  page=pages.get(title.casefold())
-  if page: mapped[name]=page
-  else:
-   # resolve normalized accents/punctuation in canonical titles; never map to another person.
-   normalized=slug(title)
-   match=[p for title2,p in pages.items() if slug(title2)==normalized]
-   if len(match)==1:mapped[name]=match[0]
+ for group in chunks(list(dict.fromkeys(OVERRIDE.get(n,n) for n in NAMES)),30):
+  q=api('en.wikipedia.org',dict(action='query',format='json',redirects=1,prop='pageimages',piprop='thumbnail|name',pithumbsize=520,titles='|'.join(group)))
+  query=(q or {}).get('query',{})
+  pages={p.get('title',''):p for p in query.get('pages',{}).values() if p.get('pageimage') and p.get('thumbnail',{}).get('source')}
+  aliases={x['from']:x['to'] for x in query.get('normalized',[])+query.get('redirects',[]) if 'from' in x and 'to' in x}
+  for name in NAMES:
+   source=OVERRIDE.get(name,name)
+   if source not in group:continue
+   title=source
+   for _ in range(6):
+    nxt=aliases.get(title)
+    if not nxt or nxt==title:break
+    title=nxt
+   page=pages.get(title)
+   if not page:
+    candidates=[p for title2,p in pages.items() if slug(title2)==slug(title)]
+    if len(candidates)==1:page=candidates[0]
+   if page:mapped[name]=page
  return mapped
 
 def commons_metadata(filenames):
@@ -142,6 +145,7 @@ def normalized_image(content,kind):
 def main():
  media=[]; pagephotos=get_pagephotos(); names={n:pagephotos[n]['pageimage'] for n in pagephotos}
  metadata=commons_metadata(list(names.values())+[v for v in LOGOS.values() if v]+list(CUPS.values()))
+ print('MEDIA12 indexed',len(NAMES),'candidates',len(names),'licensed assets',len(metadata),flush=True)
  tasks=[]
  for name in NAMES:
   filename=names.get(name); meta=metadata.get(filename)
