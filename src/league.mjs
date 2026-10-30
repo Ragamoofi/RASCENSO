@@ -3,7 +3,7 @@ import { profileMatchEffects } from './archetypes17.mjs';
  * No utiliza ni reproduce el código de Copero.
  */
 import { COUNTRIES } from './countries.mjs';
-import { identitySeasonEffects, preparationEffects } from './career08.mjs';
+import { identitySeasonEffects, preparationEffects, creatorIdentityEffects } from './career08.mjs';
 import { seasonAgendaEffects } from './agenda09.mjs';
 import { momentScoreDelta } from './moments15.mjs';
 import { VERIFIED_LEAGUES, getInauguralLeague } from './leagues2026.mjs';
@@ -86,9 +86,9 @@ export function playLeague(state){
  const r=rand(`${state.seed}|liga-original-v1|${year}|${state.clubId}|${state.seasonPlan||'equilibrio'}`);
  const plan=state.seasonPlan||'equilibrio';
  const trust=bound(state.coachTrust??50,0,100);
- const prep=preparationEffects(state),traits=identitySeasonEffects(state),agenda=seasonAgendaEffects(state),profile=profileMatchEffects(state);
+ const prep=preparationEffects(state),traits=identitySeasonEffects(state),persona=creatorIdentityEffects(state),agenda=seasonAgendaEffects(state),profile=profileMatchEffects(state);
  const own=teams[state.clubId];const role=roleOf(state,own.level);
- const playRate=bound(({Titular:.88,'Rotación':.62,Suplente:.35,Reserva:.14})[role]+(trust-50)/320-(state.age<=18?.08:0)+prep.minutes+traits.minutes+(agenda.minutes||0)+profile.minutes,.04,.98);
+ const playRate=bound(({Titular:.88,'Rotación':.62,Suplente:.35,Reserva:.14})[role]+(trust-50)/320-(state.age<=18?.08:0)+prep.minutes+traits.minutes+(agenda.minutes||0)+profile.minutes+persona.minutes,.04,.98);
  const fixtureList=league?.format==='argentina-zones'&&league.zones
   ?(()=>{const za=selected.filter(c=>league.zones.A.includes(c.id)),zb=selected.filter(c=>league.zones.B.includes(c.id));
     const a=calendar(za).filter(f=>f.round<=15),b=calendar(zb).filter(f=>f.round<=15);
@@ -98,7 +98,7 @@ export function playLeague(state){
     return [...first,...second,...inter];
    })()
   :calendar(selected);
- const injuryRoll=r();const prone=(state.injuryProfile==='fragil'?.085:state.injuryProfile==='resistente'?.025:.05)*prep.injury*traits.injury*(agenda.injury||1)*profile.injury;
+ const injuryRoll=r();const prone=(state.injuryProfile==='fragil'?.085:state.injuryProfile==='resistente'?.025:.05)*prep.injury*traits.injury*(agenda.injury||1)*profile.injury*persona.injury;
  const injuryWeeks=injuryRoll<prone+Math.max(0,state.age-29)*.008?(2+Math.floor(r()*11)):0;
  const absence=injuryAbsenceSlots(fixtureList,state.clubId,injuryWeeks,r);
  const rows=Object.fromEntries(selected.map(t=>[t.id,{id:t.id,name:t.name,level:t.level,played:0,wins:0,draws:0,losses:0,for:0,against:0,gd:0,points:0}]));
@@ -132,13 +132,13 @@ export function playLeague(state){
   if(isOwn){
    let g=0,a=0,clean=0;
    if(plays){matches++;minutes+=gameMinutes;const forGoals=home.id===state.clubId?gh:ga;const against=home.id===state.clubId?ga:gh;
-    const scoringChance={attack:.36,middle:.16,defense:.036,goalkeeper:0}[skillGroup]*(plan==='ataque'?1.18:plan==='defensa'?.82:1)*(state.style==='goleador'?1.10:1)*prep.goals*traits.goals*(agenda.goals||1)*profile.goals*gameMinutes/90;
-    const assistingChance={attack:.21,middle:.32,defense:.08,goalkeeper:.01}[skillGroup]*(plan==='ataque'?1.12:1)*(state.style==='creador'?1.15:1)*prep.assists*(agenda.assists||1)*profile.assists*gameMinutes/90;
+    const scoringChance={attack:.36,middle:.16,defense:.036,goalkeeper:0}[skillGroup]*(plan==='ataque'?1.18:plan==='defensa'?.82:1)*(state.style==='goleador'?1.10:1)*prep.goals*traits.goals*(agenda.goals||1)*profile.goals*persona.goals*gameMinutes/90;
+    const assistingChance={attack:.21,middle:.32,defense:.08,goalkeeper:.01}[skillGroup]*(plan==='ataque'?1.12:1)*(state.style==='creador'?1.15:1)*prep.assists*(agenda.assists||1)*profile.assists*persona.assists*gameMinutes/90;
     // La jugada decisiva agrega exactamente UNA acción atribuida al jugador;
     // no debe entrar también al reparto aleatorio de los goles ordinarios.
     const regularGoals=Math.max(0,forGoals-(clutch?.attack?1:0));
     for(let k=0;k<regularGoals;k++){if(r()<scoringChance)g++;else if(r()<assistingChance)a++;}
-    if(clutch?.attack){if(clutch.type==='pase')a++;else g++;}
+    if(clutch?.attack){if(['pase','corner','centro'].includes(clutch.type))a++;else g++;}
     userGoals+=g;userAssists+=a;
     if(skillGroup==='goalkeeper'){goalsConceded+=against;if(against===0){cleanSheets++;clean=1;}}
    }

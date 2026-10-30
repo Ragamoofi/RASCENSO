@@ -11,7 +11,7 @@ assert.match(root.innerHTML,/playing-layout/);
 assert.match(root.innerHTML,/right-tabs/);
 assert.match(root.innerHTML,/playing-layout/);
 assert.match(root.innerHTML,/standing-row/);
-assert.match(root.innerHTML,/ALFA 1.7/);
+assert.match(root.innerHTML,/ALFA 1.8/);
 assert.match(root.innerHTML,/assets\/crests\/.*\.png/);
 assert.match(root.innerHTML,/Valor de mercado/);
 assert.match(root.innerHTML,/Sueldo mensual/);

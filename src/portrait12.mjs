@@ -14,9 +14,11 @@ export function enhanceLegendImages(root){
    const img=new Image();img.className='legend-real-photo legend-network-photo';img.alt='';
    img.loading='eager';img.decoding='async';img.referrerPolicy='no-referrer';
    img.addEventListener('load',()=>{
-    if(card.isConnected)card.querySelector('.legend-photo-backdrop')?.appendChild(img);
+    if(card.isConnected){card.querySelector('.legend-photo-backdrop')?.appendChild(img);card.classList.add('has-licensed-photo');}
    },{once:true});
-   img.src=src;
+   const slug=card.dataset.portraitName.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+   img.addEventListener('error',()=>{if(img.dataset.triedRemote)return;img.dataset.triedRemote='1';img.src=src;},{once:false});
+   img.src=`./assets/portraits/${slug}.png`;
   }
  });
 }

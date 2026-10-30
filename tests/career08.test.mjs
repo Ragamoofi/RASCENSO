@@ -9,7 +9,7 @@ function start(seed='test08'){let s=newCareer({name:'Protagonista',country:'CL',
 test('Cuatro ejes nuevos de identidad validados y persistentes',()=>{
  const s=newCareer({name:'Único',environment:'autodidacta',publicImage:'mediatico',riskProfile:'economico',developmentPath:'fisica',seed:'identity08'});
  assert.equal(s.version,8);assert.equal(s.environment,'autodidacta');assert.equal(s.publicImage,'mediatico');assert.equal(s.riskProfile,'economico');assert.equal(s.developmentPath,'fisica');
- for(const list of [ENVIRONMENTS,PUBLIC_IMAGES,RISK_PROFILES,DEVELOPMENT_PATHS])assert.equal(list.length,4);
+ for(const list of [ENVIRONMENTS,PUBLIC_IMAGES,RISK_PROFILES,DEVELOPMENT_PATHS])assert.ok(list.length>=4);
  const bad=newCareer({name:'Validado',environment:'cualquier cosa',publicImage:'incorrecto'});assert.equal(bad.environment,'sin_contactos');assert.equal(bad.publicImage,'reservado');
 });
 test('Migración de v6 conserva historia y agrega rasgos nuevos sin borrar partida',()=>{

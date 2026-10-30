@@ -24,18 +24,34 @@ export const PERSONALITIES = [
   {id:'ambicioso',name:'Ambicioso',description:'Quieres jugar al máximo nivel y no te conformas con poco.'},
   {id:'leal',name:'Leal',description:'Valoras al equipo y las personas que confían en ti.'},
   {id:'carismatico',name:'Carismático',description:'Conectas con el vestuario, el público y la prensa.'},
+  {id:'sereno',name:'Sangre fría',description:'Te mantienes tranquilo en finales y partidos decisivos.'},
+  {id:'rebelde',name:'Rebelde',description:'Cuestionas decisiones injustas; puedes chocar con el técnico.'},
+  {id:'lider',name:'Líder silencioso',description:'Organizas al equipo sin buscar las cámaras.'},
+  {id:'obsesivo',name:'Obsesivo con mejorar',description:'Entrenas más, pero debes cuidar el descanso.'},
+  {id:'solidario',name:'Compañero solidario',description:'Ayudas al grupo y priorizas las asistencias.'},
+  {id:'competitivo',name:'Amante de los clásicos',description:'Crecen tus ganas de destacar en los partidos de máxima rivalidad.'},
 ];
 export const STYLES = [
   {id:'equilibrado',name:'Completo',description:'Te adaptas a distintas situaciones del partido.'},
   {id:'goleador',name:'Finalizador',description:'Buscas el arco y aprovechas los espacios.'},
   {id:'creador',name:'Creador',description:'Prefieres encontrar el pase que otros no ven.'},
   {id:'intenso',name:'Incansable',description:'Compites fuerte y mantienes la presión durante todo el encuentro.'},
+  {id:'vertical',name:'Vertical',description:'Buscas romper líneas y acelerar la transición.'},
+  {id:'asociativo',name:'Asociativo',description:'Te mueves para dar apoyos y combinar.'},
+  {id:'aereo',name:'Especialista aéreo',description:'Buscas el cabezazo en cada pelota parada.'},
+  {id:'defensor',name:'Seguro primero',description:'Prefieres el corte limpio y proteger tu espalda.'},
+  {id:'regateador',name:'Uno contra uno',description:'Provocas duelos individuales sin miedo al error.'},
 ];
 export const DREAMS = [
   {id:'seleccion',name:'Representar a mi país',description:'Tu gran sueño es vestir la camiseta de tu selección.'},
   {id:'europa',name:'Jugar en la élite mundial',description:'Sueñas con llegar a los clubes más exigentes.'},
   {id:'idolo',name:'Ser ídolo de un club',description:'Quieres dejar una huella imposible de olvidar.'},
   {id:'titulos',name:'Ganar todos los títulos',description:'Tu objetivo es llenar tu carrera de trofeos.'},
+  {id:'cantera',name:'Ser referente de mi cantera',description:'Ayudar a nuevas generaciones a encontrar su lugar.'},
+  {id:'regresar',name:'Volver a mis raíces',description:'Regresar a casa para cerrar mi carrera jugando.'},
+  {id:'capitan',name:'Llevar la jineta',description:'Convertirme en líder dentro y fuera de la cancha.'},
+  {id:'goleador',name:'Romper récords goleadores',description:'Ser recordado por los goles importantes.'},
+  {id:'resistencia',name:'Una carrera longeva',description:'Seguir compitiendo incluso después de los años de élite.'},
 ];
 
 export const POSITIONS = [
@@ -60,7 +76,7 @@ export function newCareer({name,number=9,foot='Derecha',country='CL',position='D
   const personalityId=validSelection(personality,PERSONALITIES,'disciplinado');
   const relationships=initialRelationships(country);
   if(originId==='cantera')relationships.coach.trust=60;
-  return {version:8,...normalizeProfile({position,roleClass,strength,weakness}),clutchMoment:null,...identityTraits({environment,publicImage,riskProfile,developmentPath}),preparation:null,careerMoments:[],annualScenes:0,market:null,agent:{searches:0,year:null,focus:'balanced'},careerEarnings:0,developmentProfile:['temprano','normal','normal','normal','tardio'][Math.floor(rng(String(seed)+':dev')()*5)],injuryProfile:rng(String(seed)+':injury')()<.18?'fragil':'resistente',seasonPlan:'equilibrio',contract:null,seed:String(seed),phase:'draft',name:safeName,number:clamp(Number(number)||9,1,99),foot:foot==='Izquierda'?'Izquierda':'Derecha', country,position,mode:mode==='Purista'?'Purista':'Clásico',
+  return {version:8,...normalizeProfile({position,roleClass,strength,weakness}),clutchMoment:null,...identityTraits({environment,publicImage,riskProfile,developmentPath}),preparation:null,careerMoments:[],annualScenes:0,market:null,agent:{searches:0,year:null,focus:'balanced'},careerEarnings:0,developmentProfile:developmentPath==='tardio'?'tardio':['temprano','normal','normal','normal','tardio'][Math.floor(rng(String(seed)+':dev')()*5)],injuryProfile:rng(String(seed)+':injury')()<.18?'fragil':'resistente',seasonPlan:'equilibrio',contract:null,seed:String(seed),phase:'draft',name:safeName,number:clamp(Number(number)||9,1,99),foot:foot==='Izquierda'?'Izquierda':'Derecha', country,position,mode:mode==='Purista'?'Purista':'Clásico',
     age:firstAge,startAge:firstAge,startYear:START_YEAR,city:String(city||'').trim().slice(0,40),origin:originId,personality:personalityId,
     style:validSelection(style,STYLES,'equilibrado'),dream:validSelection(dream,DREAMS,'seleccion'),story:String(story||'').trim().slice(0,180),
     fanClubId:getClub(fanClubId)?fanClubId:null,storyFlags:{playedForFan:false},storyLog:[],relationships,sceneBeat:0,sceneChoice:null,scenePlayerText:'',
@@ -165,7 +181,7 @@ export function choosePreparation(s,id){
  return {...s,preparation:{year,id},careerMoments:[...(s.careerMoments||[]),{year,kind:'preseason',text:`Pretemporada: ${PREPARATIONS.find(p=>p.id===id).name}`}].slice(-80)};
 }
 export function seasonMoment(s){if(s.phase!=='season'||s.clutchMoment)return null;return upcomingMoment(s,playLeague(s).playerMatches,getClub);}
-export function playCareerMoment(s,choice,timing=null){const moment=seasonMoment(s);if(!moment)return s;const next=solveMoment(s,moment,Number(choice),timing);if(next===s)return s;const played=playLeague(next).playerMatches.find(m=>m.round===moment.round&&m.home===moment.home&&m.away===moment.away);return {...next,clutchMoment:{...next.clutchMoment,fixturePreview:played?{score:played.score,minutes:played.minutes,goals:played.goals,assists:played.assists,played:played.played}:null}};}
+export function playCareerMoment(s,choice,timing=null,performance=null){const moment=seasonMoment(s);if(!moment)return s;const next=solveMoment(s,moment,Number(choice),timing,performance);if(next===s)return s;const played=playLeague(next).playerMatches.find(m=>m.round===moment.round&&m.home===moment.home&&m.away===moment.away);return {...next,clutchMoment:{...next.clutchMoment,fixturePreview:played?{score:played.score,minutes:played.minutes,goals:played.goals,assists:played.assists,played:played.played}:null}};}
 export function advanceSeason(s){
  if(s.phase!=='season')return s;
  const club=getClub(s.clubId);if(!club)return s;

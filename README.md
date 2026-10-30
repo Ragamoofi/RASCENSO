@@ -194,3 +194,7 @@ La simulación de la temporada sigue siendo por campaña completa. Los minijuego
 - Guardado más robusto: el respaldo no puede impedir escribir la partida principal; si el guardado principal falla, no se confirma el cambio visualmente y se muestra un aviso.
 - Se conserva la versión de partida y la compatibilidad con los guardados existentes.
 - Astra inició un pulido en otra sesión, pero sus cambios no estaban publicados en la rama main al revisar el repositorio.
+
+
+## Alfa 1.8 · Identidad y momentos
+Creador con 50 camisetas PNG conceptuales por país (no oficiales), opciones de identidad ampliadas, cartas de ADN limpias, escenas deportivas contextuales, opciones visuales mejoradas y minijuegos de memoria/reflejos/precisión. Fallar la ejecución impide el éxito. Conserva guardados anteriores.

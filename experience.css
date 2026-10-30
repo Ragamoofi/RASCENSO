@@ -276,3 +276,38 @@
 .agent-focus-picker>strong{font-size:12px}.agent-focus-picker>p{font-size:11px;margin:4px 0 10px;color:#a9bed4}
 .agent-focus-options{display:flex;flex-wrap:wrap;gap:7px}.agent-focus-options button{border:1px solid #56728d;background:#20415e;color:#f3f7ff;padding:9px 11px;border-radius:7px;font-weight:700;font-size:11px}
 .agent-focus-options button:hover,.agent-focus-options button:focus-visible{background:#315b81;border-color:#d9a671;outline-offset:2px}
+
+/* 1.8 – nueva identidad del creador */
+.creation-layout{max-width:1450px;grid-template-columns:minmax(560px,1.6fr) minmax(350px,.9fr);gap:21px}
+.creation-panel,.creation-aside{box-shadow:0 20px 54px #020b1670}
+.creation-aside{background:radial-gradient(circle at 48% 32%,#466a9b42,transparent 56%),linear-gradient(155deg,#1a3a59,#081f34 78%)}
+.recruit-poster{background:radial-gradient(ellipse at 50% 28%,#7193b32e,transparent 65%)}
+.poster-kit-wrap{display:grid;place-items:center;position:relative;width:min(100%,310px);height:320px;margin:18px 0 0;filter:drop-shadow(0 20px 25px #030b1b88)}
+.kit-halo{position:absolute;width:260px;height:260px;border:1px solid #e8b7844b;border-radius:50%;background:radial-gradient(circle,#a8cbdf18,transparent 70%)}
+.country-kit{height:315px;width:auto;max-width:100%;position:relative;z-index:2;object-fit:contain}
+.kit-badge{position:absolute;bottom:2px;z-index:3;font-size:10px;background:#0c2541dd;border:1px solid #7594b5;border-radius:30px;padding:6px 12px;white-space:nowrap}
+.poster-persona{font-size:11px;color:#d1e3ef;margin-top:7px}
+.choice-tile{transition:transform .16s,border-color .16s}
+.choice-tile:hover{transform:translateY(-2px);border-color:#b3d1e7}
+.choice-tile.chosen{border-color:#ecb481;background:linear-gradient(120deg,#2a4d73,#1c3455);box-shadow:inset 3px 0 #eab17d}
+.legend-photo-backdrop{background:radial-gradient(circle at 50% 40%,#4b7bb459,transparent 67%),linear-gradient(142deg,#21476b,#132a43)}
+.legend-art-field{position:absolute;inset:0;display:flex;justify-content:center;align-items:center;flex-direction:column;background:repeating-linear-gradient(110deg,transparent 0 62px,#ddefff07 63px 64px)}
+.legend-art-crest{font-size:76px;color:#e0edff2a}
+.legend-art-number{font:900 150px/1 'Barlow Condensed',sans-serif;color:#cadcf016}
+.legend-card.has-licensed-photo .legend-art-field{display:none}
+.legend-stat-feature{position:relative;z-index:4;display:inline-flex;align-items:center;gap:9px;background:#0e2944db;border:1px solid #92afc5;border-radius:8px;padding:5px 12px;margin:13px 15px 0}
+.legend-stat-feature small{font-size:10px;color:#deeeff;font-weight:900}.legend-stat-feature b{font:900 35px/1 'Barlow Condensed',sans-serif;color:#ffcb9c}
+.agenda-premium{background:linear-gradient(150deg,#194266,#0b263e);border:1px solid #6889a5;border-radius:13px;box-shadow:0 12px 30px #0005;padding:17px}
+.agenda-premium h3{font-size:27px}
+.agenda-premium .agenda-options{display:grid;gap:8px}
+.agenda-premium .agenda-options button{background:#1d3e5c;border:1px solid #537798;border-radius:10px;min-height:75px;transition:background .15s,transform .15s}
+.agenda-premium .agenda-options button:hover{background:#295479;transform:translateX(2px);border-color:#e9b382}
+.agenda-premium .agenda-options button em{display:block;margin-top:5px;font-style:normal;font-size:9px;color:#f1b98b;letter-spacing:.07em;font-weight:900}
+/* Una única fuente de movimiento: requestAnimationFrame controla la aguja. */
+.clutch-needle{animation:none!important;transition:none!important;will-change:left}
+.memory-stage>p{color:#c7ddef;margin:0;font-size:12px}
+.memory-cues,.memory-progress{display:flex;justify-content:center;gap:14px;align-items:center;min-height:70px}
+.memory-cues b,.memory-progress b{display:grid;place-items:center;width:57px;height:54px;border-radius:9px;border:1px solid #dfa773;background:#bd854835;color:#fff;font-size:27px}
+.memory-progress span{font-size:12px;color:#eab17d}.memory-cancel{background:transparent;border:0;text-decoration:underline;color:#d7e7fa;cursor:pointer;justify-self:start}
+@media(max-width:1000px){.creation-layout{height:auto;max-height:none;grid-template-columns:1fr}.creation-aside{min-height:470px}}
+@media(max-width:600px){.choice-tiles{grid-template-columns:1fr}.country-kit{height:260px}.poster-kit-wrap{height:270px}}
