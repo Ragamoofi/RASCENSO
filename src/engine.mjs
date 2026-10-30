@@ -1,7 +1,8 @@
 import { COUNTRIES } from './countries.mjs';
 
 import { initialRelationships, chooseScene, sceneFor, resultOfScene } from './story.mjs';
-import { playLeague, leagueParticipants } from './league.mjs';
+import { playLeague, leagueParticipants, getCompetitionForCareer, nextLeagueRosters } from './league.mjs';
+import { VERIFIED_LEAGUES, getInauguralLeague } from './leagues2026.mjs';
 
 export const START_YEAR = 2026;
 export const ORIGINS = [
@@ -52,7 +53,7 @@ function hash(x){ let h=2166136261;for(const c of String(x)){h^=c.charCodeAt(0);
 function rng(seed){let a=hash(seed);return ()=>{a=(a+0x6D2B79F5)|0;let t=Math.imul(a^(a>>>15),1|a);t^=t+Math.imul(t^(t>>>7),61|t);return ((t^(t>>>14))>>>0)/4294967296;};}
 function choose(arr,r){return arr[Math.floor(r()*arr.length)];}
 export function getCountry(code){return COUNTRIES.find(c=>c.code===code);}
-export function getClub(id){for(const c of COUNTRIES){const club=c.clubs.find(x=>x.id===id);if(club)return {...club,country:c.name,countryCode:c.code,league:c.league,region:c.confederation};}return null;}
+export function getClub(id){for(const c of COUNTRIES){const club=c.clubs.find(x=>x.id===id);if(club){const league=getInauguralLeague(club.id);return {...club,country:c.name,countryCode:c.code,league:league?.name||c.league,division:league?.tier??null,competitionId:league?.id??null,region:c.confederation};}}return null;}
 function validSelection(value,options,defaultId){return options.some(x=>x.id===value)?value:defaultId;}
 export function newCareer({name,number=9,foot='Derecha',country='CL',position='DC',mode='Clásico',age=16,city='',origin='barrio',personality='disciplinado',style='equilibrado',dream='seleccion',story='',fanClubId='',seed=Date.now()}){
   const safeName=String(name||'').trim().slice(0,44);
@@ -129,7 +130,9 @@ export function acceptDraft(s, index=0){
 }
 export function academyOffers(s){
   const c=getCountry(s.country); if(!c)return [];
-  const available=[...c.clubs];const r=rng(`${s.seed}:academy`);
+  const verified=c.clubs.filter(cl=>!!getInauguralLeague(cl.id));
+  const available=(verified.length>=3?verified:c.clubs.filter(cl=>!cl.inactive&&!getInauguralLeague(cl.id))).filter(cl=>!cl.inactive);
+  const r=rng(`${s.seed}:academy`);
   const count=Math.min(3,available.length);const chosen=[];while(chosen.length<count){const at=Math.floor(r()*available.length);chosen.push(available.splice(at,1)[0]);}
   return chosen.map(club=>getClub(club.id));
 }
@@ -147,7 +150,7 @@ export function advanceSeason(s){
  if(s.phase!=='season'||s.age>=40)return s;
  const club=getClub(s.clubId);if(!club)return s;
  const r=rng(`${s.seed}:seasonv5:${s.age}:${club.id}`);
- const league=playLeague(s),{matches,goals,assists,cleanSheets,goalsConceded,injuryWeeks,leaguePosition,role,minutes}=league;
+ const league=playLeague(s),leagueRosters=nextLeagueRosters(s,league),{matches,goals,assists,cleanSheets,goalsConceded,injuryWeeks,leaguePosition,role,minutes}=league;
  const profile=s.developmentProfile||'normal';
  const ageStep=profile==='temprano'?2:profile==='tardio'?-2:0;
  const devAge=s.age+ageStep;
@@ -162,20 +165,20 @@ export function advanceSeason(s){
  const growth=gap*.22*ageFactor*Math.max(.18,Math.min(1.12,share*1.55))*injuryFactor+breakout+(r()-.5)*1.4-decline;
  const ovr=clamp(Math.round(s.ovr+growth),49,99);
  const titles=[];
- if(leaguePosition===1)titles.push(`Liga de ${club.country}`);
+ if(leaguePosition===1)titles.push(league.league);
  // Solo se concede el título de liga cuando se ganó por puntos en la tabla.
  const international=s.ovr>=77&&matches>=18?Math.floor(r()*7):0;
  const worldCup=international>0&&(s.age-18)%4===0&&s.age>=18;
  const worldCupResult=worldCup?choose(['Fase de grupos','Octavos de final','Cuartos de final','Semifinal'],r):null;
  const seasonal={age:s.age,year:careerYear(s),clubId:club.id,club:club.name,country:club.country,ovrBefore:s.ovr,ovrAfter:ovr,role,matches,minutes,goals,assists,cleanSheets,goalsConceded,international,injuryWeeks,leaguePosition,titles,worldCupResult,
-  table:league.standings,fixtures:league.fixtureResults,playerMatches:league.playerMatches,plan:league.plan,champion:league.champion,leagueName:league.league,competitionVersion:1};
+  table:league.standings,fixtures:league.fixtureResults,playerMatches:league.playerMatches,plan:league.plan,champion:league.champion,leagueName:league.league,leagueId:league.leagueId,leagueVerified:league.verified,leagueDivision:league.division,competitionVersion:2};
  const coachTrust=clamp((s.coachTrust??50)+(matches>=Math.round(games*.65)?3:matches<8?-5:-1)+(s.seasonPlan==='defensa'?2:0),0,100);
  const relationships={...s.relationships,coach:{...s.relationships.coach,trust:coachTrust}};
  const flags={...(s.storyFlags||{})};if(s.fanClubId&&s.clubId===s.fanClubId)flags.playedForFan=true;
  let reputation=clamp((s.reputation||0)+(leaguePosition<=3?3:0)+Math.min(4,Math.floor((goals+assists)/13)),0,100);
  let contract=s.contract;
  if(contract&&contract.clubId===s.clubId&&contract.ends<=careerYear(s)+1)contract={...contract,ends:careerYear(s)+3,salary:Math.round(contract.salary*1.08)};
- return {...s,age:s.age+1,ovr,reputation,contract,coachTrust,relationships,history:[...s.history,seasonal],trophies:[...s.trophies,...titles],lastSeason:seasonal,pendingEvent:chooseScene({...s,lastSeason:seasonal},r),storyFlags:flags,
+ return {...s,age:s.age+1,ovr,reputation,contract,leagueRosters,coachTrust,relationships,history:[...s.history,seasonal],trophies:[...s.trophies,...titles],lastSeason:seasonal,pendingEvent:chooseScene({...s,lastSeason:seasonal},r),storyFlags:flags,
   sceneBeat:0,sceneChoice:null,scenePlayerText:'',phase:s.age===39?'retired':'event'};
 }
 
@@ -200,7 +203,7 @@ export function transferOffers(s){
  const r=rng(`${s.seed}:transfersv5:${s.age}:${s.clubId}`);
  const interest=Math.min(.90,.52+(s.reputation||0)/300+(s.contract?.ends<=careerYear(s)+1?.10:0));
  if(r()>interest)return [];
- const all=COUNTRIES.flatMap(c=>c.clubs).filter(c=>c.id!==s.clubId);
+ const all=COUNTRIES.flatMap(c=>c.clubs).filter(c=>c.id!==s.clubId&&!c.inactive&&(!VERIFIED_LEAGUES.some(l=>l.countryCode===c.id.slice(0,2).toUpperCase())||!!getInauguralLeague(c.id)));
  const valid=all.filter(c=>c.level>=s.ovr-19&&c.level<=s.ovr+15);
  const local=valid.filter(c=>getClub(c.id).countryCode===s.country);
  const pool=s.history.length<4&&local.length?[...local]:[...valid];
@@ -243,7 +246,7 @@ export function totals(s){return s.history.reduce((a,x)=>({matches:a.matches+x.m
 export function simulatedStandings(s){
  const club=getClub(s.clubId);if(!club)return [];
  const saved=[...(s.history||[])].reverse().find(x=>x.clubId===s.clubId&&Array.isArray(x.table));
- if(saved)return saved.table.map(t=>({...t,isPlayer:t.id===s.clubId}));
+ if(saved&&saved.leagueId===getCompetitionForCareer(s)?.id)return saved.table.map(t=>({...t,isPlayer:t.id===s.clubId}));
  // Antes de disputar partidos, no hay tabla ficticia con puntos inventados.
- return leagueParticipants(club.countryCode,s.clubId).map(c=>({id:c.id,name:c.name,played:0,wins:0,draws:0,losses:0,for:0,against:0,gd:0,points:0,isPlayer:c.id===s.clubId})).sort((a,b)=>a.name.localeCompare(b.name,'es')).map((x,i)=>({...x,position:i+1}));
+ return leagueParticipants(club.countryCode,s.clubId,s).map(c=>({id:c.id,name:c.name,played:0,wins:0,draws:0,losses:0,for:0,against:0,gd:0,points:0,isPlayer:c.id===s.clubId})).sort((a,b)=>a.name.localeCompare(b.name,'es')).map((x,i)=>({...x,position:i+1}));
 }

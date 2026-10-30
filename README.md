@@ -1,6 +1,6 @@
 # RASCENSO · Del barrio a la historia
 
-**Alfa 0.5 — Nueva Era** · 30 de octubre de 2026 · © Ragamoofi.
+**Alfa 0.6 — Competiciones y tarjetas** · 30 de octubre de 2026 · © Ragamoofi.
 
 Sitio oficial de prueba: https://ragamoofi.github.io/RASCENSO/
 
@@ -39,3 +39,15 @@ node tests/ui-smoke.mjs
 ### Publicación
 
 `main` dispara `.github/workflows/pages.yml`; no se requiere Python ni GitHub Desktop para jugar en la dirección de GitHub Pages.
+
+## Versión Alfa 0.6 · Competiciones verificadas 2026/27
+
+- **13 divisiones confirmadas**, de 11 países, con 246 inscripciones: CL Primera y Ascenso, BR A y B, AR Primera (2 zonas), EN, ES, DE, IT, FR, NL, PT y SC principales. Datos iniciales en `src/leagues2026.mjs`, con fuente por competición. Las temporadas europeas parten como **2026/27**.
+- Las **otras 38 selecciones nacionales** y los clubes no clasificados en estas ligas se mantienen en el catálogo para la carrera, pero su competición se muestra honestamente como **circuito de referencia**, sin afirmar que sea una nómina oficial 2026. Hay que seguir verificando estas ligas antes de activar una división oficial de esos países.
+- Chile tiene **16 clubes de Primera y 16 de Ascenso**, sin filiales B. Los equipos antiguos que ya no participan quedan en el catálogo histórico para no eliminar guardados; no entran a las competiciones verificadas.
+- Para países con dos divisiones verificadas (CL/BR), las partidas simulan dos ascensos y descensos por temporada, **ficticios**, usando los resultados de la carrera (no predicen clubes reales de 2027+).
+- Argentina usa las dos zonas de 15 integrantes, representadas con 30 fechas por club en este motor; no incluye todavía el playoff oficial del Apertura/Clausura ni la totalidad de sus reglas de desempate.
+- **Tarjetas originales RASCENSO**: Bronce 0-64, Plata 65-74, Oro 75-82 y Élite 83+, fondos PNG en `assets/cards/`. No contienen imágenes de EA FC.
+- El motor conserva los IDs históricos y migra las partidas anteriores; tablas ya jugadas no se recalculan retroactivamente.
+
+Fuentes de clubes: [Chile Primera](https://www.emol.com/especiales/2026/deportes/liga-de-primera/equipos.asp), [Chile Ascenso](https://www.cooperativa.cl/noticias/deportes/futbol/liga-de-ascenso/asi-quedo-la-tabla-del-ascenso-tras-la-desafiliacion-de-san-marcos-por/2026-10-27/213307.html), [Brasil A](https://www.cbf.com.br/futebol-brasileiro/times/campeonato-brasileiro/serie-a/2026), [Brasil B](https://www.cnnbrasil.com.br/esportes/brasileirao/campeonato-brasileiro-veja-os-clubes-que-participarao-da-serie-b-em-2026/), [Argentina](https://www.afa.com.ar/es/posts/sorteo-de-la-liga-profesional-2026-se-definen-los-grupos-del-torneo-apertura-y-torneo-clausura), [Premier League](https://www.premierleague.com/en/news/4365156), [España](https://www.laliga.com/laliga-easports/clubes), [Alemania](https://www.bundesliga.com/en/bundesliga/clubs), [Italia](https://sport.sky.it/calcio/serie-a/serie-a-2026-2027-squadre), [Francia](https://ligue1.com/fr/articles/l1_article_5293-les-dates-de-reprise-des-clubs-de-l1-2627), [Holanda](https://eredivisie.nl/competitie/clubs/), [Portugal](https://bolanarede.pt/especial-bola-na-rede/atualidade/contas-fechadas-eis-as-18-equipas-que-vao-disputar-a-primeira-liga-2026-27/), [Escocia](https://spfl.co.uk/clubs).

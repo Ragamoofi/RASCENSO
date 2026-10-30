@@ -2,17 +2,49 @@
  * No utiliza ni reproduce el código de Copero.
  */
 import { COUNTRIES } from './countries.mjs';
+import { VERIFIED_LEAGUES, getInauguralLeague } from './leagues2026.mjs';
 const bound=(v,a,b)=>Math.max(a,Math.min(b,v));
 function rand(seed){let h=2166136261;for(const c of String(seed)){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return ()=>{h+=0x6d2b79f5;let t=Math.imul(h^(h>>>15),1|h);t^=t+Math.imul(t^(t>>>7),61|t);return ((t^(t>>>14))>>>0)/4294967296;};}
 function goals(mean,random){let n=0,p=Math.exp(-mean),prod=1;do{n++;prod*=random();}while(prod>p&&n<=10);return Math.min(8,n-1);}
 function roleOf(state,level){const diff=(state.ovr||60)-level+(state.coachTrust-50)*.075;
  return diff>=-3?'Titular':diff>=-12?'Rotación':diff>=-22?'Suplente':'Reserva';}
-export function leagueParticipants(countryCode,clubId){
- const country=COUNTRIES.find(c=>c.code===countryCode);if(!country)return [];
- const all=[...country.clubs].sort((a,b)=>b.level-a.level||a.id.localeCompare(b.id));
- const limit=all.length>=20?20:all.length>=16?16:all.length>=12?12:all.length>=8?8:all.length;
- const clubs=all.slice(0,limit);if(!clubs.some(c=>c.id===clubId)){const selected=all.find(c=>c.id===clubId);if(selected)clubs.splice(Math.max(0,clubs.length-1),1,selected);}
- return clubs.sort((a,b)=>a.id.localeCompare(b.id));
+export function getCompetitionForCareer(state){
+ const mapping=state?.leagueRosters||{};
+ const match=VERIFIED_LEAGUES.find(l=>(mapping[l.id]||l.teamIds).includes(state?.clubId));
+ if(match)return {...match,teamIds:mapping[match.id]||match.teamIds,rosterStatus:'2026 verificado'};
+ // Legacy saves or countries not yet validated keep playing in an explicitly marked reference competition.
+ const country=COUNTRIES.find(c=>c.clubs.some(x=>x.id===state?.clubId));
+ return country?{id:`REF-${country.code}`,countryCode:country.code,name:`Circuito de referencia · ${country.name}`,format:'reference',verified:false,season:'No verificada',tier:null,teamIds:[]}:null;
+}
+export function leagueParticipants(countryCode,clubId,state={}){
+ const league=getCompetitionForCareer({...state,clubId});
+ const country=COUNTRIES.find(c=>c.code===countryCode);
+ if(!country)return [];
+ if(league?.verified)return league.teamIds.map(id=>country.clubs.find(c=>c.id===id)).filter(Boolean);
+ // Unverified countries: explicitly fictional grouping, never presented as a real 2026 league.
+ const active=country.clubs.filter(c=>!c.inactive);
+ const selected=active.filter(c=>!getInauguralLeague(c.id)).sort((a,b)=>b.level-a.level||a.id.localeCompare(b.id));
+ if(!selected.some(c=>c.id===clubId)){const mine=country.clubs.find(c=>c.id===clubId);if(mine)selected.unshift(mine);}
+ const size=Math.min(16,selected.length);return selected.slice(0,size);
+}
+/** Two-tier countries use the actual 2026 rosters as a baseline. Subsequent changes are fictional results of this save, never real-world future claims. */
+export function nextLeagueRosters(state,playedLeague){
+ const current=Object.fromEntries(VERIFIED_LEAGUES.map(l=>[l.id,[...(state.leagueRosters?.[l.id]||l.teamIds)]]));
+ const code=playedLeague.countryCode;
+ const higher=VERIFIED_LEAGUES.find(l=>l.countryCode===code&&l.tier===1);
+ const lower=VERIFIED_LEAGUES.find(l=>l.countryCode===code&&l.tier===2);
+ if(!higher||!lower)return current;
+ const neutral=(league)=>playLeague({
+  ...state,clubId:current[league.id][0],ovr:40,coachTrust:0,position:'POR',injuryProfile:'resistente',
+  seasonPlan:'equilibrio',neutralLeague:true,
+ });
+ const hi=playedLeague.leagueId===higher.id?playedLeague:neutral(higher);
+ const lo=playedLeague.leagueId===lower.id?playedLeague:neutral(lower);
+ const drops=hi.standings.slice(-2).map(r=>r.id),rises=lo.standings.slice(0,2).map(r=>r.id);
+ if(drops.length!==2||rises.length!==2)return current;
+ current[higher.id]=current[higher.id].filter(id=>!drops.includes(id)).concat(rises);
+ current[lower.id]=current[lower.id].filter(id=>!rises.includes(id)).concat(drops);
+ return current;
 }
 export function calendar(clubs){
  const arr=clubs.map(x=>x.id);if(arr.length<2)return [];
@@ -36,14 +68,23 @@ function normalizedClub(team,level){return {id:team.id,name:team.name,level};}
 /** Determinista con la misma carrera, la misma plantilla y el mismo plan. */
 export function playLeague(state){
  const country=COUNTRIES.find(c=>c.clubs.some(t=>t.id===state.clubId));if(!country)throw Error('El club actual no pertenece a una liga.');
- const selected=leagueParticipants(country.code,state.clubId),teams=Object.fromEntries(selected.map(t=>[t.id,t]));
+ const league=getCompetitionForCareer(state);
+ const selected=leagueParticipants(country.code,state.clubId,state),teams=Object.fromEntries(selected.map(t=>[t.id,t]));
  const year=(state.startYear||2026)+(state.age-(state.startAge||16));
  const r=rand(`${state.seed}|liga-original-v1|${year}|${state.clubId}|${state.seasonPlan||'equilibrio'}`);
  const plan=state.seasonPlan||'equilibrio';
  const trust=bound(state.coachTrust??50,0,100);
  const own=teams[state.clubId];const role=roleOf(state,own.level);
  const playRate=bound(({Titular:.88,'Rotación':.62,Suplente:.35,Reserva:.14})[role]+(trust-50)/320-(state.age<=18?.08:0),.04,.98);
- const fixtureList=calendar(selected);
+ const fixtureList=league?.format==='argentina-zones'&&league.zones
+  ?(()=>{const za=selected.filter(c=>league.zones.A.includes(c.id)),zb=selected.filter(c=>league.zones.B.includes(c.id));
+    const a=calendar(za).filter(f=>f.round<=15),b=calendar(zb).filter(f=>f.round<=15);
+    // Apertura and Clausura: one-way rounds in each zone. Interzonal contests are paired deterministically.
+    const first=[...a,...b];const second=first.map(f=>({...f,round:f.round+15,home:f.away,away:f.home}));
+    const inter=[];for(let i=0;i<15;i++){inter.push({round:15,home:za[i].id,away:zb[i].id},{round:30,home:zb[i].id,away:za[i].id});}
+    return [...first,...second,...inter];
+   })()
+  :calendar(selected);
  const injuryRoll=r();const prone=state.injuryProfile==='fragil'?.085:state.injuryProfile==='resistente'?.025:.05;
  const injuryWeeks=injuryRoll<prone+Math.max(0,state.age-29)*.008?(2+Math.floor(r()*11)):0;
  const absence=injuryWeeks?new Set(Array.from({length:Math.min(injuryWeeks,fixtureList.length)},(_,i)=>Math.floor((r()*.7+.1)*fixtureList.length)+i).map(x=>x%Math.max(1,fixtureList.length))):new Set();
@@ -55,7 +96,7 @@ export function playLeague(state){
   const home=teams[f.home],away=teams[f.away];
   const isOwn=home.id===state.clubId||away.id===state.clubId;
   const available=isOwn&&!absence.has(f.round*1000+results.length)&&!absence.has(results.length);
-  const plays=available&&r()<playRate;
+  const plays=!state.neutralLeague&&available&&r()<playRate;
   let gameMinutes=plays?(role==='Titular'?Math.round(70+r()*25):role==='Rotación'?Math.round(30+r()*62):Math.round(8+r()*40)):0;
   const impact=plays?bound((state.ovr-own.level)*.18+gameMinutes/90*1.2,-3.5,4.0):0;
   const sHome=home.level+(home.id===state.clubId?impact:0);
@@ -87,7 +128,7 @@ export function playLeague(state){
  const table=Object.values(rows).map(t=>({...t,gd:t.for-t.against})).sort((a,b)=>b.points-a.points||b.gd-a.gd||b.for-a.for||a.name.localeCompare(b.name,'es'))
   .map((row,i)=>({...row,position:i+1,isPlayer:row.id===state.clubId}));
  const playerRow=table.find(t=>t.id===state.clubId);
- return {year,league:country.league,countryCode:country.code,teams:selected.map(t=>normalizedClub(t,t.level)),fixtureResults:results,standings:table,
+ return {year,league:league?.name||country.league,leagueId:league?.id||null,verified:!!league?.verified,division:league?.tier,seasonLabel:league?.season||'No verificada',countryCode:country.code,teams:selected.map(t=>normalizedClub(t,t.level)),fixtureResults:results,standings:table,
   playerMatches:personal,role,matches,minutes,goals:userGoals,assists:userAssists,cleanSheets,goalsConceded,injuryWeeks,
   leaguePosition:playerRow.position,champion:table[0]?.id,plan};
 }

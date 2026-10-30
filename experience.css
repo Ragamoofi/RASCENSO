@@ -8,9 +8,41 @@
 /* RASCENSO 0.5 - panel lateral partido a partido */
 .right-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:4px 0 11px}.right-tabs button{padding:8px 5px;background:#203b58;color:#bed2eb;border:1px solid #3d5a7a;border-radius:6px;font-size:9px;font-weight:900;cursor:pointer}.right-tabs button.active{background:#f0b17b;color:#18283d;border-color:#ffcd9e}.match-list{display:flex;flex-direction:column;gap:8px}.fixture-item{background:#1e3854;border:1px solid #3a5776;border-radius:8px;padding:9px}.fixture-item small{display:block;color:#b8cce3;font-size:9px}.fixture-item>div{display:grid;grid-template-columns:22px minmax(0,1fr) 43px minmax(0,1fr) 22px;align-items:center;gap:5px;margin:7px 0}.fixture-item>div span{font-size:9px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.fixture-item>div b{text-align:center;color:#ffcb9e;font:900 19px 'Barlow Condensed'}.fixture-item .team-badge{width:22px;height:24px}
 
-
-/* Escudos PNG locales: respetar contorno, proporción y transparencia. */
+/* Escudos PNG locales: preservar sus formas y transparencia original. */
 .team-badge{overflow:visible;border:0;background:transparent;box-shadow:none;border-radius:0}
 .team-badge .badge-img{background:transparent;border-radius:0;padding:0;object-fit:contain}
 .team-badge.hero .badge-img{padding:0}
 .team-badge:has(.badge-img) .badge-fallback{visibility:hidden}
+
+/* RASCENSO 0.6 — cartas originales por media, sin arte de EA FC. */
+.profile-card[class*="player-tier-"]{background:#10253e;border:1px solid #546a82;padding:15px 15px 0;isolation:isolate}
+.profile-card[class*="player-tier-"]::before{content:"";position:absolute;inset:0;z-index:-2;background-position:center;background-size:100% 100%;opacity:.97}
+.profile-card.player-tier-bronze::before{background-image:url('./assets/cards/bronze.png')}
+.profile-card.player-tier-silver::before{background-image:url('./assets/cards/silver.png')}
+.profile-card.player-tier-gold::before{background-image:url('./assets/cards/gold.png')}
+.profile-card.player-tier-elite::before{background-image:url('./assets/cards/elite.png')}
+.profile-card[class*="player-tier-"]::after{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(180deg,#101a300b 5%,#101a3030 39%,#0e1c31dd 83%,#0a2039dd 100%);pointer-events:none}
+.player-tier-silver .player-overall strong,.player-tier-silver .player-label{color:#f6fbff;text-shadow:0 2px 4px #122338aa}
+.player-tier-gold .player-overall strong,.player-tier-elite .player-overall strong{color:#fff1b2;text-shadow:0 2px 5px #372310}
+.player-tier-bronze .player-overall strong{color:#ffe1c0}
+.player-overall{top:47px;left:27px;z-index:2}.player-overall strong{font-size:71px;line-height:.87}.player-overall span{font-weight:900;letter-spacing:1.4px;color:#fff;font-size:10px;margin-top:8px}
+.card-crest{height:148px;display:flex;align-items:center;justify-content:center;width:100%;padding-top:18px}
+.card-crest .team-badge.large{width:96px;height:96px;filter:drop-shadow(0px 6px 11px #07142266)}
+.card-crest .card-free{font-size:46px}
+.card-tier{font-weight:950;letter-spacing:2.5px;font-size:11px;color:#fff6d8;text-shadow:0 2px 7px #090f1d;margin:0 0 4px}
+.profile-card[class*="player-tier-"] h2{text-shadow:0 2px 5px #0a152a;font-size:28px;color:#fff;margin-bottom:3px}
+.profile-card[class*="player-tier-"] .player-label{color:#fff4e2;text-shadow:0 2px 5px #0d1b2c}
+.profile-card[class*="player-tier-"]>p{margin:5px 0 7px;color:#fff}
+.profile-card[class*="player-tier-"] .player-line span{border-color:#c7d5e477;color:#fff;background:#192a4280}
+.profile-card[class*="player-tier-"] .player-club{margin-top:auto;min-height:65px;background:#071a2adb;width:calc(100% + 30px);border-top:1px solid #e7f0ff45}
+.competition-heading{display:flex;justify-content:space-between;align-items:center;gap:7px;margin:0 0 9px;min-height:27px}
+.competition-heading b{font-size:10px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.competition-heading small{font-size:8px;color:#8db5da;text-align:right;max-width:130px}
+@media(max-width:720px){.card-crest{height:92px}.card-crest .team-badge.large{width:62px;height:62px}.player-overall{top:42px;left:17px}.player-overall strong{font-size:52px}.profile-card[class*="player-tier-"] h2{font-size:20px}}
+/* Corregir colisión con reglas antiguas de style.css: la media debe estar en la esquina superior izquierda. */
+.profile-card[class*="player-tier-"] .player-overall{left:22px;right:auto;width:86px;top:46px;z-index:3}
+.profile-card[class*="player-tier-"] .player-overall strong{font-size:65px}
+.profile-card[class*="player-tier-"] .card-crest{height:177px;align-items:flex-end;padding-top:62px}
+.profile-card[class*="player-tier-"] .card-crest .team-badge.large{width:83px;height:83px}
+.profile-card[class*="player-tier-"] .card-tier{margin-bottom:1px}
+@media(max-width:720px){.profile-card[class*="player-tier-"] .player-overall{top:39px;left:14px;width:65px}.profile-card[class*="player-tier-"] .player-overall strong{font-size:50px}.profile-card[class*="player-tier-"] .card-crest{height:130px}}
