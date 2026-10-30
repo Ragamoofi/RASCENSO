@@ -82,22 +82,38 @@ export function migrateCareer(s){
   return migrated;
 }
 export function careerYear(s){return (s.startYear??START_YEAR)+(s.age-(s.startAge??16));}
-export function currentDraft(s){
-  if(s.phase!=='draft')return null;
-  const r=rng(`${s.seed}:draft:${s.draftIndex}:${s.draftRerolls}`);
-  const legend=choose(LEGENDS,r);
+// Tres propuestas por ronda: leyendas, atributos y caminos de desarrollo diferentes.
+export function draftChoices(s) {
+  if (s.phase !== 'draft') return [];
+  const r=rng(`${s.seed}:draft-v4:${s.draftIndex}:${s.draftRerolls}`);
   const unfilled=ATTRS.filter(([key])=>!(key in s.attributes));
-  const attrs=unfilled.map(([key])=>({key,label:ATTRS.find(a=>a[0]===key)[1],value:legend.values[ATTRS.findIndex(a=>a[0]===key)]}));
-  const recommendation=attrs.sort((a,b)=>b.value/((a.key==='weak'||a.key==='skills')?5:100)-a.value/((b.key==='weak'||b.key==='skills')?5:100))[0];
-  return {legend:legend.name,...recommendation,hidden:s.mode==='Purista'};
+  const order=[...unfilled].sort(()=>r()-.5); // no altera estado de jugador ni muestra valores ocultos
+  const source=[];
+  const used=new Set();
+  const important = ['pace','shot','pass','dribble','defense','physical'];
+  for(let i=0;i<3;i++){
+    const [key,label]=order[i%order.length];
+    let idx=Math.floor(r()*LEGENDS.length);
+    for(let j=0;j<LEGENDS.length&&used.has(idx);j++)idx=(idx+1)%LEGENDS.length;
+    used.add(idx);
+    const legend=LEGENDS[idx];
+    const value=legend.values[ATTRS.findIndex(a=>a[0]===key)];
+    const weight=important.includes(key)?WEIGHTS[s.position][important.indexOf(key)]:.08;
+    const fit=weight>=.26?'CLAVE PARA TU PUESTO':weight>=.16?'COMPLEMENTO FUERTE':'PERFIL ALTERNATIVO';
+    source.push({legend:legend.name,key,label,value,fit,hidden:s.mode==='Purista'});
+  }
+  return source;
 }
+export function currentDraft(s){return draftChoices(s)[0]||null;}
 export function rerollDraft(s){if(s.phase!=='draft'||s.draftRerolls>=5)return s;return {...s,draftRerolls:s.draftRerolls+1};}
 const WEIGHTS={DC:[.13,.38,.10,.24,.02,.13],EI:[.29,.20,.15,.27,.02,.07],ED:[.29,.20,.15,.27,.02,.07],
   MCO:[.13,.18,.32,.25,.03,.09],MC:[.13,.12,.30,.22,.13,.10],MI:[.25,.12,.24,.23,.06,.10],MD:[.25,.12,.24,.23,.06,.10],
   MCD:[.09,.04,.24,.12,.30,.21],DFC:[.08,.03,.12,.07,.42,.28],LI:[.20,.04,.18,.17,.27,.14],LD:[.20,.04,.18,.17,.27,.14],POR:[.06,.01,.11,.03,.47,.32]};
-export function acceptDraft(s){
+export function acceptDraft(s, index=0){
   if(s.phase!=='draft')return s;
-  const d=currentDraft(s),attributes={...s.attributes,[d.key]:d.value};
+  const choices=draftChoices(s);
+  const d=choices[Number.isInteger(index)&&index>=0&&index<choices.length?index:0];
+  const attributes={...s.attributes,[d.key]:d.value};
   const draftSources=[...s.draftSources,{legend:d.legend,attribute:d.key,value:d.value}];
   if(s.draftIndex<7)return {...s,draftIndex:s.draftIndex+1,attributes,draftSources};
   const vals=['pace','shot','pass','dribble','defense','physical'];
@@ -114,6 +130,7 @@ export function academyOffers(s){
   return chosen.map(club=>getClub(club.id));
 }
 export function signAcademy(s,id){if(s.phase!=='academy'||!academyOffers(s).some(x=>x.id===id))return s;return {...s,phase:'event',clubId:id,pendingEvent:id===s.fanClubId?'fan_home':'arrival',sceneBeat:0,decisions:[...s.decisions,{age:s.age,text:`Primer contrato: ${getClub(id).name}`} ]};}
+function countryLeagueSize(code){return Math.min(20,Math.max(1,getCountry(code)?.clubs.length||20));}
 function positionGroup(p){if(p==='POR')return 'goalkeeper';if(['DC','EI','ED'].includes(p))return 'attack';if(['MCO','MC','MI','MD'].includes(p))return 'create';return 'defense';}
 export function advanceSeason(s){
   if(s.phase!=='season'||s.age>=40)return s;
@@ -136,7 +153,7 @@ export function advanceSeason(s){
   const growth=clamp(Math.round(peak+(matches>26?1:matches<8?-2:0)+(r()-.5)*4+(s.morale-70)/35+originGrowth+personalityGrowth),-5,5);
   const ovr=clamp(s.ovr+Math.min(growth,s.potential-s.ovr),40,99);
   const strength=clamp(club.level+(ovr-club.level)*.32+(r()-.5)*24,35,99);
-  const leaguePosition=clamp(Math.round(20-(strength-40)/3.6+(r()-.5)*8),1,20);
+  const leaguePosition=clamp(Math.round(countryLeagueSize(club.countryCode)-(strength-40)/3.6+(r()-.5)*8),1,countryLeagueSize(club.countryCode));
   const titles=[];
   if(leaguePosition===1)titles.push(`Liga de ${club.country}`);
   if(strength>74&&r()>.78)titles.push(`Copa nacional de ${club.country}`);
@@ -208,3 +225,21 @@ export function simulateToRetirement(state){
   return s;
 }
 export function totals(s){return s.history.reduce((a,x)=>({matches:a.matches+x.matches,goals:a.goals+x.goals,assists:a.assists+x.assists,international:a.international+x.international,cleanSheets:a.cleanSheets+x.cleanSheets}),{matches:0,goals:0,assists:0,international:0,cleanSheets:0});}
+
+/** Tabla orientativa reproducible; NO es un calendario de partidos real. */
+export function simulatedStandings(s){
+  const club=getClub(s.clubId); if(!club) return [];
+  const country=getCountry(club.countryCode);
+  const strongest=[...country.clubs].sort((a,b)=>b.level-a.level).slice(0,19);
+  const teams=strongest.some(x=>x.id===club.id)?[...country.clubs].sort((a,b)=>b.level-a.level).slice(0,20):[...strongest, country.clubs.find(x=>x.id===club.id)];
+  const season=s.lastSeason?.clubId===s.clubId?s.lastSeason:null;
+  const year=season?.year??careerYear(s);
+  const r=rng(`${s.seed}:tabla:${country.code}:${year}`);
+  let rows=teams.map(team=>({id:team.id,name:team.name,level:team.level,score:team.level+(r()-.5)*26}));
+  rows.sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id));
+  if(season){
+    const idx=rows.findIndex(x=>x.id===club.id);
+    if(idx>=0){const [my]=rows.splice(idx,1);rows.splice(clamp(season.leaguePosition-1,0,rows.length),0,my);}
+  }
+  return rows.map((x,i)=>({...x,position:i+1,points:Math.max(10,Math.round(86-i*2.65)),played:Math.max(18,Math.min(38,(rows.length-1)*2)),isPlayer:x.id===club.id}));
+}

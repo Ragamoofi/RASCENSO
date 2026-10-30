@@ -106,3 +106,30 @@ test('Migrar una partida v2 conserva temporada y añade relaciones y bitácora',
  const m=migrateCareer(v2);assert.equal(m.version,3);assert(m.relationships.coach);assert.deepEqual(m.storyLog,[]);
  assert.equal(m.history.length,original.history.length);
 });
+
+test('El catálogo ampliado conserva identificadores y supera 800 clubes de 49 países',()=>{
+ assert(COUNTRIES.reduce((n,c)=>n+c.clubs.length,0)>=800);
+ assert.equal(getCountry('CL').clubs.find(c=>c.id==='cl-1').name,'Colo-Colo');
+ assert(getCountry('CL').clubs.some(c=>c.name==='Santiago Wanderers'));
+ assert(COUNTRIES.every(c=>new Set(c.clubs.map(x=>x.id)).size===c.clubs.length));
+});
+test('Tres opciones del draft, un solo atributo por turno y progreso hasta academia',async()=>{
+ const {draftChoices}=await import('../src/engine.mjs');
+ let s=newCareer({name:'Prueba',seed:'draft-0.4',country:'CL',position:'DC'});
+ assert.equal(draftChoices(s).length,3);
+ const second=draftChoices(s)[1];s=acceptDraft(s,1);
+ assert.equal(s.attributes[second.key],second.value);
+ while(s.phase==='draft')s=acceptDraft(s,2);
+ assert.equal(Object.keys(s.attributes).length,8);
+ assert.equal(s.phase,'academy');
+});
+test('La tabla simulada incluye al jugador, equipos reales y ubicación de la última campaña',async()=>{
+ const {simulatedStandings}=await import('../src/engine.mjs');
+ let s=makeStarted('CL','tabla-0.4');s=advanceSeason(s);
+ const board=simulatedStandings(s);
+ assert(board.length>=15&&board.length<=20);
+ assert.equal(new Set(board.map(x=>x.id)).size,board.length);
+ const own=board.find(x=>x.id===s.clubId);
+ assert.equal(own.position,s.lastSeason.leaguePosition);
+ assert(board.every(x=>Number.isInteger(x.points)&&Number.isInteger(x.played)));
+});

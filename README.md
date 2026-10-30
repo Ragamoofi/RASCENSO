@@ -1,40 +1,40 @@
 # RASCENSO · Del barrio a la historia
 
-**Alfa 0.3 · 30 de octubre de 2026** — Juego web original de carrera futbolística de Ragamoofi.
+**Alfa 0.4 · 30 de octubre de 2026** — Simulador de carrera futbolística web de Ragamoofi.
 
-El modo de carrera combina la simulación de temporadas con elecciones de vida profesional y escenas narrativas con continuidad. Es un prototipo independiente, no afiliado a Copero ni a los clubes mencionados.
+Sitio: https://ragamoofi.github.io/RASCENSO/
 
-## Cómo jugar
+## Qué incluye la versión 0.4
 
-Abre **https://ragamoofi.github.io/RASCENSO/** cuando GitHub Pages esté habilitado. No requiere Python ni instalaciones. Los archivos son estáticos (HTML/CSS/JavaScript). Guarda automáticamente en `localStorage` de tu navegador y permite exportar tu historial al retirarte.
+- 49 países y **más de 800 clubes reales de referencia**: los equipos pertenecen a distintas temporadas y divisiones; no son una nómina oficial de la temporada 2026.
+- Identidad del jugador, origen, estilo, sueño profesional y **equipo de hincha opcional**. Conservar el club favorito no favorece artificialmente las transferencias.
+- Draft de ocho atributos con **tres propuestas de leyendas por ronda**. Solo se acepta una por ronda; el peso cambia según la posición. Hay modos Clásico y Purista.
+- Club inicial: tres ofertas de equipos del país seleccionado.
+- Carrera: avances anuales, evolución, trofeos, lesiones, fichajes, historial y retiro.
+- Escenas de **decisiones futbolísticas**: entrenamiento, táctica, vestuario, mercado, presión y club favorito. Se eliminó la interfaz de preguntas libres y la columna de familiares/personas. **Son eventos guionizados, no un narrador de IA libre.**
+- En pantallas de escritorio, tablero a tres columnas con ficha, escenario central y tabla ilustrativa a la derecha. Adaptación para móviles.
+- Banderas con respaldo de emoji y distintivos de clubes, priorizando escudos públicos donde se encuentran en la fuente de archivos, con fallback original.
 
-En la creación eliges nombre, país, ciudad, posición, origen, personalidad, estilo y sueño. Puedes añadir **un equipo del que seas hincha** o dejar el campo vacío. Esa elección no cambia las probabilidades de las ofertas ni garantiza llegar a ese club. La simulación puede reconocerla en conversaciones, fichajes y despedidas. Todos los clubes disponibles son una base de referencia, no un censo oficial de las ligas en 2026.
+### Alcance y limitaciones actuales
 
-Tras el draft de ocho atributos recibes tres ofertas de clubes de tu país. Las temporadas se resuelven en el simulador, con eventos, resultados estimados, trayectoria individual, premios y mercado. En la primera firma y al terminar temporadas aparecen escenas narrativas.
+La clasificación lateral es **ilustrativa y determinista**, no proviene todavía de un calendario real partido a partido. Los puntos son estimaciones visuales ordenadas por el modelo y el puesto del jugador en la última temporada se conserva. No se representan como resultados oficiales. La simulación de ligas, planteles y mercado sigue en evolución. Las cifras de leyendas son interpretaciones ficticias del juego, no estadísticas oficiales.
 
-## Historia viva — alcance actual
+### Imágenes y atribuciones
 
-- Escenas originales con distintos interlocutores: entrenador, compañero, representante, periodista y familia.
-- Situaciones condicionales: presentación, falta de minutos, lesiones, reconocimiento, prensa y club del que eres hincha.
-- Roleo breve en **dos pasos**: una escena, una elección del jugador (con texto libre opcional), reacción y consecuencia. No avanza la historia sin que la persona confirme o salte la escena.
-- La respuesta escrita se conserva literalmente en una bitácora, y las relaciones e impactos numéricos persisten entre temporadas.
-- **No es una IA conversacional libre**: por ahora, la reacción se determina según la postura seleccionada y el contexto, no interpreta semánticamente toda la respuesta escrita. El objetivo siguiente es profundizar la simulación de partidos, el manejo de NPC y las relaciones.
+Los escudos enlazados proceden del repositorio comunitario [JoseArroyave/football-logos](https://github.com/JoseArroyave/football-logos), que declara uso libre; **los emblemas y las marcas de los equipos siguen perteneciendo a sus respectivos titulares**. No se incluyen ni se reclaman licencias de marcas. Las imágenes se cargan bajo demanda desde el repositorio de origen, con un diseño original de respaldo si no están disponibles. Las banderas se muestran desde [FlagCDN](https://flagcdn.com). El fondo deportivo utiliza una fotografía proporcionada por [Unsplash](https://unsplash.com/license); si no carga, el tema CSS mantiene la identidad visual.
 
-## Compatibilidad y seguridad de guardados
+### Compatibilidad con partidas previas
 
-- El guardado sigue usando la clave `rascenso-save-v2` para migrar partidas alfa 0.2 y versiones anteriores sin borrarlas.
-- El motor migra el estado a versión 3 añadiendo vínculos y bitácora.
-- Las elecciones se escapan en la interfaz antes de mostrarse, y el texto personalizado tiene límite de 240 caracteres.
-- Las pruebas automáticas se ejecutan al publicar con GitHub Actions.
+La clave de guardado `rascenso-save-v2` se **mantiene**. No se eliminan temporadas, estadísticas, elecciones, equipo favorito ni bitácora. Los IDs de clubes originales se preservan. El nuevo catálogo agrega IDs distintos para evitar conflictos.
 
-## Pruebas
+## Probar y publicar
+
+Github Pages publica los archivos estáticos mediante `.github/workflows/pages.yml`, cada vez que se actualiza `main`. No se necesita Python ni cuentas nuevas.
+
+Pruebas automáticas del motor:
 
 ```bash
 node --test tests/*.test.mjs
 ```
 
-## Publicación
-
-GitHub Actions publica en Pages desde `main`, usando el archivo `.github/workflows/pages.yml`. Requiere que el repositorio tenga GitHub Pages configurado para usar **GitHub Actions**.
-
-© 2026 Ragamoofi. Código e interfaz originales. Los nombres de los clubes se usan con finalidad identificativa.
+© 2026 Ragamoofi. RASCENSO es un proyecto independiente, no afiliado a Copero, ni a ligas o clubes.

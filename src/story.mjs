@@ -144,6 +144,73 @@ const catalog={
    opt('Prefiero mantener la calma','No permitir que las expectativas te distraigan.','«Buena elección. Mañana entrenamos igual».',{coach:3,morale:2},'Te mantuviste enfocado.')]
  }
 };
+// RASCENSO 0.4: los capítulos se centran en el fútbol y sus consecuencias.
+// Se conservan los identificadores antiguos para poder cargar partidas anteriores.
+Object.assign(catalog.arrival,{
+ tag:'PRIMER ENTRENAMIENTO',place:'Campo de entrenamiento',
+ title:s=>`Empiezas tu historia en ${clubName(s.clubId)}`,
+ paragraphs:s=>[`Te entregan la camiseta y tu primer plan de trabajo en ${clubName(s.clubId)}. El técnico anuncia que habrá competencia por todos los puestos.`],
+ speech:s=>`«Aquí nadie tiene minutos asegurados. ¿Cuál será tu prioridad para ganar espacio en el equipo?»`,
+ options:()=>[
+  opt('Entrenar la definición','Buscar espacios y mejorar tu instinto de gol.','«Entonces quiero verte trabajando el remate después de cada práctica».',{coach:4,ovr:1},'El técnico seguirá de cerca tu trabajo ofensivo.'),
+  opt('Asegurar mi lugar en el esquema','Aprender las tareas tácticas del puesto.','«Buena decisión. Necesito jugadores que entiendan el sistema».',{coach:6,morale:1},'Ganas confianza con el cuerpo técnico.'),
+  opt('Competir por la titularidad desde hoy','Demostrar ambición en cada sesión.','«La ambición se demuestra con rendimiento. Empecemos».',{reputation:2,coach:2},'Te presentaste como un jugador que busca protagonismo.')]
+});
+Object.assign(catalog.teammate,{
+ tag:'VESTUARIO',place:'Antes del partido',title:()=>`El grupo prepara un encuentro difícil`,
+ paragraphs:s=>[`Tras una semana intensa, los jugadores repasan las indicaciones del cuerpo técnico. Uno de tus compañeros te propone coordinar movimientos para el próximo encuentro.`],
+ speech:()=>`«Podemos atacar por los espacios o trabajar más cerca para combinar. ¿Cómo lo hacemos?»`,
+ options:()=>[
+  opt('Combinar pases cortos','Ofrecer apoyos y generar superioridad.','«Perfecto. Voy a buscarte entre líneas».',{teammate:5,coach:2},'Mejora el entendimiento con tus compañeros.'),
+  opt('Buscar las diagonales','Exigir pases al espacio para romper la defensa.','«Si arrancas, yo te voy a encontrar».',{teammate:2,reputation:2},'Tu perfil ofensivo gana presencia.'),
+  opt('Mantener la disciplina táctica','Priorizar el orden colectivo y la cobertura.','«Con eso evitamos regalar la pelota».',{coach:5,teammate:2},'El grupo valora tu compromiso defensivo.')]
+});
+Object.assign(catalog.coach,{
+ tag:'PLAN DE JUEGO',place:'Sala táctica',title:()=>`El entrenador redefine tu función`,
+ paragraphs:s=>[`El cuerpo técnico revisa tu última temporada y busca sacar mejor partido de tus fortalezas. La pizarra muestra tres caminos posibles.`],
+ speech:()=>`«Podemos ajustar tu rol. Quiero saber dónde vas a rendir más para la próxima campaña».`,
+ options:()=>[
+  opt('Trabajar una función más ofensiva','Buscar protagonismo en los últimos metros.','«Tendrás que asumir más responsabilidad cerca del arco».',{coach:2,reputation:2},'El club reconoce tus ganas de generar peligro.'),
+  opt('Mejorar el juego sin balón','Presionar, marcar y sostener al equipo.','«Esa es la intensidad que necesitamos».',{coach:6,morale:1},'Fortaleces tu relación con el cuerpo técnico.'),
+  opt('Ser un jugador más completo','Entrenar técnica y movimientos tácticos.','«Vamos a prepararte para distintos escenarios».',{coach:4,ovr:1},'El plan de trabajo favorece tu desarrollo.')]
+});
+Object.assign(catalog.press,{
+ tag:'ZONA MIXTA',place:'Estadio · Fin de la jornada',title:()=>`Tu rendimiento está bajo la lupa`,
+ paragraphs:s=>[`La temporada terminó con ${s.lastSeason?.goals||0} goles y ${s.lastSeason?.assists||0} asistencias. Los medios te esperan después del encuentro.`],
+ speech:()=>`«Con este rendimiento, ¿crees que puedes ser determinante para tu club?»`,
+ options:()=>[
+  opt('Hablar de los objetivos del equipo','Poner el foco en la temporada y el grupo.','«El mensaje fue claro: el equipo por delante».',{coach:4,press:3},'La prensa registra tu compromiso colectivo.'),
+  opt('Asumir la responsabilidad','Reconocer que aspiras a convertirte en figura.','«No le esquivas al desafío, eso seguro».',{reputation:3,press:4},'Tu nombre gana fuerza en los medios.'),
+  opt('Responder con estadísticas','Recordar tu rendimiento dentro del campo.','«Los números son los números».',{press:1,morale:2},'Elegiste dejar que el rendimiento hable por ti.')]
+});
+Object.assign(catalog.agent,{
+ tag:'MERCADO DE PASES',place:'Oficina del representante',title:()=>`Tu representante analiza el mercado`,
+ paragraphs:s=>[`Han terminado los partidos y tu agente revisa tu progresión. Aún no hay ninguna oferta firme, pero sí un plan para tu próximo paso.`],
+ speech:()=>`«¿Buscamos un club donde seas titular o intentamos subir de categoría, aunque juegues menos?»`,
+ options:()=>[
+  opt('Buscar minutos de juego','Elegir equipos donde puedas competir por ser titular.','«Anotado. Priorizaré el aspecto deportivo».',{agent:5,morale:2},'Tu prioridad es acumular experiencia.'),
+  opt('Apuntar a una liga más fuerte','Aceptar una competencia mayor en el futuro.','«Intentaré que tu nombre circule en esos clubes».',{agent:4,reputation:2},'Tu ambición queda marcada para las siguientes negociaciones.'),
+  opt('Apostar por la continuidad','Fortalecer tu lugar actual y esperar la oferta indicada.','«No vamos a salir por salir».',{agent:2,coach:4},'Aumenta tu compromiso con el club.')]
+});
+Object.assign(catalog.fan_home,{
+ tag:'CUMPLIR UN SUEÑO',place:'Estadio · Presentación oficial',actor:'coach',
+ title:s=>`Ahora juegas por ${clubName(s.fanClubId)}`,
+ paragraphs:s=>[`El escudo de ${clubName(s.fanClubId)} ya no es solo el de tu infancia: hoy aparece en tu camiseta profesional. Has llegado por tu rendimiento, pero nadie te regala la titularidad.`],
+ speech:()=>`«Sé lo que significa este club para ti, pero necesitamos fútbol. ¿Cómo encararás este desafío?»`,
+ options:()=>[
+  opt('Convertir la emoción en rendimiento','Entrenar el doble para dar la talla.','«Eso espero. El cariño no reemplaza el trabajo».',{coach:5,morale:4},'El sueño cumplido renueva tu motivación.'),
+  opt('Buscar un título para el club','Trabajar por objetivos competitivos altos.','«Esa ambición nos puede llevar lejos».',{reputation:3,morale:2},'Llegaste con una meta deportiva clara.'),
+  opt('Ganarme la confianza de la hinchada','Dejarlo todo cada vez que juegues.','«La grada reconocerá tu esfuerzo».',{coach:3,reputation:3},'Empiezas a construir tu propia historia con estos colores.')]
+});
+Object.assign(catalog.rival,{
+ tag:'PARTIDO CLAVE',place:'Vestuario · Charla técnica',title:()=>`Se aproxima un partido decisivo`,
+ paragraphs:s=>[`Hay presión por sumar puntos. El rival conoce bien al equipo y el entrenador pide inteligencia para resolver el partido.`],
+ speech:()=>`«Podemos intentar dominar desde el primer minuto o esperar nuestra oportunidad. ¿Qué enfoque defiendes?»`,
+ options:()=>[
+  opt('Presión alta desde el inicio','Buscar recuperar cerca del área rival.','«Vamos a apretar juntos entonces».',{coach:3,teammate:3},'Te comprometiste con un planteamiento agresivo.'),
+  opt('Control del balón','Apostar por circulación y paciencia.','«Mantengamos las líneas juntas y la pelota en nuestros pies».',{coach:5},'El cuerpo técnico valora tu criterio.'),
+  opt('Buscar el contragolpe','Atacar rápido los espacios libres.','«Atentos a la transición, puede ser nuestra arma».',{reputation:2,teammate:2},'El equipo entiende tu propuesta ofensiva.')]
+});
 export const STORY_IDS=Object.keys(catalog);
 export function sceneFor(s){
  const entry=catalog[s.pendingEvent]||catalog.coach;
@@ -156,7 +223,7 @@ export function chooseScene(s,roll){
  if(s.lastSeason?.injuryWeeks>=6)return 'injury';
  if(s.fanClubId&&s.clubId!==s.fanClubId&&roll()<.28)return 'fan_press';
  if((s.lastSeason?.goals||0)>=12&&roll()<.4)return 'milestone';
- return ['coach','teammate','press','agent','family','rival','milestone'][Math.floor(roll()*7)];
+ return ['coach','teammate','press','agent','rival','milestone'][Math.floor(roll()*6)];
 }
 export function resultOfScene(s,scene,index,playerText=''){
  const o=scene.options[index]||scene.options[0];const effect=o.effect||{};
