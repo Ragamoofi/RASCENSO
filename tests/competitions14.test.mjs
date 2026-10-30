@@ -1,6 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {playGroupTournament,playQualification} from '../src/competitions14.mjs';
+import {VERIFIED_LEAGUES} from '../src/leagues2026.mjs';
 import {worldQualifiers,simulateGlobalSeason,WORLD_QUALIFYING_QUOTAS} from '../src/competitions13.mjs';
 import {newCareer,acceptDraft,signAcademy,academyOffers,autoResolveEvent,advanceSeason} from '../src/engine.mjs';
 const teams=Array.from({length:16},(_,i)=>({id:`t${i}`,name:`Equipo ${i}`,level:60+i}));
@@ -35,11 +36,12 @@ test('mundial 2030 depende exactamente de las tablas 2029, con 32 cupos',()=>{
  }
 });
 test('clasificación continental se hereda del año anterior si se permanece en el club',()=>{
- const s={...start('qualified14'),ovr:90,coachTrust:95};
+ const top=VERIFIED_LEAGUES.find(l=>l.countryCode==='CL'&&l.tier===1);
+ const s={...start('qualified14'),clubId:top.teamIds[0],ovr:90,coachTrust:95};
  const league={year:2030,leaguePosition:1,matches:35,goals:12,assists:4};
- const state={...s,history:[{year:2029,clubId:s.clubId,leaguePosition:14,competitions:[]} ]};
+ const state={...s,history:[{year:2029,clubId:s.clubId,leaguePosition:14,leagueDivision:1,competitions:[]} ]};
  assert.equal(simulateGlobalSeason(state,league).competitions.filter(c=>c.kind==='continental').length,0);
- const eligible={...state,history:[{year:2029,clubId:s.clubId,leaguePosition:2,competitions:[]}]};
+ const eligible={...state,history:[{year:2029,clubId:s.clubId,leaguePosition:2,leagueDivision:1,competitions:[]}]};
  const cup=simulateGlobalSeason(eligible,league).competitions.find(c=>c.kind==='continental');
  assert(cup);assert.equal(cup.groupTables.length,4);assert.match(cup.qualification,/Liga previa: 2°/);
 });

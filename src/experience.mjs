@@ -22,6 +22,7 @@ const n=x=>Number(x||0).toLocaleString('es-CL');
 const short=x=>String(x||'').length>20?String(x).slice(0,18)+'…':x;
 const pick=(arr,id)=>arr.find(x=>x.id===id)?.name||'—';
 const countryName=c=>getCountry(c)?.name||c;
+let agentFocusOpen=false;
 let state=null,tab='carrera',wizard=0,showHistory=false,message='',showNew=false,rightTab='standings';
 const skillUI={zone:null,started:0,current:0,raf:0};
 function stopNeedle(){if(skillUI.raf)cancelAnimationFrame(skillUI.raf);skillUI.raf=0;}
@@ -39,17 +40,18 @@ function save(){
  try{
   if(!state)return true;
   const previous=localStorage.getItem(STORE),next=JSON.stringify(state);
-  if(previous&&previous!==next)localStorage.setItem(STORE+'-backup',previous);
   localStorage.setItem(STORE,next);
+  // El respaldo nunca debe bloquear el guardado principal si no queda cuota.
+  if(previous&&previous!==next){try{localStorage.setItem(STORE+'-backup',previous);}catch{}}
   return true;
  }catch{message='No fue posible guardar la partida. Exporta una copia desde el menú.';return false;}
 }
-function mutate(s){if(!s||s===state)return;state=s;save();tab='carrera';render();}
+function mutate(s){if(!s||s===state)return;const previous=state;state=s;if(!save())state=previous;agentFocusOpen=false;tab='carrera';render();}
 function button(label,action,cls='main',more=''){return `<button type="button" class="action ${cls}" data-action="${action}" ${more}>${label}</button>`;}
 const opt=(value,label,active)=>`<option value="${h(value)}" ${active===value?'selected':''}>${h(label)}</option>`;
 function select(label,name,items,value){return `<label class="field"><span>${label}</span><select name="${name}">${items.map(([v,l])=>opt(String(v),l,String(value))).join('')}</select></label>`;}
 function branding(){return `<a class="brand brand-13" href="./" aria-label="RASCENSO"><img src="./assets/brand/rascenso-wordmark.png" alt="RASCENSO · Del barrio a la historia" width="300" height="75"></a>`;}
-function header(){return `<header class="site-head">${branding()}<nav class="main-nav">${state?['carrera','historial','mundo'].map(t=>`<button class="navtab ${tab===t?'selected':''}" data-action="nav" data-tab="${t}">${{carrera:'Mi carrera',historial:'Historial',mundo:'Mundo'}[t]}</button>`).join(''):'<span class="navtab selected">Tu historia empieza hoy</span>'}</nav><div class="head-controls"><span class="build">ALFA 1.7 · IDENTIDAD DEL FUTBOLISTA</span>${state?`<span class="head-name">${h(state.name)}</span>${button('⋯','tools','ghost')}`:`<span class="live"><i></i> MODO CARRERA</span>`}</div></header>`;}
+function header(){return `<header class="site-head">${branding()}<nav class="main-nav">${state?['carrera','historial','mundo'].map(t=>`<button class="navtab ${tab===t?'selected':''}" data-action="nav" data-tab="${t}">${{carrera:'Mi carrera',historial:'Historial',mundo:'Mundo'}[t]}</button>`).join(''):'<span class="navtab selected">Tu historia empieza hoy</span>'}</nav><div class="head-controls"><span class="build">ALFA 1.7.1 · PULIDO Y CORRECCIONES</span>${state?`<span class="head-name">${h(state.name)}</span>${button('⋯','tools','ghost')}`:`<span class="live"><i></i> MODO CARRERA</span>`}</div></header>`;}
 function shell(content,extra=''){ROOT.innerHTML=`<div class="app-shell">${header()}<main class="view ${state?'playing':''}">${content}</main><footer class="site-foot"><span>RASCENSO · Una creación de Ragamoofi</span><span>${CATALOG_COUNT} clubes disponibles · 13 ligas iniciales verificadas · copas globales con formato simplificado</span></footer>${extra}</div>${message?`<div class="notification" role="alert">${h(message)}</div>`:''}`;}
 function featureIcon(name){return {glory:'★',home:'⌂',academy:'⚑',form:'◉',tactic:'♟',news:'◎',league:'▥'}[name]||'✦';}
 function createSteps(){return ['Identidad','Raíces','Futbolista','Mentalidad','Sueños','Resumen'].map((s,i)=>`<button type="button" class="creation-step ${wizard===i?'active':wizard>i?'past':''}" data-action="step" data-index="${i}"><span>0${i+1}</span>${s}</button>`).join('');}
@@ -96,7 +98,7 @@ function season(){
  const recent=x?[`Última temporada: ${x.matches} partidos, ${x.goals} goles y ${x.assists} asistencias.`, `Tu equipo terminó ${x.leaguePosition}° en ${x.leagueName||'su liga'}.`,`El siguiente campeonato pondrá a prueba tu continuidad en ${c?.name||'el club'}.`]:[`Es tu primera temporada profesional en ${c?.name||'el club'}.`,`Tu primer contrato abre una etapa en la que cada oportunidad importa.`];
  const intro=recent[Math.abs((state.age||17)+(state.history?.length||0))%recent.length];
  const scene=agenda?`<section class="agenda-card"><div class="agenda-overline"><span>EN LA ACTUALIDAD</span><b>${h(agenda.tag)} · ${careerYear(state)}</b></div><h3>${h(agenda.title)}</h3><p>${h(agenda.description)}</p>${decided?`<div class="agenda-result">✓ ${h(snapshot?.choice||'Tu decisión está tomada')} <small>Quedará reflejada en la temporada y en tu historial.</small></div>`:`<div class="agenda-options">${agenda.choices.map((x,i)=>`<button data-action="season-agenda" data-index="${i}"><b>0${i+1}</b><span><strong>${h(x.title)}</strong><small>${h(x.detail)}</small></span><span>↗</span></button>`).join('')}</div>`}<small class="agenda-footnote">Decisión opcional · Puedes simular la temporada sin intervenir.</small></section>`:'';
- const content=`<section class="focus-card stadium season-modern"><div class="focus-eyebrow">TEMPORADA ${careerYear(state)} · ${h(c?.name||'Nuevo desafío')}</div><div class="hero-emblem">${c?badge(c,'hero'):''}</div><div class="spotlight"><span>UN NUEVO CAPÍTULO</span><h2>${x?'La carrera sigue escribiéndose.':'El fútbol te abre la primera puerta.'}</h2><p>${h(intro)}</p>${scene}${seasonMomentPanel()}<div class="season-action-row">${button('SIMULAR TEMPORADA ↗','season-next','main big')}${state.history.length?button('Hablar con mi representante','agent-open','secondary'):''}</div>${x?`<div class="last-match"><strong>ÚLTIMA CAMPAÑA · ${x.year}</strong><span>${x.leaguePosition}° en liga</span><span>${x.matches} PJ</span><span>${x.goals} G</span><span>${x.assists} A</span></div>`:''}</div></section>`;
+ const content=`<section class="focus-card stadium season-modern"><div class="focus-eyebrow">TEMPORADA ${careerYear(state)} · ${h(c?.name||'Nuevo desafío')}</div><div class="hero-emblem">${c?badge(c,'hero'):''}</div><div class="spotlight"><span>UN NUEVO CAPÍTULO</span><h2>${x?'La carrera sigue escribiéndose.':'El fútbol te abre la primera puerta.'}</h2><p>${h(intro)}</p>${scene}${seasonMomentPanel()}<div class="season-action-row">${button('SIMULAR TEMPORADA ↗','season-next','main big')}${state.history.length?button(agentFocusOpen?'Cerrar opciones del representante':'Hablar con mi representante','agent-open','secondary'):''}</div>${state.history.length&&agentFocusOpen?`<div class="agent-focus-picker"><strong>¿Qué priorizamos en las ofertas?</strong><p>Elegí una estrategia. Tu representante buscará clubes según ese objetivo.</p><div class="agent-focus-options">${[['balanced','Equilibrio'],['minutes','Jugar más'],['money','Mejor salario'],['local','Seguir en mi país'],['international','Salir al extranjero']].map(([id,label])=>`<button type="button" data-action="agent-focus" data-focus="${id}">${label}</button>`).join('')}</div></div>`:''}${x?`<div class="last-match"><strong>ÚLTIMA CAMPAÑA · ${x.year}</strong><span>${x.leaguePosition}° en liga</span><span>${x.matches} PJ</span><span>${x.goals} G</span><span>${x.assists} A</span></div>`:''}</div></section>`;
  return frame(content);
 }
 function standingsByCup(c,short=true){
@@ -182,7 +184,7 @@ async function shareCareerPNG(){
  const url=canvas.toDataURL('image/png'),anchor=document.createElement('a');anchor.download=`rascenso-expediente-${state.name.normalize('NFD').replace(/[^a-zA-Z0-9]+/g,'-')}.png`;anchor.href=url;anchor.click();
 }
 function tools(){return `<div class="modal-dimmer" id="modal"><div class="tool-panel"><span class="section-label">GESTIÓN DE CARRERA</span><h2>Tu partida</h2><p>RASCENSO guarda automáticamente en este navegador y conserva un respaldo anterior. Exporta una copia antes de cambiar de dispositivo.</p>${button('Exportar guardado JSON','export','main wide')}${button('Importar guardado JSON','import','secondary wide')}<input type="file" id="import-file" accept="application/json,.json" hidden>${button('Simular hasta el retiro','retire-auto','secondary wide')}${button('Nueva carrera','reset','danger wide')}<p class="credits-note">Créditos de fotografías: <a href="https://commons.wikimedia.org/" target="_blank" rel="noopener">Wikimedia Commons</a>. <a href="./assets/MEDIA_CREDITS.html" target="_blank" rel="noopener">Autores y licencias de cada imagen</a>.</p>${button('Cerrar','tools-close','ghost wide')}</div></div>`;}
-function render(){message='';if(!state)return creator();if(state.phase==='draft'){shell(draftScreen());enhanceLegendImages(ROOT);return;}if(state.phase==='academy')return shell(academy());let center=tab==='historial'?history():tab==='mundo'?world():state.phase==='season'?season():state.phase==='event'?narrative():state.phase==='transfer'?market():farewell();shell(center,showNew?tools():'');}
+function render(){try{if(!state)return creator();if(state.phase==='draft'){shell(draftScreen());enhanceLegendImages(ROOT);return;}if(state.phase==='academy')return shell(academy());let center=tab==='historial'?history():tab==='mundo'?world():state.phase==='season'?season():state.phase==='event'?narrative():state.phase==='transfer'?market():farewell();shell(center,showNew?tools():'');}finally{message='';}}
 function gather(){document.querySelectorAll('#creation-form [name]').forEach(el=>{if(el.type==='radio'&&!el.checked)return;draft[el.name]=el.value;});}
 function begin(){gather();if(!draft.name.trim()){wizard=0;render();document.querySelector('[name="name"]')?.focus();return;}const number=Number(draft.number);if(number<1||number>99){wizard=0;render();return;}try{mutate(newCareer({...draft,seed:`${Date.now()}-${Math.random().toString(36).slice(2)}`}));}catch(e){alert(e.message);}}
 function download(){const data=JSON.stringify(state,null,2);const url=URL.createObjectURL(new Blob([data],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=`rascenso-${state.name.toLowerCase().replace(/[^a-z0-9]+/g,'-')}-${Date.now()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
@@ -206,7 +208,8 @@ ROOT.addEventListener('click',e=>{
  if(action==='season-agenda')return mutate(chooseSeasonAgenda(state,Number(a.dataset.index))); 
  if(action==='plan')return mutate(chooseSeasonPlan(state,a.dataset.id));
  if(action==='season-next')return mutate(advanceSeason(state));
- if(action==='agent-open')return mutate(openAgentMarket(state));
+ if(action==='agent-open'){agentFocusOpen=!agentFocusOpen;render();return;}
+ if(action==='agent-focus'){agentFocusOpen=false;return mutate(openAgentMarket(state,a.dataset.focus||'balanced'));}
  if(action==='agent-search')return mutate(askAgentForMore(state));
  if(action==='market-retire')return mutate(retireFromMarket(state));
  if(action==='recap-continue')return mutate({...state,recapPending:false});

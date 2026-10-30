@@ -2,7 +2,8 @@
    Los nombres representan competiciones reales. Los cupos, el sorteo y el
    calendario se simplifican: NO reproducen los reglamentos oficiales. */
 import { COUNTRIES } from './countries.mjs';
-import { playGroupTournament, playQualification, seededRng } from './competitions14.mjs';
+import { playGroupTournament, playQualification, seededRng, cupContributionRates } from './competitions14.mjs';
+import { VERIFIED_LEAGUES } from './leagues2026.mjs';
 const byCode=new Map(COUNTRIES.map(c=>[c.code,c]));
 const min=(a,b)=>Math.min(a,b), max=(a,b)=>Math.max(a,b);
 function hash(input){let x=2166136261;for(const c of String(input)){x^=c.charCodeAt(0);x=Math.imul(x,16777619);}return x>>>0;}
@@ -52,7 +53,7 @@ export function playCup({id,name,year,teams,playerTeamId,seed,kind='club',state=
    const win=participants.find(t=>t.id===m.winner);
    next.push(win);
    let pg=0,pa=0;
-   if(playing){played++;minutes+=80;const teamGoals=a.id===playerTeamId?m.home:m.away;for(let g=0;g<teamGoals;g++){if(r()<.28)pg++;else if(r()<.19)pa++;}goals+=pg;assists+=pa;}
+   if(playing){played++;minutes+=80;const teamGoals=a.id===playerTeamId?m.home:m.away;const rates=cupContributionRates(state?.position);for(let g=0;g<teamGoals;g++){if(r()<rates.goals)pg++;else if(r()<rates.assists)pa++;}goals+=pg;assists+=pa;}
    fixtures.push({stage,round:round+1,home:a.id,away:b.id,homeName:a.name,awayName:b.name,score:`${m.home}-${m.away}`,winner:m.winner,penalties:m.pen===null?false:true,playerPlayed:playing,playerGoals:pg,playerAssists:pa});
   }
   round++;live=next;
@@ -120,6 +121,18 @@ function ownPreviousPosition(state,club,league){
  const domestic=allClubs.filter(c=>c.countryCode===club.countryCode).sort((a,b)=>b.level-a.level);
  return domestic.findIndex(x=>x.id===club.id)+1;
 }
+/** Sin cupos de primera por clasificar primero en segunda. El año previo manda. */
+export function continentalEligibility(state,club,league){
+ const previous=(state.history||[]).at(-1);
+ const currentTier=league.division??VERIFIED_LEAGUES.find(l=>(state.leagueRosters?.[l.id]||l.teamIds).includes(club.id))?.tier??null;
+ const previousTier=previous?.leagueDivision??VERIFIED_LEAGUES.find(l=>l.id===previous?.leagueId)?.tier??null;
+ const nationalCupChampion=!!(previous?.clubId===club.id&&(previous.competitions||[]).some(c=>c.kind==='national-cup'&&c.championWon));
+ if(currentTier!=null&&currentTier!==1)return {eligible:false,place:null,source:'No se otorga cupo de liga desde segunda división'};
+ if(previous?.clubId===club.id&&previousTier!=null&&previousTier!==1&&!nationalCupChampion)return {eligible:false,place:null,source:'Ascenso reciente: la posición de segunda no clasifica a copas continentales'};
+ if(nationalCupChampion)return {eligible:true,place:4,source:'Copa nacional ganada en la temporada anterior'};
+ const place=ownPreviousPosition(state,club,league);
+ return {eligible:Number.isFinite(place)&&place<=8,place,source:!previous?'Acceso provisional de temporada inicial':previous.clubId===club.id?`Liga previa: ${place}°`:'Estimación de nivel del nuevo club (no hereda cupos del anterior)'};
+}
 function regionalField(conf,year,seed){
  let teams=confNations(conf,true);
  // Cuadros 4/8/16: las rondas de clasificación se reducen a un ranking anual del catálogo.
@@ -139,9 +152,10 @@ export function simulateGlobalSeason(state,league){
  const year=league.year,seed=state.seed,r=rand(`${seed}:global14:${year}:${club.id}`),competitions=[];
  const domestic=playCup({id:`CUP-${club.countryCode}`,name:countryCups.get(club.countryCode)||'Copa nacional',year,kind:'national-cup',teams:countryClubs(club.countryCode,club),playerTeamId:club.id,seed,state});
  if(domestic)competitions.push({...domestic,qualification:'Participación en copa nacional'});
- const priorPlace=ownPreviousPosition(state,club,league),entry=continentalEntries(club,priorPlace,seed,year);
+ const eligibility=continentalEligibility(state,club,league);
+ const entry=eligibility.eligible?continentalEntries(club,eligibility.place,seed,year):null;
  if(entry){const cup=playGroupTournament({...entry,year,kind:'continental',playerTeamId:club.id,seed,state});
-  if(cup)competitions.push({...cup,qualification:state.history?.length?`Liga previa: ${priorPlace}°`:'Acceso provisional de temporada inicial'});
+  if(cup)competitions.push({...cup,qualification:eligibility.source});
  }
  // Campeones continentales del año anterior disputan una supercopa regional.
  const previous=(state.history||[]).at(-1);

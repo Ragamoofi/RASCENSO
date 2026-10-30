@@ -50,6 +50,14 @@ export function nextLeagueRosters(state,playedLeague){
  current[lower.id]=current[lower.id].filter(id=>!rises.includes(id)).concat(drops);
  return current;
 }
+/** La lesión comienza en una fecha concreta y afecta jornadas consecutivas del club. */
+export function injuryAbsenceSlots(fixtures,clubId,weeks,random){
+ const clubIndices=fixtures.map((f,i)=>f.home===clubId||f.away===clubId?i:-1).filter(i=>i>=0);
+ if(!weeks||!clubIndices.length)return new Set();
+ const count=Math.min(clubIndices.length,Math.max(0,Math.floor(weeks)));
+ const start=Math.floor(random()*Math.max(1,clubIndices.length-count+1));
+ return new Set(clubIndices.slice(start,start+count));
+}
 export function calendar(clubs){
  const arr=clubs.map(x=>x.id);if(arr.length<2)return [];
  if(arr.length%2)arr.push(null);
@@ -92,7 +100,7 @@ export function playLeague(state){
   :calendar(selected);
  const injuryRoll=r();const prone=(state.injuryProfile==='fragil'?.085:state.injuryProfile==='resistente'?.025:.05)*prep.injury*traits.injury*(agenda.injury||1)*profile.injury;
  const injuryWeeks=injuryRoll<prone+Math.max(0,state.age-29)*.008?(2+Math.floor(r()*11)):0;
- const absence=injuryWeeks?new Set(Array.from({length:Math.min(injuryWeeks,fixtureList.length)},(_,i)=>Math.floor((r()*.7+.1)*fixtureList.length)+i).map(x=>x%Math.max(1,fixtureList.length))):new Set();
+ const absence=injuryAbsenceSlots(fixtureList,state.clubId,injuryWeeks,r);
  const rows=Object.fromEntries(selected.map(t=>[t.id,{id:t.id,name:t.name,level:t.level,played:0,wins:0,draws:0,losses:0,for:0,against:0,gd:0,points:0}]));
  const skillGroup=groups[state.position]||'middle';
  let matches=0,minutes=0,userGoals=0,userAssists=0,cleanSheets=0,goalsConceded=0;
@@ -100,7 +108,7 @@ export function playLeague(state){
  for(const f of fixtureList){
   const home=teams[f.home],away=teams[f.away];
   const isOwn=home.id===state.clubId||away.id===state.clubId;
-  const available=isOwn&&!absence.has(f.round*1000+results.length)&&!absence.has(results.length);
+  const available=isOwn&&!absence.has(results.length);
   const plays=!state.neutralLeague&&available&&r()<playRate;
   let gameMinutes=plays?(role==='Titular'?Math.round(70+r()*25):role==='Rotación'?Math.round(30+r()*62):Math.round(8+r()*40)):0;
   const impact=plays?bound((state.ovr-own.level)*.18+gameMinutes/90*1.2,-3.5,4.0):0;

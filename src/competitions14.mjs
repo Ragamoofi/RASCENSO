@@ -18,6 +18,16 @@ function record(table,a,b,ga,gb){for(const [team,scored,conceded] of [[a,ga,gb],
 const orderTable=(a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf||b.level-a.level||a.id.localeCompare(b.id);
 const months={club:['Feb','Mar','Abr','May','Jun','Ago','Sep','Oct','Nov'],international:['Ene','Mar','Jun','Jul','Sep','Oct','Nov'],world:['Jun','Jul'],qualifiers:['Mar','Jun','Sep','Oct','Nov']};
 function dateSlot(kind,round){const slots=months[kind]||months.club;return `${slots[(round-1)%slots.length]} · Fecha ${round}`;}
+/** Las acciones individuales deben ajustarse al puesto: un portero no suma goles de campo aleatorios. */
+export function cupContributionRates(position){
+ const role=String(position||'DC');
+ if(role==='POR')return {goals:0,assists:.015};
+ if(['DFC','LI','LD','MCD'].includes(role))return {goals:.045,assists:.10};
+ if(['MC','MI','MD'].includes(role))return {goals:.12,assists:.25};
+ if(role==='MCO')return {goals:.19,assists:.31};
+ if(['EI','ED'].includes(role))return {goals:.25,assists:.23};
+ return {goals:.34,assists:.15};
+}
 function performance(fix,playerTeamId,st,r,stat){
   const involved=fix.home===playerTeamId||fix.away===playerTeamId;
   fix.playerPlayed=!!(involved&&r()<clamp(((st?.coachTrust??65)+15)/100,.32,.98));
@@ -25,7 +35,8 @@ function performance(fix,playerTeamId,st,r,stat){
   fix.playerGoals=0;fix.playerAssists=0;
   if(fix.playerPlayed){stat.played++;stat.minutes+=fix.playerMinutes;
     const ownGoals=fix.home===playerTeamId?Number(fix.score.split('-')[0]):Number(fix.score.split('-')[1]);
-    for(let i=0;i<ownGoals;i++){if(r()<clamp(.14+((st?.ovr??70)-65)*.004,.12,.38))fix.playerGoals++;else if(r()<.22)fix.playerAssists++;}
+    const rates=cupContributionRates(st?.position);
+    for(let i=0;i<ownGoals;i++){if(r()<(rates.goals===0?0:clamp(rates.goals+((st?.ovr??70)-65)*.003,0,.42)))fix.playerGoals++;else if(r()<rates.assists)fix.playerAssists++;}
     stat.goals+=fix.playerGoals;stat.assists+=fix.playerAssists;
   }
 }

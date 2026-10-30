@@ -183,3 +183,14 @@ La simulación de la temporada sigue siendo por campaña completa. Los minijuego
 - Minijuego: el medidor usa `requestAnimationFrame` tanto para dibujar la posición real de la aguja como para evaluar el resultado; no depende de una animación CSS que puede quedar desincronizada.
 - Al ejecutar muestra gol, fallo, atajada o corte y un **marcador proyectado** reproducible para el rival y fecha; al simular, el resumen anual confirma el marcador definitivo. Si cambias decisiones de la temporada entre ambos pasos, el resultado podrá variar.
 - El formato de guardado sigue en versión 8 y migra perfiles antiguos con un valor predeterminado válido.
+
+
+## Corrección 1.7.1 — Continuidad y simulación
+
+- Las lesiones afectan fechas consecutivas del club, en lugar de ausencias dispersas.
+- Las estadísticas de copas respetan la posición y no atribuyen goles de campo aleatorios al arquero.
+- Una posición alta en segunda división no entrega cupo continental de primera, ni tras ascender.
+- El representante ahora permite priorizar minutos, sueldo, país o salida internacional antes de buscar ofertas.
+- Guardado más robusto: el respaldo no puede impedir escribir la partida principal; si el guardado principal falla, no se confirma el cambio visualmente y se muestra un aviso.
+- Se conserva la versión de partida y la compatibilidad con los guardados existentes.
+- Astra inició un pulido en otra sesión, pero sus cambios no estaban publicados en la rama main al revisar el repositorio.

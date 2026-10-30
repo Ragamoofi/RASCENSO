@@ -270,3 +270,9 @@
 .clutch-result .clutch-score-note{font-size:9px;color:#d8e7ef}
 .recap-clutch{display:grid;gap:7px;background:#153c53;border-left:3px solid #e5ae76;padding:14px;margin:8px 0;border-radius:6px}.recap-clutch span{font-weight:900;color:#f9ba89;font-size:10px}.recap-clutch strong{font-size:17px;color:white}.recap-clutch small{font-size:11px;color:#d3e5f1}
 @media(max-width:750px){.poster-athlete{height:150px;transform:scale(.82);margin:-8px auto}.profile-card .player-economy{margin:8px 9px!important}}
+
+/* 1.7.1 · representante: objetivos explícitos, sin abrir un mercado a ciegas */
+.agent-focus-picker{margin-top:12px;padding:13px 15px;border-radius:10px;background:#0d2438;border:1px solid #3e5f7c;color:#e8f3ff}
+.agent-focus-picker>strong{font-size:12px}.agent-focus-picker>p{font-size:11px;margin:4px 0 10px;color:#a9bed4}
+.agent-focus-options{display:flex;flex-wrap:wrap;gap:7px}.agent-focus-options button{border:1px solid #56728d;background:#20415e;color:#f3f7ff;padding:9px 11px;border-radius:7px;font-weight:700;font-size:11px}
+.agent-focus-options button:hover,.agent-focus-options button:focus-visible{background:#315b81;border-color:#d9a671;outline-offset:2px}

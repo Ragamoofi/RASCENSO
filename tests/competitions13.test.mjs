@@ -1,6 +1,8 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import { COUNTRIES } from '../src/countries.mjs';
+import { VERIFIED_LEAGUES } from '../src/leagues2026.mjs';
+import { playLeague } from '../src/league.mjs';
 import { CONTINENTAL_CLUB_CUPS,NATIONAL_CUPS,playCup,simulateGlobalSeason,selectionCalendar } from '../src/competitions13.mjs';
 import { newCareer,acceptDraft,signAcademy,academyOffers,autoResolveEvent,advanceSeason,migrateCareer } from '../src/engine.mjs';
 function started(code,seed='global13'){
@@ -27,7 +29,11 @@ test('Los torneos se resuelven con fechas y marcadores, el campeón es participa
  assert(a.playerFixtures.every(f=>f.home==='t1'||f.away==='t1'));
 });
 test('El motor integra copa local, continental y selección en el mismo año',()=>{
- const s={...started('CL','chile13'),ovr:90,coachTrust:95};
+ const top=VERIFIED_LEAGUES.find(l=>l.countryCode==='CL'&&l.tier===1);
+ const base={...started('CL','chile13'),ovr:90,coachTrust:95};
+ const qualified=top.teamIds.find(clubId=>playLeague({...base,clubId}).leaguePosition<=8);
+ assert(qualified,'debe existir un equipo de primera entre los ocho primeros');
+ const s={...base,clubId:qualified};
  const a=advanceSeason(s);assert(a.lastSeason.competitions?.length>=2);
  const local=a.lastSeason.competitions.find(c=>c.kind==='national-cup');assert(local);assert.equal(local.year,2026);
  assert(a.lastSeason.calledUp);assert(a.lastSeason.nationalCaps>=0);
