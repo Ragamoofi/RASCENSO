@@ -44,8 +44,8 @@ function letters(name){return String(name||'FC').split(/\s+/).filter(w=>!['de','
 function hue(str){let value=7;for(const c of String(str))value=(value*31+c.charCodeAt(0))%360;return value;}
 export function flag(code,cls='flag'){
  const iso={EN:'gb-eng',SC:'gb-sct' }[code]||String(code||'CL').toLowerCase();
- const fallback=code==='EN'?'🏴':code==='SC'?'🏴':String.fromCodePoint(...[...(code||'CL').toUpperCase()].map(x=>127397+x.charCodeAt()));
- return `<span class="${cls}" title="${code}"><span>${fallback}</span><img src="https://flagcdn.com/w80/${iso}.png" loading="lazy" alt="" decoding="async"></span>`;
+ const fallback=''; // Sin emoji de letras superpuesto: la bandera verdadera viene en PNG.
+ return `<span class="${cls}" title="${code}"><span>${fallback}</span><img src="https://flagcdn.com/w80/${iso}.png" loading="lazy" alt="" decoding="async" onload="this.previousElementSibling.style.display='none'" onerror="this.remove()"></span>`;
 }
 export function badge(club, size=''){
  const c=typeof club==='string'?COUNTRIES.flatMap(x=>x.clubs).find(x=>x.id===club):club;
@@ -53,6 +53,6 @@ export function badge(club, size=''){
  const id=c?.id||'';const known=COUNTRIES.find(x=>x.code===code);
  const src=id?`./assets/crests/${encodeURIComponent(id)}.png`:null;
  const accent=hue(name);
- return `<span class="team-badge ${size}" data-team-id="${id}" style="--badge-hue:${accent}" title="${name.replaceAll('"','&quot;')}"><span class="badge-fallback">${letters(name)}</span>${src?`<img class="badge-img" src="${src}" loading="lazy" alt="" decoding="async" onerror="this.remove()">`:''}</span>`;
+ return `<span class="team-badge ${size}" data-team-id="${id}" style="--badge-hue:${accent}" title="${name.replaceAll('"','&quot;')}"><span class="badge-fallback">${letters(name)}</span>${src?`<img class="badge-img" src="${src}" loading="lazy" alt="Escudo de ${name.replaceAll('&','&amp;').replaceAll('"','&quot;')}" decoding="async" onerror="this.remove()">`:''}</span>`;
 }
 export const CATALOG_COUNT=COUNTRIES.reduce((n,c)=>n+c.clubs.length,0);

@@ -51,3 +51,17 @@ node tests/ui-smoke.mjs
 - El motor conserva los IDs históricos y migra las partidas anteriores; tablas ya jugadas no se recalculan retroactivamente.
 
 Fuentes de clubes: [Chile Primera](https://www.emol.com/especiales/2026/deportes/liga-de-primera/equipos.asp), [Chile Ascenso](https://www.cooperativa.cl/noticias/deportes/futbol/liga-de-ascenso/asi-quedo-la-tabla-del-ascenso-tras-la-desafiliacion-de-san-marcos-por/2026-10-27/213307.html), [Brasil A](https://www.cbf.com.br/futebol-brasileiro/times/campeonato-brasileiro/serie-a/2026), [Brasil B](https://www.cnnbrasil.com.br/esportes/brasileirao/campeonato-brasileiro-veja-os-clubes-que-participarao-da-serie-b-em-2026/), [Argentina](https://www.afa.com.ar/es/posts/sorteo-de-la-liga-profesional-2026-se-definen-los-grupos-del-torneo-apertura-y-torneo-clausura), [Premier League](https://www.premierleague.com/en/news/4365156), [España](https://www.laliga.com/laliga-easports/clubes), [Alemania](https://www.bundesliga.com/en/bundesliga/clubs), [Italia](https://sport.sky.it/calcio/serie-a/serie-a-2026-2027-squadre), [Francia](https://ligue1.com/fr/articles/l1_article_5293-les-dates-de-reprise-des-clubs-de-l1-2627), [Holanda](https://eredivisie.nl/competitie/clubs/), [Portugal](https://bolanarede.pt/especial-bola-na-rede/atualidade/contas-fechadas-eis-as-18-equipas-que-vao-disputar-a-primeira-liga-2026-27/), [Escocia](https://spfl.co.uk/clubs).
+
+
+## Alfa 0.7 · Mercado vivo (30 octubre 2026)
+
+- **Ofertas proporcionales:** el mercado evalúa OVR, estadísticas recientes, reputación, edad y prestigio deportivo del destino. Los antiguos ratings semilla (tope 75) ya no determinan en solitario las ofertas.
+- **Representante activo:** opción para consultar interesados tras al menos una temporada y hasta dos búsquedas adicionales por mercado; puede orientar búsqueda por país, minutos o salario (motor preparado). Las búsquedas no prometen ofertas concretas.
+- **Directiva con autonomía:** contratos que vencen sin renovación, transferencias forzadas por descarte y cesiones juveniles; ya no se renueva automáticamente cada contrato. Una salida forzada no ofrece el botón de permanencia.
+- **Cesiones:** duran una temporada, guardan el contrato original y retornan al club de origen.
+- **Economía en EUR por año:** calibración por mercado/país, prestigio, rol y OVR. Son **estimaciones de simulación**, no cifras oficiales de los contratos de cada institución. Se registran ingresos por temporadas nuevas. No se alteran ganancias históricas de guardados antiguos.
+- **Banderas:** elimina caracteres superpuestos en navegadores Windows.
+- **Corrección adicional:** clubes en circuitos de referencia siempre participan en su liga simulada incluso si no están entre los 16 mejor rankeados de su país.
+- **Compatibilidad:** guarda y migra partidas versión 1 a 6, sin reiniciar el historial anterior.
+
+Para la economía se usan órdenes de magnitud de las ligas (no salarios reales de cada plantilla). Es un modelo original y modificable.

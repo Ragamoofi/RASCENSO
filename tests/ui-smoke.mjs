@@ -11,6 +11,6 @@ assert.match(root.innerHTML,/playing-layout/);
 assert.match(root.innerHTML,/right-tabs/);
 assert.match(root.innerHTML,/plan-strip/);
 assert.match(root.innerHTML,/standing-row/);
-assert.match(root.innerHTML,/ALFA 0.5/);
+assert.match(root.innerHTML,/ALFA 0.7/);
 assert.match(root.innerHTML,/assets\/crests\/.*\.png/);
-console.log('Interfaz RASCENSO 0.5: 3 columnas, tabla, planes y navegación presentes. Tamaño:',root.innerHTML.length,'caracteres.');
+console.log('Interfaz RASCENSO 0.7: 3 columnas, tabla, planes y navegación presentes. Tamaño:',root.innerHTML.length,'caracteres.');

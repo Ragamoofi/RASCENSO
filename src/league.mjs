@@ -25,7 +25,7 @@ export function leagueParticipants(countryCode,clubId,state={}){
  const active=country.clubs.filter(c=>!c.inactive);
  const selected=active.filter(c=>!getInauguralLeague(c.id)).sort((a,b)=>b.level-a.level||a.id.localeCompare(b.id));
  if(!selected.some(c=>c.id===clubId)){const mine=country.clubs.find(c=>c.id===clubId);if(mine)selected.unshift(mine);}
- const size=Math.min(16,selected.length);return selected.slice(0,size);
+ const size=Math.min(16,selected.length);const top=selected.slice(0,size);if(clubId&&!top.some(c=>c.id===clubId)){const mine=country.clubs.find(c=>c.id===clubId);if(mine)top[top.length-1]=mine;}return top;
 }
 /** Two-tier countries use the actual 2026 rosters as a baseline. Subsequent changes are fictional results of this save, never real-world future claims. */
 export function nextLeagueRosters(state,playedLeague){
