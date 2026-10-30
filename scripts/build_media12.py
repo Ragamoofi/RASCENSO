@@ -112,6 +112,9 @@ def get_pagephotos():
    if page:mapped[name]=page
  return mapped
 
+def filename_key(value):
+ return unicodedata.normalize('NFC',urllib.parse.unquote(str(value)).replace('_',' ')).casefold()
+
 def commons_metadata(filenames):
  info={}
  for group in chunks(sorted(set(x for x in filenames if x)),28):
@@ -119,7 +122,7 @@ def commons_metadata(filenames):
   for page in (q or {}).get('query',{}).get('pages',{}).values():
    if 'imageinfo' not in page: continue
    name=page['title'].removeprefix('File:')
-   info[name]=page['imageinfo'][0]
+   info[filename_key(name)]=page['imageinfo'][0]
  return info
 
 def clean(value):return re.sub('<[^>]+>','',html.unescape(str(value or ''))).strip()[:400]
@@ -148,7 +151,7 @@ def main():
  print('MEDIA12 indexed',len(NAMES),'candidates',len(names),'licensed assets',len(metadata),flush=True)
  photo_catalog={}
  for name in NAMES:
-  filename=names.get(name);meta=metadata.get(filename)
+  filename=names.get(name);meta=metadata.get(filename_key(filename))
   if meta and legal(meta):
    url=meta.get('thumburl') or meta.get('url')
    if url and url.startswith('https://upload.wikimedia.org/'):
@@ -157,15 +160,15 @@ def main():
 
  tasks=[]
  for name in NAMES:
-  filename=names.get(name); meta=metadata.get(filename)
+  filename=names.get(name); meta=metadata.get(filename_key(filename))
   if meta and legal(meta):tasks.append((PORTRAITS/(slug(name)+'.png'),'portrait',name,meta,filename))
   else:fallback(PORTRAITS/(slug(name)+'.png'),name,'portrait')
  for id,filename in LOGOS.items():
-  meta=metadata.get(filename)
+  meta=metadata.get(filename_key(filename))
   if meta and legal(meta):tasks.append((COMP/(id+'.png'),'logo',id,meta,filename))
   else:fallback(COMP/(id+'.png'),id,'logo')
  for name,filename in CUPS.items():
-  meta=metadata.get(filename)
+  meta=metadata.get(filename_key(filename))
   if meta and legal(meta):tasks.append((TROPH/('real-'+name+'.png'),'trophy',name,meta,filename))
   else:fallback(TROPH/('real-'+name+'.png'),name,'trophy')
  def download_task(item):
