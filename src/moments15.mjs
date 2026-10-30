@@ -15,7 +15,7 @@ export function executionVerdict(match,timing,performance){
  if(mode==='memoria')return {valid:performance===null||accuracy===100,reason:performance===null?'Modo clásico':accuracy===100?'Secuencia correcta':'Secuencia equivocada'};
  const distance=timingQuality(match,timing).distance;
  if(distance===null)return {valid:true,reason:'Modo clásico'};
- return {valid:distance<=28,reason:distance<=28?'Ejecución dentro de la zona':'Fallaste la ventana de ejecución'};
+ return {valid:distance<=9,reason:distance<=9?'Ejecución dentro de la zona':'Fallaste la ventana de ejecución'};
 }
 export function upcomingMoment(s,playerMatches,getClub){
  if(s.phase!=='season'||!playerMatches?.length)return null;
