@@ -118,7 +118,7 @@ test('Tres opciones del draft, un solo atributo por turno y progreso hasta acade
  let s=newCareer({name:'Prueba',seed:'draft-0.4',country:'CL',position:'DC'});
  assert.equal(draftChoices(s).length,3);
  const second=draftChoices(s)[1];s=acceptDraft(s,1);
- assert.equal(s.attributes[second.key],second.value);
+ assert.equal(s.attributes[second.key],s.draftSources[0].startingValue);
  while(s.phase==='draft')s=acceptDraft(s,2);
  assert.equal(Object.keys(s.attributes).length,8);
  assert.equal(s.phase,'academy');
