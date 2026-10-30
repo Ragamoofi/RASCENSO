@@ -1,5 +1,6 @@
 /* Catálogo global con IDs persistentes. Ligas verificadas en leagues2026.mjs */
 export const COUNTRIES = [
+  {code:"NZ",name:"Nueva Zelanda",confederation:"OFC",league:"Campeonato de Nueva Zelanda (referencia)",clubs:[{id:"nz-1",name:"Auckland City",level:66},{id:"nz-2",name:"Wellington Olympic",level:62},{id:"nz-3",name:"Eastern Suburbs",level:60},{id:"nz-4",name:"Christchurch United",level:58},{id:"nz-5",name:"Auckland United",level:59}]},
   {
     "code": "AR",
     "name": "Argentina",

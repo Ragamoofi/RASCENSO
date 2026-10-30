@@ -38,6 +38,10 @@ jobs:
           test -s src/media12.mjs
           test -s src/competition12.mjs
           test -s src/portrait12.mjs
+          test -s src/competitions13.mjs
+          test -s assets/brand/rascenso-wordmark.png
+          test -s assets/brand/rascenso-icon.png
+          test -s favicon.png
           for file in assets/logos-{1..4}.json; do test -s "$file"; done
   deploy:
     needs: test
@@ -52,7 +56,7 @@ jobs:
       - name: Preparar sitio completo
         run: |
           mkdir -p _site
-          cp index.html style.css experience.css favicon.svg .nojekyll _site/
+          cp index.html style.css experience.css favicon.svg favicon.png .nojekyll _site/
           cp -R src assets _site/
           node scripts/export-clubs.mjs
           python -m pip install -q pillow cairosvg

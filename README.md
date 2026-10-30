@@ -118,29 +118,20 @@ Se mantienen los identificadores, estadísticas y estados previos. Las nuevas ag
 Documentación oficial relevante: https://developers.openai.com/siwc/quickstart y https://developers.openai.com/siwc/token-sharing-open-source.
 
 
-## Corrección de experiencia (1.0.1)
+## Alfa 1.2 — Identidad mundial
 
-- Se retira el panel de intercambio manual con ChatGPT (copiar, abrir otra pestaña y pegar), porque no proporcionaba un chat realmente integrado.
-- Se conservan las escenas futbolísticas, los resúmenes anuales y todas las partidas; no se borran posibles textos guardados localmente del panel anterior.
-- Un chat con IA solo deberá anunciarse como integrado cuando disponga de autenticación autorizada, conexión real y validación de consecuencias.
-
-
-## Versión 1.1 — Historias deportivas y continuidad
-
-- 26 conflictos deportivos nuevos y tres decisiones por escena, con requisitos por posición, edad, rendimiento, objetivos y lesiones.
-- Selección ponderada que evita los últimos doce acontecimientos y reduce la repetición de categorías narrativas.
-- Respuestas del entrenador o interlocutor visibles después de cada decisión, además de la consecuencia.
-- Variaciones coherentes en los comentarios de cierre de temporada; no se inventan resultados, fichajes ni convocatorias.
-- Se conserva el formato actual de guardados, sin reiniciar partidas.
-- **ChatGPT:** no se incorporó un falso inicio de sesión. El uso de la suscripción desde GitHub Pages requiere autorización/configuración que RASCENSO no tiene; no se solicitó API ni credenciales.
+- El draft dispone de un PNG local por cada uno de los 78 referentes. Los retratos reales se obtienen de Wikimedia Commons únicamente cuando la licencia es reutilizable y se muestra atribución completa; cuando no, se emplea una ilustración original que no pretende ser el deportista. El proceso genera `assets/MEDIA_CREDITS.html`.
+- Los 13 campeonatos verificados disponen de distintivo PNG; se usa el logo referencial procedente de Commons si su licencia permite reutilización, o un distintivo original en caso contrario. Los logos pueden seguir siendo marcas de sus titulares.
+- Competiciones y copas mundiales se presentan como referencia visual; no se finge que todas sean ya competiciones jugables. La vitrina usa imágenes reales de trofeos con licencia libre donde existen.
+- En escenas y cierres de temporada aparecen nombres de medios deportivos reales según el país, pero **todas las noticias, entrevistas y titulares son ficciones originales de RASCENSO**. Ningún medio está asociado con el juego.
+- Se genera una guía pública de licencias, autores y enlaces para permitir revisión y retirada de recursos.
 
 
-## Alfa 1.2 — Fotografías, prensa y competiciones
-- 78 PNG en el draft: fotografía real con licencia reutilizable verificada o ilustración de respaldo. El despliegue registra autor, licencia y fuente en `assets/MEDIA_CREDITS.html`.
-- Distintivos PNG para 13 competiciones. Logos reconocibles cuando la licencia encontrada permite uso; en otros casos aparece insignia original. Las marcas pertenecen a sus titulares.
-- En la vitrina y el Mundo aparecen imágenes licenciadas de copas internacionales. Algunas copas aún NO forman parte del motor jugable.
-- Medios deportivos de cada país se citan solo como simulación narrativa. **Ningún titular o entrevista es una publicación real ni implica colaboración del medio**.
-- Sin cambios en los guardados ni en el progreso deportivo de partidas existentes.
-
-### Imágenes con carga diferida 1.2.1
-Los PNG locales siguen funcionando sin red. Si GitHub Actions no pudo descargar una fotografía licenciada, las tres tarjetas visibles intentan recuperarla desde la URL documentada en `assets/portrait-catalog.json` y atribuida en `MEDIA_CREDITS.html`. No se usan fotos sin licencia documentada.
+## Alfa 1.3 — Competiciones globales (formato simplificado)
+- Marca oficial aportada por el creador: wordmark horizontal + icono cuadrado PNG y favicon.
+- 50 nacionalidades jugables, incluida Nueva Zelanda (OFC); para ligas sin plantillas oficiales verificadas se sigue usando el circuito de referencia.
+- Copa nacional anual para cada país, con llaves, partidos, resultados, clasificación y trofeo.
+- Torneos continentales de clubes de seis confederaciones, con acceso simplificado por posición de liga.
+- Convocatoria por rendimiento, eliminatorias, copa continental de selección y Mundial según ciclo del año; sus partidos se guardan separados de los de club.
+- Historial de competiciones y recapitulaciones con llaves y trofeos; guardados anteriores se migran sin perder títulos.
+- **Advertencia:** formatos de referencia de hasta 16 equipos, eliminación directa. No equivale a recrear los reglamentos oficiales de cada torneo ni su calendario completo.

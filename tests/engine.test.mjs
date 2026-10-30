@@ -9,8 +9,8 @@ function makeStarted(country='CL',seed='test-49'){
  s=autoResolveEvent(s);
  return s;
 }
-test('49 nacionalidades con tres clubes reales semilla como mínimo',()=>{
- assert.equal(COUNTRIES.length,49);assert(COUNTRIES.every(c=>c.clubs.length>=3));
+test('50 nacionalidades con tres clubes reales semilla como mínimo',()=>{
+ assert.equal(COUNTRIES.length,50);assert(COUNTRIES.every(c=>c.clubs.length>=3));
  assert(COUNTRIES.every(c=>c.clubs.every(x=>x.id&&x.name&&Number.isFinite(x.level))));
 });
 test('Chile ofrece tres clubes del país y nunca clubes extranjeros al iniciar',()=>{
@@ -41,7 +41,7 @@ test('Avanza desde un club local hasta retiro a los 40 con 24 temporadas',()=>{
  assert(s.history.every(x=>x.matches>=0&&x.goals>=0&&x.assists>=0));
 });
 
-test('Cada uno de los 49 países devuelve exactamente tres ofertas propias',()=>{
+test('Cada uno de los 50 países devuelve exactamente tres ofertas propias',()=>{
  for(const c of COUNTRIES){
   const s=newCareer({name:'Prueba',country:c.code,position:'MC',seed:`territorio-${c.code}`});
   const offers=academyOffers(s);
@@ -107,7 +107,7 @@ test('Migrar una partida v2 conserva temporada y añade relaciones y bitácora',
  assert.equal(m.history.length,original.history.length);
 });
 
-test('El catálogo ampliado conserva identificadores y supera 800 clubes de 49 países',()=>{
+test('El catálogo ampliado conserva identificadores y supera 800 clubes de 50 países',()=>{
  assert(COUNTRIES.reduce((n,c)=>n+c.clubs.length,0)>=800);
  assert.equal(getCountry('CL').clubs.find(c=>c.id==='cl-1').name,'Colo-Colo');
  assert(getCountry('CL').clubs.some(c=>c.name==='Santiago Wanderers'));

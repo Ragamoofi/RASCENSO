@@ -1,4 +1,5 @@
 import { COUNTRIES } from './countries.mjs';
+import { simulateGlobalSeason } from './competitions13.mjs';
 import { identityTraits, identitySeasonEffects, preparationEffects, PREPARATIONS, archetypeFor } from './career08.mjs';
 import { DRAFT_REFERENTS, DRAFT_TIERS, draftPotentialAdjustment } from './draft09.mjs';
 import { chooseSeasonAgenda, seasonAgendaEffects } from './agenda09.mjs';
@@ -165,6 +166,7 @@ export function advanceSeason(s){
  const club=getClub(s.clubId);if(!club)return s;
  const r=rng(`${s.seed}:seasonv5:${s.age}:${club.id}`);
  const league=playLeague(s),leagueRosters=nextLeagueRosters(s,league),{matches,goals,assists,cleanSheets,goalsConceded,injuryWeeks,leaguePosition,role,minutes}=league;
+ const global=simulateGlobalSeason(s,league);
  const profile=s.developmentProfile||'normal';
  const ageStep=profile==='temprano'?2:profile==='tardio'?-2:0;
  const devAge=s.age+ageStep;
@@ -182,18 +184,18 @@ export function advanceSeason(s){
  const titles=[];
  if(leaguePosition===1)titles.push(league.league);
  // Solo se concede el título de liga cuando se ganó por puntos en la tabla.
- const international=s.ovr>=77&&matches>=18?Math.floor(r()*7):0;
- const worldCup=international>0&&(s.age-18)%4===0&&s.age>=18;
- const worldCupResult=worldCup?choose(['Fase de grupos','Octavos de final','Cuartos de final','Semifinal'],r):null;
+ const international=global.international;
+ const worldCupResult=global.worldCupResult;
+ for(const name of global.titles)titles.push(name);
  const wage=s.contract?.currency==='EUR'?s.contract.salary:annualSalary(club,s.ovr);
  const seasonal={salaryEarned:wage,age:s.age,year:careerYear(s),clubId:club.id,club:club.name,country:club.country,ovrBefore:s.ovr,ovrAfter:ovr,role,matches,minutes,goals,assists,cleanSheets,goalsConceded,international,injuryWeeks,leaguePosition,titles,worldCupResult,
-  table:league.standings,fixtures:league.fixtureResults,playerMatches:league.playerMatches,plan:league.plan,champion:league.champion,leagueName:league.league,leagueId:league.leagueId,leagueVerified:league.verified,leagueDivision:league.division,competitionVersion:2};
+  table:league.standings,fixtures:league.fixtureResults,playerMatches:league.playerMatches,plan:league.plan,champion:league.champion,leagueName:league.league,leagueId:league.leagueId,leagueVerified:league.verified,leagueDivision:league.division,competitionVersion:3,competitions:global.competitions,calledUp:global.calledUp,nationalCaps:global.nationalCaps,nationalGoals:global.nationalGoals,clubCupMatches:global.competitions.filter(c=>['national-cup','continental'].includes(c.kind)).reduce((n,c)=>n+c.played,0)};
  const coachTrust=clamp((s.coachTrust??50)+(matches>=Math.round(games*.65)?3:matches<8?-5:-1)+(s.seasonPlan==='defensa'?2:0)+prep.coach+identity.coach,0,100);
  const relationships={...s.relationships,coach:{...s.relationships.coach,trust:coachTrust}};
  const flags={...(s.storyFlags||{})};if(s.fanClubId&&s.clubId===s.fanClubId)flags.playedForFan=true;
  let reputation=clamp((s.reputation||0)+(leaguePosition<=3?3:0)+Math.min(4,Math.floor((goals+assists)/13))+prep.reputation,0,100);
  let contract=s.contract;
- const trophyRecords=[...(s.trophyRecords||[]),...titles.map(title=>({title,year:careerYear(s),clubId:club.id,leagueId:league.leagueId||'',kind:'league'}))];
+ const trophyRecords=[...(s.trophyRecords||[]),...titles.filter(title=>title===league.league).map(title=>({title,year:careerYear(s),clubId:club.id,leagueId:league.leagueId||'',kind:'league'})),...global.trophyRecords];
  return {...s,age:s.age+1,ovr,reputation,contract,trophyRecords,annualScenes:0,morale:clamp((s.morale??70)+prep.morale+identity.morale,0,100),careerEarnings:(s.careerEarnings||0)+wage,leagueRosters,coachTrust,relationships,history:[...s.history,seasonal],trophies:[...s.trophies,...titles],lastSeason:seasonal,recapPending:true,pendingEvent:chooseScene({...s,lastSeason:seasonal},r),storyFlags:flags,
   sceneBeat:0,sceneChoice:null,scenePlayerText:'',phase:s.age===39?'retired':'event'};
 }
