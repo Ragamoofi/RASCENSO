@@ -24,6 +24,33 @@ PORTRAITS = DIR / 'portraits'
 PORTRAITS.mkdir(parents=True, exist_ok=True)
 NAMES = list(dict.fromkeys(base.NAMES))
 FILE_CACHE = {}
+# Pinned Commons photographs verified by title/description, then checked for a free license on the build.
+PINNED = {
+    'Marta': 'Marta, 2023.jpg',
+    'Paolo Maldini': 'Paolo Maldini.jpg',
+    'Sergio Ramos': 'SergioRamos.jpg',
+    'Kaká': 'Kaká Postgame In Houston, March 2015 (cropped).jpg',
+    'Mia Hamm': 'Mia Hamm 2010 cropped.jpg',
+    'Diego Maradona': 'DiegoMaradona.jpg',
+    'Andrea Pirlo': 'AndreaPirlo.jpg',
+    'Alexis Sánchez': 'Alexis Sánchez.jpg',
+    'Virgil van Dijk': 'Virgil van Dijk 2019.jpg',
+    'Federico Valverde': 'Federico Valverde Real Madrid 2018.jpg',
+    'Claudio Bravo': 'Claudio Bravo headshot.jpg',
+    'Ederson': 'Ederson 2019.jpg',
+    'Paulo Díaz': 'Paulo Díaz (cropped).jpg',
+    'Marcelino Núñez': 'Marcelino Nunez.png',
+    'Erick Pulgar': 'ErickPulgar.png',
+    'Charles Aránguiz': 'Charles Aránguiz en la Copa Mundial de Fútbol de 2014.JPG',
+    'Ángel Correa': 'Ángel Correa.jpg',
+    'Giorgian de Arrascaeta': 'Giorgian De Arrascaeta 20171114 AUT URU 4546 (cropped).jpg',
+    'Richarlison': 'Richarlison Copa do Mundo 2022 (cropped).jpg',
+    'Raphinha': 'Raphinha.jpg',
+    'Kaoru Mitoma': 'Kaoru Mitoma.jpg',
+    'Santiago Giménez': 'Santiago Giménez profile picture.jpg',
+    'Emiliano Martínez': 'Dibu Martínez - ARG v CAN - 2024-07-09 (cropped).jpg',
+    'Youssouf Fofana': 'Youssouf Fofana (footballer, born 1999) (cropped).jpg',
+}
 
 
 def wiki_people():
@@ -135,6 +162,13 @@ def main():
             item=meta.get(filename)
             if item and base.legal(item) and (item.get('thumburl') or item.get('url')):
                 chosen[name]=(filename,item);break
+    pinned_info=media_metadata([PINNED[name] for name in missing if name in PINNED])
+    for name in missing:
+        if name not in PINNED:continue
+        filename=PINNED[name]
+        info=pinned_info.get(filename)
+        if info and base.legal(info) and (info.get('thumburl') or info.get('url')):
+            chosen[name]=(filename,info)
     # MediaWiki search is used ONLY when both Wikidata P18 and enwiki picture failed.
     for i,name in enumerate(missing):
         if name in chosen:continue
