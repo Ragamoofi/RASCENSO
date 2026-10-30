@@ -120,7 +120,15 @@ def commons_candidates(name):
 def media_metadata(filenames):
     missing=[f for f in filenames if f and base.filename_key(f) not in FILE_CACHE]
     if missing:
-        FILE_CACHE.update(base.commons_metadata(missing))
+        # Commons can temporarily throttle a second batch after the main build.
+        pending=missing
+        for retry in range(4):
+            found=base.commons_metadata(pending)
+            FILE_CACHE.update(found)
+            pending=[x for x in missing if base.filename_key(x) not in FILE_CACHE]
+            if not pending:break
+            time.sleep(2.0*(retry+1))
+        if pending:print('RESTORE-PORTRAITS Commons metadata unavailable:',len(pending),flush=True)
     return {f:FILE_CACHE.get(base.filename_key(f)) for f in filenames if f}
 
 
@@ -169,6 +177,12 @@ def main():
         info=pinned_info.get(filename)
         if info and base.legal(info) and (info.get('thumburl') or info.get('url')):
             chosen[name]=(filename,info)
+    pinned_debug={}
+    for name,filename in PINNED.items():
+        info=pinned_info.get(filename)
+        lic=info.get('extmetadata',{}).get('LicenseShortName',{}).get('value','') if info else ''
+        pinned_debug[name]={'filename':filename,'metadata':bool(info),'license':base.clean(lic),
+                             'legal':base.legal(info),'chosen':name in chosen}
     # MediaWiki search is used ONLY when both Wikidata P18 and enwiki picture failed.
     for i,name in enumerate(missing):
         if name in chosen:continue
@@ -200,6 +214,10 @@ def main():
         n:next((x for x in media['credits'] if x.get('kind')=='portrait' and x.get('name')==n),None)
         for n in NAMES}}
     (DIR/'portrait-status.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
+    for name in pinned_debug:pinned_debug[name]['downloaded']=name in licensed
+    (DIR/'portrait-debug.json').write_text(json.dumps(pinned_debug,ensure_ascii=False,indent=2),encoding='utf-8')
+    print('RESTORE-PORTRAITS PINNED',sum(x['metadata'] for x in pinned_debug.values()),
+          'metadata',sum(x['legal'] for x in pinned_debug.values()),'legal',flush=True)
     credits=DIR/'MEDIA_CREDITS.html'
     page=credits.read_text(encoding='utf-8')
     lines=[]

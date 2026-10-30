@@ -86,12 +86,13 @@ jobs:
         run: |
           mkdir -p /tmp/rascenso-photo-audit
           cp _site/assets/portrait-status.json /tmp/rascenso-photo-audit/portrait-status.json
+          cp _site/assets/portrait-debug.json /tmp/rascenso-photo-audit/portrait-debug.json
           cd /tmp/rascenso-photo-audit
           git init -q
           git checkout -q -b media-audit
           git config user.name "RASCENSO Media Audit"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add portrait-status.json
+          git add portrait-status.json portrait-debug.json
           git commit -qm "audit: estado verificable de los 78 retratos"
           git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/heads/media-audit
       - uses: actions/upload-pages-artifact@v4
