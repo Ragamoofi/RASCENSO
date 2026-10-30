@@ -7,3 +7,10 @@
 
 /* RASCENSO 0.5 - panel lateral partido a partido */
 .right-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:4px 0 11px}.right-tabs button{padding:8px 5px;background:#203b58;color:#bed2eb;border:1px solid #3d5a7a;border-radius:6px;font-size:9px;font-weight:900;cursor:pointer}.right-tabs button.active{background:#f0b17b;color:#18283d;border-color:#ffcd9e}.match-list{display:flex;flex-direction:column;gap:8px}.fixture-item{background:#1e3854;border:1px solid #3a5776;border-radius:8px;padding:9px}.fixture-item small{display:block;color:#b8cce3;font-size:9px}.fixture-item>div{display:grid;grid-template-columns:22px minmax(0,1fr) 43px minmax(0,1fr) 22px;align-items:center;gap:5px;margin:7px 0}.fixture-item>div span{font-size:9px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.fixture-item>div b{text-align:center;color:#ffcb9e;font:900 19px 'Barlow Condensed'}.fixture-item .team-badge{width:22px;height:24px}
+
+
+/* Escudos PNG locales: respetar contorno, proporción y transparencia. */
+.team-badge{overflow:visible;border:0;background:transparent;box-shadow:none;border-radius:0}
+.team-badge .badge-img{background:transparent;border-radius:0;padding:0;object-fit:contain}
+.team-badge.hero .badge-img{padding:0}
+.team-badge:has(.badge-img) .badge-fallback{visibility:hidden}
