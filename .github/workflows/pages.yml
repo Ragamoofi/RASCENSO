@@ -36,6 +36,10 @@ jobs:
           cp index.html style.css experience.css favicon.svg .nojekyll _site/
           cp src/*.mjs _site/src/
           cp -R assets _site/assets
+          node scripts/export-clubs.mjs
+          python -m pip install --quiet pillow cairosvg
+          python scripts/build_crests.py
+          test -s _site/assets/crests/cl-1.png
           test -s _site/experience.css
           test -s _site/assets/logos-1.json
       - uses: actions/upload-pages-artifact@v4
