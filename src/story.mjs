@@ -4,6 +4,7 @@
  */
 import { COUNTRIES } from './countries.mjs';
 import { STORY_09 } from './story09.mjs';
+import { STORY_11 } from './story11.mjs';
 import { matchContext } from './career10.mjs';
 
 const findClub=id=>COUNTRIES.flatMap(c=>c.clubs).find(c=>c.id===id);
@@ -254,8 +255,32 @@ Object.assign(catalog,{
  opt('No buscar la cinta todavía','Consolidar tu rendimiento antes de liderar.','«Conocer tus límites también es madurez».',{morale:3,coach:2},'La confianza crece sin presión extra.')]
  }
 });
-Object.assign(catalog,STORY_09);
+Object.assign(catalog,STORY_09,STORY_11);
 export const STORY_IDS=Object.keys(catalog);
+// Variación estable por campaña y escena, sin tiradas nuevas cada vez que se dibuja la interfaz.
+const stableHash=value=>{let h=2166136261;for(const c of String(value)){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;};
+const currentYear=s=>(s.startYear||2026)+(s.age-(s.startAge||16));
+export function storyDetail(s,id){
+ const last=s.lastSeason||{}, count=Array.isArray(s.storyLog)?s.storyLog.filter(x=>x.id===id).length:0;
+ const season=last.year||currentYear(s), club=clubName(s.clubId), played=last.matches||0;
+ // Comentarios verificables de la trayectoria, sin fingir partidos o fichajes inexistentes.
+ const details=[];
+ if(last.injuryWeeks>=3)details.push(`La temporada ${season} incluyó ${last.injuryWeeks} semanas de lesión; cuidar la continuidad es parte de la conversación.`);
+ if(played>=15&&last.goals+last.assists>=18)details.push(`Tu aporte de ${last.goals||0} goles y ${last.assists||0} asistencias explica por qué en ${club} se habla de tus responsabilidades.`);
+ if(played>0&&played<=12)details.push(`Con ${played} partidos disputados, la falta de continuidad es un tema que no puedes ignorar.`);
+ if(last.leaguePosition>=12)details.push(`El ${last.leaguePosition}° puesto de ${last.leagueName||'la liga'} dejó dudas deportivas en el plantel.`);
+ if(last.leaguePosition<=3&&last.leaguePosition>0)details.push(`La posición ${last.leaguePosition}° dejó buenas sensaciones, aunque la próxima temporada sigue siendo un desafío distinto.`);
+ if(s.fanClubId&&s.clubId!==s.fanClubId)details.push(`Tu equipo de hincha sigue formando parte de tu historia, pero hoy tu contrato te vincula con ${club}.`);
+ if(s.personality==='ambicioso')details.push('Tu carácter ambicioso ya forma parte de cómo afrontas estas conversaciones.');
+ if(s.personality==='leal')details.push('Tu sentido de pertenencia pesa cuando debes tomar decisiones sobre tu futuro.');
+ if(s.publicImage==='mediatico')details.push('Las declaraciones públicas tienen más exposición por el perfil que construiste.');
+ if(s.dream==='seleccion')details.push('Tu aspiración de representar al país sigue presente, pero no existe una convocatoria asegurada.');
+ if(s.dream==='europa')details.push('Tu objetivo de llegar a la élite mundial convive con la realidad deportiva de tu club actual.');
+ if(s.coachTrust<=35)details.push('La relación con el entrenador atraviesa un momento de poca confianza.');
+ if(s.coachTrust>=75)details.push('El cuerpo técnico reconoce la confianza que has construido con trabajo sostenido.');
+ if(!details.length)details.push(`Cada temporada con ${club} puede alterar tu trayectoria; el entrenador evalúa mucho más que una estadística.`);
+ return details[stableHash(`${s.seed}:${id}:${season}:${count}`)%details.length];
+}
 export function sceneFor(s){
  const entry=catalog[s.pendingEvent]||catalog.coach;
  const speaker=s.relationships?.[entry.actor]||initialRelationships(s.country)[entry.actor];
@@ -263,23 +288,57 @@ export function sceneFor(s){
  if(s.pendingEvent==='derby'&&match){return {id:s.pendingEvent,title:`Lo que dejó el encuentro ante ${match.opponentName}`,tag:'PARTIDO DE TU TEMPORADA',place:'Camarín · Balance deportivo',actor:entry.actor,speaker,
   paragraphs:[`Fecha ${match.round}: ${match.homeName} ${match.score} ${match.awayName}. Tu equipo terminó con una ${match.result}.`,`El entrenador y los compañeros analizan las decisiones de ese partido, ya disputado, para corregir el siguiente.`],
   speech:'«Ahora que sabemos cómo terminó, ¿qué debemos mejorar para el próximo encuentro?»',options:entry.options(s)};}
- return {id:s.pendingEvent,title:entry.title(s),tag:entry.tag,place:entry.place,actor:entry.actor,speaker,paragraphs:entry.paragraphs(s),speech:entry.speech(s),options:entry.options(s),match};
+ const base=entry.paragraphs(s);
+ return {id:s.pendingEvent,title:entry.title(s),tag:entry.tag,place:entry.place,actor:entry.actor,speaker,paragraphs:s.pendingEvent==='arrival'?base:[...base,storyDetail(s,s.pendingEvent)],speech:entry.speech(s),options:entry.options(s),match};
+}
+const defensive=new Set(['POR','DFC','LI','LD','MCD']);
+const attacking=new Set(['DC','EI','ED','MCO','MI','MD']);
+function storyWeight(id,s){
+ const a=s.lastSeason||{}, n=a.matches||0, matches=Math.max(1,n), trend=(a.goals||0)+(a.assists||0);
+ let w=1;
+ const youth=['young_wall','first_call','bench_leader','rotation','bench'];
+ const leaders=['captaincy','captain_band','veteran','veteran_minute','title_defense'];
+ const highForm=['goal_bonus','winning_streak','milestone','nomination','scouting_competition'];
+ const lowForm=['dry_spell','drought','bench_leader','first_call','transfer_rejection'];
+ const injured=['injury','recovery','injury_return'];
+ const diff=['tough_lost','supporter','discipline'];
+ if(s.age<=21&&youth.includes(id))w+=4;
+ if(s.age>=27&&leaders.includes(id))w+=4;
+ if(trend>=18&&highForm.includes(id))w+=6;
+ if(trend<=5&&lowForm.includes(id))w+=4;
+ if(n<13&&youth.includes(id))w+=5;
+ if((a.injuryWeeks||0)>=4&&injured.includes(id))w+=9;
+ if((a.leaguePosition||0)>=12&&diff.includes(id))w+=5;
+ if(a.titles?.length&&['title_defense','cup','captaincy'].includes(id))w+=6;
+ if(defensive.has(s.position)&&['clean_sheet','goalkeeper_role','tactical_room','second_ball'].includes(id))w+=5;
+ if(attacking.has(s.position)&&['final_third','dry_spell','goal_bonus','playmaker','crossing'].includes(id))w+=5;
+ if(s.dream==='europa'&&['europa_path','scouting_competition','scouting_report','agent'].includes(id))w+=4;
+ if(s.dream==='seleccion'&&id==='selection_dream')w+=7;
+ if(s.fanClubId&&id==='fan_away')w+=5;
+ if(s.personality==='leal'&&['supporter','locker_split','local_roots'].includes(id))w+=3;
+ if(s.personality==='ambicioso'&&['contract_role','scouting_competition','goal_bonus'].includes(id))w+=3;
+ const seasonCount=(s.storyLog||[]).filter(x=>x.year===currentYear(s)&&x.id===id).length;
+ if(seasonCount)w*=.02;
+ return w;
 }
 export function chooseScene(s,roll){
  if(s.fanClubId && s.clubId===s.fanClubId && !s.storyFlags?.playedForFan) return 'fan_home';
- // Primero atender consecuencias fuertes y luego evitar escenas repetidas de temporadas anteriores.
- const recent=(s.storyLog||[]).slice(-5).map(x=>x.id).filter(Boolean);
- const conditional=[];
- if((s.lastSeason?.injuryWeeks||0)>=6)conditional.push('injury','recovery');
- if((s.lastSeason?.matches||99)<12)conditional.push('rotation','bench','loan_talk');
- if(s.fanClubId&&s.clubId!==s.fanClubId)conditional.push('fan_press','fan_club_rumor');
- if((s.lastSeason?.goals||0)>=12)conditional.push('milestone','nomination');
- if((s.coachTrust||50)<45)conditional.push('coach','tactical_room','bench');
- if(s.dream==='europa')conditional.push('scouting','scout');
- const all=[...STORY_IDS.filter(id=>!['arrival','fan_home','fan_departure','family'].includes(id)&&(!catalog[id].eligible||catalog[id].eligible(s))),...conditional].filter((id,i,a)=>!!catalog[id]&&a.indexOf(id)===i);
- const pool=all.filter(id=>!recent.includes(id));
- const options=pool.length?pool:all;
- return options[Math.floor(roll()*options.length)]||'coach';
+ const log=s.storyLog||[];
+ const recentIds=new Set(log.slice(-12).map(x=>x.id));
+ const recentTags=new Set(log.slice(-3).map(x=>x.tag));
+ const excluded=new Set(['arrival','fan_home','fan_departure','family']);
+ const eligible=STORY_IDS.filter(id=>!excluded.has(id)&&catalog[id]&&(!catalog[id].eligible||catalog[id].eligible(s)));
+ if(!eligible.length)return 'coach';
+ // Solo permitir reciclaje de una escena cuando todas las opciones se agotaron.
+ const fresh=eligible.filter(id=>!recentIds.has(id));
+ const pool=fresh.length?fresh:eligible.filter(id=>id!==log.at(-1)?.id);
+ const candidates=pool.length?pool:eligible;
+ const weights=candidates.map(id=>Math.max(.01,storyWeight(id,s)*(recentTags.has(catalog[id].tag)?.24:1)));
+ const total=weights.reduce((sum,n)=>sum+n,0);
+ const value=Math.max(0,Math.min(.999999999,Number(roll())||0))*total;
+ let accumulated=0;
+ for(let i=0;i<candidates.length;i++){accumulated+=weights[i];if(value<accumulated)return candidates[i];}
+ return candidates.at(-1)||'coach';
 }
 export function resultOfScene(s,scene,index,playerText=''){
  const o=scene.options[index]||scene.options[0];const effect=o.effect||{};

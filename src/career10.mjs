@@ -36,19 +36,57 @@ export function seasonReview(s, getClub){
  const position=Number(a.leaguePosition)||null;
  const medal=Array.isArray(a.titles)&&a.titles.length>0;
  const solid=starts>=23, impactful=goals+assists>=16, injured=(a.injuryWeeks||0)>=5;
- const voices=[];
- if(medal)voices.push({speaker:'Entrenador',tone:'orgullo',quote:`Ganamos ${a.titles.join(' y ')}. El grupo se lo ganó en la cancha. Ahora empieza otro desafío.`});
- else if(impacted(goals,assists,starts))voices.push({speaker:'Prensa deportiva',tone:'reconocimiento',quote:`${goals} goles y ${assists} asistencias: tu aporte con ${club} fue uno de los temas de la campaña.`});
- else if(injured)voices.push({speaker:'Entrenador',tone:'apoyo',quote:'Las lesiones nos complicaron. Lo principal es recuperar tu continuidad para la próxima temporada.'});
- else if(!solid)voices.push({speaker:'Entrenador',tone:'exigencia',quote:`Jugaste ${starts} encuentros. Todavía queda un puesto por pelear; necesitamos constancia.`});
- else if(position&&position<=4)voices.push({speaker:'Prensa deportiva',tone:'expectativa',quote:`${club} terminó ${position}° y llega con expectativas renovadas al próximo campeonato.`});
- else voices.push({speaker:'Entrenador',tone:'balance',quote:'Terminamos otra temporada. Hay cosas buenas y otras que mejorar. El siguiente año empieza desde cero.'});
+ const variant=(options)=>{
+  let key=`${s.seed||''}:${a.year}:${a.clubId}:${goals}:${assists}:${starts}:${a.leaguePosition}`;
+  let hash=2166136261;
+  for(const c of key){hash^=c.charCodeAt(0);hash=Math.imul(hash,16777619);}
+  return options[(hash>>>0)%options.length];
+ };
+ let voice;
+ if(medal)voice={speaker:'Entrenador',tone:'orgullo',quote:variant([
+  `El título con ${club} no llegó por casualidad. Hubo trabajo durante todo el año y ahora tenemos que sostenerlo.`,
+  `Levantar ${a.titles.join(' y ')} es una alegría, pero también una responsabilidad para la temporada siguiente.`,
+  `Hoy podemos celebrar. Mañana tendremos que defender lo que ganamos con ${club}.`,
+  `Esta plantilla demostró carácter: cerramos el año con un título y queremos seguir compitiendo.`,
+  `No quiero que recordemos solo la copa. También importa lo que hicimos para llegar hasta aquí.`])};
+ else if(impacted(goals,assists,starts))voice={speaker:'Prensa deportiva',tone:'reconocimiento',quote:variant([
+  `Con ${goals} goles y ${assists} asistencias, su influencia en ${club} fue difícil de ignorar.`,
+  `La campaña dejó números concretos: ${starts} partidos y ${goals+assists} participaciones directas en goles.`,
+  `Su año en ${club} obliga a hablar de rendimiento, no solamente de potencial.`,
+  `Los ${goals} tantos y ${assists} pases de gol elevaron las expectativas para el próximo campeonato.`,
+  `Los buenos números no garantizan un traspaso, pero sí explican la atención que recibe el futbolista.`])};
+ else if(injured)voice={speaker:'Entrenador',tone:'apoyo',quote:variant([
+  `Las ${a.injuryWeeks} semanas fuera complicaron la continuidad. Antes de exigir resultados, hay que recuperar ritmo.`,
+  `Una lesión cambia los planes. Lo importante será preparar el regreso sin precipitar los tiempos.`,
+  `No vamos a medir la temporada solo por los partidos que faltaron. Ahora toca recuperar sensaciones.`,
+  `Necesitamos que vuelva a estar disponible con regularidad; no vamos a adelantar decisiones médicas.`])};
+ else if(!solid)voice={speaker:'Entrenador',tone:'exigencia',quote:variant([
+  `Con ${starts} partidos todavía queda mucho espacio para competir por un puesto.`,
+  `La continuidad no se regala. Vamos a evaluar la preparación y la respuesta en los entrenamientos.`,
+  `No tuvo tantos minutos como esperaba. El desafío será ganarse oportunidades, no reclamarlas por anticipado.`,
+  `Hay futbolistas que crecen cuando juegan menos de lo que quieren. Veremos cómo responde al desafío.`])};
+ else if(position&&position<=4)voice={speaker:'Prensa deportiva',tone:'expectativa',quote:variant([
+  `${club} acabó ${position}° y deja una base competitiva que deberá confirmar en el próximo torneo.`,
+  `El ${position}° puesto mostró avances, pero todavía no permite dar nada por ganado.`,
+  `La campaña de ${club} fue positiva en la clasificación. El reto será mantener el nivel.`,
+  `Se cerró una buena temporada y ahora crecen las expectativas alrededor del plantel.`])};
+ else if(position&&position>=12)voice={speaker:'Entrenador',tone:'autocrítica',quote:variant([
+  `El ${position}° lugar no nos deja conformes. Hay que corregir errores antes de volver a competir.`,
+  `Los puntos no alcanzaron para estar donde queríamos. Tenemos que cambiar cosas en el juego.`,
+  `No sirve esconder la tabla. El trabajo empieza por asumir dónde terminamos.`,
+  `El cierre fue difícil, pero no vamos a buscar culpables individuales en vez de soluciones.`])};
+ else voice={speaker:'Entrenador',tone:'balance',quote:variant([
+  `Terminó una temporada de ${starts} partidos. Tendremos que revisar qué funciona y qué debemos ajustar.`,
+  `Hay buenas señales, pero el rendimiento de un año no garantiza nada para el siguiente.`,
+  `La evaluación es clara: el equipo tiene herramientas, pero necesita más regularidad.`,
+  `No quiero grandes discursos. Quiero que aprendamos de lo que dejó esta campaña.`,
+  `Lo que conseguimos este año tiene valor, aunque todavía haya objetivos pendientes.`])};
  const alternate=position&&position>=12?`La clasificación exige mejorar: ${club} terminó ${position}°.`:
   `El equipo terminó ${position||'sin posición registrada'}° en ${a.leagueName||'su competición'}.`;
  const summary=[`${starts} partidos, ${goals} goles y ${assists} asistencias.`,alternate,
   overallDelta>0?`Tu media subió ${overallDelta} punto${overallDelta===1?'':'s'}.`:overallDelta<0?`Tu media bajó ${Math.abs(overallDelta)} punto${overallDelta===-1?'':'s'}.`:'Tu media no cambió esta temporada.',
   injured?`Sufriste ${a.injuryWeeks} semanas de lesión.`:null].filter(Boolean);
- return {year:a.year,club,league:a.leagueName||'Competición de referencia',position,starts,goals,assists,ovrBefore:a.ovrBefore,ovrAfter:a.ovrAfter,overallDelta,injuryWeeks:a.injuryWeeks||0,medal,titles:[...(a.titles||[])],summary,voice:voices[0],match:matchContext(s,getClub)};
+ return {year:a.year,club,league:a.leagueName||'Competición de referencia',position,starts,goals,assists,ovrBefore:a.ovrBefore,ovrAfter:a.ovrAfter,overallDelta,injuryWeeks:a.injuryWeeks||0,medal,titles:[...(a.titles||[])],summary,voice,match:matchContext(s,getClub)};
 }
 function impacted(goals,assists,starts){return starts>=12&&goals+assists>=16;}
 export function chatContext(s, getClub){

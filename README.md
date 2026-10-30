@@ -123,3 +123,13 @@ Documentación oficial relevante: https://developers.openai.com/siwc/quickstart 
 - Se retira el panel de intercambio manual con ChatGPT (copiar, abrir otra pestaña y pegar), porque no proporcionaba un chat realmente integrado.
 - Se conservan las escenas futbolísticas, los resúmenes anuales y todas las partidas; no se borran posibles textos guardados localmente del panel anterior.
 - Un chat con IA solo deberá anunciarse como integrado cuando disponga de autenticación autorizada, conexión real y validación de consecuencias.
+
+
+## Versión 1.1 — Historias deportivas y continuidad
+
+- 26 conflictos deportivos nuevos y tres decisiones por escena, con requisitos por posición, edad, rendimiento, objetivos y lesiones.
+- Selección ponderada que evita los últimos doce acontecimientos y reduce la repetición de categorías narrativas.
+- Respuestas del entrenador o interlocutor visibles después de cada decisión, además de la consecuencia.
+- Variaciones coherentes en los comentarios de cierre de temporada; no se inventan resultados, fichajes ni convocatorias.
+- Se conserva el formato actual de guardados, sin reiniciar partidas.
+- **ChatGPT:** no se incorporó un falso inicio de sesión. El uso de la suscripción desde GitHub Pages requiere autorización/configuración que RASCENSO no tiene; no se solicitó API ni credenciales.

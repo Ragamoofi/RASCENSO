@@ -1,0 +1,128 @@
+/* RASCENSO 1.1 — banco de conflictos deportivos originales.
+ * Todas las situaciones son propuestas narrativas, nunca resultados no simulados.
+ * Requieren datos coherentes con la ficha antes de poder aparecer.
+ */
+const event=(tag,place,actor,title,opening,words,options,eligible=()=>true)=>({
+ tag,place,actor,title:s=>typeof title==='function'?title(s):title,
+ paragraphs:s=>[typeof opening==='function'?opening(s):opening],
+ speech:s=>`«${typeof words==='function'?words(s):words}»`,
+ options:s=>options.map(([title,detail,dialogue,effect,impact])=>({title,detail,dialogue:`«${dialogue}»`,effect,impact})),eligible
+});
+const e=(...a)=>event(...a);
+const gs=s=>s.lastSeason?.goals||0, as=s=>s.lastSeason?.assists||0, pj=s=>s.lastSeason?.matches||0;
+const cl=s=>s.lastSeason?.club||'tu equipo';
+const game=s=>s.lastSeason?.leagueName||'la competición';
+export const STORY_11={
+ final_third:e('ÚLTIMO TERCIO','Sala de video · Análisis ofensivo','coach','La última decisión antes del área',s=>`El cuerpo técnico repasó tus ${gs(s)} goles y ${as(s)} asistencias con ${cl(s)}. Hay jugadas en las que recibiste con ventaja, pero la conexión con los extremos todavía puede mejorar.`, '¿Buscamos que termines tú las jugadas o que atraigas rivales para habilitar a los demás?',[
+ ['Priorizar la definición','Atacar el espacio a espaldas de la defensa','Voy a darte movimientos concretos para ese recorrido.',{coach:3,reputation:1},'Se acordó revisar tus desmarques en el siguiente ciclo.'],
+ ['Convertirme en apoyo','Recibir y descargar antes de llegar al área','Eso puede darles aire a los compañeros.',{teammate:4,coach:2},'Propusiste una variante de asociación.'],
+ ['Alternar las funciones','No ser predecible según el rival','Trabajaremos las dos situaciones.',{coach:4,morale:1},'El plan técnico quedó abierto a ambos roles.']],s=>['DC','EI','ED','MCO','MI','MD'].includes(s.position)),
+ second_ball:e('SEGUNDAS JUGADAS','Campo de entrenamiento','teammate','Los rebotes están decidiendo demasiado',s=>`En ${game(s)}, varios partidos se definieron por detalles. Durante una práctica, un compañero insiste en que el equipo está perdiendo segundas pelotas cerca del área.`, 'Si nadie llega a la segunda jugada, da igual cuántas veces centremos. ¿Qué hacemos?',[
+ ['Cerrar por dentro','Ayudar a recuperar cerca del área','Vamos a ganar metros en las disputas.',{coach:3,teammate:3},'El plantel ensaya coberturas más cerradas.'],
+ ['Llegar desde atrás','Atacar rebotes y rechaces','Yo te cubro cuando avances.',{teammate:5},'Acordaron un movimiento complementario.'],
+ ['Pedir un ensayo específico','Practicar las pelotas divididas','Se lo planteo al preparador.',{coach:4},'La propuesta llega a la planificación semanal.']]),
+ first_call:e('CONVOCATORIA','Sala del entrenador · Lista del plantel','coach','Una lista de convocados que genera dudas',s=>`Jugaste ${pj(s)} partidos la última campaña. Ahora el entrenador prepara una nueva lista y quiere explicar cómo selecciona a los jugadores cuando los puestos están disputados.`, 'No quiero prometerte minutos. Sí quiero que sepas cómo voy a evaluar tu rendimiento.',[
+ ['Solicitar criterios claros','Pedir una evaluación deportiva objetiva','Te diré qué necesito en tu puesto.',{coach:4},'Conseguiste mayor claridad sobre la competencia.'],
+ ['Aceptar el desafío','Responder en los entrenamientos','Eso me deja tranquilo.',{coach:3,morale:2},'Elegiste competir antes de reclamar.'],
+ ['Pedir una reunión posterior','Revisar la situación tras varias fechas','Podemos volver a sentarnos.',{coach:1,agent:2},'Quedó pendiente una evaluación futura.']],s=>pj(s)<24),
+ young_wall:e('DESARROLLO','Centro de entrenamiento · Informe juvenil','coach','El salto al profesionalismo no es automático',s=>`Con ${s.age} años todavía estás aprendiendo el ritmo de ${game(s)}. Un entrenador de desarrollo te muestra que las mejores cualidades no siempre aparecen en el marcador.`, '¿En qué te vas a concentrar cuando vuelvas a entrar a competir?',[
+ ['Aprender una función nueva','Ser útil incluso fuera de mi posición','Esa flexibilidad te puede abrir puertas.',{coach:5},'Te propusiste ampliar tu repertorio.'],
+ ['Perfeccionar mi mejor recurso','Construir una especialidad reconocible','Bien, pero no descuides el resto.',{reputation:2,coach:1},'Decidiste fortalecer tu mayor virtud.'],
+ ['Pedir minutos gradualmente','Un plan sin saltarte etapas','Vamos a medir tus avances.',{coach:4,morale:2},'Elegiste un desarrollo progresivo.']],s=>s.age<=21),
+ last_contract:e('DECISIÓN CONTRACTUAL','Oficina deportiva','agent','Tu próximo contrato no es solo dinero',s=>`El contrato actual con ${cl(s)} vence en ${Math.max(0,(s.contract?.ends||0)-((s.startYear||2026)+s.age-(s.startAge||16)))} temporada(s), según la ficha. El representante quiere acordar qué condiciones defender en una negociación futura.`, 'No he recibido una oferta nueva. Antes de moverme necesito saber qué no estás dispuesto a sacrificar.',[
+ ['Pedir un rol deportivo claro','Saber si compito por la titularidad','Primero preguntaremos por el proyecto.',{agent:5,coach:-1},'El representante priorizará condiciones deportivas.'],
+ ['Dar importancia a la estabilidad','Evitar contratos demasiado cortos','La seguridad también cuenta.',{agent:3,morale:2},'Dejaste claras tus necesidades de continuidad.'],
+ ['Apostar por una liga más exigente','Aceptar un desafío deportivo grande','Exploraré esa posibilidad con cautela.',{agent:5,reputation:1},'Tu ambición quedó registrada; no es una oferta formal.']],s=>!!s.contract&&s.age>=19),
+ left_foot:e('RECURSO TÉCNICO','Campo auxiliar · Práctica individual','coach',s=>`El próximo paso con tu ${s.foot==='Izquierda'?'derecha':'izquierda'}`,s=>`El entrenador propone trabajar la pierna menos hábil. Tu perfil indica que tu pierna preferida es la ${String(s.foot||'derecha').toLowerCase()}, pero los rivales intentan cerrarte el lado fuerte.`, 'Un defensor que te obliga a cambiar de pie no debería sacarte del partido. ¿Cómo lo resolvemos?',[
+ ['Entrenar el otro perfil','Abrir nuevas salidas y controles','Vamos a empezar con tareas simples.',{coach:4},'Acordaste ampliar tus recursos técnicos.'],
+ ['Buscar un compañero cercano','Asociarme antes de quedar encerrado','Eso favorece al equipo.',{teammate:4,coach:2},'El movimiento colectivo gana importancia.'],
+ ['Cambiar el punto de partida','Recibir en una zona diferente','Es una solución interesante.',{coach:3,reputation:1},'Probaste una alternativa posicional.']]),
+ veteran_minute:e('EXPERIENCIA','Vestuario · Después de la práctica','teammate','Los jóvenes empiezan a observarte',s=>`Tras ${s.history?.length||0} temporadas de carrera, un compañero recién incorporado pregunta cómo sostener la confianza cuando el fútbol se vuelve más exigente. No te pide una charla pública: busca un consejo concreto.`, 'Me cuesta aceptar que no siempre voy a jugar. ¿Cómo lo manejaste tú?',[
+ ['Compartir mis errores','Hablar de una dificultad real','Gracias por no venderme una historia perfecta.',{teammate:6},'Fortaleciste la confianza del joven.'],
+ ['Invitarlo a entrenar','Mostrar con hechos cómo competir','Ahí estaré mañana.',{teammate:5,coach:2},'Se inicia una rutina de trabajo compartida.'],
+ ['Recomendar paciencia','No buscar atajos ni promesas','Voy a intentar verlo así.',{teammate:3,morale:1},'Le ofreciste una perspectiva más serena.']],s=>s.age>=27),
+ clean_sheet:e('SOLIDEZ DEFENSIVA','Sala táctica','coach','Un buen partido también puede ser un cero atrás',s=>`Tu posición es ${s.position}. El entrenador insiste en que la evaluación defensiva no debe depender de los goles del delantero rival, sino de cómo se coordinan las coberturas.`, '¿Qué te parece más importante para que la línea funcione mejor?',[
+ ['Ordenar la presión','Comunicar cuándo adelantarse','Esa coordinación nos falta.',{coach:5},'El cuerpo técnico prepara nuevas señales de presión.'],
+ ['Cuidar los espacios interiores','No exponerse innecesariamente','Me gusta la disciplina.',{coach:4,teammate:2},'Propusiste trabajar las coberturas.'],
+ ['Mejorar la salida limpia','Tomar mejores decisiones con pelota','Eso también es defender.',{reputation:1,coach:3},'Se incorporan ejercicios de salida.']],s=>['POR','DFC','LI','LD','MCD'].includes(s.position)),
+ locker_split:e('VESTUARIO','Comedor del club','teammate','Dos grupos, un mismo vestuario',s=>`En ${cl(s)} hay compañeros que quieren entrenar con mayor intensidad y otros que prefieren bajar las cargas. El desacuerdo apareció después de un periodo de exigencia competitiva.`, 'Nos están dividiendo las opiniones. ¿Vas a tomar partido o buscas un punto medio?',[
+ ['Buscar un acuerdo común','Proponer un plan equilibrado','Podemos hablarlo todos.',{teammate:6,coach:2},'Ayudaste a acercar posturas.'],
+ ['Respaldar mayor exigencia','Priorizar competitividad','Algunos se sumarán; otros no.',{reputation:2,teammate:-2},'Tu postura generó debate en el grupo.'],
+ ['Escuchar antes de decidir','No intervenir sin entender','Me parece justo.',{teammate:3,morale:2},'Evitaste agrandar el conflicto.']]),
+ playmaker:e('CREACIÓN','Reunión táctica','coach','El equipo necesita el último pase',s=>`Terminaste la temporada con ${as(s)} asistencias. El cuerpo técnico revisa las zonas desde las que puedes influir en la creación sin perder equilibrio.`, 'Quiero que pienses qué movimiento puede dejar al compañero de cara al arco.',[
+ ['Recibir entre líneas','Crear una ventaja con control orientado','Eso obliga al rival a decidir.',{coach:5},'Trabajaste la recepción bajo presión.'],
+ ['Abrir el juego a bandas','Cambiar el punto de ataque','Vamos a repetir esas diagonales.',{teammate:3,coach:2},'La circulación gana protagonismo.'],
+ ['Llegar desde segunda línea','No quedarme fijo en la elaboración','Puede sorprender.',{reputation:2,coach:2},'El equipo ensaya llegadas alternativas.']],s=>['MCO','MC','MI','MD','EI','ED'].includes(s.position)),
+ goalkeeper_role:e('PORTERÍA','Entrenamiento específico','coach','La confianza empieza desde el arco',s=>`Como arquero, tu temporada se evalúa también por la organización defensiva y las decisiones bajo presión. El preparador quiere trabajar una responsabilidad concreta.`, '¿Cómo puedes darle seguridad a todo el equipo cuando nos presionan arriba?',[
+ ['Ordenar a los defensores','Comunicar coberturas y marcas','La voz del arquero se tiene que oír.',{coach:5},'Tu liderazgo defensivo gana peso.'],
+ ['Trabajar el primer pase','Mejorar la salida desde atrás','Vamos a probar variantes.',{coach:3,teammate:3},'La salida se ensaya con diferentes apoyos.'],
+ ['Priorizar seguridad','Evitar riesgos innecesarios','Esa calma importa.',{coach:4,morale:2},'Elegiste un enfoque más prudente.']],s=>s.position==='POR'),
+ crossing:e('BANDAS','Cancha de entrenamiento','teammate','La banda puede cambiar un partido',s=>`El cuerpo técnico considera que hay espacio para aprovechar mejor los costados de la cancha. Un compañero te propone coordinar movimientos de apoyo y profundidad.`, '¿Quieres que llegue por fuera o que me quede para darte una opción corta?',[
+ ['Buscar profundidad','Ganar la espalda del lateral','Voy a acompañarte por dentro.',{teammate:5},'Ensayaron rupturas en diagonal.'],
+ ['Jugar en corto','Asegurar la posesión antes de acelerar','Eso nos ayudará a sostener ataques.',{coach:3,teammate:3},'Se trabajaron sociedades cercanas.'],
+ ['Alternar ambos movimientos','Cambiar según la presión rival','Me gusta, así no nos leen fácil.',{teammate:4,reputation:1},'Acordaron señales para variar las jugadas.']],s=>['LI','LD','MI','MD','EI','ED'].includes(s.position)),
+ contract_role:e('PROYECTO DEPORTIVO','Oficina de dirección deportiva','agent','Un gran sueldo no garantiza jugar',s=>`Tu media actual es ${s.ovr||'—'} y vienes de disputar ${pj(s)} encuentros. El representante quiere aclarar tus prioridades antes de escuchar posibles propuestas en el futuro.`, 'Un proyecto ambicioso puede ofrecer prestigio, pero también mucha competencia. ¿Qué priorizamos?',[
+ ['Ser titular con regularidad','No dar un salto sin opciones de jugar','Se lo dejaré claro a los interesados.',{agent:5,morale:2},'Marcaste una preferencia por continuidad.'],
+ ['Aceptar competencia de élite','Crecer entre mejores futbolistas','Eso es ambición, con riesgos.',{agent:4,reputation:2},'Aceptaste un desafío mayor, aún sin oferta firme.'],
+ ['Buscar equilibrio económico','Comparar el proyecto y sus garantías','No miraremos solo una cifra.',{agent:4,coach:1},'El representante examinará varias condiciones.']],s=>s.ovr>=75&&s.age>=20),
+ tough_lost:e('DERROTA','Sala de video · Después de la campaña','coach','La derrota que dejó preguntas',s=>`Tu equipo terminó ${s.lastSeason?.leaguePosition||'sin clasificación'}° en ${game(s)}. El entrenador quiere entender si el problema fue de concentración, circulación o desgaste.`, 'No vamos a señalar a una sola persona. Necesito soluciones que podamos entrenar.',[
+ ['Asumir mi responsabilidad','Revisar mis propias decisiones','Es un buen punto de partida.',{coach:5,morale:1},'Aceptaste trabajar tu contribución individual.'],
+ ['Proponer ajustes tácticos','Cambiar la forma de competir','Revisaremos alternativas.',{coach:3,reputation:1},'Se abre un análisis del planteamiento.'],
+ ['Pedir apoyo al vestuario','Reconstruir confianza colectiva','Necesitamos esa unidad.',{teammate:5},'Buscaste una respuesta de equipo.']],s=>(s.lastSeason?.leaguePosition||0)>=10),
+ title_defense:e('DEFENSA DEL TÍTULO','Sala de reuniones','coach','Ganar una vez no resuelve la próxima temporada',s=>`${cl(s)} levantó ${s.lastSeason?.titles?.join(' y ')||'un título'}. Ahora habrá rivales que preparen cada partido con especial atención al campeón.`, 'La exigencia será mayor. ¿Cómo evitamos que el grupo se conforme?',[
+ ['Mantener la intensidad','No dar ventajas por ser campeones','Ese es el mensaje que quiero.',{coach:4,reputation:2},'Propusiste sostener la exigencia.'],
+ ['Dar responsabilidad a todos','Rotar y cuidar el grupo','No ganamos con once jugadores solamente.',{teammate:5},'Defendiste el compromiso colectivo.'],
+ ['Renovar los objetivos','Buscar nuevos desafíos','Vamos a planearlo paso a paso.',{coach:3,morale:2},'El grupo conversa sobre una nueva meta.']],s=>(s.lastSeason?.titles?.length||0)>0),
+ goal_bonus:e('RENDIMIENTO','Zona mixta','press','Tus números despiertan expectativas',s=>`Sumaste ${gs(s)} goles y ${as(s)} asistencias durante la campaña con ${cl(s)}. La prensa insiste en compararte con otros futbolistas de la liga.`, 'Con ese registro, ¿te consideras uno de los referentes ofensivos de esta competición?',[
+ ['Dar mérito a mis compañeros','Evitar poner los goles por encima del equipo','Una respuesta que el grupo agradecerá.',{teammate:5,press:1},'Dejaste el mérito en el vestuario.'],
+ ['Reconocer mi gran momento','Asumir que puedo marcar diferencias','Entonces la exigencia será mayor.',{reputation:4,press:2},'Aceptaste la atención mediática.'],
+ ['Hablar de los próximos objetivos','Poner el foco en lo que falta','No te conformas con los números.',{coach:3,morale:1},'Evitaste detenerte en la estadística.']],s=>gs(s)+as(s)>=20),
+ dry_spell:e('SEQUÍA','Campo de definición','coach','Cuando los remates no encuentran el arco',s=>`Con ${gs(s)} goles en ${pj(s)} partidos, el cuerpo técnico considera que puedes recuperar confianza mejorando decisiones de ataque, no solo rematando más veces.`, 'Necesito que tengas paciencia para elegir el momento. ¿Qué vas a probar?',[
+ ['Repetir movimientos de definición','Trabajar precisión sin apurarse','Hay que recuperar sensaciones.',{coach:4,morale:1},'Se planificó trabajo específico de remate.'],
+ ['Participar en la creación','Aportar incluso sin convertir','Eso también es fútbol.',{teammate:4,coach:2},'Ampliarás tus funciones ofensivas.'],
+ ['Pedir un análisis de ocasiones','Entender dónde estás perdiendo ventaja','Miremos cada recepción.',{coach:5},'El video reemplazó las suposiciones.']],s=>['DC','EI','ED'].includes(s.position)&&pj(s)>=16&&gs(s)<7),
+ public_image:e('IMAGEN PÚBLICA','Zona mixta · Tras el cierre del año','press','Un titular puede acompañarte mucho tiempo',s=>`Tu perfil público es ${s.publicImage||'reservado'}. La prensa tiene preguntas sobre tu futuro después de una campaña de ${pj(s)} partidos con ${cl(s)}.`, '¿Qué imagen quieres dejar cuando hablas de tu carrera?',[
+ ['Hablar desde el equipo','Compartir crédito con el plantel','Una declaración sobria.',{teammate:3,press:2},'Reforzaste tu imagen colectiva.'],
+ ['Mostrar ambición','Decir que quiero competir más arriba','Eso va a generar debate.',{reputation:3,coach:-1},'La prensa registró tus aspiraciones.'],
+ ['Dar pocas pistas','No adelantar planes','Se nota que eliges bien tus palabras.',{press:-1,morale:2},'Reservaste tus próximos movimientos.']]),
+ scouting_competition:e('SEGUIMIENTO','Centro deportivo','agent','Un observador vino a verte, no a firmarte',s=>`Tu representante te comenta que el rendimiento en ${game(s)} puede atraer observadores. Con media ${s.ovr}, todavía hay aspectos de tu juego que deben convencer a otros clubes.`, 'Hay interés en seguirte. Eso no significa que exista una propuesta. ¿Qué ponemos primero?',[
+ ['Mostrar regularidad','Consolidar minutos y rendimiento','La continuidad vende mejor que una actuación aislada.',{agent:5},'Priorizarás partidos completos.'],
+ ['Pedir evaluación del mercado','Conocer dónde encajo hoy','Buscaré información fiable.',{agent:4},'El representante comenzará un sondeo sin ofertas inventadas.'],
+ ['Concentrarme en mi club','Evitar distraerme con rumores','Así podremos trabajar tranquilos.',{coach:4,morale:2},'No aceleraste una salida.']],s=>s.ovr>=68&&pj(s)>=14),
+ ageing:e('EXPERIENCIA','Ciudad deportiva','coach','Cambiar la forma de jugar también es evolucionar',s=>`Con ${s.age} años, el cuerpo técnico revisa cómo administrar la preparación física. No es una despedida: es una oportunidad para adaptar tu juego a lo que hoy haces mejor.`, 'Hay jugadores que siguen siendo decisivos cambiando sus movimientos. ¿Qué piensas?',[
+ ['Ganar lectura táctica','Anticipar en vez de correr siempre','La experiencia tiene que notarse.',{coach:5},'Trabajaste la interpretación del juego.'],
+ ['Dosificar esfuerzos','Elegir los momentos de intensidad','Eso puede ayudarte a sostenerte.',{coach:3,morale:2},'La carga de trabajo se replantea.'],
+ ['Compartir conocimientos','Ayudar al siguiente grupo de jugadores','Ese liderazgo vale.',{teammate:5,reputation:2},'Empezaste a asumir un rol de referente.']],s=>s.age>=32),
+ local_roots:e('RAÍCES','Entrevista deportiva','press',s=>`Tu camino comenzó en ${s.city||'tu ciudad'}`,s=>`Aunque tu carrera ya tiene ${s.history?.length||0} temporadas, todavía te preguntan por ${s.city||'tu lugar de origen'}. No se trata de una transferencia ni de un rumor.`, '¿Qué parte de tu formación quieres que recuerden cuando hablen de ti?',[
+ ['Reconocer mis comienzos','Dar valor a donde aprendí','Ese origen forma parte de tu historia.',{press:2,morale:3},'Compartiste tus raíces futbolísticas.'],
+ ['Agradecer a quienes me formaron','Recordar a entrenadores y compañeros','Un buen reconocimiento.',{teammate:3,reputation:1},'Tu recorrido fue más allá de las estadísticas.'],
+ ['Hablar de lo que aún falta','Mantener la mirada en el futuro','La ambición también cuenta.',{reputation:2},'Recordaste que la carrera sigue abierta.']],s=>s.history?.length>=2),
+ fan_away:e('CAMISETA ESPECIAL','Concentración · Viaje de equipo','press','Un escudo que significa algo para ti',s=>`El club que apoyabas de niño, ${s.fanClubId?'un equipo que sigue siendo importante en tu historia':'tu club de infancia'}, aparece en una conversación de prensa. No hay fichaje ni oferta relacionada; solo una pregunta sobre tus afectos futbolísticos.`, '¿Puedes separar lo que sientes como hincha de las responsabilidades de tu contrato?',[
+ ['Defender el club actual','La camiseta de hoy exige respeto','Respuesta profesional.',{coach:5},'Mostraste lealtad al equipo en que juegas.'],
+ ['Reconocer mi vínculo','No esconder lo que siento','Es una historia que muchos entienden.',{press:3,morale:2},'Expresaste tu vínculo sin pedir una salida.'],
+ ['Hablar solo de fútbol','No alimentar especulaciones','Queda claro.',{agent:2},'Evitarás convertirlo en rumor.']],s=>!!s.fanClubId&&s.clubId!==s.fanClubId),
+ injury_return:e('REGRESO','Campo de entrenamiento','coach','Volver a encontrar el ritmo',s=>`La última campaña incluyó ${s.lastSeason.injuryWeeks} semanas de lesión. El plan médico terminó, pero el entrenador sabe que recuperar confianza requiere tiempo.`, 'La salud va primero. ¿Qué necesitamos para que vuelvas a competir con seguridad?',[
+ ['Escuchar al equipo médico','No anticipar el regreso','No vamos a forzar nada.',{coach:6,morale:2},'Elegiste una recuperación progresiva.'],
+ ['Pedir un plan gradual','Recuperar sensaciones con control','Es lo más sensato.',{coach:4},'Se propone una vuelta escalonada.'],
+ ['Trabajar la confianza','Recuperar seguridad en cada acción','Eso también forma parte del proceso.',{morale:4},'Te concentraste en recuperar confianza.']],s=>(s.lastSeason?.injuryWeeks||0)>=4),
+ selection_dream:e('SELECCIÓN','Conferencia deportiva','press','Una camiseta que todavía tienes en mente',s=>`A tus ${s.age} años, llevar la camiseta de tu país sigue siendo un objetivo. Tu última campaña dejó ${pj(s)} partidos y un nivel general de ${s.ovr}; no hay una convocatoria anunciada.`, '¿Qué significa para ti una eventual oportunidad con tu selección?',[
+ ['Demostrarlo en mi club','Entender que la convocatoria se gana','Una respuesta prudente.',{coach:4,reputation:1},'Elegiste concentrarte en el rendimiento.'],
+ ['Declarar que es mi sueño','Mostrar públicamente la meta','Muchos aficionados se identificarán.',{press:3,morale:3},'Expresaste una motivación personal.'],
+ ['No adelantar expectativas','Evitar especulaciones de prensa','Todavía queda camino.',{press:-1,morale:2},'Dejaste que los hechos hablen.']],s=>s.dream==='seleccion'),
+ europa_path:e('DESTINO INTERNACIONAL','Reunión con representante','agent','Europa exige algo más que un buen resumen',s=>`Tu objetivo es competir en la élite mundial. Después de ${pj(s)} partidos con ${cl(s)}, tu representante analiza qué tipo de proyecto sería realista para tu nivel actual, sin anunciar propuestas que aún no existen.`, 'Antes de hablar de nombres quiero saber qué sacrificarías por dar el salto.',[
+ ['Aceptar un proyecto progresivo','Subir de exigencia sin perder minutos','Puede ser la ruta adecuada.',{agent:4,morale:1},'Priorizaste un camino sostenible.'],
+ ['Apostar por el mayor desafío','No temer a la competencia','Habrá que medir bien el riesgo.',{agent:4,reputation:2},'Mostraste ambición de élite.'],
+ ['Esperar una oferta seria','No abandonar mi proyecto por rumores','Estaremos atentos.',{coach:3,agent:2},'Evitaste precipitar una salida.']],s=>s.dream==='europa'),
+ promotion_pressure:e('ASCENSO','Charla del entrenador','coach','La exigencia de subir de categoría',s=>`Tu equipo participa en ${game(s)}. La clasificación final fue ${s.lastSeason?.leaguePosition||'sin posición'}°; en el entorno hay conversación sobre cómo competir mejor la próxima vez.`, 'Cuando se habla de ascender, la presión puede tapar lo importante. ¿Qué hacemos?',[
+ ['Comprometernos con la regularidad','No depender de una sola racha','Eso nos mantiene en la pelea.',{coach:4},'Priorizaste la constancia.'],
+ ['Buscar mayor agresividad','Animarnos a dominar ciertos encuentros','Tendremos que sostenerlo.',{reputation:2,teammate:1},'Propusiste una iniciativa competitiva.'],
+ ['Ajustar según el rival','Construir el plan fecha a fecha','Me parece una lectura madura.',{coach:4,morale:1},'Elegiste flexibilidad táctica.']],s=>s.lastSeason?.leagueDivision>1),
+ bench_leader:e('BANQUILLO','Camarín · Reunión después del entrenamiento','teammate','Hay liderazgo incluso sin ser titular',s=>`En la última campaña participaste en ${pj(s)} encuentros. Un compañero del plantel te pide que sigas involucrado incluso cuando no tengas la continuidad que deseas.`, 'Si te toca esperar, ¿podemos contar contigo para mantener al grupo unido?',[
+ ['Apoyar al once','No aislarme cuando no juego','Eso se nota desde el banco.',{teammate:6,morale:1},'Mostraste compromiso colectivo.'],
+ ['Pedir más oportunidades','Buscar minutos sin romper la unidad','Es legítimo competir.',{coach:3,reputation:1},'Expusiste tu necesidad de jugar.'],
+ ['Explorar alternativas','Hablar con el representante sin ultimátum','Entiendo que quieras crecer.',{agent:3,teammate:1},'Abriste una conversación sobre tu continuidad.']],s=>pj(s)<=15),
+ transfer_rejection:e('MERCADO','Cafetería · Reunión con representante','agent','El teléfono no sonó como esperabas',s=>`Con media ${s.ovr}, tu representante reconoce que el mercado no siempre se mueve de forma proporcional al rendimiento. Todavía no hay motivos para dar por cerrado tu futuro.`, '¿Seguimos esperando un proyecto mayor o nos concentramos en mejorar la situación actual?',[
+ ['Revisar prioridades','Buscar el mejor encaje deportivo','Haré una nueva evaluación.',{agent:5},'Redefiniste los criterios de búsqueda.'],
+ ['Confiar en mi temporada','No desgastarme por el mercado','A veces eso es lo más inteligente.',{morale:3,coach:1},'Te concentrarás en lo controlable.'],
+ ['Pedir una vía alternativa','Explorar mercados distintos','Revisaré opciones sin prometer fichajes.',{agent:4,reputation:1},'Consideraste ampliar el horizonte.']],s=>s.age>=23&&s.ovr>=72)
+};
