@@ -3,14 +3,17 @@ import { POSITIONS, ATTRS, ORIGINS, PERSONALITIES, STYLES, DREAMS, getClub, getC
 
 const STORE='rascenso-save-v2';
 const OLD_STORE='carrera-mundial-demo-v1';
+const MIGRATED='rascenso-importacion-v1';
 const root=document.getElementById('app');
 const setupData={name:'',number:'9',age:'17',country:'CL',city:'',position:'DC',foot:'Derecha',origin:'barrio',personality:'disciplinado',style:'equilibrado',dream:'seleccion',story:'',mode:'Clásico'};
 let setupStep=0;
 let state=null;
 let info='';
 try {
-  state=migrateCareer(JSON.parse(localStorage.getItem(STORE)||localStorage.getItem(OLD_STORE)||'null'));
-  if(state)localStorage.setItem(STORE,JSON.stringify(state));
+  const current=localStorage.getItem(STORE);
+  const legacy=!current&&!localStorage.getItem(MIGRATED)?localStorage.getItem(OLD_STORE):null;
+  state=migrateCareer(JSON.parse(current||legacy||'null'));
+  if(state){localStorage.setItem(STORE,JSON.stringify(state));if(legacy)localStorage.setItem(MIGRATED,'1');}
 } catch {state=null;}
 const h=v=>String(v??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
 const btn=(label,action,extra='',secondary=false)=>`<button class="btn ${secondary?'outline':''}" type="button" data-action="${action}" ${extra}>${label}</button>`;
@@ -109,7 +112,7 @@ root.addEventListener('click',e=>{
  case 'setup-prev': collectCreator();setupStep=Math.max(0,setupStep-1);render();break;
  case 'setup-step': collectCreator();setupStep=Math.min(setupStep,Number(el.dataset.step));render();break;
  case 'setup-start':collectCreator();if(!setupData.name.trim()){setupStep=0;render();return;}try{apply(newCareer({...setupData,seed:`${Date.now()}-${Math.floor(Math.random()*1e7)}`}));}catch(err){alert(err.message);}break;
- case 'reset':if(!confirm('¿Comenzar una carrera nueva? Tu partida actual se reemplazará. Puedes exportarla antes.'))return;state=null;setupStep=0;localStorage.removeItem(STORE);render();break;
+ case 'reset':if(!confirm('¿Comenzar una carrera nueva? Tu partida actual se reemplazará. Puedes exportarla antes.'))return;state=null;setupStep=0;localStorage.removeItem(STORE);localStorage.setItem(MIGRATED,'1');render();break;
  case 'draft-accept':apply(acceptDraft(state));break;
  case 'draft-reroll':apply(rerollDraft(state));break;
  case 'academy':apply(signAcademy(state,el.dataset.id));break;

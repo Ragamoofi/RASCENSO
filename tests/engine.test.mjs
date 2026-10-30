@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { COUNTRIES } from '../src/countries.mjs';
-import { newCareer, currentDraft, acceptDraft, academyOffers, signAcademy, advanceSeason, resolveEvent, chooseTransfer, simulateToRetirement, getCountry } from '../src/engine.mjs';
+import { newCareer, currentDraft, acceptDraft, academyOffers, signAcademy, advanceSeason, resolveEvent, chooseTransfer, simulateToRetirement, getCountry, careerYear, migrateCareer } from '../src/engine.mjs';
 function makeStarted(country='CL',seed='test-49'){
  let s=newCareer({name:'Sariego',country,position:'DC',mode:'Clásico',seed});
  while(s.phase==='draft')s=acceptDraft(s);
@@ -48,4 +48,17 @@ test('Cada uno de los 49 países devuelve exactamente tres ofertas propias',()=>
   assert(offers.every(o=>o.countryCode===c.code),`Club extranjero en ${c.name}`);
   assert.equal(new Set(offers.map(o=>o.id)).size,3,`Club repetido en ${c.name}`);
  }
+});
+
+test('Origen, personalidad y estilo quedan registrados y afectan la progresión',()=>{
+ let s=newCareer({name:'Jugador',country:'CL',age:18,city:'La Cisterna',origin:'amateur',personality:'ambicioso',style:'goleador',dream:'seleccion',story:'Quiero representar a mi país.',seed:'test-rol'});
+ assert.equal(careerYear(s),2026);assert.equal(s.age,18);assert.equal(s.city,'La Cisterna');
+ assert.equal(s.origin,'amateur');assert.equal(s.personality,'ambicioso');assert.equal(s.style,'goleador');
+ while(s.phase==='draft')s=acceptDraft(s);s=signAcademy(s,academyOffers(s)[0].id);
+ const season=advanceSeason(s);assert.equal(season.lastSeason.year,2026);assert.equal(season.age,19);assert.equal(careerYear(season),2027);
+});
+test('Las partidas previas pueden migrarse sin borrar estadísticas',()=>{
+ const prev={...newCareer({name:'Veterano',country:'CL',seed:'prev'}),version:1,phase:'season',clubId:'x',age:25,history:[{matches:28,goals:6}],ovr:70};
+ const updated=migrateCareer(prev);assert.equal(updated.version,2);assert.equal(updated.history[0].goals,6);assert.equal(updated.name,'Veterano');
+ assert.equal(migrateCareer(null),null);
 });
