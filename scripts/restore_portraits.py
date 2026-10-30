@@ -183,6 +183,12 @@ def main():
         lic=info.get('extmetadata',{}).get('LicenseShortName',{}).get('value','') if info else ''
         pinned_debug[name]={'filename':filename,'metadata':bool(info),'license':base.clean(lic),
                              'legal':base.legal(info),'chosen':name in chosen}
+    # Preserve real, licensed URLs even if the GitHub runner's CDN download fails.
+    for person,(filename,photo) in chosen.items():
+        if base.legal(photo):
+            url=photo.get('thumburl') or photo.get('url')
+            if url and url.startswith('https://upload.wikimedia.org/'):
+                catalog[person]={'url':url,**base.credits(photo,filename)}
     # MediaWiki search is used ONLY when both Wikidata P18 and enwiki picture failed.
     for i,name in enumerate(missing):
         if name in chosen:continue

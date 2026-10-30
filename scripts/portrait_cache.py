@@ -52,9 +52,13 @@ elif mode=='import':
   if ('portrait',name) not in existing:media.setdefault('credits',[]).append(credit)
   if name in oldcat:cat[name]=oldcat[name]
   count+=1
+ for name,entry in oldcat.items():
+  cat.setdefault(name,entry)
  total=new.get('total',78)
  new['real_photographs']=sum(1 for x in sources.values() if x)
  new['missing']=[n for n,x in sources.items() if not x]
+ new['photo_sources']=sum(1 for name,credit in sources.items() if credit or cat.get(name,{}).get('url'))
+ new['missing_photo_sources']=[name for name,credit in sources.items() if not credit and not cat.get(name,{}).get('url')]
  media.setdefault('summary',{})['portraits']=new['real_photographs']
  save(status_file,new);save(media_file,media);save(catalog_file,cat)
  if count:

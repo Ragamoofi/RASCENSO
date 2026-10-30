@@ -8,11 +8,13 @@ export function portraitSources(name,catalog={},media={}){
  const candidate=catalog[name];
  const verified=Array.isArray(media.credits)&&media.credits.some(x=>x.kind==='portrait'&&x.name===name);
  const remote=typeof candidate?.url==='string'&&candidate.url.startsWith('https://upload.wikimedia.org/')?candidate.url:null;
- return verified||remote?[`./assets/portraits/${portraitSlug(name)}.png`,...(remote?[remote]:[])]:[];
+ if(verified)return [`./assets/portraits/${portraitSlug(name)}.png`,...(remote?[remote]:[])];
+ // A generated decorative PNG must not hide a verified Commons photograph.
+ return remote?[remote]:[];
 }
 export function enhanceLegendImages(root){
  if(!root?.querySelectorAll||typeof fetch!=='function'||typeof Image==='undefined')return;
- manifestPromise ||= Promise.all([json('./assets/portrait-catalog.json?v=191'),json('./assets/media12.json?v=191')]);
+ manifestPromise ||= Promise.all([json('./assets/portrait-catalog.json?v=192'),json('./assets/media12.json?v=192')]);
  void manifestPromise.then(([catalog,media])=>{
   for(const card of root.querySelectorAll('.legend-card[data-portrait-name]')){
    if(card.dataset.photoResolved)return;
