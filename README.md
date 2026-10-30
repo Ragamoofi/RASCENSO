@@ -141,3 +141,6 @@ Documentación oficial relevante: https://developers.openai.com/siwc/quickstart 
 - En la vitrina y el Mundo aparecen imágenes licenciadas de copas internacionales. Algunas copas aún NO forman parte del motor jugable.
 - Medios deportivos de cada país se citan solo como simulación narrativa. **Ningún titular o entrevista es una publicación real ni implica colaboración del medio**.
 - Sin cambios en los guardados ni en el progreso deportivo de partidas existentes.
+
+### Imágenes con carga diferida 1.2.1
+Los PNG locales siguen funcionando sin red. Si GitHub Actions no pudo descargar una fotografía licenciada, las tres tarjetas visibles intentan recuperarla desde la URL documentada en `assets/portrait-catalog.json` y atribuida en `MEDIA_CREDITS.html`. No se usan fotos sin licencia documentada.

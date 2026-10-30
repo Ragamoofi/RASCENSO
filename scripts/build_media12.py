@@ -146,6 +146,15 @@ def main():
  media=[]; pagephotos=get_pagephotos(); names={n:pagephotos[n]['pageimage'] for n in pagephotos}
  metadata=commons_metadata(list(names.values())+[v for v in LOGOS.values() if v]+list(CUPS.values()))
  print('MEDIA12 indexed',len(NAMES),'candidates',len(names),'licensed assets',len(metadata),flush=True)
+ photo_catalog={}
+ for name in NAMES:
+  filename=names.get(name);meta=metadata.get(filename)
+  if meta and legal(meta):
+   url=meta.get('thumburl') or meta.get('url')
+   if url and url.startswith('https://upload.wikimedia.org/'):
+    photo_catalog[name]={'url':url,**credits(meta,filename)}
+ (MEDIA/'portrait-catalog.json').write_text(json.dumps(photo_catalog,ensure_ascii=False),encoding='utf-8')
+
  tasks=[]
  for name in NAMES:
   filename=names.get(name); meta=metadata.get(filename)
@@ -173,10 +182,12 @@ def main():
  with ThreadPoolExecutor(max_workers=6) as executor:
   for result in executor.map(download_task,tasks):
    if result:media.append(result)
- summary={'portraits':len([x for x in media if x['kind']=='portrait']), 'logos':len([x for x in media if x['kind']=='logo']), 'trophies':len([x for x in media if x['kind']=='trophy']), 'totalPortraits':len(NAMES), 'totalLeagues':len(LOGOS)}
+ summary={'portraits':len([x for x in media if x['kind']=='portrait']), 'logos':len([x for x in media if x['kind']=='logo']), 'trophies':len([x for x in media if x['kind']=='trophy']), 'totalPortraits':len(NAMES), 'licensedPortraitSources':len(photo_catalog), 'totalLeagues':len(LOGOS)}
  (MEDIA/'media12.json').write_text(json.dumps({'summary':summary,'credits':media},ensure_ascii=False,indent=2),encoding='utf-8')
  lines=['<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Créditos de imágenes · RASCENSO</title><style>body{max-width:900px;margin:30px auto;padding:15px;background:#10253e;color:#ecf5ff;font:15px/1.5 system-ui}a{color:#adceff}li{margin:14px 0}</style><h1>Créditos de imágenes · RASCENSO</h1><p>Imágenes alojadas con permiso de licencia libre según la ficha de Wikimedia Commons. Los logos pueden ser marcas registradas; su aparición es referencial y no indica patrocinio.</p><p>Los archivos no enumerados usan diseño original de RASCENSO. Todas las noticias de prensa del juego son ficticias.</p><ul>']
- for m in sorted(media,key=lambda x:(x['kind'],x['name'])):
+ all_credits={ (c['kind'],c['name']):c for c in media }
+ for name,c in photo_catalog.items():all_credits.setdefault(('portrait',name),dict(kind='portrait',name=name,artist=c['artist'],license=c['license'],source=c['source']))
+ for m in sorted(all_credits.values(),key=lambda x:(x['kind'],x['name'])):
   lines.append('<li><b>'+html.escape(m['name'])+'</b> · '+html.escape(m['kind'])+' — '+html.escape(m['artist'])+' ('+html.escape(m['license'])+') · <a href="'+html.escape(m['source'])+'" target="_blank" rel="noopener">Archivo y licencia</a></li>')
  lines.append('</ul></html>')
  (MEDIA/'MEDIA_CREDITS.html').write_text('\n'.join(lines),encoding='utf-8')

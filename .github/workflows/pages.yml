@@ -37,6 +37,7 @@ jobs:
           test -s scripts/build_media12.py
           test -s src/media12.mjs
           test -s src/competition12.mjs
+          test -s src/portrait12.mjs
           for file in assets/logos-{1..4}.json; do test -s "$file"; done
   deploy:
     needs: test
@@ -58,6 +59,7 @@ jobs:
           python scripts/build_crests.py _site/assets/crests
           python scripts/build_media12.py _site
           test -s _site/assets/MEDIA_CREDITS.html
+          test -s _site/assets/portrait-catalog.json
           test -s _site/assets/portraits/lionel-messi.png
           test -s _site/assets/competitions/CL1.png
           test -s _site/assets/trophies/real-libertadores.png
