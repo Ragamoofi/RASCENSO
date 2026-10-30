@@ -36,6 +36,7 @@ jobs:
           test -s src/career10.mjs
           test -s assets/trophies/league.png
           test -s scripts/build_media12.py
+          test -s scripts/restore_portraits.py
           test -s src/media12.mjs
           test -s src/competition12.mjs
           test -s src/portrait12.mjs
@@ -65,6 +66,9 @@ jobs:
           python -m pip install -q pillow cairosvg
           python scripts/build_crests.py _site/assets/crests
           python scripts/build_media12.py _site
+          python scripts/restore_portraits.py _site
+          cat _site/assets/portrait-status.json
+          test -s _site/assets/portrait-status.json
           python scripts/build_kits18.py _site/assets/kits
           test -s _site/assets/kits/CL.png
           test -s _site/assets/kits/NZ.png
