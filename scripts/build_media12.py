@@ -3,7 +3,7 @@
 Cautious: no official-logo scraping and no nonfree player photos. CC author/license
 attributions are shipped in the published site's MEDIA_CREDITS.html.
 """
-import io,json,re,sys,time,html,unicodedata,urllib.parse,urllib.request
+import io,json,re,sys,time,html,unicodedata,urllib.parse,urllib.request,urllib.error,os
 from concurrent.futures import ThreadPoolExecutor,as_completed
 from pathlib import Path
 from PIL import Image,ImageDraw,ImageFont,ImageOps
@@ -46,18 +46,38 @@ CUPS={
  'champions':'UEFA Champions LeagueTrophy7612.png',
  'worldcup':'FIFA World Cup Trophy photo by Djuradj Vujcic.jpg'
 }
-USER_AGENT='RASCENSO/1.2 (noncommercial football game; GitHub Ragamoofi/RASCENSO; open media attribution)'
+USER_AGENT='RASCENSO-MediaBot/1.8.2 (https://github.com/Ragamoofi/RASCENSO; Wikimedia-licensed photo credits) Python-urllib/3'
+FAILURES={}
+BLOCKED_HOSTS=set()
 
-def req(url, binary=False):
- try:
-  with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':USER_AGENT,'Accept':'application/json' if not binary else 'image/*'}),timeout=15) as r:
-   data=r.read(3_200_000)
-   return data if binary else json.loads(data)
- except Exception as exc:
-  return None
+def req(url,binary=False):
+ # Wikimedia APIs require a specifically identifiable client. A failure must not
+ # silently turn all 78 real photos into synthetic placeholders.
+ if os.environ.get('RASCENSO_MEDIA_OFFLINE')=='1':return None
+ host=urllib.parse.urlparse(url).hostname or 'unknown'
+ if host in BLOCKED_HOSTS:return None
+ for attempt in range(3):
+  try:
+   headers={'User-Agent':USER_AGENT,'Accept':'image/*' if binary else 'application/json', 'Api-User-Agent':USER_AGENT}
+   with urllib.request.urlopen(urllib.request.Request(url,headers=headers),timeout=24) as r:
+    content=r.read(4_000_000)
+    return content if binary else json.loads(content)
+  except urllib.error.HTTPError as err:
+   FAILURES[host]=f'HTTP {err.code}'
+   if err.code in (401,403,404):
+    if err.code in (401,403):BLOCKED_HOSTS.add(host)
+    break
+   if err.code not in (429,500,502,503,504):break
+   delay=err.headers.get('Retry-After','')
+   time.sleep(min(6, int(delay) if delay.isdigit() else 1+attempt*2))
+  except Exception as err:
+   FAILURES[host]=f'{type(err).__name__}: {str(err)[:90]}'
+   if isinstance(err,(OSError,TimeoutError)) and ('Name or service not known' in str(err) or 'Temporary failure in name resolution' in str(err)):
+    BLOCKED_HOSTS.add(host);break
+   time.sleep(.6+attempt)
+ return None
 
 def api(host,query):
- if __import__('os').environ.get('RASCENSO_MEDIA_OFFLINE')=='1':return None
  return req('https://'+host+'/w/api.php?'+urllib.parse.urlencode(query))
 
 def chunks(seq,n):
@@ -147,10 +167,50 @@ def normalized_image(content,kind):
  im.thumbnail((145,195),Image.Resampling.LANCZOS)
  canvas=Image.new('RGBA',(160,210),(0,0,0,0));canvas.alpha_composite(im,((160-im.width)//2,(210-im.height)//2));return canvas
 
+def search_commons_player(name):
+ """Search just Commons File: results, verifying name tokens, licensing and size.
+
+ The first direct Wikipedia page portrait remains preferred. Avoid guessing a
+ different person or returning insignias, group photos or video thumbnails.
+ """
+ query=OVERRIDE.get(name,name)
+ # Search a handful of files only; Wikimedia imposes request limits.
+ result=api('commons.wikimedia.org',dict(action='query',format='json',
+       generator='search',gsrsearch='intitle:"'+query+'"',gsrnamespace=6,
+       gsrlimit=12,prop='imageinfo',iiprop='url|extmetadata|size',iiurlwidth=550))
+ pages=list((result or {}).get('query',{}).get('pages',{}).values())
+ tokens=[t for t in slug(name).split('-') if len(t)>2 and t not in {'junior','sanchez'}]
+ negative=('team','squad','lineup','line-up','logo','icon','cartoon','illustration','poster',
+           'signature','stadium','flag','trophy','match','football kit','collage','mural','street')
+ ranked=[]
+ for page in pages:
+  filename=page.get('title','').removeprefix('File:')
+  inf=(page.get('imageinfo') or [None])[0]
+  if not inf or not legal(inf) or not re.search(r'\.(jpe?g|png|webp)$',filename,re.I):continue
+  lower=filename.lower().replace('_',' ')
+  if any(bad in lower for bad in negative):continue
+  normalized=slug(filename)
+  if len(tokens)>=2 and not (tokens[0] in normalized and tokens[-1] in normalized):continue
+  if len(tokens)==1 and tokens[0] not in normalized:continue
+  if min(inf.get('width',0),inf.get('height',0))<200:continue
+  score=(25 if normalized.startswith(slug(name)) else 0) + sum(t in normalized for t in tokens)*5
+  score+=min(8,round(inf.get('height',0)/180))
+  ranked.append((score,filename,inf))
+ return max(ranked,default=None,key=lambda x:x[0])
+
 def main():
  media=[]; pagephotos=get_pagephotos(); names={n:pagephotos[n]['pageimage'] for n in pagephotos}
  metadata=commons_metadata(list(names.values())+[v for v in LOGOS.values() if v]+list(CUPS.values()))
- print('MEDIA12 indexed',len(NAMES),'candidates',len(names),'licensed assets',len(metadata),flush=True)
+ # Commons-only file search for people whose Wikipedia page has no free thumbnail.
+ # This is a conservative fallback: we never mislabel a guess as verified.
+ no_license=[n for n in NAMES if not legal(metadata.get(filename_key(names.get(n))))]
+ if os.environ.get('RASCENSO_MEDIA_OFFLINE')!='1':
+  print('MEDIA12 searching Commons for',len(no_license),'missing licensed portraits',flush=True)
+  for name in no_license:
+   found=search_commons_player(name)
+   if found:
+    _,filename,info=found;names[name]=filename;metadata[filename_key(filename)]=info
+ print('MEDIA12 indexed',len(NAMES),'candidates',len(names),'licensed assets',len(metadata),'api-errors',FAILURES,flush=True)
  photo_catalog={}
  for name in NAMES:
   filename=names.get(name);meta=metadata.get(filename_key(filename))
@@ -184,10 +244,13 @@ def main():
    except Exception:pass
   fallback(path,key,kind)
   return None
- with ThreadPoolExecutor(max_workers=6) as executor:
+ with ThreadPoolExecutor(max_workers=3) as executor:
   for result in executor.map(download_task,tasks):
    if result:media.append(result)
- summary={'portraits':len([x for x in media if x['kind']=='portrait']), 'logos':len([x for x in media if x['kind']=='logo']), 'trophies':len([x for x in media if x['kind']=='trophy']), 'totalPortraits':len(NAMES), 'licensedPortraitSources':len(photo_catalog), 'totalLeagues':len(LOGOS)}
+ verified_names={x['name'] for x in media if x['kind']=='portrait'}
+ pending=[n for n in NAMES if n not in verified_names]
+ (MEDIA/'portrait-audit.json').write_text(json.dumps({'verified':sorted(verified_names),'missing':pending,'errors':FAILURES},ensure_ascii=False,indent=2),encoding='utf-8')
+ summary={'portraits':len(verified_names), 'missingPortraits':len(pending), 'logos':len([x for x in media if x['kind']=='logo']), 'trophies':len([x for x in media if x['kind']=='trophy']), 'totalPortraits':len(NAMES), 'licensedPortraitSources':len(photo_catalog), 'totalLeagues':len(LOGOS)}
  (MEDIA/'media12.json').write_text(json.dumps({'summary':summary,'credits':media},ensure_ascii=False,indent=2),encoding='utf-8')
  lines=['<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Créditos de imágenes · RASCENSO</title><style>body{max-width:900px;margin:30px auto;padding:15px;background:#10253e;color:#ecf5ff;font:15px/1.5 system-ui}a{color:#adceff}li{margin:14px 0}</style><h1>Créditos de imágenes · RASCENSO</h1><p>Imágenes alojadas con permiso de licencia libre según la ficha de Wikimedia Commons. Los logos pueden ser marcas registradas; su aparición es referencial y no indica patrocinio.</p><p>Los archivos no enumerados usan diseño original de RASCENSO. Todas las noticias de prensa del juego son ficticias.</p><ul>']
  all_credits={ (c['kind'],c['name']):c for c in media }
