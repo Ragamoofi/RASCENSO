@@ -37,6 +37,7 @@ jobs:
           test -s assets/trophies/league.png
           test -s scripts/build_media12.py
           test -s scripts/restore_portraits.py
+          test -s scripts/portrait_cache.py
           test -s src/media12.mjs
           test -s src/competition12.mjs
           test -s src/portrait12.mjs
@@ -67,6 +68,11 @@ jobs:
           python scripts/build_crests.py _site/assets/crests
           python scripts/build_media12.py _site
           python scripts/restore_portraits.py _site
+          mkdir -p /tmp/rascenso-previous-photo-cache
+          if git fetch -q origin media-audit:refs/remotes/origin/media-audit; then
+            git archive refs/remotes/origin/media-audit | tar -x -C /tmp/rascenso-previous-photo-cache
+          fi
+          python scripts/portrait_cache.py import _site /tmp/rascenso-previous-photo-cache
           cat _site/assets/portrait-status.json
           test -s _site/assets/portrait-status.json
           python scripts/build_kits18.py _site/assets/kits
@@ -85,14 +91,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p /tmp/rascenso-photo-audit
-          cp _site/assets/portrait-status.json /tmp/rascenso-photo-audit/portrait-status.json
-          cp _site/assets/portrait-debug.json /tmp/rascenso-photo-audit/portrait-debug.json
+          python scripts/portrait_cache.py export _site /tmp/rascenso-photo-audit
           cd /tmp/rascenso-photo-audit
           git init -q
           git checkout -q -b media-audit
           git config user.name "RASCENSO Media Audit"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add portrait-status.json portrait-debug.json
+          git add portrait-status.json portrait-catalog.json portrait-debug.json portraits
           git commit -qm "audit: estado verificable de los 78 retratos"
           git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/heads/media-audit
       - uses: actions/upload-pages-artifact@v4

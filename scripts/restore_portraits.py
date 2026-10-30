@@ -196,13 +196,23 @@ def main():
         return n,fn,m,download_one(n,m,fn)
     new=[]
     with ThreadPoolExecutor(max_workers=4) as pool:
-        for name,filename,m,ok in pool.map(do,chosen.items()):
-            if ok:
-                licensed.add(name)
-                credit={'kind':'portrait','name':name,**base.credits(m,filename)}
-                new.append(credit)
-                url=m.get('thumburl') or m.get('url')
-                catalog[name]={'url':url,**base.credits(m,filename)}
+        results=list(pool.map(do,chosen.items()))
+    for round_number in range(2):
+        failed=[(name,(fn,meta)) for name,fn,meta,ok in results if not ok]
+        if not failed:break
+        time.sleep(8*(round_number+1))
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            retried=list(pool.map(do,failed))
+        replacements={n:result for result in retried for n in [result[0]]}
+        results=[replacements.get(name,(name,fn,meta,ok)) if not ok else (name,fn,meta,ok)
+                 for name,fn,meta,ok in results]
+    for name,filename,m,ok in results:
+        if ok:
+            licensed.add(name)
+            credit={'kind':'portrait','name':name,**base.credits(m,filename)}
+            new.append(credit)
+            url=m.get('thumburl') or m.get('url')
+            catalog[name]={'url':url,**base.credits(m,filename)}
     media['credits'].extend(new)
     media['summary']['portraits']=len(licensed)
     media['summary']['licensedPortraitSources']=len(catalog)
