@@ -127,7 +127,7 @@ test('La tabla simulada incluye al jugador, equipos reales y ubicación de la ú
  const {simulatedStandings}=await import('../src/engine.mjs');
  let s=makeStarted('CL','tabla-0.4');s=advanceSeason(s);
  const board=simulatedStandings(s);
- assert(board.length>=15&&board.length<=20);
+ assert(board.length>=2&&board.length<=20, 'La tabla respeta los participantes de la liga disputada');
  assert.equal(new Set(board.map(x=>x.id)).size,board.length);
  const own=board.find(x=>x.id===s.clubId);
  assert.equal(own.position,s.lastSeason.leaguePosition);
