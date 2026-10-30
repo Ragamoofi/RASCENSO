@@ -60,7 +60,7 @@ test('Origen, personalidad y estilo quedan registrados y afectan la progresión'
 });
 test('Las partidas previas pueden migrarse sin borrar estadísticas',()=>{
  const prev={...newCareer({name:'Veterano',country:'CL',seed:'prev'}),version:1,phase:'season',clubId:'x',age:25,history:[{matches:28,goals:6}],ovr:70};
- const updated=migrateCareer(prev);assert.equal(updated.version,3);assert.equal(updated.history[0].goals,6);assert.equal(updated.name,'Veterano');
+ const updated=migrateCareer(prev);assert.equal(updated.version,5);assert.equal(updated.history[0].goals,6);assert.equal(updated.name,'Veterano');
  assert.equal(migrateCareer(null),null);
 });
 
@@ -103,7 +103,7 @@ test('Fichar por el club favorito dispara escena especial y marca la memoria',()
 test('Migrar una partida v2 conserva temporada y añade relaciones y bitácora',()=>{
  const original=makeStarted('CL','migracion');const v2={...original,version:2};
  delete v2.relationships;delete v2.storyLog;delete v2.fanClubId;
- const m=migrateCareer(v2);assert.equal(m.version,3);assert(m.relationships.coach);assert.deepEqual(m.storyLog,[]);
+ const m=migrateCareer(v2);assert.equal(m.version,5);assert(m.relationships.coach);assert.deepEqual(m.storyLog,[]);
  assert.equal(m.history.length,original.history.length);
 });
 
@@ -132,4 +132,28 @@ test('La tabla simulada incluye al jugador, equipos reales y ubicación de la ú
  const own=board.find(x=>x.id===s.clubId);
  assert.equal(own.position,s.lastSeason.leaguePosition);
  assert(board.every(x=>Number.isInteger(x.points)&&Number.isInteger(x.played)));
+});
+
+
+// Integridad del motor deportivo propio: todas las cifras proceden de enfrentamientos.
+import { playLeague, calendar, leagueParticipants } from '../src/league.mjs';
+import { chooseSeasonPlan } from '../src/engine.mjs';
+test('Calendario de ida y vuelta sin enfrentamientos duplicados',()=>{
+ const clubs=leagueParticipants('CL','cl-1');const fixtures=calendar(clubs);
+ assert.equal(fixtures.length,clubs.length*(clubs.length-1));
+ const keys=new Set(fixtures.map(f=>`${f.home}/${f.away}`));assert.equal(keys.size,fixtures.length);
+ const perRound=new Map();for(const f of fixtures){const ids=perRound.get(f.round)||new Set();assert(!ids.has(f.home));assert(!ids.has(f.away));ids.add(f.home);ids.add(f.away);perRound.set(f.round,ids);}
+});
+test('Cada punto, victoria, gol y diferencia sale de los marcadores archivados',()=>{
+ const player={seed:'integridad2026',startYear:2026,startAge:18,age:22,clubId:'cl-1',country:'CL',ovr:71,coachTrust:50,position:'DC',style:'goleador',seasonPlan:'ataque'};
+ const sim=playLeague(player),stats=new Map(sim.standings.map(t=>[t.id,{played:0,points:0,wins:0,draws:0,losses:0,gf:0,ga:0}]));
+ for(const [,home,away,gh,ga] of sim.fixtureResults){const a=stats.get(home),b=stats.get(away);a.played++;b.played++;a.gf+=gh;a.ga+=ga;b.gf+=ga;b.ga+=gh;if(gh===ga){a.points++;b.points++;a.draws++;b.draws++;}else if(gh>ga){a.points+=3;a.wins++;b.losses++;}else{b.points+=3;b.wins++;a.losses++;}}
+ for(const row of sim.standings){const x=stats.get(row.id);assert.equal(x.played,row.played);assert.equal(x.points,row.points);assert.equal(x.wins,row.wins);assert.equal(x.draws,row.draws);assert.equal(x.losses,row.losses);assert.equal(x.gf,row.for);assert.equal(x.ga,row.against);assert.equal(x.gf-x.ga,row.gd);}
+ const own=sim.playerMatches;assert.equal(sim.matches,own.filter(x=>x.played).length);assert.equal(sim.goals,own.reduce((a,x)=>a+x.goals,0));assert.equal(sim.assists,own.reduce((a,x)=>a+x.assists,0));
+ assert.deepEqual(playLeague(player),sim);
+});
+test('Plan deportivo se elige antes de jugar y modifica los resultados reproduciblemente',()=>{
+ const state={phase:'season',seasonPlan:'equilibrio'};assert.equal(chooseSeasonPlan(state,'ataque').seasonPlan,'ataque');assert.equal(chooseSeasonPlan(state,'inventado').seasonPlan,'equilibrio');
+ const pl={seed:'planes2026',startYear:2026,startAge:17,age:24,clubId:'cl-1',country:'CL',ovr:76,coachTrust:66,position:'DC',style:'goleador'};
+ assert.notDeepEqual(playLeague({...pl,seasonPlan:'ataque'}).fixtureResults,playLeague({...pl,seasonPlan:'defensa'}).fixtureResults);
 });

@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import {newCareer,acceptDraft,signAcademy,academyOffers,autoResolveEvent,chooseTransfer,advanceSeason} from '../src/engine.mjs';
+let s=newCareer({name:'Prueba RASCENSO',country:'CL',position:'DC',seed:'prueba-ui',age:17});
+while(s.phase==='draft')s=acceptDraft(s,0);
+s=signAcademy(s,academyOffers(s)[0].id);s=autoResolveEvent(s);s=advanceSeason(s);s=autoResolveEvent(s);if(s.phase==='transfer')s=chooseTransfer(s,null);
+const root={innerHTML:'',addEventListener(){}};
+globalThis.document={getElementById:id=>id==='app'?root:null};
+globalThis.localStorage={getItem(k){return k==='rascenso-save-v2'?JSON.stringify(s):null},setItem(){}};
+await import('../src/experience.mjs');
+assert.match(root.innerHTML,/playing-layout/);
+assert.match(root.innerHTML,/right-tabs/);
+assert.match(root.innerHTML,/plan-strip/);
+assert.match(root.innerHTML,/standing-row/);
+assert.match(root.innerHTML,/ALFA 0.5/);
+console.log('Interfaz RASCENSO 0.5: 3 columnas, tabla, planes y navegación presentes. Tamaño:',root.innerHTML.length,'caracteres.');

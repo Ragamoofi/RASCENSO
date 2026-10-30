@@ -1,40 +1,41 @@
 # RASCENSO · Del barrio a la historia
 
-**Alfa 0.4 · 30 de octubre de 2026** — Simulador de carrera futbolística web de Ragamoofi.
+**Alfa 0.5 — Nueva Era** · 30 de octubre de 2026 · © Ragamoofi.
 
-Sitio: https://ragamoofi.github.io/RASCENSO/
+Sitio oficial de prueba: https://ragamoofi.github.io/RASCENSO/
 
-## Qué incluye la versión 0.4
+## La nueva versión
 
-- 49 países y **más de 800 clubes reales de referencia**: los equipos pertenecen a distintas temporadas y divisiones; no son una nómina oficial de la temporada 2026.
-- Identidad del jugador, origen, estilo, sueño profesional y **equipo de hincha opcional**. Conservar el club favorito no favorece artificialmente las transferencias.
-- Draft de ocho atributos con **tres propuestas de leyendas por ronda**. Solo se acepta una por ronda; el peso cambia según la posición. Hay modos Clásico y Purista.
-- Club inicial: tres ofertas de equipos del país seleccionado.
-- Carrera: avances anuales, evolución, trofeos, lesiones, fichajes, historial y retiro.
-- Escenas de **decisiones futbolísticas**: entrenamiento, táctica, vestuario, mercado, presión y club favorito. Se eliminó la interfaz de preguntas libres y la columna de familiares/personas. **Son eventos guionizados, no un narrador de IA libre.**
-- En pantallas de escritorio, tablero a tres columnas con ficha, escenario central y tabla ilustrativa a la derecha. Adaptación para móviles.
-- Banderas con respaldo de emoji y distintivos de clubes, priorizando escudos públicos donde se encuentran en la fuente de archivos, con fallback original.
+- **Nueva identidad visual**: azul noche, azules eléctricos y cobre; ya no utiliza el esquema verde/negro. Interfaz original de tres columnas para 1920×1080, adaptable a pantallas pequeñas.
+- **La carrera sigue siendo rápida**: creación en cuatro capítulos, draft de ocho cualidades con leyendas de referencia, tres ofertas nacionales, avance por temporada, decisiones, fichajes y retiro.
+- **841 clubes en 49 países**, catálogo de referencia con equipos de distintas categorías y temporadas. **No es una base oficial de ligas 2026.** Un primer contrato pertenece siempre al país seleccionado. Club favorito opcional y persistente, sin fichajes garantizados.
+- **Nuevo motor propio de ligas**: se genera un calendario de ida y vuelta entre los participantes de cada liga simulada. Los marcadores se resuelven con fuerza del club, localía y contribución del jugador. Las tablas con PJ, PG, PE, PP, GF, GC, DG y puntos se **suman desde los resultados** (3/1/0). Los resultados por fecha y las apariciones personales se guardan en el historial.
+- **Estadísticas del futbolista a partir de encuentros**: las apariciones, minutos, goles y asistencias se cuentan en partidos en los que participa y nunca exceden los goles del equipo. El arquero registra porterías a cero y goles recibidos.
+- **Planes antes de cada temporada**: Equilibrio colectivo, Atacar los espacios o Disciplina táctica; influyen en la simulación. Las situaciones narrativas posteriores ofrecen decisiones sobre fútbol y consecuencias persistentes.
+- **Desarrollo separado del talento**: el OVR inicial no equivale al potencial; progresión, edad, minutos y lesiones intervienen en la evolución y el declive.
+- **Mercado de pases**: propuestas con años de contrato y retribuciones ficticias, conservando el club de hincha y la continuidad narrativa.
+- **Navegación mejorada**: Mi carrera, Historial y Mundo. A la derecha, alternancia entre clasificación y resultados individuales.
+- **Compatibilidad de guardados**: conserva la clave `rascenso-save-v2` y migra partidas antiguas; exportación/importación JSON y respaldo local periódico.
 
-### Alcance y limitaciones actuales
+## Alcance real (importante)
 
-La clasificación lateral es **ilustrativa y determinista**, no proviene todavía de un calendario real partido a partido. Los puntos son estimaciones visuales ordenadas por el modelo y el puesto del jugador en la última temporada se conserva. No se representan como resultados oficiales. La simulación de ligas, planteles y mercado sigue en evolución. Las cifras de leyendas son interpretaciones ficticias del juego, no estadísticas oficiales.
+El simulador **sí calcula encuentros y posiciones de liga reales dentro de su universo ficticio**. Sin embargo, la selección de participantes es un grupo deportivo generado desde la base disponible, no la nómina federativa oficial de cada campeonato. Los equipos no disponen de plantillas individuales detalladas. Los torneos de copa, la clasificación continental y los calendarios de selecciones todavía requieren motores propios. Los eventos narrativos están escritos de antemano: **no existe un narrador libre de IA tipo Rasthoria**. Los equipos y leyendas reales se incluyen como referencias y no implican patrocinio ni afiliación.
 
-### Imágenes y atribuciones
+La implementación es **original e independiente**. La auditoría del HAR de Copero inspiró la elección de sistemas y el enfoque de carrera rápida, pero no se ha incorporado código JavaScript extraído de Copero.
 
-Los escudos enlazados proceden del repositorio comunitario [JoseArroyave/football-logos](https://github.com/JoseArroyave/football-logos), que declara uso libre; **los emblemas y las marcas de los equipos siguen perteneciendo a sus respectivos titulares**. No se incluyen ni se reclaman licencias de marcas. Las imágenes se cargan bajo demanda desde el repositorio de origen, con un diseño original de respaldo si no están disponibles. Las banderas se muestran desde [FlagCDN](https://flagcdn.com). El fondo deportivo utiliza una fotografía proporcionada por [Unsplash](https://unsplash.com/license); si no carga, el tema CSS mantiene la identidad visual.
+## Fuentes visuales
 
-### Compatibilidad con partidas previas
+- Escudos externos: repositorio comunitario [JoseArroyave/football-logos](https://github.com/JoseArroyave/football-logos), con emblema original de respaldo donde falta correspondencia. Las marcas pertenecen a sus titulares.
+- Banderas: [FlagCDN](https://flagcdn.com).
+- Fotografía de ambiente: [Unsplash](https://unsplash.com/license).
 
-La clave de guardado `rascenso-save-v2` se **mantiene**. No se eliminan temporadas, estadísticas, elecciones, equipo favorito ni bitácora. Los IDs de clubes originales se preservan. El nuevo catálogo agrega IDs distintos para evitar conflictos.
-
-## Probar y publicar
-
-Github Pages publica los archivos estáticos mediante `.github/workflows/pages.yml`, cada vez que se actualiza `main`. No se necesita Python ni cuentas nuevas.
-
-Pruebas automáticas del motor:
+## Ejecutar pruebas
 
 ```bash
-node --test tests/*.test.mjs
+node --test tests/engine.test.mjs
+node tests/ui-smoke.mjs
 ```
 
-© 2026 Ragamoofi. RASCENSO es un proyecto independiente, no afiliado a Copero, ni a ligas o clubes.
+### Publicación
+
+`main` dispara `.github/workflows/pages.yml`; no se requiere Python ni GitHub Desktop para jugar en la dirección de GitHub Pages.
