@@ -22,12 +22,17 @@ jobs:
         run: |
           for file in src/*.mjs tests/*.mjs; do node --check "$file"; done
       - name: Validar motor e interfaz
-        run: node --test tests/*.test.mjs
+        run: |
+          node --test tests/*.test.mjs
+          node tests/ui-smoke.mjs
       - name: Comprobar recursos esenciales de publicación
         run: |
           test -s index.html
           test -s experience.css
           test -s src/experience.mjs
+          test -s src/career08.mjs
+          test -s src/legend-art.mjs
+          test -s assets/trophies/league.png
           for file in assets/logos-{1..4}.json; do test -s "$file"; done
   deploy:
     needs: test

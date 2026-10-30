@@ -211,6 +211,45 @@ Object.assign(catalog.rival,{
   opt('Control del balón','Apostar por circulación y paciencia.','«Mantengamos las líneas juntas y la pelota en nuestros pies».',{coach:5},'El cuerpo técnico valora tu criterio.'),
   opt('Buscar el contragolpe','Atacar rápido los espacios libres.','«Atentos a la transición, puede ser nuestra arma».',{reputation:2,teammate:2},'El equipo entiende tu propuesta ofensiva.')]
 });
+
+Object.assign(catalog,{
+ scouting:{tag:'SEGUIMIENTO DE CLUBES',place:'Instalaciones deportivas · Informe de ojeadores',actor:'agent',
+ title:()=>`Un ojeador te sigue de cerca`,
+ paragraphs:s=>[`El representante informa que algunos clubes han revisado tus números: ${s.lastSeason?.goals||0} goles y ${s.lastSeason?.assists||0} asistencias. No hay un contrato sobre la mesa, solo interés deportivo.`],
+ speech:()=>`«Tu siguiente temporada puede abrirte puertas. ¿Qué necesitas mostrar?»`,
+ options:()=>[
+ opt('Trabajar para ser titular','La continuidad será tu carta de presentación.','«Con minutos será más sencillo convencerlos».',{coach:3,agent:4},'La constancia queda como prioridad.'),
+ opt('Destacar en los encuentros grandes','Buscar impacto decisivo contra rivales exigentes.','«Un clásico puede cambiarlo todo».',{reputation:3,press:2},'Tu nombre empieza a circular.'),
+ opt('Proteger mi evolución','Priorizar entrenamiento y adaptación antes del salto.','«Una carrera larga necesita decisiones inteligentes».',{morale:3,agent:2},'Ganaste seguridad en tu proyecto.')]
+ },
+ rotation:{tag:'COMPETENCIA INTERNA',place:'Campo de entrenamiento · Reunión táctica',actor:'coach',
+ title:()=>`Un fichaje amenaza tu titularidad`,
+ paragraphs:s=>[`El club ha reforzado tu posición. Tras la charla técnica, el entrenador te avisa que nadie tiene el puesto asegurado. La próxima campaña puede ser una oportunidad o un retroceso.`],
+ speech:()=>`«Hay dos futbolistas para el mismo lugar. Necesito respuestas en la cancha».`,
+ options:()=>[
+ opt('Mejorar mi lectura táctica','Pelear por minutos adaptándote al esquema.','«La polivalencia suma».',{coach:5,morale:1},'El técnico reconoce tu disposición.'),
+ opt('Exigir un reto justo','Pedir una competencia abierta por el puesto.','«Si lo mereces, jugarás».',{coach:1,reputation:2},'Dejaste clara tu ambición.'),
+ opt('Consultar una posible cesión','Abrir la puerta a sumar partidos en otro club.','«Hablemos cuando termine la pretemporada».',{agent:4,coach:-1},'Tu futuro deportivo queda en evaluación.')]
+ },
+ derby:{tag:'SEMANA DE CLÁSICO',place:'Vestuario · Preparación de partido decisivo',actor:'teammate',
+ title:()=>`Se viene un partido que nadie quiere perder`,
+ paragraphs:s=>[`Los hinchas esperan una respuesta. Tu compañero más veterano te advierte que la presión se siente distinta en esta semana.`],
+ speech:()=>`«En estos partidos pesa más la cabeza que las piernas. ¿Cómo encaramos la semana?»`,
+ options:()=>[
+ opt('Entrenar los movimientos sin balón','Buscar ventaja táctica y movilidad.','«Eso puede romper el partido».',{teammate:3,coach:4},'El cuerpo técnico prepara automatismos.'),
+ opt('Proponer un equipo ofensivo','Presionar la salida del rival.','«Si vamos, vamos juntos».',{reputation:2,teammate:2},'El vestuario siente tu iniciativa.'),
+ opt('Evitar la exposición mediática','Reservar energía para el campo.','«Mejor dejar el ruido afuera».',{morale:3,press:-1},'El equipo reduce distracciones.')]
+ },
+ captaincy:{tag:'LIDERAZGO',place:'Camarín · Reunión del plantel',actor:'coach',
+ title:()=>`El entrenador evalúa nuevos líderes`,
+ paragraphs:s=>[`Tras una campaña de esfuerzo, varios jugadores te ven como un referente. La capitanía no se decide por goles solamente.`],
+ speech:()=>`«Quiero futbolistas que eleven a los demás. ¿Qué harás para ganarte esa confianza?»`,
+ options:()=>[
+ opt('Organizar trabajo colectivo','Ayudar a los más jóvenes en los entrenamientos.','«Eso suma al grupo».',{teammate:6,coach:4},'El vestuario reconoce tu apoyo.'),
+ opt('Asumir liderazgo en partidos','Ser una referencia competitiva en los momentos tensos.','«Demuestra que puedes sostenerlo».',{reputation:3,coach:2},'Tu carácter gana reconocimiento.'),
+ opt('No buscar la cinta todavía','Consolidar tu rendimiento antes de liderar.','«Conocer tus límites también es madurez».',{morale:3,coach:2},'La confianza crece sin presión extra.')]
+ }
+});
 export const STORY_IDS=Object.keys(catalog);
 export function sceneFor(s){
  const entry=catalog[s.pendingEvent]||catalog.coach;
@@ -219,11 +258,14 @@ export function sceneFor(s){
 }
 export function chooseScene(s,roll){
  if(s.fanClubId && s.clubId===s.fanClubId && !s.storyFlags?.playedForFan) return 'fan_home';
- if(s.lastSeason?.matches<12)return roll()<.52?'bench':'coach';
+ if(s.lastSeason?.matches<12)return roll()<.52?'rotation':'coach';
  if(s.lastSeason?.injuryWeeks>=6)return 'injury';
  if(s.fanClubId&&s.clubId!==s.fanClubId&&roll()<.28)return 'fan_press';
+ if(s.publicImage==='referente'&&roll()<.35)return 'captaincy';
+ if(s.dream==='europa'&&roll()<.27)return 'scouting';
+ if(s.coachTrust<45&&roll()<.5)return 'rotation';
  if((s.lastSeason?.goals||0)>=12&&roll()<.4)return 'milestone';
- return ['coach','teammate','press','agent','rival','milestone'][Math.floor(roll()*6)];
+ return ['coach','teammate','press','agent','rival','milestone','scouting','derby','rotation','captaincy'][Math.floor(roll()*10)];
 }
 export function resultOfScene(s,scene,index,playerText=''){
  const o=scene.options[index]||scene.options[0];const effect=o.effect||{};

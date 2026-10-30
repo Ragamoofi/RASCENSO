@@ -72,6 +72,10 @@ function weightClub(state,c,focus){
  if(focus==='local'&&c.countryCode!==state.country)w*=.16;
  if(focus==='money')w*=clamp(wageCeiling(c)/1600000,.35,4);
  if(focus==='minutes'&&gap>4)w*=.5;
+ if(state.riskProfile==='audaz'&&gap>3)w*=1.22;
+ if(state.riskProfile==='paciente'&&gap>5)w*=.65;
+ if(state.riskProfile==='economico')w*=clamp(wageCeiling(c)/1000000,.65,2.2);
+ if(state.publicImage==='mediatico'&&prestige>=85)w*=1.15;
  if(c.id===state.fanClubId)w*=1.0; // El equipo favorito no tiene fichaje garantizado.
  return w;
 }

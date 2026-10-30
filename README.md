@@ -1,6 +1,6 @@
 # RASCENSO · Del barrio a la historia
 
-**Alfa 0.6 — Competiciones y tarjetas** · 30 de octubre de 2026 · © Ragamoofi.
+**Alfa 0.8 — Identidad y vida de carrera** · 30 de octubre de 2026 · © Ragamoofi.
 
 Sitio oficial de prueba: https://ragamoofi.github.io/RASCENSO/
 
@@ -65,3 +65,28 @@ Fuentes de clubes: [Chile Primera](https://www.emol.com/especiales/2026/deportes
 - **Compatibilidad:** guarda y migra partidas versión 1 a 6, sin reiniciar el historial anterior.
 
 Para la economía se usan órdenes de magnitud de las ligas (no salarios reales de cada plantilla). Es un modelo original y modificable.
+
+
+## Alfa 0.8 · Identidad, legados y vida de carrera (2026-10-30)
+
+- **Creador ampliado a 6 pasos**: identidad, raíces, estilo, mentalidad, ambición y resumen. Nuevas opciones de entorno, imagen pública, tolerancia al riesgo y senda de desarrollo. Se almacenan en el guardado y modifican probabilidades de minutos, rendimiento, lesiones, moral, confianza o mercado. Ningún rasgo garantiza fichajes ni títulos.
+- **Legados con fotografía cuando existe una fuente comprobada**: capa visual fotográfica detrás de los valores que ya existían, con un fondo abstracto propio de respaldo. No se copia el diseño ni las imágenes de EA FC.
+- **ADN emergente**: se resume el arquetipo de juego a partir de los ocho atributos elegidos. Se muestra al finalizar el draft y dentro del perfil.
+- **Pretemporada**: seis enfoques, una elección definitiva por año; definición, creación, físico, táctica, recuperación o liderazgo. Modifica parámetros usados en la simulación original de RASCENSO.
+- **Más situaciones deportivas**: se incorporan ojeadores, lucha por la titularidad, clásicos y liderazgo; hasta dos escenas por temporada tras el cierre anual, con decisiones y consecuencias persistentes. Siguen siendo situaciones programadas, **no un narrador libre de IA**.
+- **Vitrina**: miniaturas PNG de trofeos originales de RASCENSO, con nombre de competición y año en el detalle. **No son imágenes oficiales licenciadas de cada copa**, que requieren una curaduría de derechos por torneo.
+- **Compatibilidad**: versión de guardado 7, migración de versiones 1–6 conservando temporadas, títulos, contratos y estadísticas. Los títulos anteriores conservan el año cuando está en el historial; de lo contrario se indican sin año.
+
+### Créditos de fotografías de leyendas
+
+Se muestran desde Wikimedia Commons (sitio externo, bajo la licencia individual de cada archivo, con sus respectivas condiciones y autoría). No se redistribuyen dentro del repositorio. Los enlaces de origen y autoría se encuentran en las páginas siguientes:
+
+- [Lionel Messi WC2022](https://commons.wikimedia.org/wiki/File:Lionel_Messi_WC2022.jpg)
+- [Cristiano Ronaldo 2018](https://commons.wikimedia.org/wiki/File:Cristiano_Ronaldo_2018.jpg)
+- [Ronaldo Nazário](https://commons.wikimedia.org/wiki/File:Ronaldo_Naz%C3%A1rio.jpg)
+- [Andrés Iniesta 2018](https://commons.wikimedia.org/wiki/File:Andres_Iniesta_2018_(edited).jpg)
+- [Xavi Hernández](https://commons.wikimedia.org/wiki/File:2012_2013_-_06_Xavi_Hern%C3%A1ndez.jpg)
+- [Ronaldinho 2019](https://commons.wikimedia.org/wiki/File:Ronaldinho_in_2019.jpg)
+- [Luka Modrić](https://commons.wikimedia.org/wiki/File:Luka_Modric.jpg)
+
+La disponibilidad de estas fotos depende del servicio externo. El resto de leyendas utiliza un fondo abstracto original hasta contar con archivos y atribuciones verificadas. Las imágenes del juego no implican relación comercial con los deportistas.

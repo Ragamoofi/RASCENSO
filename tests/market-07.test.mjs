@@ -46,7 +46,7 @@ test('La cesión guarda el contrato de origen y permite regreso al club',()=>{
 test('Partidas antiguas se conservan y contratos antiguos se recalibran sin alterar historia',()=>{
  const old={...high('legacy07'),version:5,contract:{clubId:'cl-1',ends:2040,salary:2000},clubId:'cl-1'};
  const migrated=migrateCareer(old);
- assert.equal(migrated.version,6);assert.equal(migrated.contract.currency,'EUR');
+ assert.equal(migrated.version,7);assert.equal(migrated.contract.currency,'EUR');
  assert.ok(migrated.contract.salary>10000);assert.equal(migrated.history.length,old.history.length);
 });
 

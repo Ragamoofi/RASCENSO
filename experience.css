@@ -50,3 +50,53 @@
 /* v0.7: banderas sin letras superpuestas y mercado compacto. */
 .flag{position:relative;display:inline-flex;overflow:hidden;flex:none}.flag>span{position:relative;z-index:0}.flag>img{position:absolute;inset:0;z-index:1;object-fit:cover;width:100%;height:100%}
 .market-summary{display:flex;gap:10px;margin:12px 0 4px}.market-summary span{display:flex;align-items:center;gap:7px;padding:9px 11px;border:1px solid #4b617b;border-radius:7px;font-size:10px;color:#abbfd6}.market-summary b{color:#fff}.market-pill{font-size:9px;padding:3px 5px;border-radius:4px;background:#3b647b;color:#fff}.agent-panel{padding:12px 14px;background:#25435f;border:1px solid #5d7d9f;border-radius:9px;display:flex;align-items:center;justify-content:space-between;gap:12px}.agent-panel strong{font-size:11px;letter-spacing:.6px;color:#ffbc83}.agent-panel p{font-size:11px;color:#c2d3e7;margin:7px 0 0}.market-actions{margin-top:12px}.market-empty{background:#1f354a;border:1px dashed #7490a8;border-radius:8px;padding:18px;color:#c6d4e5;font-size:12px}.must-move{color:#ffd0b5;font-size:12px;padding:9px}.market-disclaimer{font-size:10px!important;color:#91abc8!important;margin:12px 0 0}.focus-card.market .offers-list{margin:11px 0;gap:7px}.focus-card.market .offer{padding:9px 11px}.focus-card.market .market-summary{flex-wrap:wrap}@media(max-width:1100px){.agent-panel{flex-direction:column;align-items:stretch}}
+
+/* Alfa 0.8: identidad, leyendas y la vitrina. Mantener altura de viewport en escritorio. */
+.creation-tabs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
+.creation-step{min-width:0;letter-spacing:.2px;font-size:10px;white-space:nowrap;padding-inline:4px}
+.creation-content .choice-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.creation-content .choice-tile{min-width:0;padding:9px 10px;min-height:74px}
+.creation-content .choice-tile strong{font-size:11px}
+.creation-content .choice-tile small{font-size:10px;line-height:1.35}
+.creation-content .select-group{margin:12px 0}
+.creation-content .select-group h3{margin:8px 0;font-size:12px}
+.summary-traits{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.summary-traits>div{padding:14px;border:1px solid #44617d;background:#18314e;border-radius:9px}
+.summary-traits small{display:block;color:#b8cbe0;letter-spacing:1px;text-transform:uppercase;font-size:9px;margin-bottom:6px}
+.summary-traits strong{font-size:12px;color:#f4f7ff}
+.legend-card{position:relative;isolation:isolate;overflow:hidden;padding:0!important;display:flex!important;flex-direction:column!important;justify-content:space-between!important;background:linear-gradient(145deg,#304a70,#142943)!important}
+.legend-photo-backdrop{position:absolute;inset:0;z-index:-2;background:radial-gradient(ellipse at 55% 35%,#6d8bb2,#172b49 76%);pointer-events:none}
+.legend-photo-backdrop img{height:100%;width:100%;object-fit:cover;object-position:center 22%;opacity:.82;filter:saturate(.72)}
+.legend-card::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,#101e3445 0%,#11253a14 28%,#101f35b5 62%,#0d1b31 93%);pointer-events:none}
+.legend-card-top{width:100%;padding:16px 17px 0;position:relative;z-index:1}
+.legend-card .legend-symbol{margin:auto;opacity:.18;position:absolute;top:20%;left:0;width:100%;z-index:-1}
+.legend-content{margin-top:auto;padding:0 18px 18px;text-align:left;width:100%}
+.legend-content>small{font-size:9px;color:#ffcd9c;font-weight:900;letter-spacing:1.5px}
+.legend-content h2{margin:4px 0 7px!important;font-size:30px!important;text-shadow:0 2px 8px #091b31}
+.legend-content p{margin:0 0 10px;color:#edf3ff}
+.legend-content .legend-value{margin-top:8px}
+.legend-card:hover .legend-photo-backdrop img{filter:saturate(1);transform:scale(1.04);transition:.3s}
+.dna-chip{background:#31557e!important;border:1px solid #d69b72!important;color:#f4d9bc!important}
+.photo-credit{margin:3px 0 0;color:#7e9fc1;font-size:9px}
+.profile-card[class*="player-tier-"] .player-label span{font-size:10px;letter-spacing:1px}
+.profile-card[class*="player-tier-"] .card-crest{height:168px}
+.right-rail .trophy-showcase{padding:11px 14px;border:1px solid #36516c;border-radius:10px;background:#142a45;flex-shrink:0}
+.trophy-showcase .rail-heading{display:flex;justify-content:space-between;margin-bottom:8px;font-size:10px;letter-spacing:1px;color:#ffbc8f}
+.trophy-grid{display:flex;gap:8px;overflow-x:auto;align-items:center;min-height:51px;scrollbar-width:thin}
+.trophy-grid>p{color:#9bb9d5;font-size:10px;margin:3px 0}
+.trophy-unit{flex:none;width:51px;display:flex;align-items:center;flex-direction:column;gap:2px;padding:3px 4px;background:#244363;border-radius:6px;border:1px solid #577a9a}
+.trophy-unit img{width:30px;height:34px;object-fit:contain;filter:drop-shadow(0 2px 4px #0a172c)}
+.trophy-unit span{font-size:9px;color:#e6d4bb}
+.preseason-bar{border-radius:10px;border:1px solid #426284;background:#1b3956d9;padding:12px;margin-top:13px}
+.preseason-bar strong{font-size:10px;letter-spacing:1.5px;color:#f9be8f}
+.preseason-bar>div{display:flex;gap:5px;flex-wrap:wrap;margin:7px 0}
+.preseason-bar button{background:#223e61;border:1px solid #577698;color:#deebff;border-radius:6px;padding:8px 9px;font-size:10px;font-weight:700;cursor:pointer}
+.preseason-bar button:hover:not(:disabled){border-color:#ffbb8e;background:#2b5280}
+.preseason-bar button.selected{border-color:#ffd0a9;background:#4766a5;color:#fff}
+.preseason-bar button:disabled:not(.selected){opacity:.4;cursor:not-allowed}
+.preseason-bar small{display:block;color:#b6cbe0;font-size:10px}
+@media(min-width:1400px){.right-rail{gap:9px}.right-rail .table-card{min-height:0;flex:1}.right-rail .news-card{min-height:84px;flex:none}}
+@media(max-width:920px){.creation-content .choice-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:720px){.creation-tabs{grid-template-columns:repeat(3,1fr)}.creation-content .choice-tiles{grid-template-columns:1fr 1fr}.legend-content h2{font-size:26px!important}.summary-traits{grid-template-columns:1fr 1fr}.preseason-bar button{font-size:9px;padding:6px}}
+
+.academy-dna{padding:12px 16px;border:1px solid #5a759b;background:#203e5d;border-radius:10px;display:flex;align-items:center;gap:14px;margin:14px 0}.academy-dna strong{color:#f5d5b4;font-size:18px}.academy-dna small{color:#b5cbe1;font-size:10px}
