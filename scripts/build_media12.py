@@ -76,10 +76,11 @@ def font(size):
 def fallback(path,label,kind):
  if kind=='portrait':
   im=Image.new('RGBA',(420,520),(24,45,74,255));d=ImageDraw.Draw(im)
-  d.ellipse((35,-75,385,310),fill=(37,67,102),outline=(97,128,168),width=3)
-  d.ellipse((139,125,279,265),fill=(98,124,148),outline=(161,190,213),width=4)
-  d.rounded_rectangle((74,282,348,598),72,fill=(75,100,136),outline=(143,176,210),width=4)
-  d.text((210,460),'RETRATO NO DISPONIBLE',anchor='mm',fill=(194,209,225),font=font(13))
+  d.ellipse((18,40,402,424),outline=(79,119,158,160),width=4)
+  d.ellipse((68,90,352,374),outline=(58,95,134,170),width=3)
+  d.line((20,460,400,460),fill=(204,164,112,180),width=4)
+  d.text((210,230),'RASCENSO',anchor='mm',fill=(129,164,199),font=font(38))
+  d.text((210,272),'ADN FUTBOLISTICO',anchor='mm',fill=(196,208,225),font=font(15))
  else:
   size=(245,150) if kind=='logo' else (160,210)
   im=Image.new('RGBA',size,(0,0,0,0));d=ImageDraw.Draw(im)
@@ -90,7 +91,8 @@ def fallback(path,label,kind):
  im.save(path,'PNG',optimize=True)
 
 def get_pagephotos():
- # MediaWiki normaliza y redirige nombres; asociar cada título a su página correcta.
+ # The MediaWiki API canonicalizes and redirects many footballer names. The old
+ # exact-title lookup silently lost dozens of valid licensed photographs.
  mapped={}
  for group in chunks(list(dict.fromkeys(OVERRIDE.get(n,n) for n in NAMES)),30):
   q=api('en.wikipedia.org',dict(action='query',format='json',redirects=1,prop='pageimages',piprop='thumbnail|name',pithumbsize=520,titles='|'.join(group)))

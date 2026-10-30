@@ -277,37 +277,82 @@
 .agent-focus-options{display:flex;flex-wrap:wrap;gap:7px}.agent-focus-options button{border:1px solid #56728d;background:#20415e;color:#f3f7ff;padding:9px 11px;border-radius:7px;font-weight:700;font-size:11px}
 .agent-focus-options button:hover,.agent-focus-options button:focus-visible{background:#315b81;border-color:#d9a671;outline-offset:2px}
 
-/* 1.8 – nueva identidad del creador */
-.creation-layout{max-width:1450px;grid-template-columns:minmax(560px,1.6fr) minmax(350px,.9fr);gap:21px}
-.creation-panel,.creation-aside{box-shadow:0 20px 54px #020b1670}
-.creation-aside{background:radial-gradient(circle at 48% 32%,#466a9b42,transparent 56%),linear-gradient(155deg,#1a3a59,#081f34 78%)}
-.recruit-poster{background:radial-gradient(ellipse at 50% 28%,#7193b32e,transparent 65%)}
-.poster-kit-wrap{display:grid;place-items:center;position:relative;width:min(100%,310px);height:320px;margin:18px 0 0;filter:drop-shadow(0 20px 25px #030b1b88)}
-.kit-halo{position:absolute;width:260px;height:260px;border:1px solid #e8b7844b;border-radius:50%;background:radial-gradient(circle,#a8cbdf18,transparent 70%)}
-.country-kit{height:315px;width:auto;max-width:100%;position:relative;z-index:2;object-fit:contain}
-.kit-badge{position:absolute;bottom:2px;z-index:3;font-size:10px;background:#0c2541dd;border:1px solid #7594b5;border-radius:30px;padding:6px 12px;white-space:nowrap}
-.poster-persona{font-size:11px;color:#d1e3ef;margin-top:7px}
-.choice-tile{transition:transform .16s,border-color .16s}
-.choice-tile:hover{transform:translateY(-2px);border-color:#b3d1e7}
-.choice-tile.chosen{border-color:#ecb481;background:linear-gradient(120deg,#2a4d73,#1c3455);box-shadow:inset 3px 0 #eab17d}
-.legend-photo-backdrop{background:radial-gradient(circle at 50% 40%,#4b7bb459,transparent 67%),linear-gradient(142deg,#21476b,#132a43)}
-.legend-art-field{position:absolute;inset:0;display:flex;justify-content:center;align-items:center;flex-direction:column;background:repeating-linear-gradient(110deg,transparent 0 62px,#ddefff07 63px 64px)}
-.legend-art-crest{font-size:76px;color:#e0edff2a}
-.legend-art-number{font:900 150px/1 'Barlow Condensed',sans-serif;color:#cadcf016}
+
+/* RASCENSO 1.8 — personalidad visual, creador y desafíos interactivos */
+.creation-layout{max-width:1450px;grid-template-columns:minmax(560px,1.62fr) minmax(350px,.9fr);gap:22px}
+.creation-panel,.creation-aside{box-shadow:0 22px 62px #020b1680;border-color:#496683}
+.creation-aside{background:linear-gradient(155deg,#193858,#071d30 72%);position:relative}
+.creation-aside:before{content:'';position:absolute;inset:0;background:linear-gradient(130deg,transparent 28%,#e8b17e0b 28.25%,transparent 28.5%),repeating-linear-gradient(0deg,#ffffff07 0 1px,transparent 1px 48px);pointer-events:none}
+.recruit-poster{background:radial-gradient(ellipse at 50% 30%,#5277ac42,transparent 66%),radial-gradient(ellipse at 60% 70%,#ce925717,transparent 70%)}
+.recruit-poster:before{inset:5% 7%;border-radius:28px;border:1px solid #6e95b057;background:linear-gradient(145deg,#cddfff08,transparent 55%)}
+.poster-kit-wrap{position:relative;display:flex;align-items:center;justify-content:center;width:min(100%,310px);height:330px;margin:20px 0 0;isolation:isolate;filter:drop-shadow(0 18px 26px #030b1b95)}
+.kit-halo{position:absolute;width:275px;height:275px;border:1px solid #aac7ee3d;border-radius:50%;background:radial-gradient(circle,#a8b8d41e 4%,transparent 74%);box-shadow:0 0 80px #608cb72a}
+.country-kit{height:325px;width:auto;max-width:100%;object-fit:contain;position:relative;z-index:2;animation:kit-entrance .3s ease-out;filter:drop-shadow(0 15px 22px #0008)}
+.kit-badge{position:absolute;z-index:3;bottom:1px;left:50%;transform:translateX(-50%);border-radius:30px;padding:6px 12px;color:#e4f0ff;background:#102a43e8;border:1px solid #62829d;white-space:nowrap;font-size:10px;font-weight:900;letter-spacing:.06em}
+.poster-persona{font-size:11px;color:#d3dfef;letter-spacing:.035em;margin:7px 0 0}
+@keyframes kit-entrance{from{opacity:.6;transform:translateY(12px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+.creation-content{scrollbar-color:#486889 #10263b}
+.creation-content h1{font-size:clamp(32px,2.9vw,54px)}
+.choice-tile{min-height:89px;transition:border-color .16s,transform .16s,background .16s}
+.choice-tile:hover{transform:translateY(-2px);border-color:#7e9ab6}
+.choice-tile.chosen{background:linear-gradient(110deg,#2c507a,#1a3455);border-color:#e0a779;box-shadow:inset 3px 0 #e0a779}
+.choice-tile.chosen:after{content:'✓';position:absolute;right:13px;top:12px;color:#eab88d;font-weight:900}
+/* Solo la foto realmente autorizada puede tapar el fondo gráfico original. */
+.legend-photo-backdrop{background:radial-gradient(circle at 58% 36%,#5781ad66,transparent 62%),linear-gradient(146deg,#274c72,#10263b 78%);overflow:hidden}
+.legend-art-field{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;background:repeating-linear-gradient(117deg,transparent 0 55px,#cee1f608 56px 57px)}
+.legend-art-field:after{content:'';position:absolute;inset:12%;border:2px solid #d9e4f51d;border-radius:44% 44% 18% 18%}
+.legend-art-crest{font-size:76px;color:#d9ecff28;text-shadow:0 0 38px #aed4ef4d}
+.legend-art-number{font:900 150px/1 'Barlow Condensed',sans-serif;color:#c3d5f019;letter-spacing:-.02em}
 .legend-card.has-licensed-photo .legend-art-field{display:none}
-.legend-stat-feature{position:relative;z-index:4;display:inline-flex;align-items:center;gap:9px;background:#0e2944db;border:1px solid #92afc5;border-radius:8px;padding:5px 12px;margin:13px 15px 0}
-.legend-stat-feature small{font-size:10px;color:#deeeff;font-weight:900}.legend-stat-feature b{font:900 35px/1 'Barlow Condensed',sans-serif;color:#ffcb9c}
-.agenda-premium{background:linear-gradient(150deg,#194266,#0b263e);border:1px solid #6889a5;border-radius:13px;box-shadow:0 12px 30px #0005;padding:17px}
-.agenda-premium h3{font-size:27px}
+.legend-stat-feature{position:relative;z-index:4;display:flex;align-items:center;gap:9px;max-width:max-content;background:linear-gradient(110deg,#0c233cdb,#193b55bc);padding:6px 12px;margin:12px 15px 0;border:1px solid #88a5bc80;border-radius:9px;box-shadow:0 4px 25px #0006}
+.legend-stat-feature small{font-size:10px;letter-spacing:.07em;color:#d6ecff;font-weight:900}
+.legend-stat-feature b{font:900 35px/1 'Barlow Condensed',sans-serif;color:#f4c08f}
+.legend-stat-feature em{font-size:8px;max-width:66px;line-height:1.2;font-style:normal;color:#d7e6f3;font-weight:800}
+.legend-card .legend-content{padding-top:6px}
+.legend-card .legend-content h2{text-shadow:0 2px 7px #0009}
+.legend-card .legend-real-photo{object-position:center 23%;filter:saturate(.88) contrast(1.02)}
+/* Decisiones de temporada con objetivo y coste claramente visibles. */
+.agenda-premium{border:1px solid #61778f;background:linear-gradient(158deg,#183c5d,#0a253d 88%);box-shadow:0 11px 32px #07132066;padding:19px}
+.agenda-premium .agenda-overline{display:flex;justify-content:space-between;gap:14px;align-items:center;color:#f4b887;font-weight:900;letter-spacing:.07em}
+.agenda-season-context{border-bottom:1px solid #65819c66;padding:8px 0 13px;color:#bfd5e8;font-size:11px;margin-bottom:13px}
+.agenda-premium>h3{font-size:28px;color:#fff}
+.agenda-premium>p{color:#bfd5ec;font-size:13px;line-height:1.65}
 .agenda-premium .agenda-options{display:grid;gap:8px}
-.agenda-premium .agenda-options button{background:#1d3e5c;border:1px solid #537798;border-radius:10px;min-height:75px;transition:background .15s,transform .15s}
-.agenda-premium .agenda-options button:hover{background:#295479;transform:translateX(2px);border-color:#e9b382}
-.agenda-premium .agenda-options button em{display:block;margin-top:5px;font-style:normal;font-size:9px;color:#f1b98b;letter-spacing:.07em;font-weight:900}
-/* Una única fuente de movimiento: requestAnimationFrame controla la aguja. */
-.clutch-needle{animation:none!important;transition:none!important;will-change:left}
-.memory-stage>p{color:#c7ddef;margin:0;font-size:12px}
-.memory-cues,.memory-progress{display:flex;justify-content:center;gap:14px;align-items:center;min-height:70px}
-.memory-cues b,.memory-progress b{display:grid;place-items:center;width:57px;height:54px;border-radius:9px;border:1px solid #dfa773;background:#bd854835;color:#fff;font-size:27px}
-.memory-progress span{font-size:12px;color:#eab17d}.memory-cancel{background:transparent;border:0;text-decoration:underline;color:#d7e7fa;cursor:pointer;justify-self:start}
-@media(max-width:1000px){.creation-layout{height:auto;max-height:none;grid-template-columns:1fr}.creation-aside{min-height:470px}}
-@media(max-width:600px){.choice-tiles{grid-template-columns:1fr}.country-kit{height:260px}.poster-kit-wrap{height:270px}}
+.agenda-premium .agenda-options button{display:grid;grid-template-columns:30px minmax(0,1fr) 18px;gap:13px;align-items:center;background:#193651;border:1px solid #4c7191;border-radius:10px;padding:12px 14px;transition:transform .15s,background .15s,border-color .15s;min-height:71px}
+.agenda-premium .agenda-options button:hover{transform:translateX(2px);background:#275174;border-color:#e3b18c}
+.agenda-premium .agenda-options button>b{color:#efb080;font-size:13px}
+.agenda-premium .agenda-options button span{min-width:0}
+.agenda-premium .agenda-options button strong{color:#fff;font-weight:900;font-size:13px}
+.agenda-premium .agenda-options button small{color:#afc8dc;font-size:11px;display:block}
+.agenda-premium .agenda-options button em{display:inline-block;font-size:9px;font-style:normal;color:#f0b883;letter-spacing:.08em;font-weight:900;margin-top:6px}
+.agenda-choice-arrow{color:#f3c39d!important;font-size:19px!important}
+.agenda-result{border-radius:10px;background:#124e5066;border:1px solid #6fc1a366;padding:15px}
+/* Mismo valor para aguja y cálculo: sin CSS que lo sobreescriba. */
+.clutch-needle{animation:none!important;will-change:left;transition:none!important}
+.clutch-perfect-window{box-shadow:0 0 14px #d2b47a66}
+.clutch-timing{background:#08253f;border-color:#6e8dab}
+.clutch-hit-button{box-shadow:0 5px 20px #0003}
+.memory-stage>p{font-size:12px;color:#c5d9ed;margin:0}
+.memory-cues,.memory-progress{display:flex;justify-content:center;align-items:center;gap:15px;min-height:68px}
+.memory-cues b,.memory-progress b{display:grid;place-items:center;width:60px;height:56px;border:1px solid #c8a279;border-radius:10px;background:#d59b5f26;color:#fff;font-size:29px}
+.memory-progress span{font-size:12px;color:#efb98c;font-weight:900}
+.memory-cancel{border:0;background:transparent;color:#bcd5ee;text-decoration:underline;justify-self:start;cursor:pointer}
+@media(max-width:1000px){.creation-layout{grid-template-columns:minmax(0,1fr);height:auto;max-height:none}.creation-aside{min-height:460px}.recruit-poster{min-height:400px}.country-kit{height:280px}.poster-kit-wrap{height:280px}}
+@media(max-width:600px){.creation-content{padding:20px}.fields-grid,.choice-tiles{grid-template-columns:1fr}.agenda-premium{padding:12px}.legend-stat-feature{margin:9px}.legend-stat-feature b{font-size:28px}.memory-cues b{width:46px}}
+@media(prefers-reduced-motion:reduce){.country-kit,.choice-tile,.agenda-premium .agenda-options button{animation:none!important;transition:none!important}}
+
+/* 1.8.1 — Retratos restaurados y equipaciones con fuente explícita */
+.legend-art-field{background:radial-gradient(ellipse at 50% 40%,#356389a8,transparent 60%),linear-gradient(150deg,#132b48,#25405f 58%,#10283e);gap:0}
+.legend-art-field:after{border:1px solid #8faec12b;border-radius:18px;inset:11% 9%;transform:skew(-4deg)}
+.legend-art-crest,.legend-art-number{display:none!important}
+.legend-art-title{font:900 34px/1 'Barlow Condensed',sans-serif;letter-spacing:.12em;color:#b6d0e828;text-align:center;transform:rotate(-10deg);text-shadow:0 0 18px #102944}
+.legend-art-title span{display:block;font:800 10px/2 'DM Sans',sans-serif;letter-spacing:.22em;color:#bdd8ec50}
+.legend-card.has-licensed-photo .legend-art-field{display:none!important}
+.legend-card.has-licensed-photo .legend-photo-backdrop .legend-real-photo{width:100%;height:100%;opacity:1;object-fit:cover;object-position:center 18%}
+.poster-kit-wrap{position:relative;display:flex;align-items:center;justify-content:center;flex-direction:column;min-height:290px}
+.kit-country-seal{position:relative;display:flex;align-items:center;flex-direction:column;justify-content:center;gap:12px;width:230px;height:244px;border-radius:45% 45% 20% 20%;background:radial-gradient(ellipse at 50% 40%,#42658d,#1b365b 65%,#132944);border:1px solid #8bacd35c;box-shadow:0 18px 55px #07132695,inset 0 0 50px #abc6ed1c;text-align:center;animation:kit-entrance .4s both}
+.kit-country-seal>span{font-size:91px;line-height:1.15;filter:drop-shadow(0 8px 12px #07132699)}
+.kit-country-seal strong{font:900 24px/1.1 'Barlow Condensed',sans-serif;letter-spacing:.04em;color:#fff}
+.kit-country-seal small{font-size:9px;letter-spacing:.15em;color:#b9d5ef;font-weight:800}
+.poster-kit-wrap.has-official-kit .country-kit{position:relative;z-index:1;height:265px;width:245px;object-fit:contain;filter:drop-shadow(0 15px 20px #071326c5)}
+.poster-kit-wrap .kit-badge{z-index:2}

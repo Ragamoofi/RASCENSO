@@ -196,5 +196,21 @@ La simulación de la temporada sigue siendo por campaña completa. Los minijuego
 - Astra inició un pulido en otra sesión, pero sus cambios no estaban publicados en la rama main al revisar el repositorio.
 
 
-## Alfa 1.8 · Identidad y momentos
-Creador con 50 camisetas PNG conceptuales por país (no oficiales), opciones de identidad ampliadas, cartas de ADN limpias, escenas deportivas contextuales, opciones visuales mejoradas y minijuegos de memoria/reflejos/precisión. Fallar la ejecución impide el éxito. Conserva guardados anteriores.
+## Alfa 1.8 — Identidad, decisiones y minijuegos nuevos
+
+- El creador muestra una de **50 camisetas conceptuales PNG originales**, una por nacionalidad. Son diseños ficticios basados en los colores del país, **no camisetas oficiales**. Generación reproducible: `python scripts/build_kits18.py [destino]`.
+- Más opciones en personalidad, desarrollo, raíces, estilo y sueños. Varias introducen modificadores moderados y comprobables de minutos, asistencias, goles y desgaste; los guardados antiguos mantienen sus IDs.
+- El ADN solo presenta rostros reales cuando existe una fotografía reutilizable reconocida en el catálogo Wikimedia. Sin fotografía se muestra un fondo gráfico, no un retrato falso.
+- Nuevas escenas contextuales: porteros, defensa, temporada continental, experiencia, suplencia, lucha por la permanencia, liderazgo y racha goleadora. Decisiones rediseñadas con sus posibles costes o ventajas.
+- Minijuegos: precisión/reflejos por medidor (controlado por requestAnimationFrame, sin animación CSS contradictoria) y memoria de tres direcciones. Más situaciones: córner, centro, cabezazo, remate, regate, desmarque, despeje, achique y salida aérea. **Fallar el medidor o patrón obliga a un resultado negativo**. Superarlo habilita una posibilidad de éxito según atributos.
+- El resultado tras cada jugada sigue siendo proyectado hasta simular toda la temporada. El marcador definitivo queda registrado después.
+- Sin IA externa, sin claves de pago y sin cambiar el formato de guardados.
+
+
+## Reparación de fotografías y camisetas — 1.8.1
+
+- Las cartas de ADN leen tanto `assets/media12.json` (PNG realmente descargados) como `assets/portrait-catalog.json` (imágenes con licencia). Los PNG locales se intentan primero; la URL de Wikimedia se usa solo de respaldo.
+- Los retratos no disponibles tienen un fondo tipográfico, sin caras genéricas ni el rombo anterior.
+- Las camisetas conceptuales dejaron de mostrarse en el creador. La vista usa la identidad del país y, si existe un kit real aportado, carga la camiseta PNG/WebP.
+- Para incorporar camisetas: subir los archivos a `assets/kits/official/`, y registrar `{\"CL\":\"chile-home-2026.png\"}` en `assets/kits/official/catalog.json`. El catálogo por defecto está vacío hasta tener material verificable.
+- No se modifican atributos ni partidas guardadas.
