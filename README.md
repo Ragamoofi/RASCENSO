@@ -1,6 +1,6 @@
 # RASCENSO · Del barrio a la historia
 
-**Alfa 0.9 — Carrera Viva** · 30 de octubre de 2026 · © Ragamoofi.
+**Alfa 1.4 — Temporada Mundial** · 30 de octubre de 2026 · © Ragamoofi.
 
 Sitio oficial de prueba: https://ragamoofi.github.io/RASCENSO/
 
@@ -135,3 +135,19 @@ Documentación oficial relevante: https://developers.openai.com/siwc/quickstart 
 - Convocatoria por rendimiento, eliminatorias, copa continental de selección y Mundial según ciclo del año; sus partidos se guardan separados de los de club.
 - Historial de competiciones y recapitulaciones con llaves y trofeos; guardados anteriores se migran sin perder títulos.
 - **Advertencia:** formatos de referencia de hasta 16 equipos, eliminación directa. No equivale a recrear los reglamentos oficiales de cada torneo ni su calendario completo.
+
+
+## Alfa 1.4 — Temporada Mundial (30 octubre 2026)
+
+Esta actualización **profundiza** las competiciones simuladas, pero no reproduce íntegramente las reglas oficiales ni las temporadas completas de las 50 federaciones. Conserva `rascenso-save-v2` y la estructura histórica de partidas anteriores.
+
+- **Grupos de cuatro y tablas reales dentro del simulador**: puntos, goles, diferencia de goles, clasificación de los dos primeros y eliminatorias por torneo. Las copas continentales de clubes tienen ida/vuelta salvo final; el Mundial y los torneos regionales de selecciones tienen partido único en eliminatorias.
+- **Eliminatorias mundialistas consistentes**: las tablas de 2029 deciden los participantes del Mundial 2030; las de 2033, el Mundial 2034. El Mundial inicial de 2026 usa la clasificación retrospectiva ficticia de 2025. Se usa un cuadro de 32 selecciones por simplicidad, **no el formato FIFA real**.
+- **Selecciones invitadas**: el catálogo sigue teniendo 50 nacionalidades jugables, pero los torneos con pocas federaciones (especialmente OFC y CONCACAF) incluyen selecciones adicionales reales como rivales simulados. Estas selecciones no están disponibles como nacionalidad elegible.
+- **Cupos continentales por campaña anterior**: si no cambias de club, cuenta la posición alcanzada el año anterior. En la primera temporada se conserva el acceso provisional del sistema 1.3 para no romper las carreras iniciadas. Si te transfieres, no heredas automáticamente el cupo de tu exclub.
+- **Más torneos**: Mundial de Clubes ficticio por ciclo, Recopa Sudamericana y supercopas continentales para campeones elegibles; todos sujetos a simplificación de cupos y calendario.
+- **Historial y calendario**: por cada competición se conservan partidos con marcador, rondas, grupos y tabla; la pantalla de resumen muestra estos datos y el calendario de copas/selección con ventanas orientativas.
+- **Separación de estadísticas**: liga, copas de clubes y selección figuran en campos propios; el rendimiento en títulos y citaciones incide en reputación. Los datos viejos no se modifican al cargar guardados.
+- **Determinismo**: rendimiento individual, minutos y estadísticas del usuario no alteran el sorteo de resultados de las demás selecciones durante sus clasificatorias.
+
+**Pendientes conocidos**: todavía faltan reglamentos y cupos exactos de cada federación; ligas menores siguen usando un catálogo de referencia; no hay encuentros manuales fecha por fecha ni plantillas individuales reales. Las ventanas de calendario no representan fechas oficiales y el Mundial tiene 32 selecciones en vez del formato real. Estos puntos no se anuncian como terminados.

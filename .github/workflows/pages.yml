@@ -39,6 +39,7 @@ jobs:
           test -s src/competition12.mjs
           test -s src/portrait12.mjs
           test -s src/competitions13.mjs
+          test -s src/competitions14.mjs
           test -s assets/brand/rascenso-wordmark.png
           test -s assets/brand/rascenso-icon.png
           test -s favicon.png
