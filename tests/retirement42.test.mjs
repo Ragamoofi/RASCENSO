@@ -24,7 +24,7 @@ test('el retiro reúne estadísticas, años, clubes y palmarés sin duplicar tí
 });
 test('el homenaje tiene portada, curva de progresión, trofeos, premios y acciones',()=>{
  const html=retirementView(fixture,deps);
- for(const term of ['UNA CARRERA.','UNA HISTORIA.','La sala de trofeos','evolución','tu talento','Mejor jugador','Compartir']) {
+ for(const term of ['EL ÚLTIMO','SILBATAZO.','La sala de trofeos','evolución','tu talento','Mejor jugador','Compartir']) {
   if(term==='Compartir')continue;
   assert.ok(html.includes(term),term);
  }
@@ -32,7 +32,7 @@ test('el homenaje tiene portada, curva de progresión, trofeos, premios y accion
  assert.match(html,/data-action="export"/);
  assert.match(html,/data-tab="historial"/);
  assert.match(html,/2 veces/);
- assert.match(html,/UNA CARRERA/);
+ assert.match(html,/EL ÚLTIMO/);
  assert.doesNotMatch(html,/<PEPE>|<Rival>/);
  assert.match(html,/&lt;PEPE&gt;/);
 });
@@ -54,7 +54,7 @@ test('una carrera simulada completa tiene un final calculable',()=>{
  assert.ok(d.a.seasons>=8);
  assert.ok(d.a.matches>=0);
  assert.ok(d.last?.club);
- assert.ok(retirementView(s,deps).includes('UNA CARRERA.'));
+ assert.ok(retirementView(s,deps).includes('EL ÚLTIMO'));
 });
 
 
