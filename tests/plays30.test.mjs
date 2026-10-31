@@ -41,7 +41,7 @@ test('3.0 · un gol logrado suma exactamente un gol en ese partido y nada más c
 });
 
 test('3.0 · una asistencia se acredita como asistencia, no como gol',()=>{
- let found=null;for(const pos of ['MC','MCO','EI']){const [s,p]=withPlay(pos,'attack');if(s&&p.credit==='assist'){found=[s,p];break;}}
+ let found=null;for(const pos of ['MC','MCO','EI'])for(let i=0;i<20&&!found;i++){const s=start(`assistido-${pos}-${i}`,pos),p=seasonPlays(s).find(x=>x.kind==='attack'&&x.credit==='assist');if(p)found=[s,p];}
  assert.ok(found);const [s,p]=found;
  const a=playLeague(s).playerMatches.find(key(p)),b=playLeague(resolveSeasonPlay(s,p.id,{success:true,detail:'asistencia'})).playerMatches.find(key(p));
  assert.equal(b.assists,a.assists+1);assert.equal(b.goals,a.goals);
