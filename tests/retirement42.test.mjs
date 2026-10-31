@@ -74,3 +74,12 @@ test('el epílogo destaca éxitos reales y recupera rivales del historial, no fr
  assert.doesNotMatch(html,/la ocasión se fue/);
  assert.match(html,/Remate de primera/);
 });
+
+test('la despedida del arquero prioriza vallas invictas sobre goles y asistencias',()=>{
+ const s={...fixture,position:'POR',history:[{...fixture.history[0],cleanSheets:12,goalsConceded:14}]};
+ const html=retirementView(s,deps);
+ assert.match(html,/VALLAS INVICTAS/);
+ assert.match(html,/GOLES RECIBIDOS/);
+ assert.match(html,/>12<\/b>/);
+ assert.doesNotMatch(html,/<small>ASISTENCIAS<\/small>/);
+});
