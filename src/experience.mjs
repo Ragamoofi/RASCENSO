@@ -1,6 +1,6 @@
 import { retirementView } from './retirement42.mjs';
 import {importFM26Local,restoreFM26Private,forgetFM26Private} from './fm26-local.mjs';
-import {loadedFM26Clubs} from './fm26-real.mjs';
+import {loadedFM26Clubs,advanceFM26Season} from './fm26-real.mjs';
 import { academyOfferReason } from './engine.mjs';
 /* RASCENSO — Interfaz renovada. Motor y UI independientes. Sin dependencias de framework. */
 import { COUNTRIES } from './countries.mjs';
@@ -242,7 +242,7 @@ function begin(){gather();if(!draft.name.trim()){wizard=0;message='Escribe un no
 function download(){const data=JSON.stringify(state,null,2);const url=URL.createObjectURL(new Blob([data],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=`rascenso-${state.name.toLowerCase().replace(/[^a-z0-9]+/g,'-')}-${Date.now()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 ROOT.addEventListener('change',e=>{if(e.target.closest('#creation-form')){gather();if(e.target.name==='country')draft.fanClubId='';if(e.target.name==='position')draft.roleClass=classesFor(draft.position)[0].id;
  // Los campos de texto no redibujan al perder el foco: así el clic en «Continuar» nunca se pierde.
- saveDraft();if(e.target.matches('input[type=text],input:not([type]),input[type=number],textarea'))return;render();}if(e.target.id==='fm26-files'){const files=e.target.files;if(!files?.length)return;importFM26Local(files).then(result=>{if(result.loaded&&state){state=syncClub(state);save()}render();alert(result.loaded?'FM26 local: '+result.players+' jugadores en '+result.loaded+' planteles verificados.':result.notice||'Sin equipos verificados: no se activaron jugadores.');}).catch(err=>alert('FM26 local: '+err.message));return;}if(e.target.id==='import-file'){const file=e.target.files?.[0];if(!file)return;file.text().then(x=>{let data=migrateCareer(JSON.parse(x));if(!data)throw Error('Archivo incompatible');if(!confirm('¿Reemplazar la partida actual por este guardado?'))return;showNew=false;mutate(data);}).catch(err=>alert(`Error al importar: ${err.message}`));}});
+ saveDraft();if(e.target.matches('input[type=text],input:not([type]),input[type=number],textarea'))return;render();}if(e.target.id==='fm26-files'){const files=e.target.files;if(!files?.length)return;importFM26Local(files).then(result=>{if(result.loaded&&state?.clubId){const step=advanceFM26Season(state,careerYear(state)-1);state=syncClub({...state,fm26:step.fm26||state.fm26});save()}render();alert(result.loaded?'FM26 local: '+result.players+' jugadores en '+result.loaded+' planteles verificados.':result.notice||'Sin equipos verificados: no se activaron jugadores.');}).catch(err=>alert('FM26 local: '+err.message));return;}if(e.target.id==='import-file'){const file=e.target.files?.[0];if(!file)return;file.text().then(x=>{let data=migrateCareer(JSON.parse(x));if(!data)throw Error('Archivo incompatible');if(!confirm('¿Reemplazar la partida actual por este guardado?'))return;showNew=false;mutate(data);}).catch(err=>alert(`Error al importar: ${err.message}`));}});
 ROOT.addEventListener('input',e=>{if(e.target.closest('#creation-form')&&e.target.name){draft[e.target.name]=e.target.value;saveDraft();if(e.target.name==='story'){const c=document.getElementById('story-count');if(c)c.textContent=`${e.target.value.length}/180`;}if(e.target.name==='name'||e.target.name==='number'){const aside=document.querySelector('.cr-who');if(aside){const strong=aside.querySelector('strong');if(strong&&e.target.name==='name')strong.textContent=e.target.value||'TU NOMBRE';const num=aside.querySelector('.cr-num');if(num&&e.target.name==='number')num.textContent='#'+(e.target.value||'9');}}}});
 ROOT.addEventListener('submit',e=>{if(e.target.id==='creation-form'){e.preventDefault();wizard===5?begin():((gather(),wizard++,render()));}});
 ROOT.addEventListener('click',e=>{
@@ -325,4 +325,4 @@ document.addEventListener?.('keydown',e=>{
 });
 ROOT.addEventListener('error',e=>{if(e.target.matches('img.badge-img'))e.target.remove();},true);
 render();
-restoreFM26Private().then(info=>{if(info.clubs&&state?.clubId){state=syncClub(state);save();render();}}).catch(()=>{});
+restoreFM26Private().then(info=>{if(info.clubs&&state?.clubId){const step=advanceFM26Season(state,careerYear(state)-1);state=syncClub({...state,fm26:step.fm26||state.fm26});save();render();}}).catch(()=>{});
