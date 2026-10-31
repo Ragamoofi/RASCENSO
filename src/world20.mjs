@@ -10,7 +10,7 @@ import { COUNTRIES } from './countries.mjs';
 import { VERIFIED_LEAGUES, getInauguralLeague } from './leagues2026.mjs';
 import { clubPrestige, livePrestige, CLUBS, marketClub, simLevel } from './market.mjs';
 import { rng, hash, clamp, yearOf, COACH_STYLES, POSITION_NAMES, positionGroup } from './career20.mjs';
-import {isRealClubReady,getFM26LoadedPlayers} from './fm26-real.mjs';
+import {isRealClubReady,getFM26LoadedPlayers,getFM26Squad} from './fm26-real.mjs';
 
 /* ---------- Nombres ficticios por región ---------- */
 const POOLS={
@@ -278,7 +278,8 @@ export function advanceWorld(state,playedLeague,userSeason){
   const pot=Math.round(76+Math.pow(r(),1.4)*19),age=17+Math.floor(r()*2);
   const club=pickClubNear(S,62+r()*20,r);if(!club)continue;
   const p=makeNPC(state,`${world.seed}:prospect:${year}:${i}`,{age,ovr:clamp(Math.round(56+r()*10+(pot-80)*.2),50,72),pot,kind:'prospect',clubId:club.id});
-  if(isRealClubReady(club.id))continue;
+  // Nuevos canteranos ficticios sólo cuando el plantel real se agota tras años de retiros.
+  if(isRealClubReady(club.id)&&getFM26Squad(club.id,state).length>=16)continue;
   world.players.push(p);
   if(i===0)news(fresh,year,'prospect',`Un juvenil se incorpora a ${club.name}`,`${p.name}, ${age} años, ${POSITION_NAMES[p.pos].toLowerCase()}, inicia su carrera en ${club.name}.`,{playerId:p.id,clubId:club.id});
  }
@@ -290,7 +291,7 @@ export function advanceWorld(state,playedLeague,userSeason){
   if(!isRealClubReady(club.id))world.players.push(makeNPC(state,`${world.seed}:emerging:${year}:${i}`,{age,ovr,pot:ovr+Math.max(0,Math.round((26-age)*.9)),kind:'star',clubId:club.id}));
  }
  // Mantener la lista manejable: se conservan rival, estrellas activas y retirados recientes.
- const kept=world.players.filter(p=>p.status==='active'||p.rival||year-(p.retired||year)<=4);
+ const kept=world.players.filter(p=>(p.origin==='fm26'||!isRealClubReady(p.clubId))&&(p.status==='active'||p.rival||year-(p.retired||year)<=4));
  let drop=Math.max(0,kept.filter(p=>p.origin!=='fm26').length-120);
  world.players=kept.filter(p=>{if(p.origin==='fm26'||p.rival||drop<=0)return true;drop--;return false;});
  // Premios individuales.
