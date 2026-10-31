@@ -4,6 +4,7 @@
 import { COUNTRIES } from './countries.mjs';
 import { playGroupTournament, playQualification, seededRng, cupContributionRates } from './competitions14.mjs';
 import { VERIFIED_LEAGUES } from './leagues2026.mjs';
+import { choiceFx } from './identity30.mjs';
 const byCode=new Map(COUNTRIES.map(c=>[c.code,c]));
 const min=(a,b)=>Math.min(a,b), max=(a,b)=>Math.max(a,b);
 function hash(input){let x=2166136261;for(const c of String(input)){x^=c.charCodeAt(0);x=Math.imul(x,16777619);}return x>>>0;}
@@ -170,7 +171,7 @@ export function simulateGlobalSeason(state,league){
  }
  const country=byCode.get(state.country),conf=country?.confederation;let calledUp=false;
  if(conf){
-  const score=(state.ovr||50)+Math.min(5,(league.goals+league.assists)/8)+(league.matches>=18?3:-4);
+  const score=(state.ovr||50)+Math.min(5,(league.goals+league.assists)/8)+(league.matches>=18?3:-4)+choiceFx(state).callup;
   const threshold={UEFA:70,CONMEBOL:68,CAF:65,AFC:65,CONCACAF:65,OFC:58}[conf]||68;
   calledUp=score+r()*8>=threshold;
   if(calledUp){

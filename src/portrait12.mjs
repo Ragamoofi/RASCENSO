@@ -16,7 +16,7 @@ export function enhanceLegendImages(root){
  if(!root?.querySelectorAll||typeof fetch!=='function'||typeof Image==='undefined')return;
  manifestPromise ||= Promise.all([json('./assets/portrait-catalog.json?v=192'),json('./assets/media12.json?v=192')]);
  void manifestPromise.then(([catalog,media])=>{
-  for(const card of root.querySelectorAll('.legend-card[data-portrait-name]')){
+  for(const card of root.querySelectorAll('.legend-card[data-portrait-name],.lg-card[data-portrait-name]')){
    if(card.dataset.photoResolved)return;
    const sources=portraitSources(card.dataset.portraitName,catalog,media);
    if(!sources.length)continue;

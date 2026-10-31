@@ -207,6 +207,15 @@ export const WORLD_SCENES={
    o('Pedir libertad creativa','Que el sistema se adapte a tu talento.','«Gánatelo».',{coach:-3,morale:3,reputation:1},'Mantienes tu estilo, con la lupa del técnico encima.'),
    o('Estudiar el sistema a fondo','Horas extra de video y análisis.','«Me gusta tu actitud».',{coach:4,ovr:1},'Tu comprensión táctica mejoró.')]
  },
+ w_dream:{tag:'SUEÑO CUMPLIDO',place:'Estadio vacío · Después de todos',actor:'family',
+  title:s=>`Lo lograste: ${s.dreamDone?.title||'tu gran sueño'}`,
+  paragraphs:s=>[`Cuando eras chico y pateabas contra la pared de ${s.city||'tu barrio'}, esto era solo una idea: «${s.dreamDone?.title||'mi sueño'}». Hoy es un hecho.`,`${s.relationships?.family?.name||'Tu familia'} no deja de llorar de alegría. En el vestuario, hasta el entrenador sonríe.`],
+  speech:s=>'«¿Y ahora qué viene? Un sueño así no se termina: se cambia por otro más grande».',
+  options:s=>[
+   o('Fijarte una meta nueva','Subir la vara: lo mejor todavía no pasó.','«Eso es ser un grande».',{morale:4,reputation:2,coach:3},'Convertiste un logro en combustible.'),
+   o('Disfrutarlo con los tuyos','Celebrar en casa, sin cámaras.','«Te lo mereces».',{family:10,morale:6},'Tu gente vivió el sueño como propio.'),
+   o('Dedicárselo al barrio','Recordar de dónde vienes.','«Del barrio a la historia».',{fans:8,reputation:3,press:3},'Tu historia inspiró a toda la zona.')]
+ },
  w_nutrition:{tag:'PROFESIONALISMO',place:'Centro de alto rendimiento',actor:'agent',
   title:()=>'Un equipo de trabajo propio',
   paragraphs:s=>[`${s.relationships?.agent?.name||'Tu representante'} te propone contratar nutricionista, preparador físico y fisioterapeuta personales.`,'Es una inversión importante, pero los grandes futbolistas la hacen.'],
@@ -231,6 +240,7 @@ export function worldSceneCandidates(s){
  const log=s.storyLog||[];const seen=id=>log.filter(x=>x.id===id);const recent=id=>log.slice(-6).some(x=>x.id===id);
  // Urgentes
  if(s.squad?.newCoachYear===c.year)add('w_new_coach',100);
+ if(s.dreamDone?.year===last.year&&!log.some(x=>x.id==='w_dream'))add('w_dream',102);
  if(last.relegated)add('w_relegated',90);
  if(last.promoted)add('w_promoted',85);
  const broken=(s.threads||[]).find(t=>t.kind==='promise_minutes'&&!t.resolved&&t.year===last.year&&!t.data?.soft);

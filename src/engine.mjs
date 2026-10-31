@@ -14,6 +14,8 @@ import { annualSalary, marketClub, clubPrestige, playerDemand, buildTransferOffe
 import { clamp, rng, yearOf, adjustOvr, ovrFromAttributes, juniorValue, juniorCeiling, finalizeDraft, migrateAttributes, developSeason, seasonRating, seasonObjectives, evaluateObjectives, squadRole, freshSquad, threadEffects, coachSeasonEffects, preparationFocus, addThread, resolveThread, hasThread, activeThreads, KEY_ATTRS, POSITION_WEIGHTS } from './career20.mjs';
 import { ensureWorld, advanceWorld, pushNews, coachFor, namerFor, worldClub, dynamicPrestige, dynamicLevel, worldRival } from './world20.mjs';
 import { pickWorldScene } from './story20.mjs';
+import { choiceFx, dnaFromPicks, startAttrDelta, creatorCeilings, tagOf, dnaFx, DNA_TAGS, referentRadar, dreamProgress, DREAM_REWARD, marketRarity } from './identity30.mjs';
+export { choiceFx, dreamProgress, DNA_TAGS };
 import { buildSeasonPlays, sanitizeReport, autoReport, playOutcomeText, PLAYS, POSITION_PLAYS } from './plays30.mjs';
 export { PLAYS, POSITION_PLAYS };
 export const SAVE_VERSION=9;
@@ -78,14 +80,17 @@ export function newCareer({name,number=9,foot='Derecha',country='CL',position='D
   const originId=validSelection(origin,ORIGINS,'barrio');
   const personalityId=validSelection(personality,PERSONALITIES,'disciplinado');
   const relationships=initialRelationships(country);
-  if(originId==='cantera')relationships.coach.trust=60;
+  // Todas las elecciones del creador fijan el punto de partida a través de choiceFx (origen, entorno…).
+  const start=choiceFx({origin:originId,environment,developmentPath,personality:personalityId,style,strength,weakness,dream,foot:foot==='Izquierda'?'Izquierda':'Derecha',position});
+  const startTrust=clamp(50+start.startTrust,0,100);
+  relationships.coach.trust=startTrust;relationships.family.trust=clamp((relationships.family.trust||75)+start.startFamily,0,100);
   return {version:SAVE_VERSION,attrModel:2,attrCeil:{},world:null,squad:null,threads:[],awards:[],...normalizeProfile({position,roleClass,strength,weakness}),clutchMoment:null,...identityTraits({environment,publicImage,riskProfile,developmentPath}),preparation:null,careerMoments:[],annualScenes:0,market:null,agent:{searches:0,year:null,focus:'balanced'},careerEarnings:0,developmentProfile:developmentPath==='tardio'?'tardio':['temprano','normal','normal','normal','tardio'][Math.floor(rng(String(seed)+':dev')()*5)],injuryProfile:rng(String(seed)+':injury')()<.18?'fragil':'resistente',seasonPlan:'equilibrio',contract:null,seed:String(seed),phase:'draft',name:safeName,number:clamp(Number(number)||9,1,99),foot:foot==='Izquierda'?'Izquierda':'Derecha', country,position,mode:mode==='Purista'?'Purista':'Clásico',
     age:firstAge,startAge:firstAge,startYear:START_YEAR,city:String(city||'').trim().slice(0,40),origin:originId,personality:personalityId,
     style:validSelection(style,STYLES,'equilibrado'),dream:validSelection(dream,DREAMS,'seleccion'),story:String(story||'').trim().slice(0,180),
     fanClubId:getClub(fanClubId)?fanClubId:null,storyFlags:{playedForFan:false},storyLog:[],relationships,sceneBeat:0,sceneChoice:null,scenePlayerText:'',
     draftIndex:0,draftRerolls:0,attributes:{},draftSources:[],clubId:null,ovr:null,potential:null,
-    form:70,morale:originId==='barrio'?75:70,reputation:originId==='academia'?4:0,
-    coachTrust:originId==='cantera'?60:50,
+    form:70,morale:clamp(70+start.startMorale,0,100),reputation:clamp(start.startRep,0,100),
+    coachTrust:startTrust,dna:null,dreamDone:null,
     history:[],decisions:[],trophies:[],offers:[],pendingEvent:null,lastSeason:null};
 }
 export function migrateCareer(s){
@@ -132,14 +137,18 @@ export function draftChoices(s) {
   for(let i=0;i<3;i++){
     const [key,label]=order[i%order.length];
     const pool=slots[i].length?slots[i]:DRAFT_REFERENTS.filter(x=>x.tier===tiers[i]);
-    const player=pool[Math.floor(r()*pool.length)];
+    // El referente se elige con sentido: pesa su valor en la faceta ofrecida y se evita repetir familia de juego en la misma ronda.
+    const ai=ATTRS.findIndex(a=>a[0]===key),seen=new Set(source.map(x=>x.tag));
+    const w=pool.map(p=>Math.exp((p.values[ai]-58)/26)*(seen.has(tagOf(p.name))?.3:1));
+    const total=w.reduce((a,b)=>a+b,0);let roll=r()*total;let pi=w.findIndex(x=>(roll-=x)<=0);if(pi<0)pi=pool.length-1;
+    const player=pool[pi];
     used.add(player.name);
-    const value=player.values[ATTRS.findIndex(a=>a[0]===key)];
+    const value=player.values[ai];
     const weight=important.includes(key)?WEIGHTS[s.position][important.indexOf(key)]:.08;
     const fit=weight>=.26?'CLAVE PARA TU PUESTO':weight>=.16?'COMPLEMENTO FUERTE':'PERFIL ALTERNATIVO';
     source.push({legend:player.name,key,label,value,junior:juniorValue(value,key,player.tier),ceiling:juniorCeiling(value,key,player.tier),fit,tier:player.tier,development:player.ceiling,
       tierLabel:DRAFT_TIERS[player.tier].label,tierDetail:DRAFT_TIERS[player.tier].detail,
-      hidden:s.mode==='Purista',archetype:archetypeFor({...s,attributes:{...s.attributes,[key]:value}}).name});
+      hidden:s.mode==='Purista',archetype:archetypeFor({...s,attributes:{...s.attributes,[key]:value}}).name,tag:tagOf(player.name),radar:referentRadar(player.name),signature:player.values.slice(0,6)});
   }
   return source;
 }
@@ -158,13 +167,21 @@ export function acceptDraft(s, index=0){
   const attrCeil={...(s.attrCeil||{}),[d.key]:juniorCeiling(d.value,d.key,d.tier)};
   const draftSources=[...s.draftSources,{legend:d.legend,attribute:d.key,value:d.value,startingValue:starterValue,ceiling:attrCeil[d.key],tier:d.tier}];
   if(s.draftIndex<7)return {...s,draftIndex:s.draftIndex+1,attributes,attrCeil,draftSources};
+  const dna=dnaFromPicks(draftSources,s.position);
+  const withDna={...s,dna};
   const finalAttributes=classAdjustedAttributes(s,attributes);
+  // Edad de inicio y elecciones del creador (origen, estilo…) ajustan los valores de partida.
+  const delta=startAttrDelta(withDna);
+  for(const k of KEY_ATTRS)finalAttributes[k]=clamp(finalAttributes[k]+(delta[k]||0),30,95);
   for(const k of KEY_ATTRS)attrCeil[k]=Math.max(attrCeil[k]??finalAttributes[k]+8,finalAttributes[k]+4);
   const done=finalizeDraft({...s,attrCeil,draftSources},finalAttributes);
   const bonus=Math.min(3,draftPotentialAdjustment(draftSources)/3);
-  for(const k of KEY_ATTRS)done.attrCeil[k]=Math.min(99,Math.round(done.attrCeil[k]+bonus));
+  // Techos: tier de los legados + ADN heredado + origen/entorno/fortaleza/debilidad/sueño.
+  const extra=creatorCeilings(withDna);
+  for(const k of KEY_ATTRS)done.attrCeil[k]=clamp(Math.round(done.attrCeil[k]+bonus+(extra[k]||0)),finalAttributes[k]+2,99);
+  for(const k of ['skills','weak'])if(Number.isFinite(done.attrCeil[k]))done.attrCeil[k]=clamp(done.attrCeil[k]+(extra[k]||0),Math.max(1,finalAttributes[k]||1),5);
   const potential=Math.max(done.ovr+3,ovrFromAttributes(s.position,done.attrCeil));
-  return {...s,...done,potential,phase:'academy',draftIndex:8,attributes:finalAttributes,draftSources,footballDNA:archetypeFor({...s,attributes:finalAttributes,draftSources})};
+  return {...s,...done,potential,phase:'academy',draftIndex:8,attributes:finalAttributes,draftSources,dna,footballDNA:archetypeFor({...s,attributes:finalAttributes,draftSources})};
 }
 // El primer mercado prioriza proyectos modestos y ligas de ascenso, también fuera del país natal.
 // Es determinista por semilla y no depende del equipo de hincha.
@@ -220,7 +237,7 @@ export function syncClub(s,{fresh=false}={}){
     const level=dynamicLevel(n,club);
     const squad=freshSquad(n,{...club,level},coach,namerFor(club.countryCode||n.country));
     // Un club nuevo empieza de cero; una partida migrada conserva la confianza que ya tenía.
-    const trust=fresh?(n.origin==='cantera'&&!n.history?.length?60:50):clamp(n.coachTrust??50,0,100);
+    const trust=fresh?clamp(50+(!n.history?.length?choiceFx(n).startTrust:0),0,100):clamp(n.coachTrust??50,0,100);
     n={...n,squad,coachTrust:trust,relationships:{...n.relationships,coach:{...(n.relationships?.coach||{}),...(coach?{name:coach.name,role:'Entrenador',style:coach.style}:{}),trust,known:true}}};
   }else if(coach&&n.squad?.coachId&&n.squad.coachId!==coach.id){
     // El club cambió de entrenador: la relación empieza de cero y la escena de presentación queda pendiente.
@@ -315,9 +332,12 @@ export function advanceSeason(input){
  if(leaguePosition===1)titles.push(league.league);
  for(const name of global.titles)titles.push(name);
  const partial={matches,minutes,goals,assists,cleanSheets,leaguePosition,injuryWeeks,table:league.standings};
- const rating=seasonRating(partial,s.position);
+ let rating=seasonRating(partial,s.position);
+ // «Irregularidad»: rachas buenas y malas → la nota de cada temporada oscila más (determinista por semilla).
+ if(rating!=null&&s.weakness==='inconstante')rating=Math.round(clamp(rating+(rng(`${s.seed}:variance:${year}`)()-.5)*.5,5.6,8.6)*100)/100;
  // Desarrollo por atributos: edad, minutos, nota, entrenador, pretemporada, promesas y lesiones.
- const dev=developSeason(s,{share,rating:rating??6.2,injuryWeeks,coachFx,threadFx,focus:preparationFocus(prep.id)});
+ const cfx=choiceFx(s);
+ const dev=developSeason(s,{share,rating:rating??6.2,injuryWeeks,coachFx,threadFx,careerFx:cfx,focus:preparationFocus(prep.id)});
  const ovr=dev.ovr,attributes=dev.attributes,attributeChanges=dev.changes,attributesBefore={...(s.attributes||{})};
  const international=global.international;
  const worldCupResult=global.worldCupResult;
@@ -329,7 +349,7 @@ export function advanceSeason(input){
  const objectiveResult=evaluateObjectives(objectives,{...partial,matches});
  const seasonal={salaryEarned:wage,attributesBefore,attributesAfter:{...attributes},attributeChanges,age:s.age,year,clubId:club.id,club:club.name,country:club.country,ovrBefore:s.ovr,ovrAfter:ovr,potentialAfter:dev.potential,role,matches,minutes,goals,assists,cleanSheets,goalsConceded,international,injuryWeeks,leaguePosition,titles,worldCupResult,rating,
   table:league.standings,fixtures:league.fixtureResults,playerMatches:league.playerMatches,plan:league.plan,champion:league.champion,leagueName:league.league,leagueId:league.leagueId,leagueVerified:league.verified,leagueDivision:league.division,competitionVersion:4,clutchMoment:s.clutchMoment?.year===year?s.clutchMoment:null,plays:s.plays30?.year===year?s.plays30.results:[],competitions:global.competitions,competitionCalendar:global.calendar,calledUp:global.calledUp,nationalCaps:global.nationalCaps,nationalGoals:global.nationalGoals,clubCupMatches:global.totalCupMatches??0,
-  objectives:objectiveResult,devNotes:dev.notes,coachName:coach?.name,coachStyle:coach?.style,rivalName:s.squad?.rival?.name,rivalOvr:s.squad?.rival?.ovr,relegated,promoted};
+  captain:!!s.squad?.captain,objectives:objectiveResult,devNotes:dev.notes,coachName:coach?.name,coachStyle:coach?.style,rivalName:s.squad?.rival?.name,rivalOvr:s.squad?.rival?.ovr,relegated,promoted};
  // El mundo avanza: clubes, entrenadores, futbolistas, premios y noticias.
  const world=advanceWorld({...s,ovr,potential:dev.potential,leagueRosters:s.leagueRosters},league,seasonal);
  const awardsYear=world.awards.at(-1);
@@ -341,12 +361,12 @@ export function advanceSeason(input){
  const swing=coachFx.trustSwing;
  const baseTrust=(matches>=Math.round(games*.65)?3:matches<8?-5:-1)+(s.seasonPlan==='defensa'?2:0)+prep.coach+identity.coach+((rating??6.4)-6.5)*4+(objectiveResult?.personal.met?2:-1);
  // La confianza cambia por temporada de forma acotada y tiende a estabilizarse.
- const coachTrust=clamp(Math.round((s.coachTrust??50)+playFx.trust+clamp(baseTrust*swing,-11,8)-((s.coachTrust??50)-58)*.1-Math.max(0,(s.coachTrust??50)-80)*.3),0,100);
+ const coachTrust=clamp(Math.round((s.coachTrust??50)+playFx.trust+cfx.coachYear+clamp(baseTrust*swing,-11,8)-((s.coachTrust??50)-58)*.1-Math.max(0,(s.coachTrust??50)-80)*.3),0,100);
  const relationships={...s.relationships,coach:{...s.relationships.coach,trust:coachTrust}};
  const squad={...(s.squad||{})};
  squad.seasons=(squad.seasons||0)+1;
- squad.board=clamp(Math.round((squad.board??55)+(objectiveResult?(objectiveResult.board.met?7:-9)+(objectiveResult.personal.met?2:-1):0)+(titles.length?5:0)),0,100);
- squad.fans=clamp(Math.round((squad.fans??50)+(goals+assists)/5+((rating??6.4)-6.5)*6+titles.length*5+(objectiveResult?.board.met?3:-3)+(squad.seasons>=3?1:0)+threadFx.morale*.5),0,100);
+ squad.board=clamp(Math.round((squad.board??55)+cfx.boardYear+(objectiveResult?(objectiveResult.board.met?7:-9)+(objectiveResult.personal.met?2:-1):0)+(titles.length?5:0)),0,100);
+ squad.fans=clamp(Math.round((squad.fans??50)+cfx.fansYear+(goals+assists)/5+((rating??6.4)-6.5)*6+titles.length*5+(objectiveResult?.board.met?3:-3)+(squad.seasons>=3?1:0)+threadFx.morale*.5),0,100);
  if(squad.fans>=86&&squad.seasons>=4)squad.idol=true;
  // Competidor directo: envejece, progresa o se marcha; el club puede fichar otro.
  if(squad.rival){
@@ -362,7 +382,7 @@ export function advanceSeason(input){
  }
  // Reputación: rendimiento, títulos, selección y premios.
  const awardRep=myAwards.reduce((n,a)=>n+(a.id==='ball'?12:a.global?6:3),0)+(ballPlace?Math.max(0,11-ballPlace)*.6:0);
- let reputation=clamp(Math.round((s.reputation||0)+playFx.rep+(leaguePosition<=3?3:0)+Math.min(4,Math.floor((goals+assists)/13))+prep.reputation+Math.min(8,global.competitions.filter(c=>c.championWon).length*3)+Math.min(4,Math.floor(global.nationalCaps/4))+awardRep+((rating??6.4)>=7.2?2:0)),0,100);
+ let reputation=clamp(Math.round((s.reputation||0)+playFx.rep+cfx.repYear+(leaguePosition<=3?3:0)+Math.min(4,Math.floor((goals+assists)/13))+prep.reputation+Math.min(8,global.competitions.filter(c=>c.championWon).length*3)+Math.min(4,Math.floor(global.nationalCaps/4))+awardRep+((rating??6.4)>=7.2?2:0)),0,100);
  // Hilos narrativos: desafíos públicos y promesas se cobran al cierre de la temporada.
  let threads=s.threads||[];
  const challenge=activeThreads(s,year).find(t=>t.kind==='public_challenge');
@@ -372,13 +392,22 @@ export function advanceSeason(input){
  for(const n of dev.notes)moments.push({year,kind:'development',text:n.text});
  for(const a of myAwards)moments.push({year,kind:'award',text:`${a.name}${a.league?` · ${a.league}`:''}`});
  const trophyRecords=[...(s.trophyRecords||[]),...titles.filter(title=>title===league.league).map(title=>({title,year,clubId:club.id,leagueId:league.leagueId||'',kind:'league'})),...global.trophyRecords];
- const morale=clamp(Math.round((s.morale??70)+playFx.morale-((s.morale??70)-68)*.18+prep.morale+identity.morale+coachFx.morale+threadFx.morale+(objScore>=2?3:objScore<1?-4:0)+(myAwards.length?4:0)),0,100);
+ const morale=clamp(Math.round((s.morale??70)+playFx.morale+cfx.moraleYear+(s.dream==='titulos'?titles.length:0)-((s.morale??70)-68)*.18+prep.morale+identity.morale+coachFx.morale+threadFx.morale+(objScore>=2?3:objScore<1?-4:0)+(myAwards.length?4:0)),0,100);
  const flags={...(s.storyFlags||{})};if(s.fanClubId&&s.clubId===s.fanClubId)flags.playedForFan=true;
  // Las promesas de esta temporada vencen; quedan registradas para escenas posteriores.
  const next={...s,age:s.age+1,ovr,potential:dev.potential,attributes,attrCeil:dev.attrCeil,reputation,trophyRecords,annualScenes:0,morale,careerEarnings:(s.careerEarnings||0)+wage,leagueRosters,coachTrust,relationships,history:[...s.history,seasonal],trophies:[...s.trophies,...titles],lastSeason:seasonal,recapPending:true,storyFlags:flags,
   world,squad,threads,awards:[...(s.awards||[]),...myAwards],careerMoments:moments.slice(-120),
   sceneBeat:0,sceneChoice:null,scenePlayerText:'',clutchMoment:null,plays30:null,phase:'event'};
- const synced=syncClub(next);
+ let synced=syncClub(next);
+ // Sueño cumplido: recompensa única (reputación, moral, afición, directiva) y premio de carrera.
+ const dream=dreamProgress(synced);
+ if(dream?.done&&!synced.dreamDone){
+  const sq={...synced.squad,fans:clamp((synced.squad?.fans??50)+DREAM_REWARD.fans,0,100),board:clamp((synced.squad?.board??55)+DREAM_REWARD.board,0,100)};
+  synced={...synced,dreamDone:{year,id:dream.id,title:dream.title},squad:sq,reputation:clamp((synced.reputation||0)+DREAM_REWARD.rep,0,100),morale:clamp((synced.morale??70)+DREAM_REWARD.morale,0,100),
+   awards:[...synced.awards,{year,id:'dream',name:`Sueño cumplido: ${dream.title}`,global:false}],
+   careerMoments:[...synced.careerMoments,{year,kind:'award',text:`Sueño cumplido: ${dream.title}`}].slice(-120),
+   lastSeason:{...synced.lastSeason,dreamCompleted:dream.title}};
+ }
  const pick=nextScene(synced,r);
  return {...synced,pendingEvent:pick.id,sceneData:pick.data||{}};
 }

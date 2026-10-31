@@ -1,6 +1,6 @@
 /* RASCENSO 3.0 · Capa de interfaz de las Jugadas Vivas: tarjetas de temporada y ventana de juego. */
 import { PLAYS, playerStats, aiStats, autoChance } from './plays30.mjs';
-import { createMatch } from './match2d.mjs?v=301';
+import { createMatch } from './match2d.mjs';
 import { FIELD_SCENES } from './scenes-field.mjs';
 import { GOAL_SCENES } from './scenes-goal.mjs';
 import { POSITION_NAMES } from './career20.mjs';

@@ -11,7 +11,7 @@ assert.match(root.innerHTML,/playing-layout/);
 assert.match(root.innerHTML,/right-tabs/);
 assert.match(root.innerHTML,/playing-layout/);
 assert.match(root.innerHTML,/standing-row/);
-assert.match(root.innerHTML,/RASCENSO 3.0/);
+assert.match(root.innerHTML,/RASCENSO 3.1/);
 assert.match(root.innerHTML,/v2-season-grid/);
 assert.match(root.innerHTML,/OBJETIVOS/);
 assert.match(root.innerHTML,/LUCHA POR EL PUESTO/);
@@ -27,5 +27,5 @@ assert.match(root.innerHTML,/JUGADAS DE LA TEMPORADA/);
 assert.doesNotMatch(root.innerHTML,/clutch-pick/);
 assert.doesNotMatch(root.innerHTML,/director-dock|Copiar contexto y abrir ChatGPT/);
 assert.doesNotMatch(root.innerHTML,/preseason-bar/);
-console.log('Interfaz RASCENSO 3.0: tres columnas, objetivos, vestuario, jugadas vivas, tabla y navegación presentes. Tamaño:',root.innerHTML.length,'caracteres.');
+console.log('Interfaz RASCENSO 3.1: tres columnas, objetivos, vestuario, jugadas vivas, tabla y navegación presentes. Tamaño:',root.innerHTML.length,'caracteres.');
 

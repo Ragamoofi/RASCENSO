@@ -24,6 +24,7 @@ jobs:
           node --check tests/browser/e2e.cjs
           node --check tests/browser/plays-e2e.cjs
           node --check tests/browser/brief-e2e.cjs
+          node --check tests/browser/creator-e2e.cjs
       - name: Validar motor e interfaz
         run: |
           node --test tests/*.test.mjs
@@ -56,6 +57,8 @@ jobs:
           test -s src/scenes-field.mjs
           test -s src/scenes-goal.mjs
           test -s src/plays-ui.mjs
+          test -s src/identity30.mjs
+          test -s src/creator30.mjs
           test -s assets/brand/rascenso-wordmark.png
           test -s assets/brand/rascenso-icon.png
           test -s favicon.png

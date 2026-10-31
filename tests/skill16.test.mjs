@@ -21,7 +21,9 @@ test('la ventana óptima es estable y siempre alcanza una zona visible del medid
  }
 });
 test('mejor ejecución concede mayor probabilidad que un disparo claramente desviado',()=>{
- const s=start('control16','DC'),m=seasonMoment(s),t=timingTarget(m);
+ // Se busca una carrera con minutos jugados (el reparto de minutos depende de las elecciones del creador).
+ let s,m;for(let i=0;i<30&&!m;i++){s=start('control16-'+i,'DC');m=seasonMoment(s);}
+ assert.ok(m);const t=timingTarget(m);
  const good=playCareerMoment(s,m.aim,t);
  const bad=playCareerMoment(s,m.aim,t<50?100:0);
  assert.ok(good.clutchMoment.chance>bad.clutchMoment.chance);

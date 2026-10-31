@@ -34,7 +34,7 @@ const opt=(title,detail,dialogue,effect,impact)=>({title,detail,dialogue,effect,
 const catalog={
  arrival:{tag:'PRIMER CONTRATO',place:'Complejo deportivo · Primer día',actor:'coach',
   title:s=>`Tu primer día en ${clubName(s.clubId)}`,
-  paragraphs:s=>[`La puerta del camarín se cierra detrás de ti. El escudo de ${clubName(s.clubId)} ocupa el centro de la pared. Tu nombre está escrito a mano sobre un casillero vacío.`,`El entrenador te observa un momento antes de hablar. Nadie sabe todavía qué clase de futbolista vas a ser.`],
+  paragraphs:s=>[`La puerta del camarín se cierra detrás de ti. El escudo de ${clubName(s.clubId)} ocupa el centro de la pared. Tu nombre está escrito a mano sobre un casillero vacío.`,s.story?`En la mochila llevas una hoja doblada con tu historia: «${s.story}».`:`El entrenador te observa un momento antes de hablar. Nadie sabe todavía qué clase de futbolista vas a ser.`,`El entrenador te observa un momento antes de hablar. Nadie sabe todavía qué clase de futbolista vas a ser.`],
   speech:s=>`«En este club no importan las promesas. Importa lo que hagas cuando te llegue la oportunidad. ¿Qué esperas de tu primera temporada?»`,
   options:s=>[
    opt('Quiero ganarme un puesto','Hablar con ambición y aceptar la competencia.','«Eso quería escuchar. Ahora demuéstralo en la cancha».',{coach:4,reputation:1},'El cuerpo técnico notó tus ganas de competir.'),

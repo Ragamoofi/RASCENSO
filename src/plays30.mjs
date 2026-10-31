@@ -8,6 +8,7 @@
  */
 import { rng, hash, clamp, yearOf, positionGroup } from './career20.mjs';
 import { fixtureContext } from './career15.mjs';
+import { choiceFx } from './identity30.mjs';
 
 export const PLAYS={
  mano_a_mano:{name:'Mano a mano',kind:'attack',credit:'goal',view:'field',attr:['shot','dribble','pace'],brief:'Encara al arquero: muévete, amaga y define antes de que llegue el defensor.',controls:'Mueve el ratón (o WASD) para conducir · clic en el arco para rematar'},
@@ -50,24 +51,26 @@ export function composure(s){
  let c=.45+((s.morale??70)-60)/160+((s.reputation||0)/400);
  if(s.personality==='sereno')c+=.18;if(s.personality==='rebelde')c-=.05;
  if(s.weakness==='presion')c-=.15;if(s.strength==='mentalidad'||s.strength==='liderazgo')c+=.08;
+ c+=choiceFx(s).calm;
  return clamp(c,.1,.95);
 }
 export function playerStats(s,play){
  const a=s.attributes||{},v=k=>clamp((Number(a[k])||50)/100,.2,.99),stars=k=>clamp((Number(a[k])||2)/5,.2,1);
- const fatigue=play?.fatigue??0,press=(play?.pressure??50)/100,calm=composure(s);
+ const cf=choiceFx(s);
+ const fatigue=play?.fatigue??0,press=clamp(((play?.pressure??50)+cf.pressure)/100,0,1),calm=composure(s);
  const nerves=press*(1-calm); // 0 (frío) … ~0.8 (temblor)
  const tired=1-fatigue*.22;
  return {
-  speed:(5.6+v('pace')*3.6)*tired,              // m/s con balón
-  sprint:(6.4+v('pace')*3.8)*tired,
+  speed:(5.6+v('pace')*3.6+cf.sprint*.5)*tired,              // m/s con balón
+  sprint:(6.4+v('pace')*3.8+cf.sprint)*tired,
   control:v('dribble'),shot:v('shot'),power:(v('shot')*.6+v('physical')*.4),
   pass:v('pass'),defense:v('defense'),jump:v('physical'),skills:stars('skills'),weak:stars('weak'),
-  reflex:v('defense')*.6+v('pace')*.4,reach:1.1+v('physical')*.5+v('defense')*.3,
+  reflex:clamp(v('defense')*.6+v('pace')*.4+cf.reflex,.2,.99),reach:1.1+v('physical')*.5+v('defense')*.3,
   nerves,fatigue,composure:calm,
   aimNoise:(1-v('shot'))*1.15+nerves*1.1+fatigue*.45, // metros de desvío en el arco
-  passNoise:(1-v('pass'))*2.2+nerves*1.2+fatigue*.5,
-  tackleReach:1.15+v('defense')*.75,
-  feint:v('dribble')*.7+stars('skills')*.3
+  passNoise:((1-v('pass'))*2.2+nerves*1.2+fatigue*.5)*cf.passNoise,
+  tackleReach:1.15+v('defense')*.75+cf.tackle,
+  feint:clamp(v('dribble')*.7+stars('skills')*.3+cf.feint,.1,1)
  };
 }
 /** Dificultad del rival: nivel del club contrario, categoría, presión y etapa de la carrera. */
@@ -115,7 +118,7 @@ export function buildSeasonPlays(s,league,getClub,{role,rivalLevel=()=>60,clubLe
   const before=info.kind==='attack'?{gf:pick.gf,ga:pick.ga}:{gf:pick.gf,ga:pick.ga-1};
   const rivalId=pick.m.home===s.clubId?pick.m.away:pick.m.home;
   const rl=rivalLevel(rivalId);
-  const pressure=clamp(Math.round(38+(decisive?24:0)+(ctx.classic?14:0)+(Math.abs(before.gf-before.ga)<=1?8:0)+(minute>=85?8:0)+(tier===1?4:0)+(prestige-70)*.25),20,99);
+  const pressure=clamp(Math.round(38+(decisive?24:0)+(ctx.classic?14:0)+(Math.abs(before.gf-before.ga)<=1?8:0)+(minute>=85?8:0)+(tier===1?4:0)+(prestige-70)*.25+choiceFx(s).pressure),20,99);
   const fatigue=clamp(minute/95*(1.05-((s.attributes?.physical||60)/150)),0,.85);
   const difficulty=clamp(.34+(rl-(s.ovr||60))*.022+(prestige-65)*.006+(tier===1?.05:0)+pressure*.0016+(s.history?.length||0)*.004,.12,.95);
   out.push({id:`${year}:${pick.m.round}:${type}`,year,round:pick.m.round,home:pick.m.home,away:pick.m.away,type,kind:info.kind,credit:info.credit,

@@ -1,8 +1,19 @@
 # RASCENSO · Del barrio a la historia
 
-**RASCENSO 3.0 — Jugadas Vivas** · © Ragamoofi.
+**RASCENSO 3.1 — Legado y ADN** · © Ragamoofi.
 
 Sitio oficial de prueba: https://ragamoofi.github.io/RASCENSO/
+
+## Novedades 3.1 · Creador, Legado y ADN
+
+El creador de futbolista se rediseñó por completo y **cada elección tiene un efecto real en la carrera** (antes varias eran decorativas).
+
+- **Creador en 6 pasos**, pensado para 1920×1080: posición elegida sobre una cancha, tarjetas con icono y **efectos reales visibles** de cada opción, panel lateral en vivo con el resumen de consecuencias, perfiles sugeridos («Promesa de barrio», «Cerebro del juego»…) y «Sorpréndeme». Las pestañas permiten saltar a cualquier paso, el borrador **se guarda y sobrevive a recargas**, y el último paso muestra los bonos de arranque y techo de tu perfil.
+- **Más profundidad:** edad de inicio (más margen o más hecho), pierna hábil (rareza de mercado y perfiles invertidos), historia personal en una frase (aparece en tu primer día como profesional) y dorsales sugeridos por puesto.
+- **Efectos reales de cada elección:** formación, entorno, senda de desarrollo, carácter, estilo, fortaleza, debilidad, imagen pública, perfil de decisiones, sueño y modo del draft ahora modifican el desarrollo por atributo, los techos, los minutos, las lesiones, la serenidad en las jugadas, el mercado y la convocatoria. El «Club amateur» (que prometía un efecto y no hacía nada), la senda de desarrollo, el entorno y los perfiles «Cerca de mi gente», «Aventurero» y «Lealtad» por fin tienen consecuencias.
+- **Legado con ADN heredado.** Las 78 leyendas se agrupan en 7 familias de juego (Killer del área, Cerebro creativo, Gambeta pura, Cohete, Muro, Motor incansable, Guardián). Las 8 influencias determinan tu ADN: una familia dominante, una secundaria o «Mosaico». Cada ADN tiene un rasgo propio con ventajas **y costes** (por ejemplo, el velocista pierde ritmo antes), y su efecto depende del encaje con tu puesto (natural, parcial o atípico).
+- **Cartas del draft con sentido:** el referente que se ofrece se elige por su valor en la faceta de la ronda y se evita repetir familia. Cada carta muestra el perfil de la leyenda (radar), el valor de tu juvenil, su techo y el rasgo que aporta. El panel lateral muestra tu radar en construcción, el ADN que se está formando y las familias posibles.
+- **Sueños con meta medible:** cada sueño tiene un objetivo (25 partidos con tu selección, 8 temporadas en un club, 150 goles…), progreso visible en Vestuario y una **recompensa al cumplirlo** (reputación, moral, hinchada, directiva, premio y escena especial).
 
 ## Novedades 3.0 · Jugadas Vivas
 

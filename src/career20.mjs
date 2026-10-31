@@ -52,12 +52,12 @@ const TIER_CEILING={icono:0,figura:2,profesional:4};
 /** Valor real con el que el juvenil empieza en ese atributo (no la cifra de la leyenda). */
 export function juniorValue(legendValue,key,tier){
  if(key==='skills'||key==='weak')return clamp(Math.round(legendValue)-1,1,5);
- return clamp(Math.round(38+(legendValue-30)*.36+(TIER_START[tier]??0)),34,66);
+ return clamp(Math.round(36+(legendValue-30)*.36+(TIER_START[tier]??0)),32,66);
 }
 /** Techo de ese atributo, visible como proyección. El talento oculto se suma al cerrar el draft. */
 export function juniorCeiling(legendValue,key,tier){
  if(key==='skills'||key==='weak')return clamp(Math.round(legendValue),1,5);
- return clamp(Math.round(50+(legendValue-50)*.7+(TIER_CEILING[tier]??0)),50,94);
+ return clamp(Math.round(44.5+(legendValue-50)*.7+(TIER_CEILING[tier]??0)),48,94);
 }
 /** Talento oculto: la mayoría de juveniles queda cerca de su proyección; muy pocos la superan con holgura. */
 export function hiddenTalent(seed){const r=rng(seed+':talent20');const t=Math.pow(r(),2.4);return Math.round(-3+t*16);}
@@ -252,7 +252,8 @@ export function developSeason(s,info){
  const fx=info.threadFx||{growth:1,decline:1};
  const focus=info.focus||{};
  const personality=s.personality==='obsesivo'?1.08:s.personality==='disciplinado'?1.04:s.personality==='rebelde'?.96:1;
- const dAge=declineAge(s);
+ const cf=info.careerFx||{};
+ const dAge=declineAge(s)+(cf.declineYears||0);
  const w=POSITION_WEIGHTS[s.position]||POSITION_WEIGHTS.MC;
  // Lesión grave: deja huella física y, a veces, en el techo.
  if((info.injuryWeeks||0)>=10){for(const k of ['pace','physical']){if(Number.isFinite(attrs[k])){const dmg=1+Math.floor(r()*2);attrs[k]=clamp(attrs[k]-dmg,20,99);if(r()<.55&&ceil[k])ceil[k]=clamp(ceil[k]-1-Math.floor(r()*2),attrs[k],99);}}notes.push({kind:'injury',text:'La lesión grave dejó secuelas en tu velocidad y tu físico.'});}
@@ -265,11 +266,13 @@ export function developSeason(s,info){
   const v=Number(attrs[k]),c=Number(ceil[k]??v+4);
   const imp=w[KEY_ATTRS.indexOf(k)];
   const focusF=(focus[k]||1)*(coachFx.focusBonus?.[k]||1);
-  let gain=Math.max(0,c-v)*ageRate(devAge)*minutesF*perfF*coachFx.growthYoung*fx.growth*personality*focusF*(.85+imp*.9);
-  gain+=(r()-.5)*.9;
+  // Elecciones del creador: desarrollo global, por atributo, juvenil y según minutos.
+  const choiceF=(cf.growth||1)*(cf.growthAttr?.[k]||1)*(s.age<=21?cf.growthYoung||1:1)*(share<.4?cf.growthLow||1:1)*(share>.5?cf.growthRegular||1:1);
+  let gain=Math.max(0,c-v)*ageRate(devAge)*minutesF*perfF*coachFx.growthYoung*fx.growth*personality*focusF*choiceF*(.85+imp*.9);
+  gain+=(r()-.5)*.9*(1+(cf.varianceUp||0)*.8);
   if(s.age>=dAge){
    const years=s.age-dAge+1;
-   const speed=k==='pace'?1.7:k==='physical'?1.35:k==='dribble'?1.15:k==='shot'?.85:k==='pass'?.55:.65;
+   const speed=(k==='pace'?1.7*(cf.paceDecline||1):k==='physical'?1.35:k==='dribble'?1.15:k==='shot'?.85:k==='pass'?.55:.65);
    const keeper=s.position==='POR'&&k==='defense'?.6:1;
    gain-=(.45+years*.55)*speed*keeper*fx.decline*(.7+r()*.6);
   }

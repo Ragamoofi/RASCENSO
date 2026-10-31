@@ -2,6 +2,7 @@
    Prestigio deportivo / presupuesto no equivalen al nivel 0-75 del catálogo semilla. */
 import { COUNTRIES } from './countries.mjs';
 import { getInauguralLeague, VERIFIED_LEAGUES } from './leagues2026.mjs';
+import { choiceFx, marketRarity } from './identity30.mjs';
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function hash(s){let h=2166136261;for(const c of String(s)){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;}
 function random(seed){let x=hash(seed);return ()=>{x+=0x6d2b79f5;let t=Math.imul(x^(x>>>15),1|x);t^=t+Math.imul(t^(t>>>7),61|t);return ((t^(t>>>14))>>>0)/4294967296;};}
@@ -69,7 +70,7 @@ function performance(state){
  const score=clamp((production/games)*(isAttack?22:12)-3,0,23);
  return score+(last.leaguePosition<=3?4:0)+(last.international?3:0)+(last.rating?clamp((last.rating-6.6)*6,-4,6):0);
 }
-export function playerDemand(state){const age=state.age||20;const veteran=Math.max(0,age-31)*1.7;return clamp((state.ovr||60)+(performance(state)-9)*.32+((state.reputation||0)-35)*.036-veteran,42,98);}
+export function playerDemand(state){const age=state.age||20;const veteran=Math.max(0,age-31)*1.7;return clamp((state.ovr||60)+marketRarity(state)+(performance(state)-9)*.32+((state.reputation||0)-35)*.036-veteran,42,98);}
 function eligibleClubs(state){return CLUBS.filter(c=>c.id!==state.clubId&&(!validLeagueCountry.has(c.countryCode)||!!getInauguralLeague(c.id)));}
 function weightClub(state,c,focus){
  const prestige=livePrestige(state,c),demand=playerDemand(state),gap=prestige-demand;
@@ -87,10 +88,17 @@ function weightClub(state,c,focus){
  if(focus==='local'&&c.countryCode!==state.country)w*=.16;
  if(focus==='money')w*=clamp(wageCeiling(c)/1600000,.35,4);
  if(focus==='minutes'&&gap>4)w*=.5;
+ if(state.riskProfile==='hogareno')w*=c.countryCode===state.country?1.5:.7;
+ if(state.riskProfile==='aventurero'&&c.countryCode!==state.country)w*=1.35;
+ if(state.riskProfile==='leal')w*=.75;
  if(state.riskProfile==='audaz'&&gap>3)w*=1.22;
  if(state.riskProfile==='paciente'&&gap>5)w*=.65;
  if(state.riskProfile==='economico')w*=clamp(wageCeiling(c)/1000000,.65,2.2);
  if(state.publicImage==='mediatico'&&prestige>=85)w*=1.15;
+ // Sueños y ambición: europa/ambicioso miran a los grandes; regresar premia a los clubes de tu país en la veteranía.
+ const cf=choiceFx(state);
+ if(cf.market>1&&prestige>=80)w*=cf.market;
+ if(state.dream==='regresar'&&state.age>=30&&c.countryCode===state.country)w*=1.25;
  if(c.id===state.fanClubId)w*=1.0; // El equipo favorito no tiene fichaje garantizado.
  return w;
 }

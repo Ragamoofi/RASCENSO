@@ -6,6 +6,7 @@ import { coachFor, worldClub, worldRival, topPlayers, generationPlayers, powerRa
 import { currentObjectives, currentRole, canRetire, NEGOTIATION_ASKS } from './engine.mjs';
 import { annualSalaryLabel } from './market.mjs';
 import { PLAYS } from './plays30.mjs';
+import { DNA_TAGS, dreamProgress, dnaFx } from './identity30.mjs';
 
 // Utilidades compartidas con experience.mjs (único escapador HTML del juego).
 export const h=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -21,7 +22,7 @@ const threadIcon=kind=>h(THREAD_INFO[kind]?.icon||'•'),threadName=(kind,fallba
 /* ---------- Tarjeta del jugador: proyección y nota ---------- */
 export function cardExtras(s){
  const sp=scoutedPotential(s);const last=s.lastSeason;
- return `<div class="v2-card-extra">${sp?`<div><small>PROYECCIÓN</small><strong>${sp.low===sp.high?sp.low:`${sp.low}–${sp.high}`}</strong><em>${h(sp.label)}</em></div>`:''}${last?.rating?`<div><small>NOTA ${h(last.year)}</small><strong>${last.rating.toFixed(2)}</strong><em>${h(last.role||'')}</em></div>`:''}</div>`;
+ return `${dnaBadge(s)}<div class="v2-card-extra">${sp?`<div><small>PROYECCIÓN</small><strong>${sp.low===sp.high?sp.low:`${sp.low}–${sp.high}`}</strong><em>${h(sp.label)}</em></div>`:''}${last?.rating?`<div><small>NOTA ${h(last.year)}</small><strong>${last.rating.toFixed(2)}</strong><em>${h(last.role||'')}</em></div>`:''}</div>`;
 }
 export function attributeBar(s,key,label){
  const v=s.attributes?.[key],c=s.attrCeil?.[key],delta=s.lastSeason?.attributeChanges?.[key];
@@ -85,6 +86,7 @@ export function vestuarioView(s){
   <section class="v2-panel"><header><span>EL CLUB</span><b>${h(trend.label)}</b></header>${meter('Directiva',sq.board??55,'board')}${meter('Hinchada',sq.fans??50,'fans')}<div class="v2-badges">${sq.captain?'<span>C · Capitán</span>':''}${sq.idol?'<span>★ Ídolo</span>':''}${sq.loyal?'<span>♥ Lealtad</span>':''}<span>${sq.seasons||0} temporada(s) en el club</span><span>Prestigio ${dynamicPrestige(s,club)}</span></div>${obj?`<p class="muted">Objetivo de la directiva: <b>${h(obj.board.text)}</b>.</p>`:''}${trend.hist.length?`<div class="v2-trend">${trend.hist.slice(-8).map(([y,p,t])=>`<span title="${y}: ${p}° de ${t}"><i style="height:${Math.max(8,100-(p-1)/(Math.max(2,t)-1)*92)}%"></i><small>${String(y).slice(2)}</small></span>`).join('')}</div>`:''}</section>
   <section class="v2-panel v2-rels"><header><span>RELACIONES</span><b>5</b></header>${relCard('teammate','Compañero de confianza')}${relCard('agent','Representante')}${relCard('press','Periodista de cabecera')}${relCard('family','Familia')}</section>
   <section class="v2-panel v2-memory"><header><span>MEMORIA DE TUS DECISIONES</span><b>${threads.length}</b></header>${threads.length?threads.slice(0,10).map(t=>`<div class="v2-thread-row ${t.resolved?'done':''}"><i>${threadIcon(t.kind)}</i><div><strong>${threadName(t.kind)}</strong><small>${t.year}${t.until&&t.until>t.year?`–${t.until}`:''} · ${t.resolved?h(t.outcome||'cerrado'):'activo'}</small></div></div>`).join(''):'<p class="muted">Tus promesas, desafíos y compromisos quedarán registrados aquí. El juego los recuerda.</p>'}</section>
+  ${dreamPanel(s)}${dnaPanel(s)}
  </div></section>`;
 }
 
@@ -146,4 +148,16 @@ export function legacyVerdict(s){
  if(caps>=20)return {title:'Fiel a la selección',text:`${caps} partidos defendiendo a tu país.`};
  if(peak>=76)return {title:'Profesional de primer nivel',text:`Una carrera sólida con una media máxima de ${peak}.`};
  return {title:'Una vida en el fútbol',text:'No todas las historias terminan en la cima. La tuya se escribió con esfuerzo, cancha y vestuario.'};
+}
+
+/* ---------- ADN y sueño (3.1) ---------- */
+export function dnaBadge(s){const d=s.dna;if(!d)return '';const p=DNA_TAGS[d.primary]||DNA_TAGS.mosaico;return `<span class="dna-badge" title="${h(p.trait)}"><b>${p.icon}</b>${h(p.name)}</span>`;}
+export function dnaPanel(s){
+ const d=s.dna;if(!d)return '';const p=DNA_TAGS[d.primary]||DNA_TAGS.mosaico,q=d.secondary?DNA_TAGS[d.secondary]:null;
+ const fit={natural:'Encaje natural',neutral:'Encaje parcial',atipico:'ADN atípico'}[d.fit]||'';
+ return `<section class="v2-panel v2-dna"><header><span>TU ADN</span><b>${h(fit)}</b></header><div class="v2-dna-row"><span class="dna-ico sm">${p.icon}</span><div><strong>${h(p.name)}</strong><small>${h(p.trait)} — ${h(p.blurb)}</small>${q?`<small class="muted">También: ${q.icon} ${h(q.name)}</small>`:''}</div></div></section>`;
+}
+export function dreamPanel(s){
+ const dp=dreamProgress(s);if(!dp)return '';
+ return `<section class="v2-panel v2-dream ${dp.done?'done':''}"><header><span>TU SUEÑO</span><b>${dp.done?'CUMPLIDO ★':dp.pct+' %'}</b></header><strong class="v2-dream-title">${h(dp.title)}</strong><div class="v2-meter fans"><span>${n(dp.current)} / ${n(dp.target)} ${h(dp.unit||'')}</span><div><i style="width:${dp.pct}%"></i></div></div><small class="muted">${dp.done?'Recompensa recibida: reputación, moral, hinchada y directiva.':'Al cumplirlo recibirás reputación, moral y el respaldo de la hinchada y la directiva.'}</small></section>`;
 }
