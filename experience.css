@@ -929,3 +929,68 @@ button:focus-visible,summary:focus-visible,canvas:focus-visible,input:focus-visi
 @media(max-width:850px){.matchday-feature{padding:12px}.matchday-scoreboard{gap:6px}.matchday-rivals-grid{grid-template-columns:1fr}}
 @media(max-width:520px){.match-rhythm-buttons{grid-template-columns:1fr}.match-rhythm-buttons button{display:flex;justify-content:space-between;align-items:center;padding:9px}.matchday-fixture{flex-direction:column;align-items:stretch}.matchday-fixture-actions{display:flex;flex-wrap:wrap;justify-content:flex-start}.matchday-feature h3{font-size:17px!important}.matchday-center{padding:10px}}
 @media(prefers-reduced-motion:reduce){.matchday-progress span{transition:none}}
+
+
+/* RASCENSO 4.2 · La Última Ovación. Vista de retiro dedicada, sin dashboard de liga. */
+.view.playing:has(.farewell-page){overflow-y:auto;overflow-x:hidden;padding:16px 22px 30px;scrollbar-color:#55728a #0b1e30}
+.farewell-page{--farewell-copper:#f2b47e;--farewell-text:#e6edf6;--farewell-muted:#a9bdce;display:grid;gap:17px;width:min(100%,1630px);margin:0 auto 24px;color:var(--farewell-text);font-family:inherit}
+.farewell-page h1,.farewell-page h2,.farewell-page p{margin:0}
+.farewell-page h2{font:900 clamp(22px,2vw,31px)/1.15 'Barlow Condensed',sans-serif;color:#f5f7fc}
+.farewell-page .farewell-kicker{display:block;color:#e8ae7e;font-size:11px;letter-spacing:.15em;font-weight:850;text-transform:uppercase}
+.farewell-hero{position:relative;overflow:hidden;isolation:isolate;min-height:315px;border-radius:16px;border:1px solid #976f5180;background:
+ radial-gradient(ellipse 72% 125% at 83% 103%,#356b6866,transparent 70%),
+ linear-gradient(128deg,#0c2035 4%,#174459 57%,#193d47 76%,#0a2035 100%);box-shadow:0 16px 55px #020b197a}
+.farewell-hero:before{content:'';position:absolute;z-index:-1;right:-8%;top:8%;width:65%;height:150%;border:1px solid #a1c8bd24;border-radius:50%;transform:rotate(-16deg);box-shadow:0 0 0 35px #8db5ba06,0 0 0 90px #c9d8d806,0 0 0 155px #e2e4e905}
+.farewell-hero:after{content:'';position:absolute;z-index:-1;inset:0;background:repeating-linear-gradient(100deg,transparent 0px,transparent 95px,#ffffff07 96px,#ffffff02 98px);mask-image:linear-gradient(90deg,transparent 10%,black)}
+.farewell-hero-top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:19px 28px 0;color:#bed3e3;font-size:11px;font-weight:800;letter-spacing:.13em}
+.farewell-hero-top span:last-child{color:#f1c6a3}
+.farewell-hero-row{display:flex;justify-content:space-between;align-items:center;gap:25px;padding:20px 38px 15px}
+.farewell-hero-text{min-width:0}.farewell-hero-text h1{display:grid;gap:2px;font:900 clamp(38px,4.4vw,78px)/.94 'Barlow Condensed',sans-serif;letter-spacing:.004em;text-shadow:0 2px 15px #041b29}
+.farewell-hero-text h1 em{font-style:normal;color:#f3bc8c}.farewell-name{font:900 clamp(22px,2vw,32px)/1.12 'Barlow Condensed',sans-serif;color:#fff;margin:10px 0 3px!important;letter-spacing:.016em}
+.farewell-hero-text>p:not(.farewell-name){font-size:13px;color:#bed4df;line-height:1.4}
+.farewell-hero-badges{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
+.farewell-hero-badges>span{display:inline-flex;align-items:center;padding:7px 10px;background:#061f3280;color:#f2d7bf;border:1px solid #c4956d8c;border-radius:40px;font-size:10px;font-weight:850;letter-spacing:.05em}
+.farewell-medallion{width:160px;height:160px;flex-shrink:0;border:2px solid #ecb78d90;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:#f8e8d7;background:radial-gradient(circle,#315765aa,#103449bd 75%);box-shadow:0 0 0 11px #ffffff0a,0 0 55px #f2bb781c,inset 0 0 35px #0004;text-align:center;transform:rotate(3deg)}
+.farewell-medallion>span{font-size:22px;color:#f2ba7b}.farewell-medallion strong{font:900 61px/.94 'Barlow Condensed',sans-serif}.farewell-medallion small{font-size:10px;line-height:1.35;letter-spacing:.1em;color:#e0c2a8;font-weight:900}
+.farewell-hero-foot{display:flex;align-items:center;gap:12px;padding:10px 29px;min-height:48px;background:#06192ab8;border-top:1px solid #98aebf35}
+.farewell-hero-foot>span{font-size:10px;letter-spacing:.11em;color:#c5a588;font-weight:900}
+.farewell-hero-foot b{font-size:13px}.farewell-hero-foot .badge-img{max-height:28px;max-width:28px}
+.farewell-numbers{display:grid;gap:12px;border-radius:13px;padding:17px 19px;background:linear-gradient(115deg,#18354e,#102940);border:1px solid #49617ba8}
+.farewell-numbers>div:first-child{display:flex;justify-content:space-between;align-items:end;gap:14px}
+.farewell-stats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.farewell-stat{min-width:0;display:flex;align-items:center;flex-direction:column;justify-content:center;gap:3px;padding:12px 5px;background:#0a2136bd;border:1px solid #49657a;border-radius:9px}
+.farewell-stat b{font:900 clamp(25px,2.4vw,38px)/1 'Barlow Condensed',sans-serif;font-variant-numeric:tabular-nums;color:#f6f4ee}.farewell-stat small{font-size:10px;color:#a9c8d8;letter-spacing:.07em;text-align:center;font-weight:800}
+.farewell-content{display:grid;grid-template-columns:minmax(0,1.07fr) minmax(0,.93fr);align-items:start;gap:16px}
+.farewell-main,.farewell-side{display:grid;gap:16px;min-width:0}
+.farewell-section{min-width:0;border:1px solid #405d76;border-radius:13px;padding:19px 20px;background:linear-gradient(145deg,#18344d,#112b42 78%);box-shadow:0 5px 17px #05142628}
+.farewell-section h2{margin:5px 0 14px}.farewell-section-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.farewell-section-head>b{color:#c4a487;font-size:11px;white-space:nowrap}
+.farewell-tribute{background:linear-gradient(128deg,#26354a,#3d4b56 75%,#1a3247);border-color:#99734f}
+.farewell-tribute h2{font-size:clamp(24px,2.1vw,36px)}
+.farewell-tribute>p{font-size:14px;color:#d5e2ec;line-height:1.7}
+.farewell-dates{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid #ffffff3d;margin-top:16px;padding-top:12px;color:#ebc5a7;font-size:11px;font-weight:850}
+.farewell-dream{margin-top:16px;display:flex;gap:12px;align-items:center;padding:11px;background:#101d30a3;border:1px solid #92765c;border-radius:9px}
+.farewell-dream>span{font-size:26px;color:#f1bf87}.farewell-dream>div{display:grid;gap:3px}.farewell-dream small{font-size:10px;color:#d1aa8c;font-weight:850}.farewell-dream b{font-size:14px}
+.farewell-clubs{max-height:410px;overflow:auto;padding-right:5px;scrollbar-color:#688198 #1b3045}
+.farewell-club{display:grid;grid-template-columns:27px 39px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 3px;border-top:1px solid #ffffff21}
+.farewell-club .badge-img{max-width:36px;max-height:36px}.farewell-club .farewell-numeral{font:800 13px 'Barlow Condensed',sans-serif;color:#dbac84}
+.farewell-club div{display:grid;gap:3px}.farewell-club strong{font-size:13px}.farewell-club small{color:#9eb9c9;font-size:11px}.farewell-club>b{font-size:12px;color:#c3d6e6;white-space:nowrap}
+.farewell-trophies{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;max-height:370px;overflow-y:auto;scrollbar-color:#688198 #1b3045}
+.farewell-trophy{display:grid;align-content:start;justify-items:center;gap:5px;min-width:0;background:#23435d;border:1px solid #54738c;border-radius:9px;text-align:center;padding:13px 5px}
+.farewell-trophy img{max-width:48px;height:52px;object-fit:contain;filter:drop-shadow(0 5px 9px #0006)}
+.farewell-trophy strong{font-size:11px;line-height:1.25;overflow-wrap:anywhere}.farewell-trophy small{font-size:10px;color:#b1c6d7;line-height:1.4}
+.farewell-memory{display:grid;grid-template-columns:30px minmax(0,1fr);gap:9px;padding:10px 0;border-top:1px solid #ffffff22}
+.farewell-memory>b{font:900 17px 'Barlow Condensed',sans-serif;color:#e7aa7a}.farewell-memory small{font-size:11px;color:#e8b487;font-weight:800}.farewell-memory p{font-size:12px;line-height:1.5;color:#cadae6;margin:4px 0}
+.farewell-curve svg{display:block;width:100%;height:135px}.farewell-curve-caption{display:flex;justify-content:space-between;gap:9px;flex-wrap:wrap;font-size:10px;color:#bdd6e4;font-weight:800}
+.farewell-best{display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:12px;row-gap:4px;background:#233d51;border:1px solid #a17c5f;border-radius:9px;padding:12px;margin-top:15px}
+.farewell-best span{color:#e9ba91;font-size:10px;letter-spacing:.04em;font-weight:900}.farewell-best b{font-size:14px;color:#f6f7f8;text-align:right}.farewell-best small{font-size:11px;color:#aec7d6;grid-column:1/-1}
+.farewell-awards{display:grid;gap:6px}.farewell-award{display:flex;align-items:center;gap:9px;background:#1a3549;border:1px solid #466279;border-radius:8px;padding:9px 11px;color:#e9ad7c}.farewell-award strong{font-size:12px;color:#eaf2f8;flex:1}.farewell-award span{font-size:11px;color:#9fc2d5}
+.farewell-outro{text-align:center;position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 100%,#497c7055,transparent 70%),linear-gradient(130deg,#193a4d,#0e2339);border:1px solid #7c6b5ca3;border-radius:14px;padding:26px 24px}
+.farewell-outro h2{display:grid;margin:12px 0;font:900 clamp(31px,3.6vw,49px)/1.05 'Barlow Condensed',sans-serif}.farewell-outro h2 em{font-style:normal;color:#f2ba87}.farewell-outro>p{font-size:13px;color:#c0d1df}
+.farewell-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin:21px 0 14px}
+.farewell-actions .action{min-height:40px}.farewell-outro>small{font-size:10px;color:#97b6c9}
+@media(min-width:1650px){.farewell-hero{min-height:330px}.farewell-hero-row{padding-top:25px;padding-bottom:25px}}
+@media(max-width:1000px){.farewell-content{grid-template-columns:1fr}.farewell-side{grid-template-columns:1fr 1fr}.farewell-side>.farewell-section:last-child:nth-child(odd){grid-column:1/-1}.farewell-trophies{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:700px){.view.playing:has(.farewell-page){padding:9px 8px 20px}.farewell-page{gap:10px}.farewell-hero{min-height:0}.farewell-hero-top{padding:14px 16px 0;font-size:9px;letter-spacing:.05em}.farewell-hero-row{padding:25px 16px 15px;gap:5px;align-items:start}.farewell-hero-text h1{font-size:clamp(35px,9vw,58px)}.farewell-medallion{width:83px;height:83px;box-shadow:0 0 0 5px #ffffff0a}.farewell-medallion>span{font-size:12px}.farewell-medallion strong{font-size:35px}.farewell-medallion small{font-size:7px}.farewell-hero-badges>span{font-size:9px;padding:5px 7px}.farewell-hero-foot{padding:10px 15px}.farewell-stats{grid-template-columns:repeat(3,minmax(0,1fr))}.farewell-numbers{padding:13px 10px}.farewell-side{grid-template-columns:1fr}.farewell-section{padding:15px 13px}.farewell-trophies{grid-template-columns:repeat(3,minmax(0,1fr))}.farewell-club{grid-template-columns:23px 37px minmax(0,1fr) auto}.farewell-actions>.action{flex:1 1 165px}}
+@media(max-width:400px){.farewell-hero-top span:first-child{max-width:58%}.farewell-hero-text h1{font-size:33px}.farewell-hero-text .farewell-name{font-size:23px}.farewell-medallion{width:72px;height:72px}.farewell-medallion strong{font-size:29px}.farewell-club strong{font-size:11px}.farewell-trophy strong{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.farewell-page *{transition:none!important;animation:none!important}}
