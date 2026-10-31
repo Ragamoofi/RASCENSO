@@ -297,9 +297,17 @@ const rondo={
  draw(m,g){drawPitch(g);drawRing(g,m.c.x,m.c.y,8.2,'rgba(255,255,255,.18)',{dash:[6,6]});for(const p of m.spots)us(m,p,{highlight:p===m.ball.owner});for(const p of m.press)them(m,p);drawBall(g,m.ball);}
 };
 
+/** Entrada decidida por distancia y momento; los atributos amplían el margen de error. */
+export function tackleTiming(distance,reach,elapsed,window,skill,difficulty){
+ const proximity=clampN(1-distance/Math.max(.01,reach),0,1);
+ const timing=clampN(1-Math.abs(elapsed/Math.max(.01,window)-.5)*2,0,1);
+ const score=proximity*.5+timing*.33+clampN(skill,0,1)*.25-clampN(difficulty,0,1)*.12;
+ return {success:score>=.34,quality:clampN(score,0,1),timing};
+}
+const tackleColor=(m,window)=>tackleTiming(0,1,m.t%m.cycle,window,m.stats.defense,m.ai.d).timing>.65?'#ffe3a8':COLORS.copper;
 const recuperacion={
  init(m){m.timer=10;m.rv=makePlayer(16,rnd(m,9,20),{num:'10',speed:m.ai.defSpeed*.62});m.ball=makeBall(0,0);m.ball.owner=m.rv;m.me=makePlayer(27,14.5,{num:'5',team:'us'});
-  m.recv=[makePlayer(31,rnd(m,4,8),{num:'9'}),makePlayer(32,rnd(m,21,25),{num:'11'})];m.cycle=rnd(m,.9,1.3);m.passAt=rnd(m,3.2,5.2)+m.ai.d*1.2;m.hint='Acércate · clic para robar cuando el balón se le separe (anillo cobre)';},
+  m.recv=[makePlayer(31,rnd(m,4,8),{num:'9'}),makePlayer(32,rnd(m,21,25),{num:'11'})];m.cycle=rnd(m,.9,1.3);m.passAt=rnd(m,3.2,5.2)+m.ai.d*1.2;m.hint='Acércate · entra cuando el anillo brille más';},
  exposed(m){return (m.t%m.cycle)<.34;},
  update(m,dt){
   m.steer(m.me,m.stats.sprint,dt);
@@ -313,10 +321,10 @@ const recuperacion={
   else{stepBall(m.ball,dt);if(dist(m.me,m.ball)<.9&&!m.result){setBanner(m,m.me.x,m.me.y);return m.finish(true,'corte',.7);}if((dist(m.target,m.ball)<.8||Math.hypot(m.ball.vx,m.ball.vy)<.4)&&!m.result){setBanner(m,m.target.x,m.target.y);return m.finish(false,'superado',.1);}}
  },
  down(m){if(m.passing||m.me.stun>0)return;const d=dist(m.me,m.ball),reach=m.stats.tackleReach;
-  if(d<=reach&&!m.ball.owner){const p=clampN(.5+m.stats.defense*.4-m.ai.d*.25,.2,.92);setBanner(m,m.me.x,m.me.y);if(m.rand()<p)return m.finish(true,'robo',.6+m.stats.defense*.3);m.me.stun=.55;m.passAt=Math.min(m.passAt,m.t+.35);m.say('LLEGASTE TARDE',false);return;}
+  if(d<=reach&&!m.ball.owner){const duel=tackleTiming(d,reach,m.t%m.cycle,.34,m.stats.defense,m.ai.d);setBanner(m,m.me.x,m.me.y);if(duel.success)return m.finish(true,'robo',duel.quality);m.me.stun=.55;m.passAt=Math.min(m.passAt,m.t+.35);m.say('ENTRADA IMPRECISA',false);return;}
   if(dist(m.me,m.rv)<=reach){setBanner(m,m.rv.x,m.rv.y);m.say('¡FALTA!',false);return m.finish(false,'falta',.1);}
   m.me.stun=.55;m.passAt=Math.min(m.passAt,m.t+.35);m.say('AL AIRE',false);},
- draw(m,g){drawPitch(g);for(const r of m.recv)them(m,r);them(m,m.rv,{ring:this.exposed(m)&&!m.passing?COLORS.copper:null});us(m,m.me,{highlight:true});drawRing(g,m.me.x,m.me.y,m.stats.tackleReach,'rgba(122,166,255,.35)',{dash:[3,5]});drawBall(g,m.ball);}
+ draw(m,g){drawPitch(g);for(const r of m.recv)them(m,r);them(m,m.rv,{ring:this.exposed(m)&&!m.passing?tackleColor(m,.34):null});us(m,m.me,{highlight:true});drawRing(g,m.me.x,m.me.y,m.stats.tackleReach,'rgba(122,166,255,.35)',{dash:[3,5]});drawBall(g,m.ball);}
 };
 
 /* ======================================================================
@@ -324,7 +332,7 @@ const recuperacion={
    ====================================================================== */
 const entrada={
  init(m){m.timer=10;m.att=makePlayer(27,rnd(m,10,19),{num:'9',speed:m.ai.defSpeed*.82});m.ball=makeBall(0,0);m.ball.owner=m.att;m.me=makePlayer(38,14.5,{num:'4',team:'us'});m.k=makePlayer(51,14.5,{num:'1',r:.5});
-  m.cycle=rnd(m,1,1.35)-m.ai.d*.2;m.hint='Acompaña sin tirarte · clic cuando el balón quede expuesto (anillo cobre)';},
+  m.cycle=rnd(m,1,1.35)-m.ai.d*.2;m.hint='Acompaña · entra cuando el anillo brille más';},
  exposed(m){return (m.t%m.cycle)<.3+(1-m.ai.d)*.12;},
  update(m,dt){
   m.steer(m.me,m.stats.sprint*.95,dt);
@@ -336,10 +344,10 @@ const entrada={
    if(timeUp(m))return m.finish(false,'superado',.1);}
  },
  down(m){if(m.result||m.me.stun>0)return;const d=dist(m.me,m.ball),reach=m.stats.tackleReach;
-  if(d<=reach&&this.exposed(m)){const p=clampN(.45+m.stats.defense*.4-m.ai.d*.25+(d<reach*.6?.08:0),.15,.92);setBanner(m,m.me.x,m.me.y);if(m.rand()<p){m.ball.owner=m.me;return m.finish(true,'robo',.55+m.stats.defense*.35);}m.me.stun=.7;m.att.x+=1.2;m.say('SE LA LLEVÓ',false);return;}
+  if(d<=reach&&this.exposed(m)){const window=.3+(1-m.ai.d)*.12,duel=tackleTiming(d,reach,m.t%m.cycle,window,m.stats.defense,m.ai.d);setBanner(m,m.me.x,m.me.y);if(duel.success){m.ball.owner=m.me;return m.finish(true,'robo',duel.quality);}m.me.stun=.7;m.att.x+=1.2;m.say('ENTRADA IMPRECISA',false);return;}
   if(dist(m.me,m.att)<=reach+.2){setBanner(m,m.att.x,m.att.y);m.say(m.att.x>FIELD.boxX?'¡PENAL!':'¡FALTA!',false);return m.finish(false,'falta',.1);}
   m.me.stun=.7;m.say('TE TIRASTE ANTES',false);},
- draw(m,g){drawPitch(g);keeper(m,m.k,true);them(m,m.att,{ring:this.exposed(m)?COLORS.copper:null});us(m,m.me,{highlight:true});drawRing(g,m.me.x,m.me.y,m.stats.tackleReach,'rgba(122,166,255,.35)',{dash:[3,5]});drawBall(g,m.ball);}
+ draw(m,g){drawPitch(g);keeper(m,m.k,true);them(m,m.att,{ring:this.exposed(m)?tackleColor(m,.3+(1-m.ai.d)*.12):null});us(m,m.me,{highlight:true});drawRing(g,m.me.x,m.me.y,m.stats.tackleReach,'rgba(122,166,255,.35)',{dash:[3,5]});drawBall(g,m.ball);}
 };
 
 const anticipacion={

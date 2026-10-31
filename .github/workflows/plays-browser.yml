@@ -1,7 +1,7 @@
 name: Prueba de jugadas en navegador
 on:
   push:
-    branches: [mejora-penales-controles, carrera-mundo35, jugadas36]
+    branches: [mejora-penales-controles, carrera-mundo35, jugadas36, duelos37]
   workflow_dispatch:
 permissions:
   contents: read
