@@ -10,12 +10,13 @@ const NAMED_LEAGUES=[
 ];
 const MARKED=[
  [/libertadores/,'real-libertadores','Continental','continental.png'],
- [/sudamericana/,'real-sudamericana','Continental','continental.png'],
  [/recopa sudamericana/,'real-recopa','Supercopa','continental.png'],
+ [/sudamericana/,'real-sudamericana','Continental','continental.png'],
  [/copa america/,'real-copaamerica','Selecciones','world.png'],
  [/uefa champions|champions league(?! two| elite)/,'real-champions','Continental','continental.png'],
  [/mundial de la fifa|copa mundial de la fifa|fifa world cup/,'real-worldcup','Mundial','world.png'],
  [/copa del rey/,'real-copadelrey','Copa nacional','cup.png'],
+ [/copa chile/,'real-copachile','Copa nacional','cup.png'],
  [/afc champions league elite/,'real-afcchampions','Continental','continental.png'],
  [/caf champions league/,'real-cafchampions','Continental','continental.png']
 ];
@@ -53,6 +54,7 @@ export function trophyIdentity(record,club=null){
    else {key='league-'+safeCountry;}
  }
  if(key==='league-en1'){key='real-premier';fallback='league.png';}
+ if(key==='league-br1'){key='real-brasileirao';fallback='league.png';}
  if(key==='league-nl1'){key='real-eredivisie';fallback='league.png';}
  return {title,key,category,src:'./assets/trophies/'+key+'.png',fallback:'./assets/trophies/'+fallback,year:record?.year??null,clubId:record?.clubId??null};
 }
