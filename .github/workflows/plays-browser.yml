@@ -38,6 +38,7 @@ jobs:
           node tests/browser/viewport40.cjs
           SHOTS=/tmp/rascenso-capturas node tests/browser/matchday41.cjs
           SHOTS=/tmp/rascenso-capturas node tests/browser/retirement42.cjs
+          SHOTS=/tmp/rascenso-capturas node tests/browser/trophies45.cjs
       - name: Guardar capturas
         if: always()
         uses: actions/upload-artifact@v4
