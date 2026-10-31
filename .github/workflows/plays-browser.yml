@@ -36,6 +36,7 @@ jobs:
           node tests/browser/e2e.cjs http://localhost:8765/index.html firefox
           node tests/browser/e2e.cjs http://localhost:8765/index.html webkit
           node tests/browser/viewport40.cjs
+          SHOTS=/tmp/rascenso-capturas node tests/browser/matchday41.cjs
       - name: Guardar capturas
         if: always()
         uses: actions/upload-artifact@v4
