@@ -4,6 +4,7 @@ import { COUNTRIES } from './countries.mjs';
 import { getInauguralLeague, VERIFIED_LEAGUES } from './leagues2026.mjs';
 import { choiceFx, marketRarity } from './identity30.mjs';
 import { socialEffects, activeThreads } from './career20.mjs';
+import {getFM26BestCompetitor,isRealClubReady} from './fm26-real.mjs';
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function hash(s){let h=2166136261;for(const c of String(s)){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;}
 function random(seed){let x=hash(seed);return ()=>{x+=0x6d2b79f5;let t=Math.imul(x^(x>>>15),1|x);t^=t+Math.imul(t^(t>>>7),61|t);return ((t^(t>>>14))>>>0)/4294967296;};}
@@ -74,6 +75,7 @@ function performance(state){
 export function playerDemand(state){const age=state.age||20;const veteran=Math.max(0,age-31)*1.7;return clamp((state.ovr||60)+marketRarity(state)+(performance(state)-9)*.32+((state.reputation||0)-35)*.036-veteran,42,98);}
 /** Competencia conocida dentro del mundo simulado; ausencia de datos no implica vacante. */
 export function positionCompetition(state,clubId){
+ if(isRealClubReady(clubId))return getFM26BestCompetitor(clubId,state.position,state);
  return (state.world?.players||[]).filter(p=>p.status==='active'&&p.clubId===clubId&&p.pos===state.position&&Number.isFinite(p.ovr)).sort((a,b)=>b.ovr-a.ovr)[0]||null;
 }
 function competitionWeight(state,competitor){return competitor?clamp(1-((competitor.ovr-(state.ovr||60))*.025),.72,1.16):1;}
