@@ -994,3 +994,11 @@ button:focus-visible,summary:focus-visible,canvas:focus-visible,input:focus-visi
 @media(max-width:700px){.view.playing:has(.farewell-page){padding:9px 8px 20px}.farewell-page{gap:10px}.farewell-hero{min-height:0}.farewell-hero-top{padding:14px 16px 0;font-size:9px;letter-spacing:.05em}.farewell-hero-row{padding:25px 16px 15px;gap:5px;align-items:start}.farewell-hero-text h1{font-size:clamp(35px,9vw,58px)}.farewell-medallion{width:83px;height:83px;box-shadow:0 0 0 5px #ffffff0a}.farewell-medallion>span{font-size:12px}.farewell-medallion strong{font-size:35px}.farewell-medallion small{font-size:7px}.farewell-hero-badges>span{font-size:9px;padding:5px 7px}.farewell-hero-foot{padding:10px 15px}.farewell-stats{grid-template-columns:repeat(3,minmax(0,1fr))}.farewell-numbers{padding:13px 10px}.farewell-side{grid-template-columns:1fr}.farewell-section{padding:15px 13px}.farewell-trophies{grid-template-columns:repeat(3,minmax(0,1fr))}.farewell-club{grid-template-columns:23px 37px minmax(0,1fr) auto}.farewell-actions>.action{flex:1 1 165px}}
 @media(max-width:400px){.farewell-hero-top span:first-child{max-width:58%}.farewell-hero-text h1{font-size:33px}.farewell-hero-text .farewell-name{font-size:23px}.farewell-medallion{width:72px;height:72px}.farewell-medallion strong{font-size:29px}.farewell-club strong{font-size:11px}.farewell-trophy strong{font-size:10px}}
 @media(prefers-reduced-motion:reduce){.farewell-page *{transition:none!important;animation:none!important}}
+
+
+/* Rivalidades del legado: solo enfrentamientos registrados. */
+.farewell-rivals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.farewell-rival{display:grid;gap:4px;padding:12px 13px;background:#0c273c;border:1px solid #47667d;border-radius:9px}
+.farewell-rival strong{font-size:13px;color:#f1f4f7;overflow-wrap:anywhere}
+.farewell-rival span{font-size:11px;color:#e1b188}.farewell-rival small{font-size:10px;color:#a3bece}
+@media(max-width:700px){.farewell-rivals{grid-template-columns:1fr}}
