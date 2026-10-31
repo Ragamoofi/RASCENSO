@@ -41,16 +41,20 @@ const url=process.argv[2]||'http://localhost:8765/index.html';
  await p.click('[data-action=create]');await p.waitForSelector('.lg-card');
  check(await p.locator('.lg-card').count()===3,'tres cartas por ronda');
  check(await p.locator('.lg-tag').count()===3,'cada carta muestra su familia de juego');
- await p.click('[data-action=draft-focus][data-key=pass]');
- check(await p.locator('.lg-facet strong:text-is("Pase")').count()===3,'comparar tres referentes de Pase');
+ check(await p.locator('[data-action=draft-focus]').count()===0,'no hay filtros de atributo en las cartas');
+ check(await p.locator('.lg-random-note').count()===1,'se explica el sorteo aleatorio');
  await p.reload();await p.waitForSelector('.lg-card');
- check(await p.locator('[data-action=draft-focus][data-key=pass][aria-pressed=true]').count()===1,'faceta persistente tras recarga');
  check(await p.locator('.lg-preview').count()===3,'vista previa del ADN por carta');
  await p.click('[data-action=reroll]');check(await p.locator('[data-action=reroll]:has-text("(2)")').count()===1,'quedan 2 cambios');
  for(let i=0;i<8;i++){await p.locator('[data-action=draft-accept]').nth(i%3).click();await p.waitForTimeout(60);}
  // 6 · ADN heredado y firma
  await p.waitForSelector('.dna-card');
  check(await p.locator('.dna-card h2').innerText()!=='','el ADN se revela');
+ await p.locator('[data-action=academy-continue]').click();
+ check(await p.locator('.academy-card').count()===3,'la última pantalla muestra tres contratos');
+ check(await p.locator('.academy-stage .dna-card').count()===0,'el ADN quedó en la pantalla anterior');
+ const visible=await p.locator('[data-action=academy]').first().evaluate(el=>{const r=el.getBoundingClientRect();const p=el.closest('.academy-stage').getBoundingClientRect();return r.height>0&&r.bottom<=p.bottom;});
+ check(visible,'el botón para firmar no queda cortado en 1920×1080');
  await p.locator('[data-action=academy]').first().click();await p.waitForTimeout(400);
  const save=await p.evaluate(()=>JSON.parse(localStorage.getItem('rascenso-save-v2')));
  check(save.dna&&save.story==='Pateaba contra la pared.'&&save.city==='La Cisterna','el ADN, la historia y la ciudad se guardan');

@@ -795,3 +795,25 @@
 .lg-focus button:focus-visible,.cr-edit:focus-visible{outline:3px solid #f1c79e;outline-offset:3px}
 @media(min-width:1600px){.creation-layout.cr3{grid-template-columns:minmax(0,1fr) 370px}.lg-wrap{grid-template-columns:minmax(0,1fr) 320px}.lg-card{min-height:0}.lg-radar .cr-radar{max-width:120px}.lg-head h1{font-size:42px}.lg-main{padding:20px 24px}.lg-side{overflow:auto}.lg-panel.fam{content-visibility:auto}}
 @media(max-width:600px){.lg-focus button{padding:9px 11px}.cr-report{padding:12px}.cr-bonus-table{font-size:12px}}
+
+/* 3.2.1 · Contratos accesibles + cierre de ADN antes de las ofertas */
+.view.playing:has(.academy-stage),.view.playing:has(.dna-review-stage){overflow:hidden;min-height:0}
+.setup-stage.academy-stage,.setup-stage.dna-review-stage{width:100%;max-width:1640px;max-height:100%;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#54708c #10283e;padding:clamp(16px,2vw,28px) clamp(16px,2.5vw,36px)}
+.academy-stage>h1,.dna-review-stage>h1{margin:4px 0 8px;font-size:clamp(32px,3vw,46px)}
+.academy-stage>p,.dna-review-stage>p{margin-bottom:12px;font-size:12px;max-width:1080px}
+.academy-stage .academy-grid{flex:none;min-height:0;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:16px;margin-top:10px}
+.academy-stage .academy-card{min-height:0;gap:5px;padding:15px 18px 18px;justify-content:flex-start;overflow:visible}
+.academy-stage .academy-card .team-badge.hero{width:74px;height:74px}
+.academy-stage .academy-card>small{margin:3px 0;font-size:11px}
+.academy-stage .academy-card h2{font-size:clamp(23px,2vw,32px);margin:3px 0}
+.academy-stage .academy-card p{margin:2px 0 6px;font-size:12px;line-height:1.35}
+.academy-stage .academy-contract{padding:10px 12px;margin:3px 0 9px}
+.academy-stage .academy-card .action{flex:none;min-height:46px;width:100%;margin-top:auto;position:relative;z-index:2}
+.dna-review-stage{justify-content:flex-start}.dna-review-stage .dna-card{flex:none}
+.dna-review-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:18px 0}
+.dna-review-list span{min-width:0;padding:11px 13px;border:1px solid #38536d;border-radius:9px;background:#10283e}
+.dna-review-list b{display:block;font-size:12px;overflow-wrap:anywhere}.dna-review-list small{display:block;color:#d9a072;font-size:10px;margin-top:4px}
+.dna-review-actions{display:flex;justify-content:flex-end;margin-top:auto;padding:13px 0 2px}.dna-review-actions .action{min-height:50px;font-size:14px}
+.lg-random-note{margin:0 0 12px;color:#b8cde3;font-size:12px;line-height:1.5}.lg-random-note b{color:#f3bc89}
+@media(max-width:1050px){.academy-stage .academy-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dna-review-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:690px){.view.playing:has(.academy-stage),.view.playing:has(.dna-review-stage){overflow-y:auto}.setup-stage.academy-stage,.setup-stage.dna-review-stage{max-height:none;height:auto;overflow:visible;padding:16px 12px}.academy-stage .academy-grid{grid-template-columns:1fr}.dna-review-list{grid-template-columns:repeat(2,minmax(0,1fr))}.dna-review-actions .action{width:100%}}

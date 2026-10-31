@@ -15,6 +15,7 @@ const engine=process.argv[3]||'chromium';
  await page.fill('input[name=name]','Prueba Navegador');
  for(let i=0;i<6;i++){const create=await page.locator('[data-action=create]').count();await page.click(create?'[data-action=create]':'[data-action=creator-next]');await page.waitForTimeout(120);}
  for(let i=0;i<8;i++){await page.locator('[data-action=draft-accept]').first().click();await page.waitForTimeout(80);}
+ await page.locator('[data-action=academy-continue]').click();
  await page.locator('[data-action=academy]').first().click();
  const seen=new Set();let save0;
  for(let step=0;step<70;step++){

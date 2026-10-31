@@ -19,17 +19,24 @@ test('3.2 · emigrar depende de edad y perfil; no es una oferta obligatoria',()=
  assert.ok(minor<adult);assert.ok(home<adult);assert.ok(away>adult);assert.ok(adult>20&&adult<150);
  console.log({minor,adult,home,away,total:300});
 });
-test('3.2 · comparar una faceta conserva semilla, no consume cambios y completa las ocho',()=>{
+test('3.2.1 · cada ronda ofrece 3 facetas aleatorias sin filtros y conserva las ocho',()=>{
  for(const [position] of POSITIONS){let s=newCareer({name:'P',position,seed:'focus-'+position});
- for(const key of ['defense','pass','shot','dribble','physical','pace','skills','weak']){
-  s=chooseDraftFocus(s,key);const choices=draftChoices(s);assert.ok(choices.every(c=>c.key===key));assert.equal(s.draftRerolls,0);
-  assert.deepEqual(draftChoices(migrateCareer(JSON.parse(JSON.stringify(s)))),choices);
-  s=acceptDraft(s,1);assert.equal(s.draftFocus,'');
- }
- assert.equal(s.phase,'academy');assert.equal(Object.keys(s.attributes).length,8);
- for(const k of ['skills','weak'])assert.ok(s.attributes[k]<=5&&s.attrCeil[k]<=5);
- const restored=migrateCareer(JSON.parse(JSON.stringify(s)));assert.deepEqual(academyOffers(s),academyOffers(restored));
- assert.equal(signAcademy(restored,academyOffers(s)[0].id).clubId,academyOffers(s)[0].id);
+  const found=new Set();
+  while(s.phase==='draft'){
+   const choices=draftChoices(s);assert.equal(choices.length,3);
+   assert.equal(new Set(choices.map(c=>c.key)).size,Math.min(3,8-s.draftIndex),'cada ronda prioriza facetas distintas mientras quedan disponibles');
+   assert.deepEqual(draftChoices(chooseDraftFocus(s,'shot')),choices,'no se permite filtrar a voluntad');
+   assert.deepEqual(draftChoices({...s,draftFocus:'skills'}),choices,'los guardados antiguos no fuerzan facetas');
+   assert.deepEqual(draftChoices(migrateCareer(JSON.parse(JSON.stringify(s)))),choices);
+   s=acceptDraft(s,1);found.add(s.draftSources.at(-1).attribute);
+  }
+  assert.equal(s.phase,'academy');assert.equal(s.dnaReviewed,false);
+  assert.equal(found.size,8);assert.equal(s.draftRerolls,0);
+  for(const k of ['skills','weak'])assert.ok(s.attributes[k]<=5&&s.attrCeil[k]<=5);
+  const restored=migrateCareer(JSON.parse(JSON.stringify(s)));
+  assert.equal(restored.dnaReviewed,false);
+  assert.deepEqual(academyOffers(s),academyOffers(restored));
+  assert.equal(signAcademy(restored,academyOffers(s)[0].id).clubId,academyOffers(s)[0].id);
  }
 });
 test('3.2 · filigranas del especialista en penales respetan cinco estrellas',()=>{
@@ -40,4 +47,5 @@ test('3.2 · informe y resumen muestran penalizaciones y comparador del legado',
  for(let i=0;i<6;i++)assert.match(creatorView(d,i).content,/INFORME DEL FORMADOR/);
  assert.match(creatorView(d,5).aside,/<td>-1<\/td>/);
  assert.match(draftView(d,draftChoices(d)),/ADN SI ELIGES ESTA CARTA/);
+ assert.doesNotMatch(draftView(d,draftChoices(d)),/data-action="draft-focus"/);
 });

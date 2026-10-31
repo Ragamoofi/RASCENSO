@@ -128,7 +128,6 @@ export function draftChoices(s) {
   const r=rng(`${s.seed}:draft-v4:${s.draftIndex}:${s.draftRerolls}`);
   const unfilled=ATTRS.filter(([key])=>!(key in s.attributes));
   const order=[...unfilled];for(let i=order.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[order[i],order[j]]=[order[j],order[i]];}
-  if(unfilled.some(([k])=>k===s.draftFocus)){const selected=unfilled.find(([k])=>k===s.draftFocus);order.splice(0,order.length,selected);}
   const source=[];
   const used=new Set((s.draftSources||[]).map(x=>x.legend));
   const important = ['pace','shot','pass','dribble','defense','physical'];
@@ -154,7 +153,8 @@ export function draftChoices(s) {
   }
   return source;
 }
-export function chooseDraftFocus(s,key){return s.phase==='draft'&&(key===''||ATTRS.some(([k])=>k===key&&!(k in s.attributes)))?{...s,draftFocus:key}:s;}
+// Compatibilidad con guardados 3.2: los filtros dejaron de alterar el sorteo de cartas.
+export function chooseDraftFocus(s,key){return s;}
 export function currentDraft(s){return draftChoices(s)[0]||null;}
 export function rerollDraft(s){if(s.phase!=='draft'||s.draftRerolls>=3)return s;return {...s,draftRerolls:s.draftRerolls+1};}
 const WEIGHTS={DC:[.13,.38,.10,.24,.02,.13],EI:[.29,.20,.15,.27,.02,.07],ED:[.29,.20,.15,.27,.02,.07],
@@ -184,7 +184,7 @@ export function acceptDraft(s, index=0){
   for(const k of KEY_ATTRS)done.attrCeil[k]=clamp(Math.round(done.attrCeil[k]+bonus+(extra[k]||0)),finalAttributes[k]+2,99);
   for(const k of ['skills','weak'])if(Number.isFinite(done.attrCeil[k]))done.attrCeil[k]=clamp(done.attrCeil[k]+(extra[k]||0),Math.max(1,finalAttributes[k]||1),5);
   const potential=Math.max(done.ovr+3,ovrFromAttributes(s.position,done.attrCeil));
-  const completed={...s,...done,potential,phase:'academy',draftFocus:'',draftIndex:8,attributes:finalAttributes,draftSources,dna,footballDNA:archetypeFor({...s,attributes:finalAttributes,draftSources})};
+  const completed={...s,...done,potential,phase:'academy',dnaReviewed:false,draftFocus:'',draftIndex:8,attributes:finalAttributes,draftSources,dna,footballDNA:archetypeFor({...s,attributes:finalAttributes,draftSources})};
   return {...completed,initialOfferIds:academyOffers(completed).map(c=>c.id)};
 }
 // Primer contrato: dos rutas locales y una tercera que puede abrir el mercado regional.
