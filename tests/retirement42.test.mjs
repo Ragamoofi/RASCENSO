@@ -56,3 +56,21 @@ test('una carrera simulada completa tiene un final calculable',()=>{
  assert.ok(d.last?.club);
  assert.ok(retirementView(s,deps).includes('UNA CARRERA.'));
 });
+
+
+test('el epílogo destaca éxitos reales y recupera rivales del historial, no fracasos repetidos',()=>{
+ const s={...fixture,history:[{...fixture.history[0],plays:[
+  {rival:'<Gran Rival>',success:true},{rival:'<Gran Rival>',success:false}
+ ]}],careerMoments:[
+  {year:2026,kind:'on-field',text:'Penal: la ocasión se fue (atajado)'},
+  {year:2026,kind:'on-field',text:'Remate de primera: ¡gol!'}
+ ]};
+ const d=retirementData(s);
+ assert.equal(d.rivalries[0].duels,2);assert.equal(d.rivalries[0].successes,1);
+ assert.equal(d.highlights.length,1);
+ const html=retirementView(s,deps);
+ assert.match(html,/Rivales inolvidables/);
+ assert.match(html,/&lt;Gran Rival&gt;/);
+ assert.doesNotMatch(html,/la ocasión se fue/);
+ assert.match(html,/Remate de primera/);
+});
