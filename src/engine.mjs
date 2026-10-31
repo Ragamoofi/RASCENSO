@@ -14,6 +14,7 @@ import { VERIFIED_LEAGUES, getInauguralLeague } from './leagues2026.mjs';
 import { annualSalary, marketClub, clubPrestige, playerDemand, buildTransferOffers, evaluateClubFuture } from './market.mjs';
 import { clamp, rng, yearOf, adjustOvr, ovrFromAttributes, juniorValue, juniorCeiling, finalizeDraft, migrateAttributes, developSeason, seasonRating, seasonObjectives, evaluateObjectives, squadRole, freshSquad, threadEffects, coachSeasonEffects, socialEffects, preparationFocus, addThread, resolveThread, hasThread, activeThreads, compareChallenge, KEY_ATTRS, POSITION_WEIGHTS } from './career20.mjs';
 import { ensureWorld, advanceWorld, pushNews, coachFor, namerFor, worldClub, dynamicPrestige, dynamicLevel, worldRival } from './world20.mjs';
+import {getFM26BestCompetitor,isRealClubReady,advanceFM26Season} from './fm26-real.mjs';
 import { pickWorldScene } from './story20.mjs';
 import { choiceFx, dnaFromPicks, startAttrDelta, creatorCeilings, tagOf, dnaFx, DNA_TAGS, referentRadar, dreamProgress, DREAM_REWARD, marketRarity } from './identity30.mjs';
 export { choiceFx, dreamProgress, DNA_TAGS };
@@ -263,6 +264,10 @@ export function syncClub(s,{fresh=false}={}){
     // El club cambió de entrenador: la relación empieza de cero y la escena de presentación queda pendiente.
     n={...n,coachTrust:48,relationships:{...n.relationships,coach:{...n.relationships.coach,name:coach.name,trust:48,style:coach.style}},squad:{...n.squad,coachId:coach.id,newCoachYear:careerYear(n)}};
   }
+  if(isRealClubReady(n.clubId)){
+    const competitor=getFM26BestCompetitor(n.clubId,n.position,n);
+    n={...n,squad:{...n.squad,rival:competitor?{id:competitor.id,name:competitor.name,age:competitor.age,ovr:competitor.ovr,position:competitor.pos,origin:'fm26'}:null,realCoverage:true}};
+  }
   return n;
 }
 function countryLeagueSize(code){return Math.min(20,Math.max(1,getCountry(code)?.clubs.length||20));}
@@ -384,8 +389,9 @@ export function advanceSeason(input){
   captain:!!s.squad?.captain,matchdayImpact:matchImpact,objectives:objectiveResult,devNotes:dev.notes,coachName:coach?.name,coachStyle:coach?.style,rivalName:s.squad?.rival?.name,rivalOvr:s.squad?.rival?.ovr,relegated,promoted};
  // El mundo avanza: clubes, entrenadores, futbolistas, premios y noticias.
  const baseWorld=advanceWorld({...s,ovr,potential:dev.potential,leagueRosters:s.leagueRosters},league,seasonal);
+ const fmProgress=advanceFM26Season(s,year);
  const matchHeadline=matchImpactHeadline(s,year,matchImpact);
- const world=matchHeadline?{...baseWorld,news:[...baseWorld.news,matchHeadline].slice(-90)}:baseWorld;
+ const world={...baseWorld,news:[...baseWorld.news,...(fmProgress.fm26Events||[]),...(matchHeadline?[matchHeadline]:[])].slice(-90)};
  const awardsYear=world.awards.at(-1);
  const myAwards=(awardsYear?.list||[]).filter(a=>a.winner?.you).map(a=>({year,id:a.id,name:a.name,league:a.league||null,global:!!a.global}));
  const ballPlace=awardsYear?.youPlace||null;
@@ -439,7 +445,7 @@ export function advanceSeason(input){
  const flags={...(s.storyFlags||{})};if(s.fanClubId&&s.clubId===s.fanClubId)flags.playedForFan=true;
  // Las promesas de esta temporada vencen; quedan registradas para escenas posteriores.
  const next={...s,age:s.age+1,ovr,potential:dev.potential,attributes,attrCeil:dev.attrCeil,reputation,trophyRecords,annualScenes:0,morale,careerEarnings:(s.careerEarnings||0)+wage,leagueRosters,coachTrust,relationships,history:[...s.history,seasonal],trophies:[...s.trophies,...titles],lastSeason:seasonal,recapPending:true,storyFlags:flags,
-  world,squad,threads,awards:[...(s.awards||[]),...myAwards],careerMoments:moments.slice(-120),
+  world,fm26:fmProgress.fm26,squad,threads,awards:[...(s.awards||[]),...myAwards],careerMoments:moments.slice(-120),
   sceneBeat:0,sceneChoice:null,scenePlayerText:'',clutchMoment:null,plays30:null,phase:'event'};
  let synced=syncClub(next);
  // Sueño cumplido: recompensa única (reputación, moral, afición, directiva) y premio de carrera.
