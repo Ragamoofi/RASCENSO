@@ -12,4 +12,5 @@ test('la titularidad, el rendimiento y los minutos pesan en la evaluación',()=>
  const high=nationalSelectionEligibility({...state,history:[{matches:30,rating:7.5,nationalCaps:12}]},league,'normal');
  assert.ok(high.score>low.score);
  assert.equal(nationalSelectionEligibility({...state,ovr:70},{...league,minutes:100},'normal').eligible,false);
+ assert.equal(nationalSelectionEligibility({...state,age:18,ovr:90},{...league,minutes:100},'world-cup').eligible,false);
 });

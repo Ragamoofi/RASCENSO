@@ -170,7 +170,8 @@ export function nationalSelectionEligibility(state,league,competition='normal'){
  // Excepciones para promesas extraordinarias son deliberadamente escasas.
  const exceptional=age>=18&&ovr>=83&&reputation>=45&&appearances>=20&&tier!=null&&tier<2;
  const minMinutes=Math.min(12,Math.max(5,Math.round((league.playerMatches?.length||30)*.5)));
- if((appearances<minMinutes||(Number.isFinite(league.minutes)&&league.minutes<450))&&!exceptional)return {eligible:false,score,reason:'Pocos minutos profesionales'};
+ if(Number.isFinite(league.minutes)&&league.minutes<450)return {eligible:false,score,reason:'Pocos minutos profesionales'};
+ if(appearances<minMinutes&&!exceptional)return {eligible:false,score,reason:'Pocos partidos profesionales'};
  if(age<18)return {eligible:false,score,reason:'Edad de formación'};
  if(experience===0&&tier>=2&&!exceptional)return {eligible:false,score,reason:'Debutante del ascenso'};
  const major=competition==='world-cup'||competition==='regional';

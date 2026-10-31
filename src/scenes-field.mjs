@@ -309,6 +309,11 @@ const contragolpe={
  draw(m,g){drawPitch(g);if(m.mode==='carry')drawPassOption(g,m,m.me,m.mates,m.defs);for(const t of m.mates)mate(m,t);for(const d of m.defs)them(m,d,{ghost:d.stun>0});keeper(m,m.k);us(m,m.me,{highlight:true});drawBall(g,m.ball);if(m.mode==='carry')drawAim(g,m,m.me);}
 };
 
+/** Cada presionante asume una tarea: balón, anticipación o receptor. */
+export function rondoPressureTarget(ball,receiver,index,difficulty){
+ const predict=index===0?0:index===1?.20+difficulty*.18:.1;
+ return index===2&&difficulty>.45?{x:receiver.x,y:receiver.y}:{x:ball.x+ball.vx*predict,y:ball.y+ball.vy*predict};
+}
 const rondo={
  init(m){m.timer=14;m.need=6;m.done=0;const c={x:26,y:14.5};m.spots=[[-6.5,0],[0,-6],[6.5,0],[0,6]].map(([dx,dy],i)=>makePlayer(c.x+dx,c.y+dy,{num:String([6,8,10,4][i]),team:'us'}));m.c=c;
   m.holder=m.spots[0];m.ball=makeBall(0,0);m.ball.owner=m.holder;m.press=[makePlayer(26,14.5,{num:'7',speed:m.ai.defSpeed*.8}),makePlayer(23,10,{num:'9',speed:m.ai.defSpeed*.78}),makePlayer(29,19,{num:'10',speed:m.ai.defSpeed*.78})];
@@ -320,7 +325,11 @@ const rondo={
    const others=m.spots.filter(p=>p!==h).sort((a,b)=>dist(a,h)-dist(b,h));
    m.press.slice(1).forEach((p,i)=>{const o=others[i]||others[0];moveToward(p,(h.x+o.x)/2,(h.y+o.y)/2,p.speed,dt);});
    if(dist(m.press[0],h)<.8&&m.holdT>.6&&!m.result){setBanner(m,h.x,h.y);return m.finish(false,'robo',.2);}}
-  else{stepBall(m.ball,dt);if(m.t-m.passT>m.ai.defReaction)for(const p of m.press)moveToward(p,m.ball.x,m.ball.y,p.speed*.7,dt);
+  else{stepBall(m.ball,dt);if(m.t-m.passT>m.ai.defReaction)m.press.forEach((p,i)=>{
+   // Uno persigue la pelota; los demás intentan cerrar el carril y el receptor.
+   const target=rondoPressureTarget(m.ball,m.target,i,m.ai.d);
+   moveToward(p,target.x,target.y,p.speed*(.68+m.ai.d*.12),dt);
+  });
    for(const p of m.press)if(dist(p,m.ball)<.6&&!m.result){setBanner(m,p.x,p.y);return m.finish(false,'interceptado',.2);}
    if(dist(m.target,m.ball)<.8){m.ball.owner=m.target;m.holdT=0;m.done++;m.hint=`${m.done}/${m.need} pases`;if(m.done>=m.need&&!m.result){setBanner(m,m.target.x,m.target.y);return m.finish(true,'posesión',.6+m.stats.pass*.3);}}}
   if(timeUp(m)){setBanner(m,m.c.x,m.c.y);return m.finish(true,'posesión',.5);}

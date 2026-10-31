@@ -20,6 +20,7 @@ Rama de trabajo: `rascenso-4-integral`. Base: `bb85f188cf63e016ba8429b8d24b44d53
 - Interfaz: nueva jerarquía visual, foco visible y ajustes de movimiento reducido. Pendiente de validación visual en navegador.
 - Pase filtrado, contragolpe, centro y encare: el receptor define con un remate visible y el arquero puede reaccionar; la calidad del pase y espacio afectan la definición. El arquero de cancha puede equivocarse al anticipar.
 - Opciones: engranaje y acceso a importar disponibles también en el creador, con preferencias persistentes. Pendiente de comprobación en navegador.
+- Rondo: rivales reparten tareas entre perseguir balón, anticipar trayectoria y cubrir receptor según dificultad.
 - Centro, encare, contragolpe y rondo: señal visual del espacio en la línea de pase al apuntar; no garantiza recepción.
 - Mercado temprano: el peso por país evita que la cantidad de clubes extranjeros domine las ofertas; conserva búsqueda internacional. Pruebas iniciales con semillas de Chile, Argentina, Francia y Japón.
 - Auditoría local de 874 clubes: 826 fuentes identificadas, 48 pendientes y cero alias inválidos; falta revisión externa de las fuentes y su vigencia.
