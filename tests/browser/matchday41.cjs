@@ -20,6 +20,8 @@ const {chromium}=require('playwright');
    const btn=page.locator('[data-action=match-rhythm][data-rhythm=inmersivo]');await btn.click();
    if(!await btn.evaluate(x=>x.classList.contains('selected')))throw Error('No se activó el modo inmersivo');
    if(await page.locator('.matchday-center').count()!==1)throw Error('Centro de partido ausente');
+   if(await page.locator('.matchday-arena').count()!==1)throw Error('No se visualiza el estadio nuevo');
+   if(await page.locator('.matchday-team-crest').count()!==2)throw Error('Faltan escudos del marcador');
    const stored=await page.evaluate(()=>JSON.parse(localStorage.getItem('rascenso-save-v2')));
    if(stored.matchRhythm!=='inmersivo')throw Error('No se guardó el ritmo');
    const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);
