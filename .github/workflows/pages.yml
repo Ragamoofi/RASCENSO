@@ -83,7 +83,7 @@ jobs:
       - name: Preparar sitio completo
         run: |
           mkdir -p _site
-          cp index.html experience.css favicon.svg favicon.png .nojekyll _site/
+          cp index.html experience.css visual44.css favicon.svg favicon.png .nojekyll _site/
           cp -R src assets _site/
           node scripts/export-clubs.mjs
           python scripts/audit_crests.py
@@ -116,6 +116,7 @@ jobs:
           test -s _site/assets/crest-manifest.json
           test -s _site/assets/crest-audit.json
           test -s _site/experience.css
+          test -s _site/visual44.css
           test -s _site/assets/logos-1.json
       - name: Guardar informe de retratos por jugador
         env:
