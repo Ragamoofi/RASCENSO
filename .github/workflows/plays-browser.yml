@@ -29,6 +29,7 @@ jobs:
           SHOTS=/tmp/rascenso-capturas node tests/browser/plays-e2e.cjs
           node tests/browser/controls-e2e.cjs
           node tests/browser/e2e.cjs
+          node tests/browser/viewport40.cjs
       - name: Guardar capturas
         if: always()
         uses: actions/upload-artifact@v4

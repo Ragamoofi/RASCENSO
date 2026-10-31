@@ -11,6 +11,16 @@ const mate=(m,p,o={})=>drawPlayer(m.g,p,{color:COLORS.ally,dark:'#22448f',...o})
 const keeper=(m,k,ours=false)=>drawPlayer(m.g,k,{color:ours?COLORS.keeperUs:COLORS.keeperThem,dark:ours?'#127a4c':'#9a7d12',highlight:ours});
 const rnd=(m,a,b)=>a+m.rand()*(b-a);
 function setBanner(m,x,y){m.bannerAt=toScreen(x,y);}
+/** Distancia del rival más cercano a la línea de pase; información visible, no una garantía. */
+export function passLaneSpace(from,to,defenders){return defenders.length?Math.min(...defenders.map(d=>segDist(d,from,to))):Infinity;}
+function drawPassOption(g,m,from,teammates,defenders){
+ if(!m.pointer.inside||!from||!teammates.length)return;
+ const target=[...teammates].sort((a,b)=>Math.hypot(a.x-m.pointer.wx,a.y-m.pointer.wy)-Math.hypot(b.x-m.pointer.wx,b.y-m.pointer.wy))[0];
+ if(Math.hypot(target.x-m.pointer.wx,target.y-m.pointer.wy)>3)return;
+ const space=passLaneSpace(from,target,defenders),color=space<1.2?'#f18783':space<2.5?'#f2be79':'#85dfb6';
+ drawLine(g,from,target,color,{dash:[5,5],width:2});drawRing(g,target.x,target.y,1.05,color,{width:2});
+}
+
 
 /* ---------- Arquero rival y vuelo de remates ---------- */
 function makeKeeper(m){return makePlayer(FIELD.goalX-.8,FIELD.goalY,{num:'1',r:.5,speed:m.ai.keeperSpeed,reach:m.ai.keeperReach});}
@@ -199,7 +209,7 @@ const centro={
   const near=m.run.map(r=>r.t).sort((a,b)=>Math.hypot(a.x-tx,a.y-ty)-Math.hypot(b.x-tx,b.y-ty))[0];if(near&&Math.hypot(near.x-tx,near.y-ty)<2.2){tx=near.x+.8;ty=near.y;}
   const err=st.passNoise*.55;m.target={x:clampN(tx+m.aimNoise(err),36,51),y:clampN(ty+m.aimNoise(err),5,24)};
   const time=clampN(dist(m.me,m.target)/(17+st.pass*9),.7,1.5);loft(m.ball,m.target.x,m.target.y,time,3.2);m.arrive=m.t+time;m.quality=clampN(1-err/3,0,1);m.hint='';},
- draw(m,g){drawPitch(g);for(const {t,d} of m.run){mate(m,t);them(m,d);}them(m,m.fb);keeper(m,m.k);us(m,m.me,{highlight:true});if(m.target)drawRing(g,m.target.x,m.target.y,.7,COLORS.copper,{dash:[4,4]});drawBall(g,m.ball);}
+ draw(m,g){drawPitch(g);if(m.ball.owner===m.me)drawPassOption(g,m,m.me,m.run.map(r=>r.t),[m.fb,...m.run.map(r=>r.d)]);for(const {t,d} of m.run){mate(m,t);them(m,d);}them(m,m.fb);keeper(m,m.k);us(m,m.me,{highlight:true});if(m.target)drawRing(g,m.target.x,m.target.y,.7,COLORS.copper,{dash:[4,4]});drawBall(g,m.ball);}
 };
 
 const encare={
@@ -222,7 +232,7 @@ const encare={
   const st=m.stats;let tx=m.pointer.wx,ty=m.pointer.wy;const near=m.run.map(r=>r.t).sort((a,b)=>Math.hypot(a.x-tx,a.y-ty)-Math.hypot(b.x-tx,b.y-ty))[0];if(near&&Math.hypot(near.x-tx,near.y-ty)<2.4){tx=near.x+.6;ty=near.y;}
   const err=st.passNoise*(m.beaten?.4:.8);m.target={x:clampN(tx+m.aimNoise(err),34,51),y:clampN(ty+m.aimNoise(err),4,25)};
   const ground=m.me.x>46;const time=clampN(dist(m.me,m.target)/(16+st.pass*9),.45,1.4);if(ground)kick(m.ball,m.target.x,m.target.y,dist(m.me,m.target)/time*1.15,0);else loft(m.ball,m.target.x,m.target.y,time,2.6);m.arrive=m.t+time;m.quality=clampN(1-err/3,0,1);m.hint='';},
- draw(m,g){drawPitch(g);for(const {t,d} of m.run){mate(m,t);them(m,d);}them(m,m.fb,{ghost:m.fb.stun>0});keeper(m,m.k);us(m,m.me,{highlight:true});if(m.target)drawRing(g,m.target.x,m.target.y,.7,COLORS.copper,{dash:[4,4]});drawBall(g,m.ball);}
+ draw(m,g){drawPitch(g);if(m.ball.owner===m.me)drawPassOption(g,m,m.me,m.run.map(r=>r.t),[m.fb,...m.run.map(r=>r.d)]);for(const {t,d} of m.run){mate(m,t);them(m,d);}them(m,m.fb,{ghost:m.fb.stun>0});keeper(m,m.k);us(m,m.me,{highlight:true});if(m.target)drawRing(g,m.target.x,m.target.y,.7,COLORS.copper,{dash:[4,4]});drawBall(g,m.ball);}
 };
 
 /* ======================================================================
@@ -281,7 +291,7 @@ const contragolpe={
   if(tx>FIELD.goalX-1.5&&Math.abs(ty-FIELD.goalY)<FIELD.post+1.5){m.mode='shot';shoot(m,m.ball,m.me,ty,{noise:1.1});m.hint='';return;}
   m.receiver=[...m.mates].sort((a,b)=>Math.hypot(a.x-tx,a.y-ty)-Math.hypot(b.x-tx,b.y-ty))[0];const err=m.stats.passNoise*.45;const lead={x:m.receiver.x+2+m.aimNoise(err),y:m.receiver.y+m.aimNoise(err)};
   m.quality=clampN(1-err/2.5,0,1);m.mode='pass';m.passT=m.t;kick(m.ball,lead.x,lead.y,16+m.stats.pass*9,0);m.hint='';},
- draw(m,g){drawPitch(g);for(const t of m.mates)mate(m,t);for(const d of m.defs)them(m,d,{ghost:d.stun>0});keeper(m,m.k);us(m,m.me,{highlight:true});drawBall(g,m.ball);if(m.mode==='carry')drawAim(g,m,m.me);}
+ draw(m,g){drawPitch(g);if(m.mode==='carry')drawPassOption(g,m,m.me,m.mates,m.defs);for(const t of m.mates)mate(m,t);for(const d of m.defs)them(m,d,{ghost:d.stun>0});keeper(m,m.k);us(m,m.me,{highlight:true});drawBall(g,m.ball);if(m.mode==='carry')drawAim(g,m,m.me);}
 };
 
 const rondo={
@@ -302,7 +312,7 @@ const rondo={
  },
  down(m){if(!m.ball.owner)return;const tx=m.pointer.wx,ty=m.pointer.wy;const t=m.spots.filter(p=>p!==m.ball.owner).sort((a,b)=>Math.hypot(a.x-tx,a.y-ty)-Math.hypot(b.x-tx,b.y-ty))[0];if(Math.hypot(t.x-tx,t.y-ty)>3)return;
   m.target=t;m.passT=m.t;const err=m.stats.passNoise*.15;const px=t.x+m.aimNoise(err),py=t.y+m.aimNoise(err);kick(m.ball,px,py,Math.hypot(px-m.ball.x,py-m.ball.y)*1.15+8+m.stats.pass*7,0);},
- draw(m,g){drawPitch(g);drawRing(g,m.c.x,m.c.y,8.2,'rgba(255,255,255,.18)',{dash:[6,6]});for(const p of m.spots)us(m,p,{highlight:p===m.ball.owner});for(const p of m.press)them(m,p);drawBall(g,m.ball);}
+ draw(m,g){drawPitch(g);drawRing(g,m.c.x,m.c.y,8.2,'rgba(255,255,255,.18)',{dash:[6,6]});if(m.ball.owner)drawPassOption(g,m,m.ball.owner,m.spots.filter(p=>p!==m.ball.owner),m.press);for(const p of m.spots)us(m,p,{highlight:p===m.ball.owner});for(const p of m.press)them(m,p);drawBall(g,m.ball);}
 };
 
 /** Entrada decidida por distancia y momento; los atributos amplían el margen de error. */

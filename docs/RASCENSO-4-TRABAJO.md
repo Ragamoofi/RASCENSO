@@ -8,6 +8,8 @@ Rama de trabajo: `rascenso-4-integral`. Base: `bb85f188cf63e016ba8429b8d24b44d53
 - Vestuario: una amistad con el competidor aporta moral mientras compartan club y abre una escena contextual con elecciones persistentes.
 - Interfaz: nueva jerarquía visual, foco visible y ajustes de movimiento reducido. Pendiente de validación visual en navegador.
 - Pase filtrado y contragolpe: el receptor define con un remate visible y el arquero puede reaccionar; la calidad del pase y espacio afectan la definición. El arquero de cancha puede equivocarse al anticipar.
+- Opciones: engranaje y acceso a importar disponibles también en el creador, con preferencias persistentes. Pendiente de comprobación en navegador.
+- Centro, encare, contragolpe y rondo: señal visual del espacio en la línea de pase al apuntar; no garantiza recepción.
 - Mundo: lesiones reproducibles de futbolistas del mundo reducen partidos y generan noticias verificables para figuras y rivales.
 - Equilibrio pendiente: el bot de referencia logra 18/100 en pase filtrado y 38/100 en contragolpe; no equivalen a pruebas humanas y requieren ajuste.
 
