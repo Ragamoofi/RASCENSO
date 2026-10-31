@@ -462,13 +462,15 @@ const salida_aerea={
   if(dist(m.st,m.ball)<.9&&m.ball.z<2.6&&m.ball.z>.3&&dist(m.st,m.ball)<dist(m.me,m.ball)-.2&&!m.result){setBanner(m,m.st.x,m.st.y);return m.finish(false,'gol rival',.1);}
   if(m.ball.z<=0&&m.t>.3&&!m.result){setBanner(m,m.ball.x,m.ball.y);const mine=dist(m.me,m.ball)<dist(m.st,m.ball);return m.finish(mine,mine?'controlada':'gol rival',.3);}
  },
- down(m){if(m.caught)return;const d=dist(m.me,m.ball),top=2.6+m.stats.jump*.8;
-  if(d>1.35+m.stats.reach*.2||m.ball.z>top){m.say('¡NO LLEGA!',false);m.me.stun=.35;return;}
-  m.caught=true;setBanner(m,m.me.x,m.me.y);
-  // Entre empujones el balón puede escaparse de las manos.
-  const p=clampN(.55+m.stats.jump*.25+m.stats.reflex*.15-m.ai.d*.3-(d>1.1?.15:0),.2,.92);
-  if(m.rand()<p){m.ball.owner=m.me;return m.finish(true,'atajada',.5+clampN(1.3-d,0,1)*.5);}
-  m.say('¡SE LE ESCAPÓ!',false);return m.finish(false,'gol rival',.1);},
+ down(m){if(m.caught||m.me.stun>0||m.result)return;const d=dist(m.me,m.ball),top=2.6+m.stats.jump*.8,reach=1.35+m.stats.reach*.2;
+  if(d>reach||m.ball.z>top){m.say('¡NO LLEGA!',false);m.me.stun=.35;return;}
+  setBanner(m,m.me.x,m.me.y);
+  const positioning=clampN(1-d/reach,0,1),height=clampN(1-Math.abs(m.ball.z-2.0)/2.5,0,1);
+  const pressure=clampN(1-dist(m.st,m.me)/2,0,1);
+  const control=positioning*.45+height*.25+m.stats.reflex*.25+m.stats.jump*.15-pressure*.12-m.ai.d*.12;
+  if(control>=.34){m.caught=true;m.ball.owner=m.me;return m.finish(true,'atajada',clampN(control,0,1));}
+  // Si no logra asegurarla, la pelota queda viva y el delantero puede disputar el rebote.
+  m.ball.owner=null;m.ball.vx=-3;m.ball.vy=(m.ball.y<m.me.y?-1:1)*2;m.ball.vz=1.8;m.ball.g=9.8;m.me.stun=.45;m.hint='¡Se escapó! Ve por el rebote';},
  draw(m,g){drawPitch(g);drawRing(g,m.landing.x,m.landing.y,.5,'rgba(255,255,255,.18)',{dash:[3,4]});them(m,m.st);us(m,m.def);keeper(m,m.me,true);drawBall(g,m.ball);}
 };
 
