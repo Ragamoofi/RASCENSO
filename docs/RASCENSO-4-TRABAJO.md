@@ -54,3 +54,8 @@ Rama de trabajo: `rascenso-4-integral`. Base: `bb85f188cf63e016ba8429b8d24b44d53
 ## Continuación: balones sueltos y achique
 - Base anterior: 82054601d18bf68a2eabe2501b4168cd451abacd. La salida aérea ya no resuelve a favor del jugador solo por estar más cerca de un balón lejano: ambos deben llegar a disputar el rebote, con límite de tiempo. En achique, agotar el tiempo con el rival en posesión ya no concede una atajada.
 - La batería automática del commit 8205460 terminó correctamente en GitHub Actions. Estos ajustes nuevos todavía requieren revisión visual y humana. El bot omnisciente sigue logrando 98–100 % en salida aérea y 100 % en achique: no se considera resuelto el equilibrio.
+
+## Continuación: remates y rebotes
+- Base anterior: 4e63a6aa33813761026b52205f2130bad387725e. En achique, si el remate se detiene lejos, el balón sigue en disputa hasta que llegue el arquero o el delantero. En reflejos, la puntería rival depende de su habilidad y puede elegir el lado libre al preparar el remate, sin cambiar el destino después.
+- Pruebas locales: 216 pruebas completas antes de agregar una prueba específica del rematador, que también pasó por separado. Se ejecutó la matriz automática de 20 jugadas. Falta validar visualmente y con jugadores; el bot conoce el destino del balón y no representa desempeño humano.
+- Siguen pendientes la renovación integral de las 20 jugadas, equilibrio, interfaz, carrera, narrativa, escudos y validación antes de integrar.

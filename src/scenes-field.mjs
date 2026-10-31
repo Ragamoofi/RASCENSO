@@ -478,7 +478,12 @@ const achique={
    const coverage=m.me.grounded?.6:st.reach+clampN((52-m.me.x)*.12,0,.6)+(m.me.diveTime>0?.4:0);
    if(sweptKeeperContact(previous,m.ball,m.me,coverage)&&!m.result){setBanner(m,m.me.x,m.me.y);return m.finish(true,'atajada',.5+clampN(coverage-dist(m.me,m.ball),0,1)*.5);}
    if(m.ball.x>=FIELD.goalX&&!m.result){setBanner(m,m.ball.x,m.ball.y);return inGoalMouth(m.ball.y,m.ball.z)?m.finish(false,'gol rival',.1):m.finish(true,'fuera',.4);}
-   if(Math.hypot(m.ball.vx,m.ball.vy)<.5&&m.ball.z<=0&&!m.result){setBanner(m,m.ball.x,m.ball.y);return m.finish(true,'atajada',.4);}}
+   if(Math.hypot(m.ball.vx,m.ball.vy)<.5&&m.ball.z<=0&&!m.result){
+    m.hint='¡Balón suelto! Acércate para asegurarlo';
+    moveToward(m.st,m.ball.x,m.ball.y,m.st.speed,dt);
+    if(dist(m.me,m.ball)<.85){setBanner(m,m.ball.x,m.ball.y);return m.finish(true,'controlada',.4);}
+    if(dist(m.st,m.ball)<.85||m.t-m.shotAt>4){setBanner(m,m.ball.x,m.ball.y);return m.finish(false,'balón suelto',.1);}
+   }}
  },
  down(m){if(m.me.stun>0||m.me.diveTime>0||m.result)return;
   if(m.ball.owner!==m.st){if(m.t-(m.me.lastDive??-9)<.65)return;m.me.lastDive=m.t;m.me.diveTime=.35;

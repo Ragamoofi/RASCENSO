@@ -206,7 +206,11 @@ const reflejos={
    const rebound=onTarget&&reachError>.28;m.hint=rebound?'¡Rebote! Prepárate para el siguiente remate':onTarget?'¡Controlada! Atención al siguiente':'¡Afuera! Atención al siguiente';
    this.next(m,rebound);}}
  },
- next(m,rebound=false){const from=[-260,0,260][Math.floor(m.rand()*3)];const off=m.rand()<.16;m.shot={from:rebound?m.shot?.from??0:from,at:m.t+(rebound?.45:.9+m.rand()*.6),target:[off?(m.rand()<.5?-1:1)*(POST+.6):(m.rand()*2-1)*(POST-.4),.2+m.rand()*1.9],ball:null,rebound};},
+ next(m,rebound=false){const from=[-260,0,260][Math.floor(m.rand()*3)];const skill=clampN(m.ai.shooterSkill,0,1),off=m.rand()<.26-skill*.2;
+  // El rival decide al preparar el disparo: puede buscar el lado libre, pero no lo corrige después.
+  const aimed=m.rand()<skill*.55&&Math.abs(m.k.x)>.45;
+  const horizontal=off?(m.rand()<.5?-1:1)*(POST+.6):aimed?(m.k.x>0?-1:1)*(.8+m.rand()*(POST-1.2)):(m.rand()*2-1)*(POST-.4);
+  m.shot={from:rebound?m.shot?.from??0:from,at:m.t+(rebound?.45:.9+m.rand()*.6),target:[horizontal,.2+m.rand()*1.9],ball:null,rebound};},
  down(m){if(m.k.diving)return;const [gx,gz]=toGoal(m.pointer.x,m.pointer.y);m.k.diveAt=m.t;startDive(m.k,gx,gz,1.4+m.stats.reach*.9);},
  draw(m,g){stadium(g,m.t);goalFrame(g);const s=m.shot;
   const sx=CX+s.from,sy=H-46;g.fillStyle=rc(m).dark;roundRect(g,sx-16,sy-60,32,64,10);g.fill();g.fillStyle=rc(m).body;roundRect(g,sx-14,sy-58,28,38,9);g.fill();g.fillStyle='#f2d2b6';g.beginPath();g.arc(sx,sy-70,12,0,7);g.fill();

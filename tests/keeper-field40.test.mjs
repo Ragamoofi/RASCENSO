@@ -12,3 +12,6 @@ test('un achique cercano depende de la posición y los reflejos sin tirada ocult
  const run=()=>{const {m,scene}=setup();m.st.x=49.9;m.st.y=m.me.y;scene.down(m);return m.result;};
  assert.deepEqual(run(),run());assert.equal(run().detail,'atajada');
 });
+test('un disparo detenido lejos del arquero sigue en disputa',()=>{
+ const {m,scene}=setup();m.ball.owner=null;m.ball.x=44;m.ball.y=10;m.ball.z=0;m.ball.vx=0;m.ball.vy=0;m.ball.vz=0;m.shotAt=m.t;m.st.x=36;m.st.y=10;scene.update(m,.05);assert.equal(m.result,undefined);
+});
