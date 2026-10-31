@@ -1,0 +1,289 @@
+{
+  "total": 874,
+  "mapped": 818,
+  "unmatched": 56,
+  "aliasCount": 241,
+  "invalidAliases": [],
+  "missing": [
+    {
+      "id": "nz-1",
+      "name": "Auckland City",
+      "country": "NZ"
+    },
+    {
+      "id": "nz-2",
+      "name": "Wellington Olympic",
+      "country": "NZ"
+    },
+    {
+      "id": "nz-3",
+      "name": "Eastern Suburbs",
+      "country": "NZ"
+    },
+    {
+      "id": "nz-4",
+      "name": "Christchurch United",
+      "country": "NZ"
+    },
+    {
+      "id": "nz-5",
+      "name": "Auckland United",
+      "country": "NZ"
+    },
+    {
+      "id": "ar-extra-29",
+      "name": "San Martín de Tucumán",
+      "country": "AR"
+    },
+    {
+      "id": "ar-extra-31",
+      "name": "Banfield II",
+      "country": "AR"
+    },
+    {
+      "id": "ar-2026-gimnasia-de-mendoza",
+      "name": "Gimnasia de Mendoza",
+      "country": "AR"
+    },
+    {
+      "id": "bo-extra-11",
+      "name": "Royal Pari",
+      "country": "BO"
+    },
+    {
+      "id": "bo-extra-13",
+      "name": "Real Potosí",
+      "country": "BO"
+    },
+    {
+      "id": "br-extra-26",
+      "name": "Paraná Clube",
+      "country": "BR"
+    },
+    {
+      "id": "cl-extra-7",
+      "name": "Colo-Colo B",
+      "country": "CL"
+    },
+    {
+      "id": "cl-extra-15",
+      "name": "Santiago Morning",
+      "country": "CL"
+    },
+    {
+      "id": "cl-extra-24",
+      "name": "Provincial Osorno",
+      "country": "CL"
+    },
+    {
+      "id": "cl-extra-25",
+      "name": "Trasandino",
+      "country": "CL"
+    },
+    {
+      "id": "cl-extra-26",
+      "name": "General Velásquez",
+      "country": "CL"
+    },
+    {
+      "id": "cl-extra-27",
+      "name": "Real San Joaquín",
+      "country": "CL"
+    },
+    {
+      "id": "cl-extra-28",
+      "name": "Brujas de Salamanca",
+      "country": "CL"
+    },
+    {
+      "id": "cl-extra-29",
+      "name": "Deportes Melipilla",
+      "country": "CL"
+    },
+    {
+      "id": "cl-extra-30",
+      "name": "Deportes Valdivia",
+      "country": "CL"
+    },
+    {
+      "id": "cl-extra-31",
+      "name": "Fernández Vial",
+      "country": "CL"
+    },
+    {
+      "id": "cl-extra-32",
+      "name": "San Antonio Unido",
+      "country": "CL"
+    },
+    {
+      "id": "cl-extra-33",
+      "name": "Deportes Rengo",
+      "country": "CL"
+    },
+    {
+      "id": "co-extra-19",
+      "name": "Patriotas Boyacá",
+      "country": "CO"
+    },
+    {
+      "id": "ec-extra-14",
+      "name": "Imbabura",
+      "country": "EC"
+    },
+    {
+      "id": "py-extra-5",
+      "name": "Sol de América",
+      "country": "PY"
+    },
+    {
+      "id": "py-extra-6",
+      "name": "Tacuary",
+      "country": "PY"
+    },
+    {
+      "id": "py-extra-9",
+      "name": "12 de Octubre",
+      "country": "PY"
+    },
+    {
+      "id": "py-extra-12",
+      "name": "Guaireña",
+      "country": "PY"
+    },
+    {
+      "id": "pe-extra-11",
+      "name": "Carlos A. Mannucci",
+      "country": "PE"
+    },
+    {
+      "id": "pe-extra-17",
+      "name": "Binacional",
+      "country": "PE"
+    },
+    {
+      "id": "ve-extra-12",
+      "name": "Angostura FC",
+      "country": "VE"
+    },
+    {
+      "id": "ve-extra-14",
+      "name": "Aragua FC",
+      "country": "VE"
+    },
+    {
+      "id": "mx-extra-24",
+      "name": "Celaya",
+      "country": "MX"
+    },
+    {
+      "id": "cr-extra-8",
+      "name": "Guanacasteca",
+      "country": "CR"
+    },
+    {
+      "id": "cr-extra-11",
+      "name": "Grecia",
+      "country": "CR"
+    },
+    {
+      "id": "au-extra-8",
+      "name": "Wellington Phoenix",
+      "country": "AU"
+    },
+    {
+      "id": "au-extra-13",
+      "name": "Auckland FC",
+      "country": "AU"
+    },
+    {
+      "id": "ir-extra-10",
+      "name": "Nassaji Mazandaran",
+      "country": "IR"
+    },
+    {
+      "id": "sn-1",
+      "name": "ASC Jaraaf",
+      "country": "SN"
+    },
+    {
+      "id": "sn-2",
+      "name": "Teungueth FC",
+      "country": "SN"
+    },
+    {
+      "id": "sn-3",
+      "name": "AS Pikine",
+      "country": "SN"
+    },
+    {
+      "id": "sn-extra-3",
+      "name": "Génération Foot",
+      "country": "SN"
+    },
+    {
+      "id": "sn-extra-4",
+      "name": "Casa Sports",
+      "country": "SN"
+    },
+    {
+      "id": "sn-extra-5",
+      "name": "US Gorée",
+      "country": "SN"
+    },
+    {
+      "id": "sn-extra-6",
+      "name": "Diambars",
+      "country": "SN"
+    },
+    {
+      "id": "ng-extra-9",
+      "name": "Akwa United",
+      "country": "NG"
+    },
+    {
+      "id": "gh-extra-9",
+      "name": "Nations FC",
+      "country": "GH"
+    },
+    {
+      "id": "cm-1",
+      "name": "Coton Sport",
+      "country": "CM"
+    },
+    {
+      "id": "cm-2",
+      "name": "Canon Yaoundé",
+      "country": "CM"
+    },
+    {
+      "id": "cm-3",
+      "name": "Union Douala",
+      "country": "CM"
+    },
+    {
+      "id": "cm-extra-4",
+      "name": "PWD Bamenda",
+      "country": "CM"
+    },
+    {
+      "id": "cm-extra-5",
+      "name": "Bamboutos FC",
+      "country": "CM"
+    },
+    {
+      "id": "cm-extra-6",
+      "name": "Stade Renard",
+      "country": "CM"
+    },
+    {
+      "id": "cm-extra-7",
+      "name": "Colombe Sportive",
+      "country": "CM"
+    },
+    {
+      "id": "cm-extra-8",
+      "name": "Victoria United",
+      "country": "CM"
+    }
+  ]
+}

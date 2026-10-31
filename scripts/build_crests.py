@@ -25,6 +25,7 @@ OFFLINE = '--offline' in sys.argv
 OUT.mkdir(parents=True, exist_ok=True)
 CATALOG = ROOT / 'clubs-export.json'
 CLUBS = json.loads(CATALOG.read_text(encoding='utf8'))
+PINNED_ALIASES = json.loads((ROOT / 'scripts' / 'crest_aliases.json').read_text(encoding='utf8'))
 INDEX = {}
 for part in range(1, 5):
     p = ROOT / 'assets' / f'logos-{part}.json'
@@ -44,8 +45,11 @@ def norm(text: str) -> str:
     return re.sub(r'[^a-z0-9]', '', ''.join(c for c in text if not unicodedata.combining(c)).lower())
 
 
-def select_file(code: str, name: str) -> str | None:
+def select_file(code: str, name: str, club_id: str | None = None) -> str | None:
     names=INDEX.get(code,[])
+    pinned=PINNED_ALIASES.get(club_id)
+    if pinned and pinned['country']==code and pinned['file'] in names:
+        return pinned['file']
     explicit=ALIASES.get((code,name),'NOT_SET')
     if explicit is None: return None
     if explicit!='NOT_SET' and explicit in names: return explicit
@@ -89,10 +93,10 @@ def render_logo(svg: bytes):
 
 def process(item: dict):
     club=item['club'];code=item['country']; name=club['name']; cid=club['id']
-    selected=select_file(code,name)
+    selected=select_file(code,name,cid)
     matched=False
-    if selected and not OFFLINE:
-        source=f'https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/{DIRS[code]}/{urllib.parse.quote(selected)}'
+    source=f'https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/{DIRS[code]}/{urllib.parse.quote(selected)}' if selected else None
+    if source and not OFFLINE:
         try:
             req=urllib.request.Request(source,headers={'User-Agent':'RASCENSO/0.5 (independent football career demo)'})
             with urllib.request.urlopen(req,timeout=9) as resp: raw=resp.read(350_000)
@@ -103,14 +107,17 @@ def process(item: dict):
     if not matched:picture=fallback(club)
     path=OUT / f'{cid}.png'
     picture.save(path,format='PNG',optimize=True)
-    return {'id':cid,'name':name,'country':code,'kind':'reference-crest' if matched else 'original-placeholder',
-            'source':f'JoseArroyave/football-logos/{DIRS[code]}/{selected}' if matched else None}
+    return {'id':cid,'name':name,'country':code,'kind':'reference-crest' if matched else 'source-unavailable' if source else 'original-placeholder',
+            'source':f'JoseArroyave/football-logos/{DIRS[code]}/{selected}' if source else None,
+            'sourceUrl':source}
 
 with futures.ThreadPoolExecutor(max_workers=16 if not OFFLINE else 6) as pool:
     results=list(pool.map(process,CLUBS))
 manifest={'total':len(results),'referenceCrests':sum(x['kind']=='reference-crest' for x in results),
+          'mappedSources':sum(bool(x['sourceUrl']) for x in results),
+          'sourceDownloadFailures':sum(x['kind']=='source-unavailable' for x in results),
           'originalPlaceholders':sum(x['kind']=='original-placeholder' for x in results),
           'logos':results}
 (OUT.parent/'crest-manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2),encoding='utf8')
-print('Clubes:',manifest['total'],'Escudos de referencia:',manifest['referenceCrests'],'Provisionales:',manifest['originalPlaceholders'])
+print('Clubes:',manifest['total'],'Escudos descargados:',manifest['referenceCrests'],'Fuentes conocidas:',manifest['mappedSources'],'Sin fuente:',manifest['originalPlaceholders'])
 if manifest['total']<800:sys.exit('El catálogo generado está incompleto')

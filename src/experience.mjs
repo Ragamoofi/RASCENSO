@@ -3,7 +3,7 @@ import { academyOfferReason } from './engine.mjs';
 import { COUNTRIES } from './countries.mjs';
 import { VERIFIED_LEAGUES, getInauguralLeague } from './leagues2026.mjs';
 import { getCompetitionForCareer, leagueParticipants } from './league.mjs';
-import { flag, badge, CATALOG_COUNT } from './assets.mjs';
+import { flag, badge, CATALOG_COUNT } from './assets.mjs?v=322';
 import { annualSalaryLabel, playerDemand, clubPrestige } from './market.mjs';
 import { ENVIRONMENTS, PUBLIC_IMAGES, RISK_PROFILES, DEVELOPMENT_PATHS, PREPARATIONS, archetypeFor } from './career08.mjs';
 import { legendPhoto, legendIllustration } from './legend-art.mjs';
@@ -75,7 +75,7 @@ function button(label,action,cls='main',more=''){return `<button type="button" c
 const opt=(value,label,active)=>`<option value="${h(value)}" ${active===value?'selected':''}>${h(label)}</option>`;
 function select(label,name,items,value){return `<label class="field"><span>${label}</span><select name="${name}">${items.map(([v,l])=>opt(String(v),l,String(value))).join('')}</select></label>`;}
 function branding(){return `<a class="brand brand-13" href="./" aria-label="RASCENSO"><img src="./assets/brand/rascenso-wordmark.png" alt="RASCENSO · Del barrio a la historia" width="300" height="75"></a>`;}
-function header(){return `<header class="site-head">${branding()}<nav class="main-nav">${state?(['draft','academy'].includes(state.phase)?['carrera']:['carrera','vestuario','historial','mundo']).map(t=>`<button class="navtab ${tab===t?'selected':''}" data-action="nav" data-tab="${t}">${{carrera:'Mi carrera',vestuario:'Vestuario',historial:'Historial',mundo:'Mundo'}[t]}</button>`).join(''):'<span class="navtab selected">Tu historia empieza hoy</span>'}</nav><div class="head-controls"><span class="build">RASCENSO 3.2.1 · CONTRATOS Y ADN</span>${state?`<span class="head-name">${h(state.name)}</span>${button('⋯','tools','ghost')}`:`<span class="live"><i></i> MODO CARRERA</span>`}</div></header>`;}
+function header(){return `<header class="site-head">${branding()}<nav class="main-nav">${state?(['draft','academy'].includes(state.phase)?['carrera']:['carrera','vestuario','historial','mundo']).map(t=>`<button class="navtab ${tab===t?'selected':''}" data-action="nav" data-tab="${t}">${{carrera:'Mi carrera',vestuario:'Vestuario',historial:'Historial',mundo:'Mundo'}[t]}</button>`).join(''):'<span class="navtab selected">Tu historia empieza hoy</span>'}</nav><div class="head-controls"><span class="build">RASCENSO 3.2.2 · CONTRATOS Y ADN</span>${state?`<span class="head-name">${h(state.name)}</span>${button('⋯','tools','ghost')}`:`<span class="live"><i></i> MODO CARRERA</span>`}</div></header>`;}
 function shell(content,extra=''){ROOT.innerHTML=`<div class="app-shell">${header()}<main class="view ${state?'playing':''}">${content}</main><footer class="site-foot"><span>RASCENSO · Una creación de Ragamoofi</span><span>${CATALOG_COUNT} clubes disponibles · 13 ligas iniciales verificadas · copas globales con formato simplificado</span></footer>${extra}</div>${message?`<div class="notification" role="alert">${h(message)}</div>`:''}`;}
 function featureIcon(name){return {glory:'★',home:'⌂',academy:'⚑',form:'◉',tactic:'♟',news:'◎',league:'▥'}[name]||'✦';}
 function createSteps(){return STEPS.map((s,i)=>`<button type="button" class="creation-step ${wizard===i?'active':wizard>i?'past':''}" data-action="step" data-index="${i}"><span>0${i+1}</span>${s}</button>`).join('');}

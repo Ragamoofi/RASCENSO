@@ -63,6 +63,10 @@ jobs:
           test -s assets/brand/rascenso-icon.png
           test -s favicon.png
           for file in assets/logos-{1..4}.json; do test -s "$file"; done
+      - name: Auditar cobertura y equivalencias de los 874 escudos
+        run: |
+          node scripts/export-clubs.mjs
+          python scripts/audit_crests.py
   deploy:
     needs: test
     runs-on: ubuntu-latest
@@ -99,6 +103,8 @@ jobs:
           test -s _site/assets/competitions/CL1.png
           test -s _site/assets/trophies/real-libertadores.png
           test -s _site/assets/crests/cl-1.png
+          test -s _site/assets/crest-manifest.json
+          test -s _site/assets/crest-audit.json
           test -s _site/experience.css
           test -s _site/assets/logos-1.json
       - name: Guardar informe de retratos por jugador

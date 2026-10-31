@@ -1,0 +1,966 @@
+{
+  "ar-extra-2": {
+    "country": "AR",
+    "file": "San_Lorenzo_de_Almagro.svg"
+  },
+  "ar-extra-5": {
+    "country": "AR",
+    "file": "Gimnasia_LP.svg"
+  },
+  "ar-extra-8": {
+    "country": "AR",
+    "file": "Talleres.svg"
+  },
+  "ar-extra-10": {
+    "country": "AR",
+    "file": "Instituto_Córdoba.svg"
+  },
+  "ar-extra-15": {
+    "country": "AR",
+    "file": "Union.svg"
+  },
+  "ar-extra-22": {
+    "country": "AR",
+    "file": "Deportivo_Riestra.svg"
+  },
+  "ar-extra-28": {
+    "country": "AR",
+    "file": "Club_Atlético_Temperley.svg"
+  },
+  "bo-3": {
+    "country": "BO",
+    "file": "Deportivo_Oriente_Petrolero.svg"
+  },
+  "bo-extra-5": {
+    "country": "BO",
+    "file": "Atlético_Nacional_Potosí.svg"
+  },
+  "bo-extra-7": {
+    "country": "BO",
+    "file": "Deportivo_Guabirá.svg"
+  },
+  "br-4": {
+    "country": "BR",
+    "file": "Santos_FC.svg"
+  },
+  "br-extra-5": {
+    "country": "BR",
+    "file": "Botafogo_FR.svg"
+  },
+  "br-extra-10": {
+    "country": "BR",
+    "file": "RB_Bragantino.svg"
+  },
+  "br-extra-28": {
+    "country": "BR",
+    "file": "Clube_do_Remo.svg"
+  },
+  "br-extra-31": {
+    "country": "BR",
+    "file": "Fortaleza.svg"
+  },
+  "br-2026-athletic-club": {
+    "country": "BR",
+    "file": "Athletic.svg"
+  },
+  "br-2026-novorizontino": {
+    "country": "BR",
+    "file": "Grêmio_Novorizontino.svg"
+  },
+  "co-extra-15": {
+    "country": "CO",
+    "file": "Bucaramanga.svg"
+  },
+  "ec-extra-9": {
+    "country": "EC",
+    "file": "Mushuc_Runa_Sporting_Club.svg"
+  },
+  "ec-extra-10": {
+    "country": "EC",
+    "file": "Libertad_Fútbol_Club.svg"
+  },
+  "ec-extra-11": {
+    "country": "EC",
+    "file": "Universidad_Católica.svg"
+  },
+  "py-extra-3": {
+    "country": "PY",
+    "file": "Nacional.svg"
+  },
+  "py-extra-8": {
+    "country": "PY",
+    "file": "Trinidense.svg"
+  },
+  "py-extra-10": {
+    "country": "PY",
+    "file": "Club_Sportivo_Ameliano.svg"
+  },
+  "py-extra-11": {
+    "country": "PY",
+    "file": "Club_Rubio_Ñu.svg"
+  },
+  "pe-extra-2": {
+    "country": "PE",
+    "file": "Universitario_de_Deportes.svg"
+  },
+  "pe-extra-4": {
+    "country": "PE",
+    "file": "FBC_Melgar.svg"
+  },
+  "pe-extra-5": {
+    "country": "PE",
+    "file": "Cienciano_del_Cusco.svg"
+  },
+  "pe-extra-10": {
+    "country": "PE",
+    "file": "Universidad_Técnica_de_Cajamarca.svg"
+  },
+  "pe-extra-13": {
+    "country": "PE",
+    "file": "Asociación_Deportiva_Tarma.svg"
+  },
+  "pe-extra-19": {
+    "country": "PE",
+    "file": "Deportivo_Los_Chankas.svg"
+  },
+  "uy-extra-5": {
+    "country": "UY",
+    "file": "Liverpool.svg"
+  },
+  "uy-extra-9": {
+    "country": "UY",
+    "file": "River_Plate.svg"
+  },
+  "uy-extra-12": {
+    "country": "UY",
+    "file": "Montevideo_Wanderers.svg"
+  },
+  "uy-extra-16": {
+    "country": "UY",
+    "file": "Juventud.svg"
+  },
+  "uy-extra-19": {
+    "country": "UY",
+    "file": "Albion_FC.svg"
+  },
+  "ve-2": {
+    "country": "VE",
+    "file": "Caracas.svg"
+  },
+  "ve-extra-8": {
+    "country": "VE",
+    "file": "Metropolitanos_FC.svg"
+  },
+  "ve-extra-13": {
+    "country": "VE",
+    "file": "Trujillanos_FC.svg"
+  },
+  "mx-1": {
+    "country": "MX",
+    "file": "Club_America.svg"
+  },
+  "mx-2": {
+    "country": "MX",
+    "file": "CD_Guadalajara.svg"
+  },
+  "mx-extra-4": {
+    "country": "MX",
+    "file": "UNAM_Pumas.svg"
+  },
+  "mx-extra-9": {
+    "country": "MX",
+    "file": "Club_Leon.svg"
+  },
+  "mx-extra-13": {
+    "country": "MX",
+    "file": "Queretaro_FC.svg"
+  },
+  "mx-extra-14": {
+    "country": "MX",
+    "file": "Club_Tijuana.svg"
+  },
+  "mx-extra-16": {
+    "country": "MX",
+    "file": "Mazatlan_FC.svg"
+  },
+  "mx-extra-18": {
+    "country": "MX",
+    "file": "FC_Juarez.svg"
+  },
+  "mx-extra-19": {
+    "country": "MX",
+    "file": "Atlante_FC.svg"
+  },
+  "mx-extra-20": {
+    "country": "MX",
+    "file": "Leones_Negros_UdeG.svg"
+  },
+  "mx-extra-21": {
+    "country": "MX",
+    "file": "Venados_FC.svg"
+  },
+  "mx-extra-22": {
+    "country": "MX",
+    "file": "Tepatitlán_FC.svg"
+  },
+  "mx-extra-26": {
+    "country": "MX",
+    "file": "Club_Atlético_Morelia.svg"
+  },
+  "cn-extra-8": {
+    "country": "CN",
+    "file": "Zhejiang_Professional_FC.svg"
+  },
+  "us-1": {
+    "country": "US",
+    "file": "Los_Angeles_Galaxy.svg"
+  },
+  "us-2": {
+    "country": "US",
+    "file": "Seattle_Sounders_FC.svg"
+  },
+  "us-3": {
+    "country": "US",
+    "file": "Inter_Miami_CF.svg"
+  },
+  "us-extra-2": {
+    "country": "US",
+    "file": "Los_Angeles_Football_Club.svg"
+  },
+  "us-extra-6": {
+    "country": "US",
+    "file": "New_York_City_Football_Club.svg"
+  },
+  "us-extra-12": {
+    "country": "US",
+    "file": "Chicago_Fire_FC.svg"
+  },
+  "us-extra-18": {
+    "country": "US",
+    "file": "Houston_Dynamo_FC.svg"
+  },
+  "us-extra-19": {
+    "country": "US",
+    "file": "Minnesota_United_FC.svg"
+  },
+  "us-extra-28": {
+    "country": "US",
+    "file": "St._Louis_CITY_SC.svg"
+  },
+  "us-extra-29": {
+    "country": "US",
+    "file": "San_Diego_Football_Club.svg"
+  },
+  "cr-1": {
+    "country": "CR",
+    "file": "Deportivo_Saprissa.svg"
+  },
+  "cr-2": {
+    "country": "CR",
+    "file": "Liga_Deportiva_Alajuelense.svg"
+  },
+  "cr-3": {
+    "country": "CR",
+    "file": "Club_Sport_Herediano.svg"
+  },
+  "cr-extra-4": {
+    "country": "CR",
+    "file": "Club_Sport_Cartaginés.svg"
+  },
+  "cr-extra-5": {
+    "country": "CR",
+    "file": "Asociación_Deportiva_San_Carlos.svg"
+  },
+  "cr-extra-6": {
+    "country": "CR",
+    "file": "Sporting_FC.svg"
+  },
+  "cr-extra-7": {
+    "country": "CR",
+    "file": "Puntarenas_FC.svg"
+  },
+  "cr-extra-10": {
+    "country": "CR",
+    "file": "AD_Municipal_Liberia.svg"
+  },
+  "es-3": {
+    "country": "ES",
+    "file": "Atletico_Madrid.svg"
+  },
+  "es-extra-4": {
+    "country": "ES",
+    "file": "Athletic_Club_Bilbao.svg"
+  },
+  "es-extra-10": {
+    "country": "ES",
+    "file": "Celta.svg"
+  },
+  "es-extra-18": {
+    "country": "ES",
+    "file": "Deportivo_Alavés.svg"
+  },
+  "es-extra-20": {
+    "country": "ES",
+    "file": "Real_Valladolid.svg"
+  },
+  "es-extra-21": {
+    "country": "ES",
+    "file": "Oviedo.svg"
+  },
+  "es-extra-24": {
+    "country": "ES",
+    "file": "Real_Zaragoza.svg"
+  },
+  "es-extra-26": {
+    "country": "ES",
+    "file": "Sporting_Gijón.svg"
+  },
+  "es-extra-29": {
+    "country": "ES",
+    "file": "Cádiz_CF.svg"
+  },
+  "en-2": {
+    "country": "EN",
+    "file": "Liverpool_FC.svg"
+  },
+  "en-4": {
+    "country": "EN",
+    "file": "Tottenham.svg"
+  },
+  "en-extra-9": {
+    "country": "EN",
+    "file": "West_Ham.svg"
+  },
+  "en-extra-16": {
+    "country": "EN",
+    "file": "Wolverhampton_Wanderers.svg"
+  },
+  "en-extra-18": {
+    "country": "EN",
+    "file": "Leicester.svg"
+  },
+  "en-extra-20": {
+    "country": "EN",
+    "file": "Ipswich.svg"
+  },
+  "de-extra-6": {
+    "country": "DE",
+    "file": "VfB_Stuttgart.svg"
+  },
+  "de-extra-9": {
+    "country": "DE",
+    "file": "Freiburg.svg"
+  },
+  "de-extra-17": {
+    "country": "DE",
+    "file": "VfL_Bochum.svg"
+  },
+  "de-extra-18": {
+    "country": "DE",
+    "file": "FC_Heidenheim.svg"
+  },
+  "de-extra-19": {
+    "country": "DE",
+    "file": "Hamburger_SV.svg"
+  },
+  "de-extra-21": {
+    "country": "DE",
+    "file": "Hertha_BSC.svg"
+  },
+  "de-extra-22": {
+    "country": "DE",
+    "file": "Cologne.svg"
+  },
+  "de-2026-elversberg": {
+    "country": "DE",
+    "file": "SV_Elversberg.svg"
+  },
+  "de-2026-paderborn": {
+    "country": "DE",
+    "file": "SC_Paderborn.svg"
+  },
+  "it-2": {
+    "country": "IT",
+    "file": "Inter.svg"
+  },
+  "it-3": {
+    "country": "IT",
+    "file": "Milan.svg"
+  },
+  "it-extra-16": {
+    "country": "IT",
+    "file": "Como_1907.svg"
+  },
+  "it-extra-20": {
+    "country": "IT",
+    "file": "Hellas_Verona.svg"
+  },
+  "it-2026-frosinone": {
+    "country": "IT",
+    "file": "Frosinone_Calcio.svg"
+  },
+  "fr-1": {
+    "country": "FR",
+    "file": "Paris_Saint-Germain_(PSG).svg"
+  },
+  "fr-2": {
+    "country": "FR",
+    "file": "Marseille.svg"
+  },
+  "fr-3": {
+    "country": "FR",
+    "file": "Olympique_Lyonnais.svg"
+  },
+  "fr-extra-2": {
+    "country": "FR",
+    "file": "Marseille.svg"
+  },
+  "fr-extra-3": {
+    "country": "FR",
+    "file": "Olympique_Lyonnais.svg"
+  },
+  "fr-extra-4": {
+    "country": "FR",
+    "file": "AS_Monaco.svg"
+  },
+  "fr-extra-6": {
+    "country": "FR",
+    "file": "Nice.svg"
+  },
+  "fr-extra-7": {
+    "country": "FR",
+    "file": "RC_Lens.svg"
+  },
+  "fr-extra-9": {
+    "country": "FR",
+    "file": "RC_Strasbourg_Alsace.svg"
+  },
+  "fr-extra-14": {
+    "country": "FR",
+    "file": "Le_Havre_AC.svg"
+  },
+  "fr-extra-17": {
+    "country": "FR",
+    "file": "Stade_de_Reims.svg"
+  },
+  "fr-extra-18": {
+    "country": "FR",
+    "file": "AS_Saint-Étienne.svg"
+  },
+  "fr-extra-19": {
+    "country": "FR",
+    "file": "FC_Metz.svg"
+  },
+  "fr-extra-20": {
+    "country": "FR",
+    "file": "Lorient_FC.svg"
+  },
+  "fr-2026-le-mans": {
+    "country": "FR",
+    "file": "Le_Mans_FC.svg"
+  },
+  "fr-2026-strasbourg": {
+    "country": "FR",
+    "file": "RC_Strasbourg_Alsace.svg"
+  },
+  "pt-extra-2": {
+    "country": "PT",
+    "file": "FC_Porto.svg"
+  },
+  "pt-extra-4": {
+    "country": "PT",
+    "file": "SC_Braga.svg"
+  },
+  "pt-extra-12": {
+    "country": "PT",
+    "file": "Casa_Pia_AC.svg"
+  },
+  "pt-extra-17": {
+    "country": "PT",
+    "file": "Estrela_da_Amadora.svg"
+  },
+  "nl-extra-2": {
+    "country": "NL",
+    "file": "PSV_Eindhoven.svg"
+  },
+  "nl-extra-6": {
+    "country": "NL",
+    "file": "FC_Utrecht.svg"
+  },
+  "nl-extra-7": {
+    "country": "NL",
+    "file": "sc_Heerenveen.svg"
+  },
+  "nl-extra-8": {
+    "country": "NL",
+    "file": "FC_Groningen.svg"
+  },
+  "nl-extra-18": {
+    "country": "NL",
+    "file": "Almere_City_FC.svg"
+  },
+  "nl-extra-19": {
+    "country": "NL",
+    "file": "Excelsior_Rotterdam.svg"
+  },
+  "nl-2026-cambuur": {
+    "country": "NL",
+    "file": "SC_Cambuur.svg"
+  },
+  "be-1": {
+    "country": "BE",
+    "file": "Club_Brugge.svg"
+  },
+  "be-2": {
+    "country": "BE",
+    "file": "RSC_Anderlecht.svg"
+  },
+  "be-extra-3": {
+    "country": "BE",
+    "file": "KRC_Genk.svg"
+  },
+  "be-extra-4": {
+    "country": "BE",
+    "file": "KAA_Gent.svg"
+  },
+  "be-extra-6": {
+    "country": "BE",
+    "file": "Royal_Antwerp_FC.svg"
+  },
+  "be-extra-7": {
+    "country": "BE",
+    "file": "Standard_Liège.svg"
+  },
+  "be-extra-8": {
+    "country": "BE",
+    "file": "Royal_Charleroi_S.C..svg"
+  },
+  "be-extra-9": {
+    "country": "BE",
+    "file": "KV_Mechelen.svg"
+  },
+  "be-extra-10": {
+    "country": "BE",
+    "file": "Cercle_Brugge_KSV.svg"
+  },
+  "be-extra-11": {
+    "country": "BE",
+    "file": "Oud-Heverlee_Leuven.svg"
+  },
+  "be-extra-12": {
+    "country": "BE",
+    "file": "KVC_Westerlo.svg"
+  },
+  "be-extra-13": {
+    "country": "BE",
+    "file": "Sint-Truidense_VV.svg"
+  },
+  "be-extra-14": {
+    "country": "BE",
+    "file": "KV_Kortrijk.svg"
+  },
+  "be-extra-15": {
+    "country": "BE",
+    "file": "FCV_Dender_EH.svg"
+  },
+  "tr-extra-12": {
+    "country": "TR",
+    "file": "Çaykur_Rizespor.svg"
+  },
+  "tr-extra-15": {
+    "country": "TR",
+    "file": "Gaziantep.svg"
+  },
+  "tr-extra-18": {
+    "country": "TR",
+    "file": "Göztepe_Izmir.svg"
+  },
+  "hr-1": {
+    "country": "HR",
+    "file": "GNK_Dinamo_Zagreb.svg"
+  },
+  "hr-extra-9": {
+    "country": "HR",
+    "file": "HNK_Gorica.svg"
+  },
+  "ch-2": {
+    "country": "CH",
+    "file": "Basel.svg"
+  },
+  "ch-extra-2": {
+    "country": "CH",
+    "file": "Basel.svg"
+  },
+  "ch-extra-12": {
+    "country": "CH",
+    "file": "Yverdon-Sport_FC.svg"
+  },
+  "at-1": {
+    "country": "AT",
+    "file": "Salzburg.svg"
+  },
+  "at-extra-3": {
+    "country": "AT",
+    "file": "Austria_Wien.svg"
+  },
+  "at-extra-6": {
+    "country": "AT",
+    "file": "Wolfsberg.svg"
+  },
+  "at-extra-8": {
+    "country": "AT",
+    "file": "Klagenfurt.svg"
+  },
+  "at-extra-9": {
+    "country": "AT",
+    "file": "FC_Blau-Weiß_Linz.svg"
+  },
+  "at-extra-11": {
+    "country": "AT",
+    "file": "Tirol.svg"
+  },
+  "sc-extra-6": {
+    "country": "SC",
+    "file": "Dundee.svg"
+  },
+  "gr-3": {
+    "country": "GR",
+    "file": "AEK_Athens.svg"
+  },
+  "gr-extra-6": {
+    "country": "GR",
+    "file": "OFI.svg"
+  },
+  "rs-2": {
+    "country": "RS",
+    "file": "FK_Partizan.svg"
+  },
+  "rs-3": {
+    "country": "RS",
+    "file": "FK_Vojvodina.svg"
+  },
+  "rs-extra-4": {
+    "country": "RS",
+    "file": "FK_Čukarički.svg"
+  },
+  "rs-extra-7": {
+    "country": "RS",
+    "file": "FK_Novi_Pazar.svg"
+  },
+  "rs-extra-8": {
+    "country": "RS",
+    "file": "FK_Mladost_Lučani.svg"
+  },
+  "cz-1": {
+    "country": "CZ",
+    "file": "AC_Sparta_Praha.svg"
+  },
+  "cz-2": {
+    "country": "CZ",
+    "file": "SK_Slavia_Praha.svg"
+  },
+  "cz-extra-9": {
+    "country": "CZ",
+    "file": "Bohemians_Praha.svg"
+  },
+  "cz-extra-10": {
+    "country": "CZ",
+    "file": "1._FC_Slovácko.svg"
+  },
+  "pl-1": {
+    "country": "PL",
+    "file": "Legia_Warszawa.svg"
+  },
+  "pl-extra-7": {
+    "country": "PL",
+    "file": "Wisła_Kraków.svg"
+  },
+  "ua-1": {
+    "country": "UA",
+    "file": "Dynamo_Kyiv.svg"
+  },
+  "ua-2": {
+    "country": "UA",
+    "file": "Shakhtar.svg"
+  },
+  "ua-extra-3": {
+    "country": "UA",
+    "file": "Dnipro.svg"
+  },
+  "ua-extra-4": {
+    "country": "UA",
+    "file": "Kryvbas.svg"
+  },
+  "ua-extra-7": {
+    "country": "UA",
+    "file": "Olexandriya.svg"
+  },
+  "ua-extra-9": {
+    "country": "UA",
+    "file": "Karpaty.svg"
+  },
+  "se-1": {
+    "country": "SE",
+    "file": "Malmö.svg"
+  },
+  "se-extra-3": {
+    "country": "SE",
+    "file": "Djurgården.svg"
+  },
+  "se-extra-9": {
+    "country": "SE",
+    "file": "Kalmar.svg"
+  },
+  "se-extra-12": {
+    "country": "SE",
+    "file": "Halmstad.svg"
+  },
+  "no-extra-5": {
+    "country": "NO",
+    "file": "Viking_FK.svg"
+  },
+  "dk-1": {
+    "country": "DK",
+    "file": "F.C._Copenhagen.svg"
+  },
+  "dk-2": {
+    "country": "DK",
+    "file": "FC_Midtjylland.svg"
+  },
+  "dk-3": {
+    "country": "DK",
+    "file": "Brøndby_IF.svg"
+  },
+  "dk-extra-1": {
+    "country": "DK",
+    "file": "F.C._Copenhagen.svg"
+  },
+  "dk-extra-4": {
+    "country": "DK",
+    "file": "FC_Nordsjælland.svg"
+  },
+  "dk-extra-5": {
+    "country": "DK",
+    "file": "AGF.svg"
+  },
+  "dk-extra-6": {
+    "country": "DK",
+    "file": "Randers_FC.svg"
+  },
+  "dk-extra-7": {
+    "country": "DK",
+    "file": "Silkeborg_IF.svg"
+  },
+  "dk-extra-8": {
+    "country": "DK",
+    "file": "Viborg_FF.svg"
+  },
+  "dk-extra-9": {
+    "country": "DK",
+    "file": "AaB.svg"
+  },
+  "jp-1": {
+    "country": "JP",
+    "file": "Urawa_Reds.svg"
+  },
+  "jp-extra-15": {
+    "country": "JP",
+    "file": "Hokkaido_Consadole_Sapporo.svg"
+  },
+  "kr-1": {
+    "country": "KR",
+    "file": "Ulsan_HD_FC.svg"
+  },
+  "kr-2": {
+    "country": "KR",
+    "file": "Jeonbuk.svg"
+  },
+  "kr-extra-10": {
+    "country": "KR",
+    "file": "Jeju_SK_FC.svg"
+  },
+  "kr-extra-12": {
+    "country": "KR",
+    "file": "Gimcheon_Sangmu_FC.svg"
+  },
+  "au-3": {
+    "country": "AU",
+    "file": "Melbourne_City_FC.svg"
+  },
+  "au-extra-5": {
+    "country": "AU",
+    "file": "Adelaide_United_FC.svg"
+  },
+  "au-extra-6": {
+    "country": "AU",
+    "file": "Brisbane_Roar_FC.svg"
+  },
+  "au-extra-7": {
+    "country": "AU",
+    "file": "Perth_Glory_FC.svg"
+  },
+  "au-extra-10": {
+    "country": "AU",
+    "file": "Newcastle_Jets_FC.svg"
+  },
+  "au-extra-12": {
+    "country": "AU",
+    "file": "Western_United_FC.svg"
+  },
+  "qa-extra-5": {
+    "country": "QA",
+    "file": "Al_Arabi.svg"
+  },
+  "qa-extra-10": {
+    "country": "QA",
+    "file": "Al_Ahli.svg"
+  },
+  "ir-extra-4": {
+    "country": "IR",
+    "file": "Tractor.svg"
+  },
+  "ma-1": {
+    "country": "MA",
+    "file": "Wydad_AC.svg"
+  },
+  "ma-3": {
+    "country": "MA",
+    "file": "AS_FAR.svg"
+  },
+  "ma-extra-5": {
+    "country": "MA",
+    "file": "Fath_Union_Sports_Rabat.svg"
+  },
+  "ma-extra-6": {
+    "country": "MA",
+    "file": "Maghreb_of_Fez.svg"
+  },
+  "ma-extra-8": {
+    "country": "MA",
+    "file": "IR_Tanger.svg"
+  },
+  "ma-extra-10": {
+    "country": "MA",
+    "file": "Olympic_Club_Safi.svg"
+  },
+  "eg-1": {
+    "country": "EG",
+    "file": "Al_Ahly_SC.svg"
+  },
+  "eg-2": {
+    "country": "EG",
+    "file": "Zamalek_SC.svg"
+  },
+  "eg-extra-3": {
+    "country": "EG",
+    "file": "Pyramids_FC.svg"
+  },
+  "eg-extra-4": {
+    "country": "EG",
+    "file": "Al-Masry_SC.svg"
+  },
+  "eg-extra-7": {
+    "country": "EG",
+    "file": "ENPPI_SC.svg"
+  },
+  "eg-extra-8": {
+    "country": "EG",
+    "file": "Ismaily_SC.svg"
+  },
+  "eg-extra-9": {
+    "country": "EG",
+    "file": "Smouha_SC.svg"
+  },
+  "eg-extra-10": {
+    "country": "EG",
+    "file": "El_Gouna_FC.svg"
+  },
+  "eg-extra-12": {
+    "country": "EG",
+    "file": "Al_Ittihad_Alexandria_Club.svg"
+  },
+  "sn-extra-7": {
+    "country": "SN",
+    "file": "AS_Dakar_Sacré-Cœur.svg"
+  },
+  "ng-1": {
+    "country": "NG",
+    "file": "Enyimba.svg"
+  },
+  "gh-extra-3": {
+    "country": "GH",
+    "file": "Medeama_SC.svg"
+  },
+  "tn-1": {
+    "country": "TN",
+    "file": "Espérance_Sportive_de_Tunis.svg"
+  },
+  "tn-2": {
+    "country": "TN",
+    "file": "Étoile_Sportive_du_Sahel.svg"
+  },
+  "tn-extra-5": {
+    "country": "TN",
+    "file": "Union_Sportive_Monastirienne.svg"
+  },
+  "tn-extra-7": {
+    "country": "TN",
+    "file": "Club_Athlétique_Bizertin.svg"
+  },
+  "tn-extra-9": {
+    "country": "TN",
+    "file": "Étoile_Sportive_de_Métlaoui.svg"
+  },
+  "sc-3": {
+    "country": "SC",
+    "file": "Hearts.svg"
+  },
+  "gr-extra-5": {
+    "country": "GR",
+    "file": "Aris_Thessaloniki.svg"
+  },
+  "rs-1": {
+    "country": "RS",
+    "file": "Crvena_Zvezda.svg"
+  },
+  "rs-extra-5": {
+    "country": "RS",
+    "file": "FK_TSC.svg"
+  },
+  "dk-extra-10": {
+    "country": "DK",
+    "file": "OB.svg"
+  },
+  "fr-extra-22": {
+    "country": "FR",
+    "file": "Stade_Malherbe_Caen.svg"
+  },
+  "br-extra-29": {
+    "country": "BR",
+    "file": "Clube_de_Regatas_Brasil.svg"
+  },
+  "ar-extra-16": {
+    "country": "AR",
+    "file": "Club_Atlético_Colón.svg"
+  },
+  "co-extra-3": {
+    "country": "CO",
+    "file": "Atlético_Junior.svg"
+  },
+  "uy-extra-10": {
+    "country": "UY",
+    "file": "Racing.svg"
+  },
+  "cn-extra-9": {
+    "country": "CN",
+    "file": "Henan_Songshan_Longmen.svg"
+  },
+  "pt-extra-18": {
+    "country": "PT",
+    "file": "AVS_Futebol_SAD.svg"
+  },
+  "eg-extra-5": {
+    "country": "EG",
+    "file": "Modern_Sport_FC.svg"
+  }
+}
