@@ -27,7 +27,7 @@ export function syncOwned(ball){const o=ball?.owner;if(!o)return;const f=o.face|
 export function kick(ball,tx,ty,speed,lift=0,curl=0){
  syncOwned(ball);
  const dx=tx-ball.x,dy=ty-ball.y,d=Math.hypot(dx,dy)||1;
- ball.owner=null;ball.vx=dx/d*speed;ball.vy=dy/d*speed;ball.vz=lift;ball.curl=curl;ball.z=Math.max(ball.z,.05);
+ ball.owner=null;ball.vx=dx/d*speed;ball.vy=dy/d*speed;ball.vz=lift;ball.g=9.8;ball.curl=curl;ball.z=Math.max(ball.z,.05);
 }
 /** Lanza la pelota para que caiga en (tx,ty) tras `time` segundos con una altura máxima aproximada `peak`. */
 export function loft(ball,tx,ty,time,peak=3){

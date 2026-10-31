@@ -93,7 +93,7 @@ const penal={
  down(m){if(m.ball||m.charge!=null)return;m.charge=m.t;},
  up(m){if(m.ball||m.charge==null)return;const pw=this.power(m);const [ax,ay]=this.aim(m);let [gx,gz]=toGoal(ax,ay);
   const err=m.stats.aimNoise*.32;gx+=m.aimNoise(err);gz+=m.aimNoise(err*.6);if(pw>.9)gz+=(pw-.9)*14;if(pw<.35)gz=Math.max(0,gz-.4);
-  const T=clampN(.62-pw*.24,.36,.62);m.ball={t:0,T,gx,gz:Math.max(0,gz),pw};m.charge=null;m.hint='';
+  const T=clampN(.62-pw*.24-(m.stats.power-.5)*.09,.32,.66);m.ball={t:0,T,gx,gz:Math.max(0,gz),pw};m.charge=null;m.hint='';
   // El arquero elige lado: tus penales anteriores y su lectura pesan en la decisión.
   const side=gx<0?-1:1,bias=m.tendency<.5?-1:1;
   const readP=clampN(.25+m.ai.d*.30+(1-pw)*.12,.25,.68);

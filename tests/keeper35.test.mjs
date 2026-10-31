@@ -16,3 +16,11 @@ test('el penal genera goles y atajadas según la dificultad, sin acertar todos l
  }return results;}
  const easy=simulate(.2),hard=simulate(.9);assert.ok(hard.atajado>easy.atajado);assert.ok(hard.atajado>20);assert.ok(hard.gol>100);
 });
+
+test('un remate tras un centro recupera la gravedad normal del balón',async()=>{
+ const {makeBall,loft,kick}=await import('../src/match2d.mjs');const b=makeBall(0,0);loft(b,10,5,1,4);assert.notEqual(b.g,9.8);kick(b,20,5,20,1);assert.equal(b.g,9.8);
+});
+test('la potencia del futbolista cambia la velocidad del penal',()=>{
+ const shot=power=>{const r=rng('power');const m={play:{memory:[]},stats:{nerves:0,aimNoise:0,power},ai:aiStats({difficulty:.5}),rand:r,t:0,pointer:{x:600,y:300},aimNoise:()=>0};const scene=GOAL_SCENES.penal;scene.init(m);scene.down(m);m.t=.8;scene.up(m);return m.ball.T;};
+ assert.ok(shot(.9)<shot(.3));
+});
