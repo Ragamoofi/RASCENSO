@@ -1,5 +1,5 @@
 /* RASCENSO 3.0 · Jugadas Vivas — lógica pura (sin DOM).
- * Cada temporada ofrece hasta tres jugadas en partidos reales del calendario simulado.
+ * Ofrece jugadas según ritmo de temporada y rol, en partidos reales del calendario simulado.
  * La jugada parte del marcador que el simulador ya calculó para ese partido:
  *  - ofensiva lograda: +1 gol del equipo (gol o asistencia tuya, según la jugada);
  *  - defensiva lograda: −1 gol del rival (evitaste el gol que el simulador había anotado);
@@ -34,7 +34,7 @@ export const PLAYS={
 };
 export const PLAY_IDS=Object.keys(PLAYS);
 /** Repertorio por puesto: cada posición vive situaciones y controles propios. */
-export const POSITION_PLAYS={
+const LEGACY_POSITION_PLAYS={
  DC:['mano_a_mano','penal','cabezazo','remate'],
  EI:['encare','diagonal','centro','tiro_libre'],ED:['encare','diagonal','centro','tiro_libre'],
  MCO:['pase_filtrado','contragolpe','tiro_libre','remate'],
@@ -44,6 +44,17 @@ export const POSITION_PLAYS={
  DFC:['entrada','anticipacion','despeje','fuera_juego'],
  LI:['entrada','centro','anticipacion','despeje'],LD:['entrada','centro','anticipacion','despeje'],
  POR:['reflejos','penal_atajado','achique','salida_aerea']
+};
+export const POSITION_PLAYS={
+ DC:['mano_a_mano','penal','cabezazo','remate','diagonal','contragolpe','encare','tiro_libre'],
+ EI:['encare','diagonal','centro','tiro_libre','contragolpe','pase_filtrado','remate','rondo'],ED:['encare','diagonal','centro','tiro_libre','contragolpe','pase_filtrado','remate','rondo'],
+ MCO:['pase_filtrado','contragolpe','tiro_libre','remate','diagonal','centro','rondo','encare'],
+ MC:['pase_filtrado','contragolpe','rondo','recuperacion','anticipacion','tiro_libre','centro','encare'],
+ MI:['centro','contragolpe','pase_filtrado','encare','diagonal','rondo','recuperacion','tiro_libre'],MD:['centro','contragolpe','pase_filtrado','encare','diagonal','rondo','recuperacion','tiro_libre'],
+ MCD:['recuperacion','anticipacion','rondo','entrada','fuera_juego','pase_filtrado','despeje','contragolpe'],
+ DFC:['entrada','anticipacion','despeje','fuera_juego','recuperacion','cabezazo','rondo','pase_filtrado'],
+ LI:['entrada','centro','anticipacion','despeje','encare','recuperacion','fuera_juego','contragolpe'],LD:['entrada','centro','anticipacion','despeje','encare','recuperacion','fuera_juego','contragolpe'],
+ POR:['reflejos','penal_atajado','achique','salida_aerea','despeje']
 };
 
 /* ---------- Atributos → capacidades del jugador en la cancha ---------- */
@@ -81,7 +92,7 @@ export function aiStats(play){
 
 /* ---------- Selección de jugadas de la temporada ---------- */
 const DECISIVE_LABEL=['Último minuto','Partido de máxima tensión','Recta final','Duelo directo'];
-function playCount(role){return ({Titular:3,'Rotación':2,Suplente:1,Reserva:1})[role]||1;}
+function playCount(role,mode='equilibrado'){const counts={rapido:{Titular:3,'Rotación':2,Suplente:1,Reserva:1},equilibrado:{Titular:5,'Rotación':4,Suplente:3,Reserva:2},inmersivo:{Titular:7,'Rotación':6,Suplente:4,Reserva:3}};return (counts[mode]||counts.equilibrado)[role]||1;}
 function parseScore(m,clubId){const [h,a]=String(m.score||'0-0').split('-').map(Number);return m.home===clubId?{gf:h,ga:a}:{gf:a,ga:h};}
 /** Lista determinista de jugadas para la temporada en curso (no depende de las ya resueltas). */
 export function buildSeasonPlays(s,league,getClub,{role,rivalLevel=()=>60,clubLevel=60,tier=1,prestige=60}={}){
@@ -89,12 +100,14 @@ export function buildSeasonPlays(s,league,getClub,{role,rivalLevel=()=>60,clubLe
  const year=yearOf(s);
  const matches=league.playerMatches.filter(m=>m.played&&m.minutes>=20);
  if(!matches.length)return [];
- const repertoire=POSITION_PLAYS[s.position]||POSITION_PLAYS.MC;
+ const oldMode=!!s.__legacyPlays;
+ const set=oldMode?LEGACY_POSITION_PLAYS:POSITION_PLAYS;
+ const repertoire=set[s.position]||set.MC;
  const r=rng(`${s.seed}:plays30:${year}:${s.clubId}`);
  // Variedad: se evitan primero los tipos jugados el año anterior.
  const lastTypes=new Set((s.history?.at(-1)?.plays||[]).map(p=>p.type));
  const order=[...repertoire].sort((a,b)=>(lastTypes.has(a)?1:0)-(lastTypes.has(b)?1:0)||hash(`${s.seed}:${year}:${a}`)-hash(`${s.seed}:${year}:${b}`));
- const count=Math.min(playCount(role),order.length);
+ const count=Math.min(playCount(role,oldMode?'rapido':s.matchRhythm),order.length);
  const used=new Set(),legacy=s.clutchMoment;
  const out=[];
  for(let i=0;i<count;i++){

@@ -290,7 +290,9 @@ export function seasonPlays(s){
  if(PLAY_LISTS.has(s))return PLAY_LISTS.get(s);
  const year=careerYear(s);
  // El calendario base no depende de las jugadas resueltas: se calcula sin ellas.
- const base={...s,plays30:null};
+ const playedThisYear=s.plays30?.year===year&&s.plays30?.results?.length>0;
+ const legacyPlays=!!(playedThisYear&&(!s.plays30.version||s.plays30.version===3));
+ const base={...s,plays30:null,__legacyPlays:legacyPlays};
  const league=playLeague(base);
  const levels=Object.fromEntries(league.teams.map(t=>[t.id,t.level]));
  const comp=getCompetitionForCareer(s);
@@ -298,6 +300,11 @@ export function seasonPlays(s){
  const results=s.plays30?.year===year?s.plays30.results:[];
  const merged=list.map(p=>({...p,result:results.find(r=>r.id===p.id)||null}));
  PLAY_LISTS.set(s,merged);return merged;
+}
+export function chooseMatchRhythm(s,mode){
+ if(s.phase!=='season'||!['rapido','equilibrado','inmersivo'].includes(mode)||s.plays30?.results?.length)return s;
+ if((s.matchRhythm||'equilibrado')===mode)return s;
+ return {...s,matchRhythm:mode};
 }
 export function nextSeasonPlay(s){return seasonPlays(s).find(p=>!p.result)||null;}
 /** Registra el resultado de una jugada interactiva (o automática) y actualiza moral y confianza. */
@@ -310,7 +317,7 @@ export function resolveSeasonPlay(s,id,report){
  const prev=s.plays30?.year===year?s.plays30.results:[];
  const memory={...(s.playMemory||{})};
  if(play.type==='penal'&&Number.isFinite(res.dir))memory.penalties=[...(memory.penalties||[]),res.dir].slice(-6);
- let next={...s,plays30:{year,results:[...prev,result]},playMemory:memory,
+ let next={...s,plays30:{year,version:s.plays30?.year===year&&(s.plays30.version===3||(!s.plays30.version&&s.plays30.results?.length))?3:4,results:[...prev,result]},playMemory:memory,
   // Moral, confianza y reputación cambian al cerrar la temporada: si cambiaran ahora,
   // alterarían los minutos simulados y el resto del calendario dejaría de coincidir.
   careerMoments:[...(s.careerMoments||[]),{year,kind:'on-field',text:`${playOutcomeText(play,res)} ante ${play.rival} · min. ${play.minute}`}].slice(-120)};

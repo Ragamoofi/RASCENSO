@@ -1,7 +1,7 @@
 name: Prueba de jugadas en navegador
 on:
   push:
-    branches: [main, mejora-penales-controles, carrera-mundo35, jugadas36, duelos37, rascenso-4-integral]
+    branches: [main, mejora-penales-controles, carrera-mundo35, jugadas36, duelos37, rascenso-4-integral, rascenso-4-1-centro-partidos]
   workflow_dispatch:
 permissions:
   contents: read
