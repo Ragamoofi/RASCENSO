@@ -3,6 +3,7 @@
 Rama de trabajo: `rascenso-4-integral`. Base: `bb85f188cf63e016ba8429b8d24b44d5320cfd00`.
 
 ## Avance
+- Cancha cenital: trama estable de césped, red con profundidad y pelota con paneles. Pendiente de inspección visual de esta versión.
 - Movimiento: aceleración y frenado; teclado y ratón cambian de modo según la última entrada, con diagonales normalizadas. Prueba real en navegador pendiente.
 - Mano a mano: elección entre definición colocada y potente. Cabezazo y remate: momento de contacto influye en potencia.
 - Recuperación y entrada: el cansancio reduce el margen. Anticipación: intercepción por trayectoria continua.

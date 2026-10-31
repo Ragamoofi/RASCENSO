@@ -157,6 +157,8 @@ export function drawPitch(g,{stripes=true}={}){
  g.fillStyle='#163f2b';g.fillRect(0,0,W,H);
  const [x0,y0]=toScreen(0,0),[x1,y1]=toScreen(FIELD.len,FIELD.wid);
  if(stripes)for(let i=0;i<13;i++){g.fillStyle=i%2?COLORS.grassA:COLORS.grassB;const a=toScreen(i*4,0)[0],b=toScreen(Math.min(FIELD.len,(i+1)*4),0)[0];g.fillRect(a,y0,b-a,y1-y0);}
+ // Trama fija de césped: no consume azar de la simulación ni parpadea entre cuadros.
+ g.strokeStyle='rgba(193,229,180,.075)';g.lineWidth=1;g.beginPath();for(let i=0;i<220;i++){const x=x0+((i*137)%(x1-x0)),y=y0+((i*83)%(y1-y0));g.moveTo(x,y);g.lineTo(x+2,y-2);}g.stroke();
  const vg=g.createRadialGradient(W*.62,H*.5,60,W*.55,H*.5,W*.75);vg.addColorStop(0,'rgba(255,255,255,.05)');vg.addColorStop(1,'rgba(0,0,0,.32)');g.fillStyle=vg;g.fillRect(0,0,W,H);
  g.strokeStyle=COLORS.line;g.lineWidth=2;
  const L=(ax,ay,bx,by)=>{const [a,b]=toScreen(ax,ay),[c,d]=toScreen(bx,by);g.beginPath();g.moveTo(a,b);g.lineTo(c,d);g.stroke();};
@@ -171,6 +173,7 @@ export function drawPitch(g,{stripes=true}={}){
  const [gx,gy0]=toScreen(FIELD.goalX,FIELD.goalY-FIELD.post),[,gy1]=toScreen(FIELD.goalX,FIELD.goalY+FIELD.post);
  g.fillStyle='rgba(255,255,255,.14)';g.fillRect(gx,gy0,1.6*SCALE,gy1-gy0);
  g.strokeStyle='rgba(255,255,255,.35)';g.lineWidth=1;for(let i=0;i<=8;i++){const yy=gy0+(gy1-gy0)*i/8;g.beginPath();g.moveTo(gx,yy);g.lineTo(gx+1.6*SCALE,yy);g.stroke();}
+ for(let i=1;i<=3;i++){const xx=gx+i*.4*SCALE;g.beginPath();g.moveTo(xx,gy0);g.lineTo(xx,gy1);g.stroke();}
  g.strokeStyle='#fff';g.lineWidth=4;g.beginPath();g.moveTo(gx,gy0);g.lineTo(gx,gy1);g.stroke();
  g.fillStyle='#fff';g.fillRect(gx-3,gy0-3,6,6);g.fillRect(gx-3,gy1-3,6,6);
 }
@@ -198,8 +201,8 @@ export function drawBall(g,b){
  for(let i=0;i<b.trail.length;i++){const [tx,ty,tz]=b.trail[i];const [sx,sy]=toScreen(tx,ty);g.fillStyle=`rgba(255,255,255,${i/b.trail.length*.18})`;g.beginPath();g.arc(sx,sy-tz*SCALE*.55,3,0,7);g.fill();}
  const [x,y]=toScreen(b.x,b.y),z=b.z*SCALE*.55,r=6+b.z*1.1;
  g.fillStyle=COLORS.shadow;g.beginPath();g.ellipse(x+2,y+2,r*Math.max(.5,1-b.z*.08),r*.55*Math.max(.5,1-b.z*.08),0,0,7);g.fill();
- g.fillStyle=COLORS.ball;g.beginPath();g.arc(x,y-z,r,0,7);g.fill();g.fillStyle='#1a1a1a';g.beginPath();g.arc(x+r*.2,y-z-r*.15,r*.32,0,7);g.fill();
- g.strokeStyle='rgba(0,0,0,.35)';g.lineWidth=1;g.beginPath();g.arc(x,y-z,r,0,7);g.stroke();
+ g.fillStyle=COLORS.ball;g.beginPath();g.arc(x,y-z,r,0,7);g.fill();g.fillStyle='#25313b';g.beginPath();for(let i=0;i<5;i++){const a=-Math.PI/2+i*Math.PI*2/5,px=x+r*.15+Math.cos(a)*r*.32,py=y-z-r*.1+Math.sin(a)*r*.32;if(i===0)g.moveTo(px,py);else g.lineTo(px,py);}g.closePath();g.fill();
+ g.fillStyle='rgba(255,255,255,.65)';g.beginPath();g.arc(x-r*.35,y-z-r*.4,r*.18,0,7);g.fill();g.strokeStyle='rgba(0,0,0,.35)';g.lineWidth=1;g.beginPath();g.arc(x,y-z,r,0,7);g.stroke();
 }
 export function drawRing(g,x,y,radius,color,{dash=null,width=2,fill=null}={}){const [sx,sy]=toScreen(x,y);g.beginPath();g.arc(sx,sy,radius*SCALE,0,7);if(fill){g.fillStyle=fill;g.fill();}g.strokeStyle=color;g.lineWidth=width;if(dash)g.setLineDash(dash);g.stroke();g.setLineDash([]);}
 export function drawLine(g,a,b,color,{dash=null,width=2}={}){const [x1,y1]=toScreen(a.x,a.y),[x2,y2]=toScreen(b.x,b.y);g.strokeStyle=color;g.lineWidth=width;if(dash)g.setLineDash(dash);g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.stroke();g.setLineDash([]);}
