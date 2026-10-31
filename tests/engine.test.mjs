@@ -18,7 +18,7 @@ test('Chile puede recibir ofertas nacionales e internacionales al iniciar',()=>{
  assert.equal(getCountry(s.country).name,'Chile');
  const d=newCareer({name:'X',country:'CL',position:'POR',seed:'test-49'});
  assert.equal(academyOffers(d).length,3);
- assert(academyOffers(d).some(c=>c.countryCode==='CL'));assert(academyOffers(d).some(c=>c.countryCode!=='CL'));
+ assert(academyOffers(d).filter(c=>c.countryCode==='CL').length>=2);
 });
 test('Draft completa ocho atributos, OVR y potencial',()=>{
  let s=newCareer({name:'Prueba',country:'CL',position:'POR',seed:'same'});

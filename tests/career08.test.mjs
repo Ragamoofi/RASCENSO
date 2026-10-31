@@ -19,8 +19,10 @@ test('Migración de v6 conserva historia y agrega rasgos nuevos sin borrar parti
 test('Preparación se elige una vez por año y cambia la probabilidad deportiva',()=>{
  const s=start('preparation08');assert.equal(s.phase,'season');const a=choosePreparation(s,'definicion');assert.equal(a.preparation.year,careerYear(a));assert.equal(preparationEffects(a).goals,1.16);assert.strictEqual(choosePreparation(a,'creacion'),a);
  const b=choosePreparation(s,'tactica');assert.equal(preparationEffects(b).minutes,.08);
- assert.notDeepEqual(playLeague(a).standings,playLeague(b).standings);
- assert.notDeepEqual(playLeague(a).playerMatches,playLeague(b).playerMatches);
+ // Una variación de probabilidad puede producir el mismo marcador con una semilla.
+ const simulations=Array.from({length:20},(_,i)=>{const base={...s,seed:'preparation-distribution-'+i};return [playLeague(choosePreparation(base,'definicion')).standings,playLeague(choosePreparation(base,'tactica')).standings];});
+ assert.ok(simulations.some(([x,y])=>JSON.stringify(x)!==JSON.stringify(y)));
+ assert.ok(Array.from({length:20},(_,i)=>{const base={...s,seed:'minutes-distribution-'+i};return JSON.stringify(playLeague(choosePreparation(base,'definicion')).playerMatches)!==JSON.stringify(playLeague(choosePreparation(base,'tactica')).playerMatches);}).some(Boolean));
 });
 test('Eventos futbolísticos adicionales tienen consecuencias persistentes',()=>{
  for(const id of ['scouting','rotation','derby','captaincy'])assert.ok(STORY_IDS.includes(id));

@@ -128,6 +128,7 @@ export function draftChoices(s) {
   const r=rng(`${s.seed}:draft-v4:${s.draftIndex}:${s.draftRerolls}`);
   const unfilled=ATTRS.filter(([key])=>!(key in s.attributes));
   const order=[...unfilled];for(let i=order.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[order[i],order[j]]=[order[j],order[i]];}
+  if(unfilled.some(([k])=>k===s.draftFocus)){const selected=unfilled.find(([k])=>k===s.draftFocus);order.splice(0,order.length,selected);}
   const source=[];
   const used=new Set((s.draftSources||[]).map(x=>x.legend));
   const important = ['pace','shot','pass','dribble','defense','physical'];
@@ -136,7 +137,8 @@ export function draftChoices(s) {
   const slots=tiers.map(t=>DRAFT_REFERENTS.filter(x=>x.tier===t&&!used.has(x.name)));
   for(let i=0;i<3;i++){
     const [key,label]=order[i%order.length];
-    const pool=slots[i].length?slots[i]:DRAFT_REFERENTS.filter(x=>x.tier===tiers[i]);
+    let pool=slots[i].length?slots[i]:DRAFT_REFERENTS.filter(x=>x.tier===tiers[i]);
+    if(s.position==='POR'&&['defense','physical','pace','pass'].includes(key)){const keepers=pool.filter(p=>tagOf(p.name)==='guardian');if(keepers.length)pool=keepers;}
     // El referente se elige con sentido: pesa su valor en la faceta ofrecida y se evita repetir familia de juego en la misma ronda.
     const ai=ATTRS.findIndex(a=>a[0]===key),seen=new Set(source.map(x=>x.tag));
     const w=pool.map(p=>Math.exp((p.values[ai]-58)/26)*(seen.has(tagOf(p.name))?.3:1));
@@ -152,6 +154,7 @@ export function draftChoices(s) {
   }
   return source;
 }
+export function chooseDraftFocus(s,key){return s.phase==='draft'&&(key===''||ATTRS.some(([k])=>k===key&&!(k in s.attributes)))?{...s,draftFocus:key}:s;}
 export function currentDraft(s){return draftChoices(s)[0]||null;}
 export function rerollDraft(s){if(s.phase!=='draft'||s.draftRerolls>=3)return s;return {...s,draftRerolls:s.draftRerolls+1};}
 const WEIGHTS={DC:[.13,.38,.10,.24,.02,.13],EI:[.29,.20,.15,.27,.02,.07],ED:[.29,.20,.15,.27,.02,.07],
@@ -166,7 +169,7 @@ export function acceptDraft(s, index=0){
   const attributes={...s.attributes,[d.key]:starterValue};
   const attrCeil={...(s.attrCeil||{}),[d.key]:juniorCeiling(d.value,d.key,d.tier)};
   const draftSources=[...s.draftSources,{legend:d.legend,attribute:d.key,value:d.value,startingValue:starterValue,ceiling:attrCeil[d.key],tier:d.tier}];
-  if(s.draftIndex<7)return {...s,draftIndex:s.draftIndex+1,attributes,attrCeil,draftSources};
+  if(s.draftIndex<7)return {...s,draftIndex:s.draftIndex+1,draftFocus:'',attributes,attrCeil,draftSources};
   const dna=dnaFromPicks(draftSources,s.position);
   const withDna={...s,dna};
   const finalAttributes=classAdjustedAttributes(s,attributes);
@@ -181,35 +184,51 @@ export function acceptDraft(s, index=0){
   for(const k of KEY_ATTRS)done.attrCeil[k]=clamp(Math.round(done.attrCeil[k]+bonus+(extra[k]||0)),finalAttributes[k]+2,99);
   for(const k of ['skills','weak'])if(Number.isFinite(done.attrCeil[k]))done.attrCeil[k]=clamp(done.attrCeil[k]+(extra[k]||0),Math.max(1,finalAttributes[k]||1),5);
   const potential=Math.max(done.ovr+3,ovrFromAttributes(s.position,done.attrCeil));
-  return {...s,...done,potential,phase:'academy',draftIndex:8,attributes:finalAttributes,draftSources,dna,footballDNA:archetypeFor({...s,attributes:finalAttributes,draftSources})};
+  const completed={...s,...done,potential,phase:'academy',draftFocus:'',draftIndex:8,attributes:finalAttributes,draftSources,dna,footballDNA:archetypeFor({...s,attributes:finalAttributes,draftSources})};
+  return {...completed,initialOfferIds:academyOffers(completed).map(c=>c.id)};
 }
-// El primer mercado prioriza proyectos modestos y ligas de ascenso, también fuera del país natal.
-// Es determinista por semilla y no depende del equipo de hincha.
+// Primer contrato: dos rutas locales y una tercera que puede abrir el mercado regional.
 export function academyOffers(s){
-  const r=rng(String(s.seed)+':academy-v2');
+  if(Array.isArray(s.initialOfferIds)&&s.initialOfferIds.length===3)return s.initialOfferIds.map(getClub).filter(Boolean);
+  const r=rng(String(s.seed)+':academy-v3');
   const all=COUNTRIES.flatMap(country=>country.clubs.filter(c=>!c.inactive&&!/\s(?:B|II|Reservas)$/i.test(c.name)).map(c=>getClub(c.id))).filter(Boolean);
-  const elite=c=>getInauguralLeague(c.id)?.tier===1&&clubPrestige(c)>=76;
-  const modest=c=>getInauguralLeague(c.id)?.tier>=2||c.level<=70;
-  const chosen=[];
-  function choose(pool){
-    const eligible=pool.filter(c=>!chosen.some(x=>x.id===c.id));
-    if(!eligible.length)return null;
-    const weighted=eligible.map(c=>({club:c,weight:getInauguralLeague(c.id)?.tier>=2?9:c.level<=66?7:c.level<=70?5:2}));
-    const total=weighted.reduce((sum,x)=>sum+x.weight,0);let sample=r()*total;
-    return (weighted.find(x=>(sample-=x.weight)<0)||weighted.at(-1)).club;
-  }
   const home=all.filter(c=>c.countryCode===s.country);
-  const away=all.filter(c=>c.countryCode!==s.country&&!!getInauguralLeague(c.id));
-  const homeHumble=home.filter(c=>!elite(c));
-  const awayHumble=away.filter(c=>!elite(c));
-  const take=pool=>{const club=choose(pool);if(club)chosen.push(club);};
-  take(homeHumble.filter(modest).length?homeHumble.filter(modest):homeHumble.length?homeHumble:home);
-  take(awayHumble.filter(modest).length?awayHumble.filter(modest):awayHumble);
-  take([...homeHumble,...awayHumble].filter(modest).length?[...homeHumble,...awayHumble].filter(modest):[...homeHumble,...awayHumble]);
-  while(chosen.length<3){const old=chosen.length;take(all.filter(c=>!elite(c)));if(chosen.length===old){take(all);if(chosen.length===old)break;}}
-  // Solo un 3,5 % de probabilidades de que aparezca una propuesta de un grande.
-  if(chosen.length===3&&r()<.035){const giant=choose(all.filter(elite));if(giant)chosen[2]=giant;}
-  return chosen.map(c=>getClub(c.id));
+  const conf=getCountry(s.country)?.confederation;
+  const elite=c=>clubPrestige(c)>=76;
+  const reachable=c=>!elite(c)&&c.level<=Math.max(70,(s.ovr||55)+10);
+  const local=home.filter(reachable);
+  const chosen=[];
+  const take=pool=>{
+    const candidates=pool.filter(c=>!chosen.some(x=>x.id===c.id));
+    if(!candidates.length)return;
+    const weights=candidates.map(c=>{
+      const tier=getInauguralLeague(c.id)?.tier||1;
+      const gap=Math.max(0,c.level-(s.ovr||55));
+      return (tier>=2?3:1)*Math.exp(-gap/14);
+    });
+    let roll=r()*weights.reduce((a,b)=>a+b,0);
+    const index=weights.findIndex(w=>(roll-=w)<=0);
+    chosen.push(candidates[index<0?candidates.length-1:index]);
+  };
+  const locals=local.length>=2?local:home.filter(c=>!elite(c));
+  take(locals.length?locals:home);take(locals.length>=2?locals:home);
+  // Probabilidades de diseño, no una reproducción de reglamentos de transferencias.
+  let abroad=s.age<18?.07:.25;
+  if(s.riskProfile==='aventurero')abroad+=.25;
+  if(['hogareno','leal','paciente'].includes(s.riskProfile))abroad*=.25;
+  if(s.environment==='migrante')abroad+=.12;
+  const regional=all.filter(c=>c.countryCode!==s.country&&getCountry(c.countryCode)?.confederation===conf&&reachable(c));
+  const foreign=all.filter(c=>c.countryCode!==s.country&&reachable(c));
+  if(r()<abroad)take(regional.length&&r()<.9?regional:foreign);
+  if(chosen.length<3)take(locals);
+  if(chosen.length<3)take(home.filter(c=>!elite(c)));
+  if(chosen.length<3)take(home);
+  while(chosen.length<3){const before=chosen.length;take(regional);if(chosen.length===before)take(foreign);if(chosen.length===before)break;}
+  return chosen;
+}
+export function academyOfferReason(s,c){
+ const local=c.countryCode===s.country,regional=getCountry(c.countryCode)?.confederation===getCountry(s.country)?.confederation;
+ return local?'Seguimiento nacional · adaptación cercana a casa':regional?'Red regional de ojeadores · primera experiencia fuera':'Oportunidad internacional · mayor esfuerzo de adaptación';
 }
 export function academyContractOffer(s,clubOrId){
   const club=getClub(typeof clubOrId==='string'?clubOrId:clubOrId?.id);
@@ -579,7 +598,7 @@ export function totals(s){return s.history.reduce((a,x)=>({matches:a.matches+x.m
 export function simulatedStandings(s){
  const club=getClub(s.clubId);if(!club)return [];
  const saved=[...(s.history||[])].reverse().find(x=>x.clubId===s.clubId&&Array.isArray(x.table));
- if(saved&&saved.leagueId===getCompetitionForCareer(s)?.id)return saved.table.map(t=>({...t,isPlayer:t.id===s.clubId}));
+ if(saved)return saved.table.map(t=>({...t,isPlayer:t.id===s.clubId}));
  // Antes de disputar partidos, no hay tabla ficticia con puntos inventados.
  return leagueParticipants(club.countryCode,s.clubId,s).map(c=>({id:c.id,name:c.name,played:0,wins:0,draws:0,losses:0,for:0,against:0,gd:0,points:0,isPlayer:c.id===s.clubId})).sort((a,b)=>a.name.localeCompare(b.name,'es')).map((x,i)=>({...x,position:i+1}));
 }

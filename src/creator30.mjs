@@ -1,3 +1,4 @@
+import { dnaFromPicks } from './identity30.mjs';
 /* RASCENSO 3.1 · Creador de futbolista y Legado/ADN — vistas.
  * Funciones puras que devuelven HTML. experience.mjs decide cuándo montarlas y gestiona los eventos. */
 import { COUNTRIES } from './countries.mjs';
@@ -62,12 +63,12 @@ const pctTxt=v=>{const x=Math.round((v-1)*100);return x?`${x>0?'+':''}${x} %`:nu
 function projection(d){
  const full={...d,startAge:Number(d.age)};
  const st=startAttrDelta(full),cls=Object.fromEntries(classBonuses(d.position,d.roleClass)),boost=STRENGTH_OPTIONS.find(x=>x.id===d.strength)?.boost;
- const start=KEYS.map(k=>Math.max(0,(st[k]||0)+(cls[k]||0)+(boost===k?1:0)));
- const cc=creatorCeilings(full),ceil=KEYS.map(k=>Math.max(0,cc[k]||0));
+ const start=KEYS.map(k=>(st[k]||0)+(cls[k]||0)+(boost===k?1:0));
+ const cc=creatorCeilings(full),ceil=KEYS.map(k=>cc[k]||0);
  const f=choiceFx(full);
  const rows=[[f.goals,'goles'],[f.assists,'asistencias'],[f.injury,'lesiones',-1],[f.growth,'desarrollo']].map(([v,l,sg=1])=>{const t=pctTxt(v);return t?`<i class="${(v-1)*sg>=0?'up':'down'}">${t} ${l}</i>`:'';}).join('')
   +(f.minutes?`<i class="${f.minutes>0?'up':'down'}">${f.minutes>0?'+':''}${(f.minutes*100).toFixed(1).replace('.0','').replace('.',',')} % minutos</i>`:'')+(f.calm?`<i class="${f.calm>0?'up':'down'}">${f.calm>0?'+':''}${Math.round(f.calm*100)} % serenidad</i>`:'')+(f.market>1?`<i class="up">Mercado +${Math.round((f.market-1)*100)} %</i>`:'');
- return `<div class="cr-proj"><header><span>BONOS DE TU PERFIL</span><small>Arranque y techo</small></header>${radar(start,{ghost:ceil,size:230,max:5})}<div class="lg-legend"><i class="a"></i>Arranque<i class="b"></i>Techo</div><div class="cr-chips center">${rows||'<small>Sin modificadores globales.</small>'}</div><p class="cr-proj-note">Los modificadores de cada decisión se suman. Tu ADN heredado (siguiente paso) añadirá techos y rasgos propios.</p></div>`;
+ return `<div class="cr-proj"><header><span>BONOS DE TU PERFIL</span><small>Arranque y techo</small></header><table class="cr-bonus-table"><caption>Modificadores antes del Legado</caption><thead><tr><th>Atributo</th><th>Inicio</th><th>Techo</th></tr></thead><tbody>${KEYS.map((k,i)=>`<tr><th>${h(ATTR_LABEL[k])}</th><td>${start[i]>0?'+':''}${start[i]}</td><td>${ceil[i]>0?'+':''}${ceil[i]}</td></tr>`).join('')}</tbody></table><div class="cr-chips center">${rows||'<small>Sin modificadores globales.</small>'}</div><p class="cr-proj-note">Los bonos de atributos se suman; los porcentajes se combinan multiplicativamente. Tu ADN heredado (siguiente paso) añadirá techos y rasgos propios.</p></div>`;
 }
 function dreamGoalPanel(d){
  const g=DREAM_GOALS[d.dream];if(!g)return '';
@@ -128,7 +129,7 @@ function summaryLine(d){
 }
 function stepSummary(d){
  const cons=draftConsequences(d,NAME_OF);
- const missing=[!d.name.trim()&&'Escribe un nombre',!(Number(d.number)>=1&&Number(d.number)<=99)&&'El dorsal debe estar entre 1 y 99'].filter(Boolean);
+ const missing=[!d.name.trim()&&'Escribe un nombre',!(Number.isInteger(Number(d.number))&&Number(d.number)>=1&&Number(d.number)<=99)&&'El dorsal debe estar entre 1 y 99'].filter(Boolean);
  return heading('CAPÍTULO VI · PERFIL PREVIO','Tu carrera','comienza acá.','Revisa lo que has decidido. Ninguna elección garantiza el éxito: cambian las oportunidades, los riesgos y la manera de crecer.')
  +`<div class="cr-oneliner"><b>“</b>${h(summaryLine(d))}<b>”</b></div>`
  +(missing.length?`<div class="cr-warn">${missing.map(m=>`<span>⚠ ${h(m)}</span>`).join('')}</div>`:'')
@@ -136,7 +137,7 @@ function stepSummary(d){
  +`<div class="cr-next"><div class="cr-ico">◈</div><div><strong>Lo que viene: tu legado</strong><p>Ahora elegirás 8 influencias entre leyendas e íconos. Cada una te da una faceta con su techo, y juntas forman tu <b>ADN futbolístico</b>: una familia de juego con un rasgo propio que acompañará toda tu carrera.</p></div></div>`;
 }
 export function creatorView(draft,wizard){
- const body=[stepIdentity,stepRoots,stepPlayer,stepMind,stepDreams,stepSummary][wizard](draft);
+ const body=[stepIdentity,stepRoots,stepPlayer,stepMind,stepDreams,stepSummary][wizard](draft)+profileReport(draft,wizard);
  return {content:body,aside:aside(draft,wizard)};
 }
 
@@ -159,6 +160,8 @@ export function draftView(state,choices){
   const tag=DNA_TAGS[x.tag]||DNA_TAGS.mosaico,hide=x.hidden;
   const pts=x.radar&&!hide?x.radar:null;
   const stars=['skills','weak'].includes(x.key);
+  const projected=dnaFromPicks([...sources,{legend:x.legend,attribute:x.key,tier:x.tier}],state.position);
+  const projectedTag=DNA_TAGS[projected.primary];
   return `<button class="lg-card tier-${h(x.tier)}" data-portrait-name="${h(x.legend)}" data-action="draft-accept" data-index="${i}">
    <div class="legend-photo-backdrop" aria-hidden="true"><div class="legend-art-field"><div class="legend-art-title">RASCENSO <span>ADN FUTBOLÍSTICO</span></div></div></div>
    <div class="lg-top"><span class="lg-tier">${TIER_ICON[x.tier]} ${h(x.tierLabel)}</span><span class="lg-fit fit-${x.fit.startsWith('CLAVE')?'key':x.fit.startsWith('COMPL')?'mid':'alt'}">${h(x.fit)}</span></div>
@@ -168,13 +171,13 @@ export function draftView(state,choices){
     <div class="lg-nums"><div><small>LEYENDA</small><b>${hide?'?':stars?'★'.repeat(x.value):n(x.value)}</b></div><div class="arrow">→</div><div><small>TU JUVENIL</small><b>${hide?'?':stars?'★'.repeat(x.junior):n(x.junior)}</b></div><div class="ceil"><small>TECHO</small><b>${hide?'?':stars?'★'.repeat(x.ceiling):n(x.ceiling)}</b></div></div>
     ${stars?'':`<div class="lg-meter" aria-hidden="true"><i style="width:${hide?0:x.junior}%"></i><b style="left:${hide?0:x.ceiling}%"></b></div>`}
     <div class="lg-radar">${pts?radar(pts,{size:150,dashed:false}):'<div class="lg-hidden">Perfil oculto<br><small>Modo Purista</small></div>'}<div class="lg-trait"><small>RASGO DE LA FAMILIA</small><strong>${h(tag.trait)}</strong><p>${h(tag.blurb)}</p></div></div>
-    <p class="lg-tier-detail">${h(x.tierDetail)}</p>
+    <p class="lg-tier-detail">${h(x.tierDetail)}</p><div class="lg-preview"><small>ADN SI ELIGES ESTA CARTA</small><strong>${projectedTag.icon} ${h(projectedTag.name)}</strong><span>${projected.fit==='natural'?'Encaje natural':projected.fit==='neutral'?'Encaje parcial':'Estilo atípico para tu puesto'}${projected.secondary?' · secundaria: '+h(DNA_TAGS[projected.secondary].name):''}</span></div>
    </div>
    <span class="lg-cta">Incorporar al jugador ↗</span></button>`;}).join('');
  const picks=sources.map(p=>{const t=DNA_TAGS[tagFor(p)]||DNA_TAGS.mosaico;return `<li><b>${t.icon}</b><div><strong>${h(p.legend)}</strong><small>${h(ATTR_LABEL[p.attribute]||p.attribute)} · ${h(t.name)}</small></div><span>${TIER_ICON[p.tier]}</span></li>`;}).join('');
  return `<div class="lg-wrap"><div class="lg-main">
   <div class="lg-head"><div><span class="section-label">CAPÍTULO VII · TU ADN FUTBOLÍSTICO</span><h1>Elige tu <em>influencia.</em></h1><p>Cada carta te da una faceta distinta de la mano de una leyenda. La cifra del referente es solo una guía: tu juvenil hereda un valor modesto y un <b>techo</b> de crecimiento. Las 8 influencias forman tu <b>ADN</b>.</p></div><div class="lg-count"><strong>${state.draftIndex}<span>/8</span></strong><small>INFLUENCIAS</small></div></div>
-  <div class="lg-pips">${pips}</div>
+  <div class="lg-pips">${pips}</div><div class="lg-focus" role="group" aria-label="Faceta del legado"><span>¿QUÉ QUIERES HEREDAR?</span><button type="button" data-action="draft-focus" data-key="" aria-pressed="${!state.draftFocus}">Explorar</button>${ATTRS.filter(([k])=>!(k in state.attributes)).map(([k,l])=>`<button type="button" data-action="draft-focus" data-key="${k}" aria-pressed="${state.draftFocus===k}">${h(l)}</button>`).join('')}<small>${state.draftFocus?'Tres referentes para la misma faceta: compara arranque, techo y ADN.':'Explora distintas facetas o elige una para comparar tres referentes. No consume cambios.'}</small></div>
   <div class="lg-cards">${cards}</div>
   <div class="lg-foot"><button type="button" class="action secondary" data-action="reroll" ${state.draftRerolls>=3?'disabled':''}>↻ Cambiar propuestas (${Math.max(0,3-state.draftRerolls)})</button><small>Las cifras son ficticias. Solo las cartas con fotografía autorizada muestran rostros reales. <a href="./assets/MEDIA_CREDITS.html" target="_blank" rel="noopener">Créditos y licencias</a>.</small></div></div>
   <aside class="lg-side"><section class="lg-panel"><header><span>TU JUGADOR HOY</span><small>${filled.length}/8 atributos</small></header>${radar(KEYS.map(k=>state.attributes[k]??null),{ghost:KEYS.map(k=>state.attrCeil?.[k]??null),size:230})}<div class="lg-legend"><i class="a"></i>Valor inicial<i class="b"></i>Techo</div></section>
@@ -184,7 +187,7 @@ export function draftView(state,choices){
 }
 const tagFor=p=>tagOf(p.legend);
 function leaning(state){
- const t={};for(const p of state.draftSources||[]){const k=tagFor(p);t[k]=(t[k]||0)+({icono:1.15,figura:1,profesional:.9}[p.tier]||1);}
+ const t=dnaFromPicks(state.draftSources||[],state.position).tally;
  const ranked=Object.entries(t).sort((a,b)=>b[1]-a[1]);
  const max=Math.max(2.2,ranked[0]?.[1]||0);
  const bars=ranked.length?ranked.map(([k,v])=>`<div class="lg-dna ${v>=2.2?'hot':''}"><span><b>${DNA_TAGS[k].icon}</b>${h(DNA_TAGS[k].name)}</span><div><i style="width:${Math.round(v/max*100)}%"></i></div><em>${v>=2.2?'DOMINANTE':''}</em></div>`).join(''):'<p class="muted">Elige influencias: la familia que más se repita será tu ADN. Si ninguna domina, serás un <b>Mosaico</b>.</p>';
@@ -201,4 +204,16 @@ export function dnaCard(state){
  const lines=[['goals','goles',1],['assists','asistencias',1],['injury','lesiones',-1]].map(([k,l,sg])=>{const t=pct(fx[k]);return t?`<i class="${(fx[k]-1)*sg>=0?'up':'down'}">${t} ${l}</i>`:'';}).join('')+(fx.minutes?`<i class="${fx.minutes>0?'up':'down'}">${fx.minutes>0?'+':''}${(fx.minutes*100).toFixed(1).replace('.0','').replace('.',',')} % minutos</i>`:'')+(fx.feint?'<i class="up">Amague mejorado</i>':'')+(fx.tackle?'<i class="up">Entrada más larga</i>':'')+(fx.reflex?'<i class="up">Reflejos mejorados</i>':'')+(fx.sprint?'<i class="up">Sprint más rápido</i>':'')+(fx.paceDecline>1?'<i class="down">El Ritmo declina antes</i>':'');
  const ceils=Object.entries(ceil).filter(([,v])=>v).map(([k,v])=>`<i class="up">+${v} techo ${h(ATTR_LABEL[k])}</i>`).join('');
  return `<section class="dna-card"><div class="dna-ico">${p.icon}</div><div class="dna-main"><small>TU ADN HEREDADO</small><h2>${h(p.name)}</h2><strong>${h(p.trait)}</strong><p>${h(p.blurb)}</p>${s?`<p class="dna-2"><b>${s.icon} Influencia secundaria:</b> ${h(s.name)} — ${h(s.trait)}</p>`:''}<div class="dna-fit ${fit[2]}"><b>${h(fit[0])}</b> ${h(fit[1])}</div></div><div class="dna-fx"><small>EFECTOS EN TU CARRERA</small><div class="cr-chips">${lines}${ceils}</div></div>${radar(KEYS.map(k=>state.attributes[k]??null),{ghost:KEYS.map(k=>state.attrCeil?.[k]??null),size:210})}</section>`;
+}
+
+/** Informe contextual: no promete contratos ni confunde techo con capacidad actual. */
+function profileReport(d,step){
+ const f=choiceFx(d),delta=startAttrDelta(d);
+ const notes=[];
+ if(step===0)notes.push('La posición pondera tu media. Cambiar de puesto actualiza las clases disponibles; el resto de tu identidad se conserva.');
+ if(step===1)notes.push(`Tu formación fija ${70+f.startMorale} de moral y ${50+f.startTrust} de confianza inicial del entrenador. La ciudad y tu historia acompañan el relato; no conceden puntos extra.`);
+ if(step===2){const strongest=classBonuses(d.position,d.roleClass).map(([k,v])=>`${ATTR_LABEL[k]} +${v}`).join(' · ');notes.push(`Tu clase: ${strongest}. El Legado aporta la base; formación, edad y fortaleza se añaden al cerrar las ocho elecciones.`);if((delta.pace||0)<0)notes.push('El origen amateur reduce en 1 el Ritmo inicial; puedes compensarlo con una influencia o tu clase.');}
+ if(step===3||step===4||step===5)notes.push(`Primer contrato: prioridad para ${getCountry(d.country)?.name}. ${Number(d.age)<18?'Por tu edad, las salidas al extranjero son especialmente poco frecuentes.':'Puedes recibir una oportunidad regional junto a los proyectos locales.'} ${d.riskProfile==='aventurero'?'Tu espíritu aventurero aumenta esa posibilidad.':['hogareno','leal','paciente'].includes(d.riskProfile)?'Tu perfil refuerza un comienzo cerca de casa.':''}`);
+ if(step===4)notes.push('El club de hincha añade vínculos y escenas, pero no compra una oferta. Tu sueño se seguirá durante la carrera.');
+ return `<section class="cr-report"><span>INFORME DEL FORMADOR</span>${notes.map(t=>`<p>${h(t)}</p>`).join('')}</section>`;
 }

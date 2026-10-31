@@ -18,6 +18,6 @@ export const WEAKNESS_OPTIONS=WEAKNESSES;
 export function classesFor(position){return (CLASS_DATA[position]||CLASS_DATA.MC).map(([id,name,description,primary,power,secondary,extra,moment])=>({id,name,description,primary,power,secondary,extra,moment}));}
 export function classFor(s){return classesFor(s.position).find(c=>c.id===s.roleClass)||classesFor(s.position)[0];}
 export function normalizeProfile(s){const position=s.position||'DC';return {roleClass:classesFor(position).some(c=>c.id===s.roleClass)?s.roleClass:classesFor(position)[0].id,strength:STRENGTHS.some(t=>t.id===s.strength)?s.strength:'tecnica',weakness:WEAKNESSES.some(t=>t.id===s.weakness)?s.weakness:'inconstante'};}
-export function classAdjustedAttributes(s,attrs){const c=classFor(s),a={...attrs};for(const [k,v] of [[c.primary,c.power],[c.secondary,c.extra]]){if(k in a)a[k]=Math.max(1,Math.min(99,a[k]+v));}
+export function classAdjustedAttributes(s,attrs){const c=classFor(s),a={...attrs};for(const [k,v] of [[c.primary,c.power],[c.secondary,c.extra]]){if(k in a)a[k]=Math.max(1,Math.min(['skills','weak'].includes(k)?5:99,a[k]+v));}
  const strength=STRENGTHS.find(x=>x.id===s.strength);if(strength?.boost in a)a[strength.boost]=Math.max(1,Math.min(99,a[strength.boost]+1));return a;}
 export function profileMatchEffects(s){const c=classFor(s),w=s.weakness||'inconstante';return {minutes:w==='fisico'?-0.018:w==='presion'?-0.006:.012,goals:['shot','pace'].includes(c.primary)?1.045:1,assists:c.primary==='pass'?1.07:1,injury:w==='fisico'?1.12:1,pressure:w==='presion'?7:0,moment:c.moment};}

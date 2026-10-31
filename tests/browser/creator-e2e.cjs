@@ -41,6 +41,11 @@ const url=process.argv[2]||'http://localhost:8765/index.html';
  await p.click('[data-action=create]');await p.waitForSelector('.lg-card');
  check(await p.locator('.lg-card').count()===3,'tres cartas por ronda');
  check(await p.locator('.lg-tag').count()===3,'cada carta muestra su familia de juego');
+ await p.click('[data-action=draft-focus][data-key=pass]');
+ check(await p.locator('.lg-facet strong:text-is("Pase")').count()===3,'comparar tres referentes de Pase');
+ await p.reload();await p.waitForSelector('.lg-card');
+ check(await p.locator('[data-action=draft-focus][data-key=pass][aria-pressed=true]').count()===1,'faceta persistente tras recarga');
+ check(await p.locator('.lg-preview').count()===3,'vista previa del ADN por carta');
  await p.click('[data-action=reroll]');check(await p.locator('[data-action=reroll]:has-text("(2)")').count()===1,'quedan 2 cambios');
  for(let i=0;i<8;i++){await p.locator('[data-action=draft-accept]').nth(i%3).click();await p.waitForTimeout(60);}
  // 6 · ADN heredado y firma

@@ -219,7 +219,7 @@ export const CHOICES={
  }
 };
 /** Tipo de personalidades con efecto ya implementado en otras partes (se anotan para el resumen). */
-export const AGE_FX={16:[['Más años para crecer (+1 año de carrera)',1],['Arranque más bajo',0]],17:[['Equilibrio entre margen y madurez',1]],18:[['+2 a los atributos clave al empezar',1]],19:[['+4 a los atributos clave al empezar',1],['Un año menos de desarrollo',0]]};
+export const AGE_FX={16:[['Más años para crecer (+1 año de carrera)',1],['Arranque más bajo',0]],17:[['Equilibrio entre margen y madurez',1]],18:[['+2 a los seis atributos al empezar',1]],19:[['+4 a los seis atributos al empezar',1],['Un año menos de desarrollo',0]]};
 export function startBoost(age){return Math.max(0,(clamp(Number(age)||17,16,19)-17)*2);} // 17:0, 18:+2, 19:+4
 
 const NEUTRAL={minutes:0,goals:1,assists:1,injury:1,growth:1,growthYoung:1,growthLow:1,growthRegular:1,declineYears:0,ceilAll:0,
