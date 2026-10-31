@@ -5,17 +5,20 @@ En el despliegue se crean DESPUÉS de descargar copas licenciadas de Commons.
 """
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from pathlib import Path
-import re,sys,hashlib,colorsys
+import re,sys,hashlib,colorsys,json
 ROOT=Path(sys.argv[1] if len(sys.argv)>1 else '_site')
 OUT=ROOT/'assets'/'trophies';OUT.mkdir(parents=True,exist_ok=True)
 COUNTRY_SRC=Path('src/countries.mjs').read_text(encoding='utf-8')
 COUNTRIES=sorted(set(re.findall(r'(?:["\x27]?code["\x27]?\s*:\s*)["\x27]([A-Z]{2})["\x27]',COUNTRY_SRC)))
 LEAGUES=['CL1','CL2','BR1','BR2','AR1','EN1','ES1','DE1','IT1','FR1','NL1','PT1','SC1']
 EXTRAS=['club-world','supercup','continental-generic','continental-europa','continental-conference','continental-concacaf','continental-afc2','continental-cafconf','continental-ofc','continental-superuefa','national-generic','national-conmebol','national-uefa','national-caf','national-afc','national-concacaf','national-ofc']
+REAL=['libertadores','sudamericana','recopa','copaamerica','champions','worldcup',
+      'premier','eredivisie','copadelrey','copachile','brasileirao','afcchampions','cafchampions']
 KEYS=([(f'league-{code.lower()}','league',code) for code in COUNTRIES]+
  [(f'cup-{code.lower()}','cup',code) for code in COUNTRIES]+
  [(f'league-{id.lower()}','league',id) for id in LEAGUES]+
- [(k,k.split('-')[0],k.split('-')[-1].upper()) for k in EXTRAS])
+ [(k,k.split('-')[0],k.split('-')[-1].upper()) for k in EXTRAS]+
+ [(f'real-{k}','continental' if k not in ['copachile','copadelrey','premier','eredivisie','brasileirao'] else 'cup',k[:4].upper()) for k in REAL])
 def font(size):
  for file in ('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf','/usr/share/fonts/truetype/liberation2/LiberationSans-Bold.ttf'):
   try:return ImageFont.truetype(file,size)
@@ -79,7 +82,13 @@ def make(key,kind,code):
   d.regular_polygon((x,295,5),5,rotation=270,fill=gold)
  img.resize((160,210),Image.Resampling.LANCZOS).save(OUT/(key+'.png'),'PNG',optimize=True)
 def main():
+ credits=ROOT/'assets'/'media12.json'
+ try:verified={c['name'] for c in json.loads(credits.read_text(encoding='utf-8')).get('credits',[]) if c.get('kind')=='trophy'}
+ except (OSError,ValueError,KeyError):verified=set()
  for key,kind,code in KEYS:
-  if not (OUT/(key+'.png')).exists():make(key,kind,code)
+  # Si Wikimedia no entregó imagen licenciada, no presentar el respaldo genérico como oficial.
+  if key.startswith('real-'):
+   if key[5:] not in verified:make(key,kind,code)
+  elif not (OUT/(key+'.png')).exists():make(key,kind,code)
  print('RASCENSO 4.5: ',len(KEYS),'ilustraciones PNG únicas disponibles, más trofeos reales licenciados; países:',len(COUNTRIES),flush=True)
 if __name__=='__main__':main()
