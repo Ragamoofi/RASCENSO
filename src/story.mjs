@@ -7,6 +7,8 @@ import { COUNTRIES } from './countries.mjs';
 import { STORY_09 } from './story09.mjs';
 import { STORY_11 } from './story11.mjs';
 import { matchContext } from './career10.mjs';
+import { isWorldScene, buildWorldScene, applyWorldEffects } from './story20.mjs';
+import { adjustOvr } from './career20.mjs';
 
 const findClub=id=>COUNTRIES.flatMap(c=>c.clubs).find(c=>c.id===id);
 const clubName=id=>findClub(id)?.name||'tu club';
@@ -283,6 +285,7 @@ export function storyDetail(s,id){
  return details[stableHash(`${s.seed}:${id}:${season}:${count}`)%details.length];
 }
 export function sceneFor(s){
+ if(isWorldScene(s.pendingEvent))return buildWorldScene(s);
  const entry=catalog[s.pendingEvent]||catalog.coach;
  const relationship=s.relationships?.[entry.actor]||initialRelationships(s.country)[entry.actor];
  const club=findClub(s.clubId);const outlet=entry.actor==='press'?outletFor({...s,clubCountry:club?.countryCode||club?.id?.slice(0,2).toUpperCase()},s.pendingEvent):null;
@@ -346,13 +349,19 @@ export function chooseScene(s,roll){
 export function resultOfScene(s,scene,index,playerText=''){
  const o=scene.options[index]||scene.options[0];const effect=o.effect||{};
  const relation={...s.relationships};
- for(const key of ['coach','teammate','agent','press','family'])if(effect[key])relation[key]={...relation[key],trust:x((relation[key]?.trust||50)+effect[key],0,100),known:true};
- const ovr=effect.ovr?x(s.ovr+effect.ovr,40,s.potential):s.ovr;
+ // Rendimientos decrecientes: cuanto más alta la relación, menos suma cada gesto positivo.
+ const gain=(cur,d)=>d>0?d*Math.max(.25,(100-cur)/55):d;
+ for(const key of ['coach','teammate','agent','press','family'])if(effect[key])relation[key]={...relation[key],trust:x(Math.round((relation[key]?.trust??50)+gain(relation[key]?.trust??50,effect[key])),0,100),known:true};
+ // Con el modelo por atributos la media nunca se escribe directamente: se mueven atributos reales.
+ const modern=s.attrModel===2;
+ const ovr=effect.ovr&&!modern?x(s.ovr+effect.ovr,40,s.potential):s.ovr;
  const newState={...s,relationships:relation,ovr,coachTrust:relation.coach.trust,
    morale:x((s.morale??70)+(effect.morale||0),0,100),reputation:x((s.reputation??0)+(effect.reputation||0),0,100),
    sceneBeat:1,sceneChoice:index,scenePlayerText:String(playerText||'').trim().slice(0,240),
    decisions:[...s.decisions,{age:s.age,text:`${scene.title}: ${o.title}`}],
    storyLog:[...(s.storyLog||[]),{year:(s.startYear||2026)+(s.age-(s.startAge||16)),id:scene.id,title:scene.title,tag:scene.tag,actor:scene.speaker.name,choice:o.title,words:String(playerText||'').trim().slice(0,240),result:o.impact,club:clubName(s.clubId)}].slice(-100)};
- return newState;
+ const shifted=modern&&effect.ovr?adjustOvr(newState,x(s.ovr+effect.ovr,40,s.potential)-s.ovr):newState;
+ // Efectos extendidos (hinchada, directiva, compromisos, posición…) valen para cualquier escena.
+ return applyWorldEffects(shifted,effect);
 }
 export function sceneOutcome(s){const scene=sceneFor(s);return scene.options[s.sceneChoice??0]||scene.options[0];}

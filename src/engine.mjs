@@ -11,6 +11,10 @@ import { initialRelationships, chooseScene, sceneFor, resultOfScene } from './st
 import { playLeague, leagueParticipants, getCompetitionForCareer, nextLeagueRosters } from './league.mjs';
 import { VERIFIED_LEAGUES, getInauguralLeague } from './leagues2026.mjs';
 import { annualSalary, marketClub, clubPrestige, playerDemand, buildTransferOffers, evaluateClubFuture } from './market.mjs';
+import { clamp, rng, yearOf, adjustOvr, ovrFromAttributes, juniorValue, juniorCeiling, finalizeDraft, migrateAttributes, developSeason, seasonRating, seasonObjectives, evaluateObjectives, squadRole, freshSquad, threadEffects, coachSeasonEffects, preparationFocus, addThread, resolveThread, hasThread, activeThreads, KEY_ATTRS, POSITION_WEIGHTS } from './career20.mjs';
+import { ensureWorld, advanceWorld, pushNews, coachFor, namerFor, worldClub, dynamicPrestige, dynamicLevel, worldRival } from './world20.mjs';
+import { pickWorldScene } from './story20.mjs';
+export const SAVE_VERSION=9;
 
 export const START_YEAR = 2026;
 export const ORIGINS = [
@@ -61,9 +65,6 @@ export const POSITIONS = [
 ];
 export const ATTRS = [['pace','Ritmo'],['shot','Tiro'],['pass','Pase'],['dribble','Regate'],['defense','Defensa'],['physical','Físico'],['skills','Filigranas'],['weak','Pierna mala']];
 
-const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
-function hash(x){ let h=2166136261;for(const c of String(x)){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0; }
-function rng(seed){let a=hash(seed);return ()=>{a=(a+0x6D2B79F5)|0;let t=Math.imul(a^(a>>>15),1|a);t^=t+Math.imul(t^(t>>>7),61|t);return ((t^(t>>>14))>>>0)/4294967296;};}
 function choose(arr,r){return arr[Math.floor(r()*arr.length)];}
 export function getCountry(code){return COUNTRIES.find(c=>c.code===code);}
 export function getClub(id){for(const c of COUNTRIES){const club=c.clubs.find(x=>x.id===id);if(club){const league=getInauguralLeague(club.id);return {...club,country:c.name,countryCode:c.code,league:league?.name||c.league,division:league?.tier??null,competitionId:league?.id??null,region:c.confederation};}}return null;}
@@ -76,7 +77,7 @@ export function newCareer({name,number=9,foot='Derecha',country='CL',position='D
   const personalityId=validSelection(personality,PERSONALITIES,'disciplinado');
   const relationships=initialRelationships(country);
   if(originId==='cantera')relationships.coach.trust=60;
-  return {version:8,...normalizeProfile({position,roleClass,strength,weakness}),clutchMoment:null,...identityTraits({environment,publicImage,riskProfile,developmentPath}),preparation:null,careerMoments:[],annualScenes:0,market:null,agent:{searches:0,year:null,focus:'balanced'},careerEarnings:0,developmentProfile:developmentPath==='tardio'?'tardio':['temprano','normal','normal','normal','tardio'][Math.floor(rng(String(seed)+':dev')()*5)],injuryProfile:rng(String(seed)+':injury')()<.18?'fragil':'resistente',seasonPlan:'equilibrio',contract:null,seed:String(seed),phase:'draft',name:safeName,number:clamp(Number(number)||9,1,99),foot:foot==='Izquierda'?'Izquierda':'Derecha', country,position,mode:mode==='Purista'?'Purista':'Clásico',
+  return {version:SAVE_VERSION,attrModel:2,attrCeil:{},world:null,squad:null,threads:[],awards:[],...normalizeProfile({position,roleClass,strength,weakness}),clutchMoment:null,...identityTraits({environment,publicImage,riskProfile,developmentPath}),preparation:null,careerMoments:[],annualScenes:0,market:null,agent:{searches:0,year:null,focus:'balanced'},careerEarnings:0,developmentProfile:developmentPath==='tardio'?'tardio':['temprano','normal','normal','normal','tardio'][Math.floor(rng(String(seed)+':dev')()*5)],injuryProfile:rng(String(seed)+':injury')()<.18?'fragil':'resistente',seasonPlan:'equilibrio',contract:null,seed:String(seed),phase:'draft',name:safeName,number:clamp(Number(number)||9,1,99),foot:foot==='Izquierda'?'Izquierda':'Derecha', country,position,mode:mode==='Purista'?'Purista':'Clásico',
     age:firstAge,startAge:firstAge,startYear:START_YEAR,city:String(city||'').trim().slice(0,40),origin:originId,personality:personalityId,
     style:validSelection(style,STYLES,'equilibrado'),dream:validSelection(dream,DREAMS,'seleccion'),story:String(story||'').trim().slice(0,180),
     fanClubId:getClub(fanClubId)?fanClubId:null,storyFlags:{playedForFan:false},storyLog:[],relationships,sceneBeat:0,sceneChoice:null,scenePlayerText:'',
@@ -87,13 +88,13 @@ export function newCareer({name,number=9,foot='Derecha',country='CL',position='D
 }
 export function migrateCareer(s){
   if(!s||typeof s!=='object'||!['draft','academy','season','event','transfer','retired'].includes(s.phase)||!getCountry(s.country))return null;
-  if(![1,2,3,4,5,6,7,8].includes(s.version))return null;
+  if(![1,2,3,4,5,6,7,8,9].includes(s.version))return null;
   const v1=s.version===1?{...s,startAge:16,startYear:START_YEAR,city:'',origin:'barrio',personality:'disciplinado',style:'equilibrado',dream:'seleccion',story:'',coachTrust:50}:s;
   const rel=v1.relationships||initialRelationships(v1.country);
   const safeRel={...rel,coach:{...rel.coach,trust:v1.coachTrust??rel.coach?.trust??50}};
   const backfilledTrophies=(v1.history||[]).flatMap(x=>(x.titles||[]).map(title=>({title,year:x.year??null,clubId:x.clubId??null,leagueId:x.leagueId||'',kind:'league'})));
   if(backfilledTrophies.length<(v1.trophies||[]).length){for(const title of (v1.trophies||[]).slice(backfilledTrophies.length))backfilledTrophies.push({title:String(title),year:null,clubId:null,kind:'league'});}
-  const migrated={...v1,...normalizeProfile(v1),version:8,clutchMoment:v1.clutchMoment||null,trophyRecords:Array.isArray(v1.trophyRecords)?v1.trophyRecords:backfilledTrophies,...identityTraits(v1),preparation:v1.preparation||null,careerMoments:Array.isArray(v1.careerMoments)?v1.careerMoments:[],annualScenes:v1.annualScenes||0,market:v1.market||null,agent:v1.agent||{searches:0,year:null,focus:'balanced'},careerEarnings:v1.careerEarnings??(v1.history||[]).reduce((n,x)=>n+(x.salaryEarned||0),0),developmentProfile:v1.developmentProfile||'normal',injuryProfile:v1.injuryProfile||'resistente',seasonPlan:v1.seasonPlan||'equilibrio',contract:v1.contract||null,fanClubId:getClub(v1.fanClubId)?v1.fanClubId:null,
+  const migrated={...v1,...normalizeProfile(v1),version:SAVE_VERSION,threads:Array.isArray(v1.threads)?v1.threads:[],awards:Array.isArray(v1.awards)?v1.awards:[],world:v1.world&&v1.world.v?v1.world:null,squad:v1.squad||null,clutchMoment:v1.clutchMoment||null,trophyRecords:Array.isArray(v1.trophyRecords)?v1.trophyRecords:backfilledTrophies,...identityTraits(v1),preparation:v1.preparation||null,careerMoments:Array.isArray(v1.careerMoments)?v1.careerMoments:[],annualScenes:v1.annualScenes||0,market:v1.market||null,agent:v1.agent||{searches:0,year:null,focus:'balanced'},careerEarnings:v1.careerEarnings??(v1.history||[]).reduce((n,x)=>n+(x.salaryEarned||0),0),developmentProfile:v1.developmentProfile||'normal',injuryProfile:v1.injuryProfile||'resistente',seasonPlan:v1.seasonPlan||'equilibrio',contract:v1.contract||null,fanClubId:getClub(v1.fanClubId)?v1.fanClubId:null,
     storyFlags:v1.storyFlags||{playedForFan:!!(v1.fanClubId&&v1.history?.some(h=>h.clubId===v1.fanClubId))},
     storyLog:Array.isArray(v1.storyLog)?v1.storyLog:[],recapPending:!!v1.recapPending,relationships:safeRel,
     sceneBeat:v1.sceneBeat||0,sceneChoice:v1.sceneChoice??null,scenePlayerText:v1.scenePlayerText||''};
@@ -106,9 +107,14 @@ export function migrateCareer(s){
    migrated.market={canStay:true,reason:'normal',renewal:null,source:'migration',searches:0,focus:'balanced'};
    migrated.offers=buildTransferOffers(migrated,{attempt:0});
   }
+  // 2.0: atributos coherentes con la media y techos por atributo (solo partidas con draft completo).
+  if(migrated.phase!=='draft')Object.assign(migrated,migrateAttributes(migrated));
+  else if(!migrated.attrCeil)migrated.attrCeil={};
+  // 2.0: el mundo vivo y el vestuario se crean al cargar, no recién al simular.
+  if(['season','event','transfer'].includes(migrated.phase)&&migrated.clubId&&getClub(migrated.clubId))return syncClub(migrated);
   return migrated;
 }
-export function careerYear(s){return (s.startYear??START_YEAR)+(s.age-(s.startAge??16));}
+export const careerYear=yearOf;
 // Tres propuestas por ronda: leyendas, atributos y caminos de desarrollo diferentes.
 export function draftChoices(s) {
   if (s.phase !== 'draft') return [];
@@ -129,7 +135,7 @@ export function draftChoices(s) {
     const value=player.values[ATTRS.findIndex(a=>a[0]===key)];
     const weight=important.includes(key)?WEIGHTS[s.position][important.indexOf(key)]:.08;
     const fit=weight>=.26?'CLAVE PARA TU PUESTO':weight>=.16?'COMPLEMENTO FUERTE':'PERFIL ALTERNATIVO';
-    source.push({legend:player.name,key,label,value,fit,tier:player.tier,development:player.ceiling,
+    source.push({legend:player.name,key,label,value,junior:juniorValue(value,key,player.tier),ceiling:juniorCeiling(value,key,player.tier),fit,tier:player.tier,development:player.ceiling,
       tierLabel:DRAFT_TIERS[player.tier].label,tierDetail:DRAFT_TIERS[player.tier].detail,
       hidden:s.mode==='Purista',archetype:archetypeFor({...s,attributes:{...s.attributes,[key]:value}}).name});
   }
@@ -144,22 +150,19 @@ export function acceptDraft(s, index=0){
   if(s.phase!=='draft')return s;
   const choices=draftChoices(s);
   const d=choices[Number.isInteger(index)&&index>=0&&index<choices.length?index:0];
-  // El legado es un referente, no convierte a un juvenil en una estrella de 99 desde el debut.
-  const starterValue=['skills','weak'].includes(d.key)
-    ? clamp(Math.round(d.value),1,5)
-    : clamp(Math.round(43+(d.value-35)*.56+(d.tier==='icono'?3:d.tier==='profesional'?-2:0)),38,87);
+  // El legado es un referente: el juvenil hereda una faceta y un techo, nunca la cifra de la leyenda.
+  const starterValue=juniorValue(d.value,d.key,d.tier);
   const attributes={...s.attributes,[d.key]:starterValue};
-  const draftSources=[...s.draftSources,{legend:d.legend,attribute:d.key,value:d.value,startingValue:starterValue,tier:d.tier}];
-  if(s.draftIndex<7)return {...s,draftIndex:s.draftIndex+1,attributes,draftSources};
+  const attrCeil={...(s.attrCeil||{}),[d.key]:juniorCeiling(d.value,d.key,d.tier)};
+  const draftSources=[...s.draftSources,{legend:d.legend,attribute:d.key,value:d.value,startingValue:starterValue,ceiling:attrCeil[d.key],tier:d.tier}];
+  if(s.draftIndex<7)return {...s,draftIndex:s.draftIndex+1,attributes,attrCeil,draftSources};
   const finalAttributes=classAdjustedAttributes(s,attributes);
-  const vals=['pace','shot','pass','dribble','defense','physical'];
-  const weighted=vals.reduce((sum,k,i)=>sum+(finalAttributes[k]??50)*WEIGHTS[s.position][i],0);
-  const bonus=((attributes.skills||2)+(attributes.weak||2)-4)*.5;
-  // El talento del draft representa el techo; el OVR inicial es una valoración independiente.
-  const talent=clamp(Math.round(weighted+bonus*.75),60,97);
-  const potential=clamp(talent+Math.floor(rng(`${s.seed}:potential`)()*7)-3+draftPotentialAdjustment(draftSources),68,97);
-  const ovr=clamp(Math.round(59+(potential-65)*.23+rng(`${s.seed}:base`)()*5),55,Math.min(72,potential-5));
-  return {...s,phase:'academy',draftIndex:8,attributes:finalAttributes,draftSources,ovr,potential,footballDNA:archetypeFor({...s,attributes:finalAttributes,draftSources})};
+  for(const k of KEY_ATTRS)attrCeil[k]=Math.max(attrCeil[k]??finalAttributes[k]+8,finalAttributes[k]+4);
+  const done=finalizeDraft({...s,attrCeil,draftSources},finalAttributes);
+  const bonus=Math.min(3,draftPotentialAdjustment(draftSources)/3);
+  for(const k of KEY_ATTRS)done.attrCeil[k]=Math.min(99,Math.round(done.attrCeil[k]+bonus));
+  const potential=Math.max(done.ovr+3,ovrFromAttributes(s.position,done.attrCeil));
+  return {...s,...done,potential,phase:'academy',draftIndex:8,attributes:finalAttributes,draftSources,footballDNA:archetypeFor({...s,attributes:finalAttributes,draftSources})};
 }
 // El primer mercado prioriza proyectos modestos y ligas de ascenso, también fuera del país natal.
 // Es determinista por semilla y no depende del equipo de hincha.
@@ -202,7 +205,26 @@ export function signAcademy(s,id){
   const offer=academyOffers(s).find(c=>c.id===id);
   if(s.phase!=='academy'||!offer)return s;
   const contract=academyContractOffer(s,offer);
-  return {...s,phase:'event',clubId:id,contract,pendingEvent:id===s.fanClubId?'fan_home':'arrival',sceneBeat:0,decisions:[...s.decisions,{age:s.age,text:'Primer contrato: '+offer.name+' · '+contract.years+' años'}]};
+  const next={...s,phase:'event',clubId:id,contract,pendingEvent:id===s.fanClubId?'fan_home':'arrival',sceneBeat:0,decisions:[...s.decisions,{age:s.age,text:'Primer contrato: '+offer.name+' · '+contract.years+' años'}]};
+  return syncClub(next,{fresh:true});
+}
+/** Mantiene coherentes mundo, vestuario y entrenador del club actual. */
+export function syncClub(s,{fresh=false}={}){
+  if(!s.clubId)return s;
+  let n=ensureWorld(s);
+  const club=worldClub(n.clubId)||getClub(n.clubId);if(!club)return n;
+  const coach=coachFor(n,n.clubId);
+  if(fresh||n.squad?.clubId!==n.clubId){
+    const level=dynamicLevel(n,club);
+    const squad=freshSquad(n,{...club,level},coach,namerFor(club.countryCode||n.country));
+    // Un club nuevo empieza de cero; una partida migrada conserva la confianza que ya tenía.
+    const trust=fresh?(n.origin==='cantera'&&!n.history?.length?60:50):clamp(n.coachTrust??50,0,100);
+    n={...n,squad,coachTrust:trust,relationships:{...n.relationships,coach:{...(n.relationships?.coach||{}),...(coach?{name:coach.name,role:'Entrenador',style:coach.style}:{}),trust,known:true}}};
+  }else if(coach&&n.squad?.coachId&&n.squad.coachId!==coach.id){
+    // El club cambió de entrenador: la relación empieza de cero y la escena de presentación queda pendiente.
+    n={...n,coachTrust:48,relationships:{...n.relationships,coach:{...n.relationships.coach,name:coach.name,trust:48,style:coach.style}},squad:{...n.squad,coachId:coach.id,newCoachYear:careerYear(n)}};
+  }
+  return n;
 }
 function countryLeagueSize(code){return Math.min(20,Math.max(1,getCountry(code)?.clubs.length||20));}
 function positionGroup(p){if(p==='POR')return 'goalkeeper';if(['DC','EI','ED'].includes(p))return 'attack';if(['MCO','MC','MI','MD'].includes(p))return 'create';return 'defense';}
@@ -218,68 +240,109 @@ export function choosePreparation(s,id){
  const year=careerYear(s);if(s.preparation?.year===year)return s;
  return {...s,preparation:{year,id},careerMoments:[...(s.careerMoments||[]),{year,kind:'preseason',text:`Pretemporada: ${PREPARATIONS.find(p=>p.id===id).name}`}].slice(-80)};
 }
-export function seasonMoment(s){if(s.phase!=='season'||s.clutchMoment)return null;return upcomingMoment(s,playLeague(s).playerMatches,getClub);}
+// Cada render consulta la jugada: se calcula una vez por estado (los estados son inmutables).
+const MOMENTS=new WeakMap();
+export function seasonMoment(s){if(s.phase!=='season'||s.clutchMoment)return null;if(!MOMENTS.has(s))MOMENTS.set(s,upcomingMoment(s,playLeague(s).playerMatches,getClub));return MOMENTS.get(s);}
 export function playCareerMoment(s,choice,timing=null,performance=null){const moment=seasonMoment(s);if(!moment)return s;const next=solveMoment(s,moment,Number(choice),timing,performance);if(next===s)return s;const played=playLeague(next).playerMatches.find(m=>m.round===moment.round&&m.home===moment.home&&m.away===moment.away);return {...next,clutchMoment:{...next.clutchMoment,fixturePreview:played?{score:played.score,minutes:played.minutes,goals:played.goals,assists:played.assists,played:played.played}:null}};}
-export function advanceSeason(s){
- if(s.phase!=='season')return s;
- const club=getClub(s.clubId);if(!club)return s;
+function participantsFor(s){const club=getClub(s.clubId);return club?leagueParticipants(club.countryCode,s.clubId,s):[];}
+/** Objetivos que la directiva y el técnico fijan antes de empezar la temporada. */
+function roleContext(s){const parts=participantsFor(s);const own=parts.find(c=>c.id===s.clubId);return {parts,role:s.squad?squadRole(s,own?.level??60,coachFor(s,s.clubId)):null};}
+export function currentObjectives(s){
+  if(!s.clubId||!s.squad)return null;
+  const {parts,role}=roleContext(s);
+  return seasonObjectives({...s,__tier:getCompetitionForCareer(s)?.tier??null},parts,role);
+}
+export function currentRole(s){return roleContext(s).role;}
+export function advanceSeason(input){
+ if(input.phase!=='season')return input;
+ let s=syncClub(input);
+ const club=getClub(s.clubId);if(!club)return input;
  const r=rng(`${s.seed}:seasonv5:${s.age}:${club.id}`);
+ const year=careerYear(s);
+ const coach=coachFor(s,s.clubId);
+ const objectives=currentObjectives(s);
+ const comp=getCompetitionForCareer(s);
  const league=playLeague(s),leagueRosters=nextLeagueRosters(s,league),{matches,goals,assists,cleanSheets,goalsConceded,injuryWeeks,leaguePosition,role,minutes}=league;
  const global=simulateGlobalSeason(s,league);
- const profile=s.developmentProfile||'normal';
- const ageStep=profile==='temprano'?2:profile==='tardio'?-2:0;
- const devAge=s.age+ageStep;
- const ageFactor=devAge<=21?1:devAge<=24?.78:devAge<=27?.5:devAge<=29?.22:0;
  const games=league.playerMatches.length||1;
  const share=minutes/(games*90);
- const injuryFactor=injuryWeeks>0?.56:1;
- const prep=preparationEffects(s),identity=identitySeasonEffects(s),agenda=seasonAgendaEffects(s);
- const gap=Math.max(0,s.potential-s.ovr);
- const breakout=s.age===(profile==='temprano'?19:profile==='tardio'?25:21)&&r()<.25?3:0;
- const declineStart=profile==='tardio'?33:profile==='temprano'?30:31;
- const decline=s.age>=declineStart?Math.max(1,Math.round(.6+(s.age-declineStart)*.65)):0;
- const growth=gap*.22*ageFactor*Math.max(.18,Math.min(1.12,share*1.55))*injuryFactor+breakout+prep.growth+(agenda.growth||0)+(r()-.5)*1.4-decline;
- const ovr=clamp(Math.round(s.ovr+growth),49,99);
- // Evolución individual: minutos, edad, potencial, importancia de cada faceta y rendimiento.
- // El atributo escogido en el draft se conserva durante toda la carrera.
- const attributesBefore={...(s.attributes||{})},attributes={...attributesBefore},attributeChanges={};
- const developmentKeys=['pace','shot','pass','dribble','defense','physical'];
- const minutesFactor=share>.35&&matches>=8;
- for(const [key] of ATTRS){
-   if(!Number.isFinite(Number(attributesBefore[key])))continue;
-   const old=Number(attributesBefore[key]);
-   const roll=rng(String(s.seed)+':attribute-v2:'+s.age+':'+club.id+':'+key)();
-   let next;
-   if(key==='skills'||key==='weak'){
-     const bonus=minutesFactor&&s.age<=29&&roll>.91?1:0;
-     next=clamp(old+bonus-(s.age>=37&&roll<.08?1:0),1,5);
-   }else{
-     const importance=WEIGHTS[s.position]?.[developmentKeys.indexOf(key)]??.1;
-     const trained=minutesFactor&&s.age<30&&roll<.23+importance*.55?1:0;
-     const difference=clamp(Math.round((ovr-s.ovr)*(.48+importance*1.35))+trained-(s.age>=33&&roll<.38?1:0),-4,5);
-     const ceiling=Math.max(old,Math.min(99,(s.potential||80)+8));
-     next=clamp(old+difference,20,ceiling);
-   }
-   attributes[key]=next;
-   attributeChanges[key]=next-old;
- }
+ const prep=preparationEffects(s),identity=identitySeasonEffects(s);
+ const threadFx=threadEffects(s),coachFx=coachSeasonEffects(coach,s);
  const titles=[];
  if(leaguePosition===1)titles.push(league.league);
- // Solo se concede el título de liga cuando se ganó por puntos en la tabla.
+ for(const name of global.titles)titles.push(name);
+ const partial={matches,minutes,goals,assists,cleanSheets,leaguePosition,injuryWeeks,table:league.standings};
+ const rating=seasonRating(partial,s.position);
+ // Desarrollo por atributos: edad, minutos, nota, entrenador, pretemporada, promesas y lesiones.
+ const dev=developSeason(s,{share,rating:rating??6.2,injuryWeeks,coachFx,threadFx,focus:preparationFocus(prep.id)});
+ const ovr=dev.ovr,attributes=dev.attributes,attributeChanges=dev.changes,attributesBefore={...(s.attributes||{})};
  const international=global.international;
  const worldCupResult=global.worldCupResult;
- for(const name of global.titles)titles.push(name);
  const wage=s.contract?.currency==='EUR'?s.contract.salary:annualSalary(club,s.ovr);
- const seasonal={salaryEarned:wage,attributesBefore,attributesAfter:{...attributes},attributeChanges,age:s.age,year:careerYear(s),clubId:club.id,club:club.name,country:club.country,ovrBefore:s.ovr,ovrAfter:ovr,role,matches,minutes,goals,assists,cleanSheets,goalsConceded,international,injuryWeeks,leaguePosition,titles,worldCupResult,
-  table:league.standings,fixtures:league.fixtureResults,playerMatches:league.playerMatches,plan:league.plan,champion:league.champion,leagueName:league.league,leagueId:league.leagueId,leagueVerified:league.verified,leagueDivision:league.division,competitionVersion:4,clutchMoment:s.clutchMoment?.year===careerYear(s)?s.clutchMoment:null,competitions:global.competitions,competitionCalendar:global.calendar,calledUp:global.calledUp,nationalCaps:global.nationalCaps,nationalGoals:global.nationalGoals,clubCupMatches:global.totalCupMatches??0};
- const coachTrust=clamp((s.coachTrust??50)+(matches>=Math.round(games*.65)?3:matches<8?-5:-1)+(s.seasonPlan==='defensa'?2:0)+prep.coach+identity.coach,0,100);
+ // Ascensos y descensos del club del jugador.
+ const nextComp=getCompetitionForCareer({...s,leagueRosters});
+ const relegated=!!(comp?.tier===1&&nextComp?.tier===2);
+ const promoted=!!(comp?.tier===2&&nextComp?.tier===1);
+ const objectiveResult=evaluateObjectives(objectives,{...partial,matches});
+ const seasonal={salaryEarned:wage,attributesBefore,attributesAfter:{...attributes},attributeChanges,age:s.age,year,clubId:club.id,club:club.name,country:club.country,ovrBefore:s.ovr,ovrAfter:ovr,potentialAfter:dev.potential,role,matches,minutes,goals,assists,cleanSheets,goalsConceded,international,injuryWeeks,leaguePosition,titles,worldCupResult,rating,
+  table:league.standings,fixtures:league.fixtureResults,playerMatches:league.playerMatches,plan:league.plan,champion:league.champion,leagueName:league.league,leagueId:league.leagueId,leagueVerified:league.verified,leagueDivision:league.division,competitionVersion:4,clutchMoment:s.clutchMoment?.year===year?s.clutchMoment:null,competitions:global.competitions,competitionCalendar:global.calendar,calledUp:global.calledUp,nationalCaps:global.nationalCaps,nationalGoals:global.nationalGoals,clubCupMatches:global.totalCupMatches??0,
+  objectives:objectiveResult,devNotes:dev.notes,coachName:coach?.name,coachStyle:coach?.style,rivalName:s.squad?.rival?.name,rivalOvr:s.squad?.rival?.ovr,relegated,promoted};
+ // El mundo avanza: clubes, entrenadores, futbolistas, premios y noticias.
+ const world=advanceWorld({...s,ovr,potential:dev.potential,leagueRosters:s.leagueRosters},league,seasonal);
+ const awardsYear=world.awards.at(-1);
+ const myAwards=(awardsYear?.list||[]).filter(a=>a.winner?.you).map(a=>({year,id:a.id,name:a.name,league:a.league||null,global:!!a.global}));
+ const ballPlace=awardsYear?.youPlace||null;
+ seasonal.awards=myAwards;seasonal.ballPlace=ballPlace;
+ // Relación con el entrenador, la directiva y la hinchada.
+ const objScore=objectiveResult?.score??1;
+ const swing=coachFx.trustSwing;
+ const baseTrust=(matches>=Math.round(games*.65)?3:matches<8?-5:-1)+(s.seasonPlan==='defensa'?2:0)+prep.coach+identity.coach+((rating??6.4)-6.5)*4+(objectiveResult?.personal.met?2:-1);
+ // La confianza cambia por temporada de forma acotada y tiende a estabilizarse.
+ const coachTrust=clamp(Math.round((s.coachTrust??50)+clamp(baseTrust*swing,-11,8)-((s.coachTrust??50)-58)*.1-Math.max(0,(s.coachTrust??50)-80)*.3),0,100);
  const relationships={...s.relationships,coach:{...s.relationships.coach,trust:coachTrust}};
+ const squad={...(s.squad||{})};
+ squad.seasons=(squad.seasons||0)+1;
+ squad.board=clamp(Math.round((squad.board??55)+(objectiveResult?(objectiveResult.board.met?7:-9)+(objectiveResult.personal.met?2:-1):0)+(titles.length?5:0)),0,100);
+ squad.fans=clamp(Math.round((squad.fans??50)+(goals+assists)/5+((rating??6.4)-6.5)*6+titles.length*5+(objectiveResult?.board.met?3:-3)+(squad.seasons>=3?1:0)+threadFx.morale*.5),0,100);
+ if(squad.fans>=86&&squad.seasons>=4)squad.idol=true;
+ // Competidor directo: envejece, progresa o se marcha; el club puede fichar otro.
+ if(squad.rival){
+  const rr=rng(`${s.seed}:rival-year:${year}`);
+  const rv={...squad.rival,age:squad.rival.age+1};
+  const d=rv.age<=23?1+rr()*3:rv.age<=28?rr()*2-.5:rv.age<=31?-rr()*1.5:-1-rr()*2.5;
+  rv.ovr=clamp(Math.round(rv.ovr+d),40,95);rv.trend=Math.round(d);
+  const leaves=(role==='Titular'&&ovr-rv.ovr>=6&&rr()<.55)||(rv.age>=34&&rr()<.5)||rr()<.12;
+  if(leaves){const lvl=dynamicLevel({...s,world},club);const arrives=rr()<.6;
+   squad.rival={name:namerFor(club.countryCode)(`${s.seed}:rival-new:${year}`),age:arrives?20+Math.floor(rr()*10):18+Math.floor(rr()*2),ovr:clamp(Math.round(arrives?Math.max(lvl,ovr-3)+rr()*6:lvl-6+rr()*6),45,95),position:s.position,trend:0,since:year+1,signed:arrives};
+   seasonal.rivalChange=`${rv.name} dejó el club. ${squad.rival.signed?`Llega ${squad.rival.name} (media ${squad.rival.ovr}) para pelear tu puesto.`:`Sube desde la cantera ${squad.rival.name} (media ${squad.rival.ovr}).`}`;}
+  else squad.rival=rv;
+ }
+ // Reputación: rendimiento, títulos, selección y premios.
+ const awardRep=myAwards.reduce((n,a)=>n+(a.id==='ball'?12:a.global?6:3),0)+(ballPlace?Math.max(0,11-ballPlace)*.6:0);
+ let reputation=clamp(Math.round((s.reputation||0)+(leaguePosition<=3?3:0)+Math.min(4,Math.floor((goals+assists)/13))+prep.reputation+Math.min(8,global.competitions.filter(c=>c.championWon).length*3)+Math.min(4,Math.floor(global.nationalCaps/4))+awardRep+((rating??6.4)>=7.2?2:0)),0,100);
+ // Hilos narrativos: desafíos públicos y promesas se cobran al cierre de la temporada.
+ let threads=s.threads||[];
+ const challenge=activeThreads(s,year).find(t=>t.kind==='public_challenge');
+ const nemesis=world.players.find(p=>p.rival);
+ const moments=[...(s.careerMoments||[])];
+ if(challenge&&nemesis){const theirs=nemesis.seasons?.at(-1);const mine=(goals+assists)+(rating??6)*2;const them=theirs?(theirs.goals+theirs.assists)+(nemesis.ovr/12):0;const won=mine>=them;reputation=clamp(reputation+(won?4:-3),0,100);moments.push({year,kind:'story',text:won?`Ganaste el duelo público con ${nemesis.name}.`:`${nemesis.name} ganó el duelo que le planteaste en la prensa.`});threads=threads.map(t=>t===challenge?{...t,resolved:true,outcome:won?'ganado':'perdido'}:t);}
+ for(const n of dev.notes)moments.push({year,kind:'development',text:n.text});
+ for(const a of myAwards)moments.push({year,kind:'award',text:`${a.name}${a.league?` · ${a.league}`:''}`});
+ const trophyRecords=[...(s.trophyRecords||[]),...titles.filter(title=>title===league.league).map(title=>({title,year,clubId:club.id,leagueId:league.leagueId||'',kind:'league'})),...global.trophyRecords];
+ const morale=clamp(Math.round((s.morale??70)-((s.morale??70)-68)*.18+prep.morale+identity.morale+coachFx.morale+threadFx.morale+(objScore>=2?3:objScore<1?-4:0)+(myAwards.length?4:0)),0,100);
  const flags={...(s.storyFlags||{})};if(s.fanClubId&&s.clubId===s.fanClubId)flags.playedForFan=true;
- let reputation=clamp((s.reputation||0)+(leaguePosition<=3?3:0)+Math.min(4,Math.floor((goals+assists)/13))+prep.reputation+Math.min(8,global.competitions.filter(c=>c.championWon).length*3)+Math.min(4,Math.floor(global.nationalCaps/4)),0,100);
- let contract=s.contract;
- const trophyRecords=[...(s.trophyRecords||[]),...titles.filter(title=>title===league.league).map(title=>({title,year:careerYear(s),clubId:club.id,leagueId:league.leagueId||'',kind:'league'})),...global.trophyRecords];
- return {...s,age:s.age+1,ovr,attributes,reputation,contract,trophyRecords,annualScenes:0,morale:clamp((s.morale??70)+prep.morale+identity.morale,0,100),careerEarnings:(s.careerEarnings||0)+wage,leagueRosters,coachTrust,relationships,history:[...s.history,seasonal],trophies:[...s.trophies,...titles],lastSeason:seasonal,recapPending:true,pendingEvent:chooseScene({...s,lastSeason:seasonal},r),storyFlags:flags,
+ // Las promesas de esta temporada vencen; quedan registradas para escenas posteriores.
+ const next={...s,age:s.age+1,ovr,potential:dev.potential,attributes,attrCeil:dev.attrCeil,reputation,trophyRecords,annualScenes:0,morale,careerEarnings:(s.careerEarnings||0)+wage,leagueRosters,coachTrust,relationships,history:[...s.history,seasonal],trophies:[...s.trophies,...titles],lastSeason:seasonal,recapPending:true,storyFlags:flags,
+  world,squad,threads,awards:[...(s.awards||[]),...myAwards],careerMoments:moments.slice(-120),
   sceneBeat:0,sceneChoice:null,scenePlayerText:'',clutchMoment:null,phase:'event'};
+ const synced=syncClub(next);
+ const pick=nextScene(synced,r);
+ return {...synced,pendingEvent:pick.id,sceneData:pick.data||{}};
+}
+function nextScene(s,r){
+ const world=pickWorldScene(s,r);
+ if(world&&(world.weight>=25||r()<.62))return world;
+ return {id:chooseScene(s,r),data:{}};
 }
 
 export function eventInfo(s){if(s.phase!=='event')return null;return sceneFor(s);}
@@ -289,37 +352,53 @@ export function resolveEvent(s,option,playerText=''){
   if(!Number.isInteger(option)||option<0||option>=event.options.length)return s;
   return resultOfScene(s,event,option,playerText);
 }
+function retireState(s,text){return {...s,phase:'retired',market:null,offers:[],pendingEvent:null,sceneBeat:0,decisions:[...s.decisions,{age:s.age,text}]};}
 export function finishEvent(s){
  if(s.phase!=='event'||s.sceneBeat!==1)return s;
  const hadFanScene=s.pendingEvent==='fan_home';
  const flags=hadFanScene?{...s.storyFlags,playedForFan:true}:s.storyFlags;
- let next={...s,phase:'season',pendingEvent:null,sceneBeat:0,sceneChoice:null,scenePlayerText:'',storyFlags:flags};
+ let next={...s,phase:'season',pendingEvent:null,sceneBeat:0,sceneChoice:null,scenePlayerText:'',sceneData:{},storyFlags:flags};
+ if(next.retireRequested)return retireState(next,'Anunciaste tu retiro del fútbol profesional');
+ // Última función: tras la temporada de despedida llega el retiro.
+ const farewell=(next.threads||[]).find(t=>t.kind==='last_dance'&&!t.resolved&&t.year<careerYear(next));
+ if(farewell)return retireState({...next,threads:resolveThread(next,'last_dance','cumplida')},'Cumpliste tu temporada de despedida y colgaste los botines');
+ if(next.age>=44)return retireState(next,'El cuerpo dijo basta: retiro a los '+next.age+' años');
  // Al concluir una cesión de una temporada vuelve al club de origen conservando su contrato.
  if(next.contract?.kind==='loan'&&next.contract.ends<=careerYear(next)&&next.contract.parentClubId){
   const parent=marketClub(next.contract.parentClubId);
   if(parent){const parentContract=next.contract.parentContract||{clubId:parent.id,ends:careerYear(next)+1,salary:annualSalary(parent,next.ovr),currency:'EUR'};
-   next={...next,clubId:parent.id,contract:parentContract,coachTrust:48,decisions:[...next.decisions,{age:next.age,text:`Regresaste a ${parent.name} tras una cesión`}]};}
+   next=syncClub({...next,clubId:parent.id,contract:parentContract,coachTrust:48,decisions:[...next.decisions,{age:next.age,text:`Regresaste a ${parent.name} tras una cesión`}]});}
  }
  if(next.history.length===0)return next;
- // Segunda escena contextual por campaña, sin repetir el primer contrato ni escenas de hinchas.
- const extraScenes=rng(`${next.seed}:scene-amount:${careerYear(next)}`)()<.55?1:2;
- if((next.annualScenes||0)<extraScenes && next.history.length>0 && !['arrival','fan_home','fan_departure'].includes(s.pendingEvent)){
-  const r=rng(`${next.seed}:second-scene:${careerYear(next)}:${next.clubId}`);
-  let another=chooseScene({...next,lastSeason:next.lastSeason},r);
-  if(another===s.pendingEvent)another=chooseScene(next,()=>.97);
-  if(another===s.pendingEvent)another='coach';
-  return {...next,pendingEvent:another,phase:'event',annualScenes:(next.annualScenes||0)+1};
+ // Escenas adicionales por campaña, sin repetir el primer contrato ni escenas de hinchas.
+ const extraScenes=rng(`${next.seed}:scene-amount:${careerYear(next)}`)()<.5?1:2;
+ if((next.annualScenes||0)<extraScenes && !['arrival','fan_home','fan_departure'].includes(s.pendingEvent)){
+  const r=rng(`${next.seed}:second-scene:${careerYear(next)}:${next.clubId}:${next.annualScenes||0}`);
+  let pick=nextScene(next,r);
+  if(pick.id===s.pendingEvent){const alt=chooseScene(next,()=>.97);pick={id:alt===s.pendingEvent?'coach':alt,data:{}};}
+  return {...next,pendingEvent:pick.id,sceneData:pick.data||{},phase:'event',annualScenes:(next.annualScenes||0)+1};
  }
  const policy=evaluateClubFuture(next);
+ const requested=hasThread(next,'transfer_request');
+ const interest=activeThreads(next).find(t=>t.kind==='big_club_interest');
  const mandatory=!policy.canStay;
- const pressure=Math.min(.96,.33+(next.reputation||0)/190+Math.max(0,(next.ovr||60)-78)*.025);
- const shouldOpen=mandatory||policy.reason==='renewal'||next.age>=39&&!!next.contract&&next.contract.ends<=careerYear(next)+1||rng(`${next.seed}:transfer7:${next.age}`)()<pressure;
+ // Mercado: se abre por contrato, por pedido propio, por interés de un grande o cuando el jugador supera a su club.
+ const prestige=dynamicPrestige(next,worldClub(next.clubId));
+ const outgrown=Math.max(0,(next.ovr||60)-prestige-2)*.05;
+ const pressure=Math.min(.85,.16+(next.reputation||0)/260+outgrown+((next.lastSeason?.rating||6.4)>=7.1?.12:0));
+ const shouldOpen=mandatory||requested||!!interest||policy.reason==='renewal'||next.age>=39&&!!next.contract&&next.contract.ends<=careerYear(next)+1||rng(`${next.seed}:transfer7:${next.age}`)()<pressure;
  if(!shouldOpen)return {...next,market:null,offers:[]};
- let offers=buildTransferOffers(next,{attempt:0,forced:mandatory});
+ let offers=buildTransferOffers(next,{attempt:0,forced:mandatory||requested});
  if(policy.reason==='loan-request')offers=offers.map((o,i)=>i<2?{...o,kind:'loan',role:'Cesión',years:1,salary:annualSalary(o,next.ovr,'Cesión')}:o);
- return {...next,offers,market:{...policy,source:'season',searches:0,focus:'balanced'},agent:{searches:0,year:careerYear(next),focus:'balanced'},phase:'transfer'};
+ if(requested)next={...next,threads:resolveThread(next,'transfer_request','mercado abierto')};
+ const reason=requested&&policy.canStay?'request':interest&&policy.reason==='normal'?'interest':policy.reason;
+ return {...next,offers,market:{...policy,reason,source:'season',searches:0,focus:'balanced'},agent:{searches:0,year:careerYear(next),focus:'balanced'},phase:'transfer'};
 }
-export function autoResolveEvent(s){if(s.phase!=='event')return s;const first=(s.sceneBeat||0)===0?resolveEvent(s,0):s;return finishEvent(first);}
+export function autoResolveEvent(s){if(s.phase!=='event')return s;const first=(s.sceneBeat||0)===0?resolveEvent(s,autoOption(s)):s;return finishEvent(first);}
+/** La simulación automática evita decisiones extremas (como retirarse) salvo que la carrera ya esté terminando. */
+function autoOption(s){const e=sceneFor(s);
+ const safe=o=>!o.effect?.retire&&o.effect?.thread?.kind!=='transfer_request'&&!o.effect?.position&&(o.effect?.thread?.kind!=='last_dance'||s.age>=37);
+ const idx=e.options.findIndex(safe);return idx>=0?idx:0;}
 export function transferOffers(s){if((s.history||[]).length<1)return [];return buildTransferOffers(s,{attempt:0});}
 export function openAgentMarket(s,focus='balanced'){
  if(s.phase!=='season'||!s.history?.length)return s;
@@ -334,6 +413,37 @@ export function askAgentForMore(s,focus='balanced'){
  const searches=(s.market?.searches||0)+1;
  const offers=buildTransferOffers(s,{attempt:searches,focus,forced:!s.market?.canStay});
  return {...s,offers,market:{...(s.market||{canStay:true}),searches,focus},agent:{year:careerYear(s),searches,focus}};
+}
+/** Negociación: pedir más sueldo, titularidad o más años. El club puede aceptar, mantener o retirar la oferta. */
+export const NEGOTIATION_ASKS={salary:'Pedir +20 % de sueldo',role:'Exigir rol de titular',years:'Pedir un año más'};
+export function negotiateOffer(s,id,ask){
+ if(s.phase!=='transfer'||!NEGOTIATION_ASKS[ask])return s;
+ const offer=(s.offers||[]).find(o=>o.id===id);if(!offer||offer.negotiated)return s;
+ const r=rng(`${s.seed}:negotiate:${careerYear(s)}:${id}:${ask}`);
+ const leverage=playerDemand(s)-(offer.prestige||clubPrestige(offer));
+ const agent=(s.relationships?.agent?.trust??45)-50;
+ const p=clamp(.42+leverage*.035+agent/180-(ask==='role'&&offer.role!=='Titular'?.08:0),.08,.9);
+ const roll=r();
+ let result,changed={...offer,negotiated:ask};
+ if(roll<p){result='accepted';
+  if(ask==='salary')changed.salary=Math.round(offer.salary*1.2/1000)*1000;
+  if(ask==='role'){changed.role='Titular';changed.project='Titular prometido';changed.promise=true;}
+  if(ask==='years')changed.years=(offer.years||2)+1;
+ }else if(roll<p+(1-p)*.42){result='withdrawn';}
+ else result='rejected';
+ changed.negotiation=result;
+ const offers=result==='withdrawn'?s.offers.filter(o=>o.id!==id):s.offers.map(o=>o.id===id?changed:o);
+ const text={accepted:`${offer.name} aceptó tu pedido.`,rejected:`${offer.name} mantiene su propuesta original.`,withdrawn:`${offer.name} retiró la oferta tras tu pedido.`}[result];
+ return {...s,offers,lastNegotiation:{id,ask,result,text,club:offer.name},relationships:{...s.relationships,agent:{...s.relationships.agent,trust:clamp((s.relationships.agent?.trust??45)+(result==='accepted'?3:result==='withdrawn'?-3:0),0,100),known:true}}};
+}
+export function negotiateRenewal(s){
+ if(s.phase!=='transfer'||!s.market?.renewal||s.market.renewal.negotiated)return s;
+ const r=rng(`${s.seed}:renewal-talk:${careerYear(s)}`);
+ const board=s.squad?.board??55;
+ const p=clamp(.3+(board-50)/90+((s.lastSeason?.rating||6.4)-6.5)*.35+(s.squad?.idol?.15:0),.08,.88);
+ const ok=r()<p;
+ const renewal={...s.market.renewal,negotiated:true,salary:ok?Math.round(s.market.renewal.salary*1.18/1000)*1000:s.market.renewal.salary};
+ return {...s,market:{...s.market,renewal},squad:{...s.squad,board:clamp(board+(ok?-2:-6),0,100)},lastNegotiation:{id:'renewal',result:ok?'accepted':'rejected',text:ok?'La directiva mejoró tu renovación un 18 %.':'La directiva no mejora la oferta de renovación.'}};
 }
 export function chooseTransfer(s,id=null){
  if(s.phase!=='transfer')return s;
@@ -350,26 +460,42 @@ export function chooseTransfer(s,id=null){
   if(offer.kind==='loan')contract={...contract,parentClubId:s.clubId,parentContract:s.contract};
  }else if(s.market?.renewal){contract={clubId:s.clubId,...s.market.renewal,currency:'EUR',estimated:true,kind:'permanent'};}
  else if(!contract||contract.ends<=careerYear(s))contract={clubId:s.clubId,ends:careerYear(s)+2,salary:annualSalary(marketClub(s.clubId),s.ovr),currency:'EUR',estimated:true};
- return {...s,phase:joinedFan||leftFan?'event':'season',pendingEvent:joinedFan?'fan_home':leftFan?'fan_departure':null,
-  sceneBeat:0,clubId:nextClubId,contract,market:null,relationships:rel,coachTrust:rel.coach.trust,offers:[],
+ let threads=resolveThread(s,'big_club_interest','mercado cerrado');
+ threads=threads.map(t=>offer&&!t.resolved&&['captain','mentor','fans_conflict','board_ultimatum','promise_minutes'].includes(t.kind)?{...t,resolved:true,outcome:'cambio de club'}:t);
+ let next={...s,phase:joinedFan||leftFan?'event':'season',pendingEvent:joinedFan?'fan_home':leftFan?'fan_departure':null,
+  sceneBeat:0,clubId:nextClubId,contract,market:null,relationships:rel,coachTrust:rel.coach.trust,offers:[],lastNegotiation:null,threads,
   decisions:[...s.decisions,{age:s.age,text:offer?`${offer.kind==='loan'?'Cesión a':'Fichaste por'} ${offer.name} (${offer.country})`:`Continuaste en ${getClub(s.clubId)?.name||'tu equipo'}`}]};
+ if(offer){
+  next=syncClub(next,{fresh:true});
+  if(offer.promise)next={...next,threads:addThread(next,'promise_minutes',{clubId:offer.id},1)};
+  next={...next,world:pushNews(next.world,{year:careerYear(s),kind:'you',title:`${s.name} ${offer.kind==='loan'?'llega cedido a':'ficha por'} ${offer.name}`,text:`${offer.kind==='loan'?'Préstamo por una temporada':`Contrato por ${offer.years||3} año(s)`} desde ${getClub(s.clubId)?.name||'su club'}.`,clubId:offer.id,mine:true})};
+ }
+ return next;
 }
 export function retireFromMarket(s){
  if(s.phase!=='transfer'||s.market?.canStay||s.age<31)return s;
- return {...s,phase:'retired',market:null,offers:[],decisions:[...s.decisions,{age:s.age,text:'Sin contrato disponible: decidiste retirarte del fútbol profesional'}]};
+ return retireState(s,'Sin contrato disponible: decidiste retirarte del fútbol profesional');
 }
+/** Retiro voluntario: desde los 32 años, entre temporadas. */
+export function canRetire(s){return ['season','transfer'].includes(s?.phase)&&s.age>=32&&(s.history||[]).length>0;}
+export function retireNow(s){if(!canRetire(s))return s;return retireState(s,`Anunciaste tu retiro a los ${s.age} años`);}
 export function simulateToRetirement(state){
   let s=state;
-  for(let k=0;k<160&&s.phase!=='retired';k++){
-    if(s.phase==='season')s=advanceSeason(s);
+  for(let k=0;k<180&&s.phase!=='retired';k++){
+    if(s.phase==='season'){
+      // Un veterano en caída libre deja el fútbol por decisión propia.
+      if(s.age>=35&&(s.ovr<62||s.age>=39&&s.ovr<70))s=retireNow(s);
+      else s=advanceSeason(s);
+    }
     else if(s.phase==='event')s=autoResolveEvent(s);
     else if(s.phase==='transfer'){
-      const current=getClub(s.clubId);
+      const currentPrestige=dynamicPrestige(s,worldClub(s.clubId));
       const best=[...(s.offers||[])].sort((a,b)=>b.prestige-a.prestige)[0];
-      if(best)s=chooseTransfer(s,best.id);
+      const better=best&&(best.prestige>=currentPrestige+4||s.market?.canStay===false||s.market?.reason==='request');
+      if(better)s=chooseTransfer(s,best.id);
       else if(s.market?.canStay)s=chooseTransfer(s);
       else if((s.market?.searches||0)<2)s=askAgentForMore(s);
-      else s=retireFromMarket(s);
+      else s=s.age>=31?retireFromMarket(s):chooseTransfer({...s,market:{...s.market,canStay:true}});
     }
     else break;
   }

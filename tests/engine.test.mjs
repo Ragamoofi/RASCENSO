@@ -33,11 +33,11 @@ test('Simulación determinista',()=>{
  assert.deepEqual(a.lastSeason,b.lastSeason);
  assert(a.lastSeason.matches>=0&&a.lastSeason.matches<=42);
 });
-test('Carrera veterana continúa más allá de los 40 hasta que termina el contrato o el mercado',()=>{
+test('La carrera termina de forma orgánica entre los 32 y los 44 años (2.0)',()=>{
  let s=makeStarted('CL','full-run');
  s=simulateToRetirement(s);
- assert.equal(s.phase,'retired');assert.ok(s.age>40&&s.age<75);
- assert.ok(s.history.length>24);
+ assert.equal(s.phase,'retired');assert.ok(s.age>=32&&s.age<=44,`retiro a los ${s.age}`);
+ assert.ok(s.history.length>=14);
  assert(s.history.every(x=>x.matches>=0&&x.goals>=0&&x.assists>=0));
 });
 
@@ -60,7 +60,7 @@ test('Origen, personalidad y estilo quedan registrados y afectan la progresión'
 });
 test('Las partidas previas pueden migrarse sin borrar estadísticas',()=>{
  const prev={...newCareer({name:'Veterano',country:'CL',seed:'prev'}),version:1,phase:'season',clubId:'x',age:25,history:[{matches:28,goals:6}],ovr:70};
- const updated=migrateCareer(prev);assert.equal(updated.version,8);assert.equal(updated.history[0].goals,6);assert.equal(updated.name,'Veterano');
+ const updated=migrateCareer(prev);assert.equal(updated.version,9);assert.equal(updated.history[0].goals,6);assert.equal(updated.name,'Veterano');
  assert.equal(migrateCareer(null),null);
 });
 
@@ -103,7 +103,7 @@ test('Fichar por el club favorito dispara escena especial y marca la memoria',()
 test('Migrar una partida v2 conserva temporada y añade relaciones y bitácora',()=>{
  const original=makeStarted('CL','migracion');const v2={...original,version:2};
  delete v2.relationships;delete v2.storyLog;delete v2.fanClubId;
- const m=migrateCareer(v2);assert.equal(m.version,8);assert(m.relationships.coach);assert.deepEqual(m.storyLog,[]);
+ const m=migrateCareer(v2);assert.equal(m.version,9);assert(m.relationships.coach);assert.deepEqual(m.storyLog,[]);
  assert.equal(m.history.length,original.history.length);
 });
 
@@ -169,9 +169,10 @@ test('Contrato inicial mostrado y firmado es el mismo; los atributos sobreviven 
  let s=newCareer({name:'Carrera',seed:'stats-persistentes'});
  while(s.phase==='draft')s=acceptDraft(s,0);
  const club=academyOffers(s)[0];const contract=academyContractOffer(s,club);
- const starting={...s.attributes};s=signAcademy(s,club.id);
+ s=signAcademy(s,club.id);
  assert.deepEqual(s.contract,contract);assert(s.contract.salary>=9000);
- s=autoResolveEvent(s);const next=advanceSeason(s);
+ // La escena de llegada puede mejorar un atributo real (2.0): se compara con el estado previo a la temporada.
+ s=autoResolveEvent(s);const starting={...s.attributes};const next=advanceSeason(s);
  assert.deepEqual(next.lastSeason.attributesBefore,starting);
  assert.deepEqual(next.lastSeason.attributesAfter,next.attributes);
  assert.equal(Object.keys(next.attributes).length,8);

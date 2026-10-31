@@ -21,6 +21,7 @@ jobs:
       - name: Comprobar módulos JavaScript
         run: |
           for file in src/*.mjs tests/*.mjs; do node --check "$file"; done
+          node --check tests/browser/e2e.cjs
       - name: Validar motor e interfaz
         run: |
           node --test tests/*.test.mjs
@@ -44,6 +45,10 @@ jobs:
           test -s src/competitions13.mjs
           test -s scripts/build_kits18.py
           test -s src/competitions14.mjs
+          test -s src/career20.mjs
+          test -s src/world20.mjs
+          test -s src/story20.mjs
+          test -s src/ui20.mjs
           test -s assets/brand/rascenso-wordmark.png
           test -s assets/brand/rascenso-icon.png
           test -s favicon.png
@@ -61,7 +66,7 @@ jobs:
       - name: Preparar sitio completo
         run: |
           mkdir -p _site
-          cp index.html style.css experience.css favicon.svg favicon.png .nojekyll _site/
+          cp index.html experience.css favicon.svg favicon.png .nojekyll _site/
           cp -R src assets _site/
           node scripts/export-clubs.mjs
           python -m pip install -q pillow cairosvg

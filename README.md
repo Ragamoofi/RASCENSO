@@ -1,8 +1,44 @@
 # RASCENSO · Del barrio a la historia
 
-**Alfa 1.4 — Temporada Mundial** · 30 de octubre de 2026 · © Ragamoofi.
+**RASCENSO 2.0 — Mundo Vivo** · © Ragamoofi.
 
 Sitio oficial de prueba: https://ragamoofi.github.io/RASCENSO/
+
+## Novedades 2.0 · Mundo Vivo
+
+El mundo ya no espera al jugador: clubes, entrenadores y futbolistas evolucionan cada temporada, y cada decisión deja huella.
+
+- **Motor de carrera reconstruido.** La media se calcula siempre a partir de los atributos reales según el puesto. Cada atributo tiene un *techo* propio (heredado del legado + talento oculto) que puede subir con una temporada de explosión o bajar por falta de minutos o lesiones graves. Llegar a 90 es posible, pero raro (≈1–2 % de las carreras); la mayoría son carreras profesionales modestas, y el retiro llega de forma orgánica (normalmente entre los 34 y los 39).
+- **Draft honesto.** La cifra de la leyenda es solo una referencia: cada carta muestra el valor real con el que empieza tu juvenil y el techo estimado de esa faceta. Se mantienen las tres oportunidades de cambiar propuestas.
+- **Mundo vivo.** Los clubes suben o se hunden según resultados, inversiones y crisis; sus niveles alimentan la simulación y el mercado. Cada club tiene un entrenador con personalidad (formador, pragmático, ofensivo, disciplinario, gestor, estratega) que puede ser despedido. Estrellas, promesas de tu generación y un **rival generacional** progresan, cambian de club, ganan premios y se retiran; cada año irrumpen nuevas promesas.
+- **Vestuario.** Competidor directo por el puesto (con nombre, edad y media), confianza del técnico, directiva, hinchada, capitanía, estatus de ídolo y relaciones con compañero, representante, prensa y familia.
+- **Objetivos de temporada** de la directiva y del entrenador (según presupuesto del club, rol y puesto), evaluados al cierre y con efectos en renovaciones, confianza y afición.
+- **Narrativa con memoria.** 22 escenas nuevas conectadas al contexto real (entrenador nuevo, lucha por el puesto, cambio de posición, promesa rota, interés de otro club, rival generacional, lesión grave, veteranía, crisis económica, descenso, ascenso, capitanía, hinchada, mentor, gala de premios, selección, vida personal, polémicas, cambio táctico, profesionalismo). Las decisiones crean **compromisos** que el juego recuerda y cobra más adelante; cada opción muestra sus consecuencias.
+- **Premios y récords.** Balón de Ascenso (top 10 mundial), Trofeo Promesa, Bota, Mejor jugador, Revelación y Guante de la liga; nota media por temporada; récords personales, hitos, gráfico de evolución y veredicto de legado al retirarte.
+- **Mercado con negociación.** Pedir más sueldo, titularidad o un año más (el club puede aceptar, mantener o retirar la oferta); renovar con mejora; los clubes muestran entrenador y tendencia. Retiro voluntario desde los 32 años.
+- **Interfaz.** Nueva pestaña *Vestuario*, *Mundo* rediseñado (noticias, Balón de Ascenso, tu generación, figuras, poder de clubes), temporada a dos columnas sin desplazamiento en 1920×1080, atributos con barra de techo, cierre de temporada con objetivos, premios y titulares.
+- **Compatibilidad.** Guardado versión 9 con la misma clave `rascenso-save-v2`; las partidas v1–v8 se migran conservando historial, títulos y contratos (los atributos se reajustan para coincidir con la media guardada). Si el navegador se queda sin espacio, las temporadas antiguas se compactan automáticamente.
+
+Todos los futbolistas y entrenadores generados por el mundo vivo son **ficticios**. Detalle completo de cambios en [`CHANGELOG-2.0.md`](CHANGELOG-2.0.md).
+
+## Ejecutar pruebas
+
+```bash
+node --test tests/*.test.mjs
+node tests/ui-smoke.mjs
+```
+
+Prueba de navegador opcional (requiere Playwright y un servidor estático en la raíz):
+
+```bash
+python3 -m http.server 8765
+node tests/browser/e2e.cjs http://localhost:8765/index.html chromium
+```
+
+---
+
+# Historial de versiones anteriores
+
 
 ## La nueva versión
 
@@ -28,13 +64,6 @@ La implementación es **original e independiente**. La auditoría del HAR de Cop
 - Escudos externos: repositorio comunitario [JoseArroyave/football-logos](https://github.com/JoseArroyave/football-logos), con emblema original de respaldo donde falta correspondencia. Las marcas pertenecen a sus titulares.
 - Banderas: [FlagCDN](https://flagcdn.com).
 - Fotografía de ambiente: [Unsplash](https://unsplash.com/license).
-
-## Ejecutar pruebas
-
-```bash
-node --test tests/engine.test.mjs
-node tests/ui-smoke.mjs
-```
 
 ### Publicación
 

@@ -7,6 +7,8 @@ import { identitySeasonEffects, preparationEffects, creatorIdentityEffects } fro
 import { seasonAgendaEffects } from './agenda09.mjs';
 import { momentScoreDelta } from './moments15.mjs';
 import { VERIFIED_LEAGUES, getInauguralLeague } from './leagues2026.mjs';
+import { dynamicLevel, coachFor } from './world20.mjs';
+import { squadRole, threadEffects, coachSeasonEffects } from './career20.mjs';
 const bound=(v,a,b)=>Math.max(a,Math.min(b,v));
 function rand(seed){let h=2166136261;for(const c of String(seed)){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return ()=>{h+=0x6d2b79f5;let t=Math.imul(h^(h>>>15),1|h);t^=t+Math.imul(t^(t>>>7),61|t);return ((t^(t>>>14))>>>0)/4294967296;};}
 function goals(mean,random){let n=0,p=Math.exp(-mean),prod=1;do{n++;prod*=random();}while(prod>p&&n<=10);return Math.min(8,n-1);}
@@ -24,12 +26,13 @@ export function leagueParticipants(countryCode,clubId,state={}){
  const league=getCompetitionForCareer({...state,clubId});
  const country=COUNTRIES.find(c=>c.code===countryCode);
  if(!country)return [];
- if(league?.verified)return league.teamIds.map(id=>country.clubs.find(c=>c.id===id)).filter(Boolean);
+ const live=list=>list.map(c=>({...c,level:dynamicLevel(state,c)}));
+ if(league?.verified)return live(league.teamIds.map(id=>country.clubs.find(c=>c.id===id)).filter(Boolean));
  // Unverified countries: explicitly fictional grouping, never presented as a real 2026 league.
  const active=country.clubs.filter(c=>!c.inactive);
  const selected=active.filter(c=>!getInauguralLeague(c.id)).sort((a,b)=>b.level-a.level||a.id.localeCompare(b.id));
  if(!selected.some(c=>c.id===clubId)){const mine=country.clubs.find(c=>c.id===clubId);if(mine)selected.unshift(mine);}
- const size=Math.min(16,selected.length);const top=selected.slice(0,size);if(clubId&&!top.some(c=>c.id===clubId)){const mine=country.clubs.find(c=>c.id===clubId);if(mine)top[top.length-1]=mine;}return top;
+ const size=Math.min(16,selected.length);const top=selected.slice(0,size);if(clubId&&!top.some(c=>c.id===clubId)){const mine=country.clubs.find(c=>c.id===clubId);if(mine)top[top.length-1]=mine;}return live(top);
 }
 /** Two-tier countries use the actual 2026 rosters as a baseline. Subsequent changes are fictional results of this save, never real-world future claims. */
 export function nextLeagueRosters(state,playedLeague){
@@ -87,8 +90,14 @@ export function playLeague(state){
  const plan=state.seasonPlan||'equilibrio';
  const trust=bound(state.coachTrust??50,0,100);
  const prep=preparationEffects(state),traits=identitySeasonEffects(state),persona=creatorIdentityEffects(state),agenda=seasonAgendaEffects(state),profile=profileMatchEffects(state);
- const own=teams[state.clubId];const role=roleOf(state,own.level);
- const playRate=bound(({Titular:.88,'Rotación':.62,Suplente:.35,Reserva:.14})[role]+(trust-50)/320-(state.age<=18?.08:0)+prep.minutes+traits.minutes+(agenda.minutes||0)+profile.minutes+persona.minutes,.04,.98);
+ const own=teams[state.clubId];
+ const coach=state.world&&!state.neutralLeague?coachFor(state,state.clubId):null;
+ // Un único algoritmo de rol: squadRole usa al competidor si existe y, si no, el nivel del club.
+ // roleOf solo queda para las ligas neutrales (simulaciones de otros campeonatos sin jugador).
+ const modern=!state.neutralLeague;
+ const role=modern?squadRole(state,own.level,coach):roleOf(state,own.level);
+ const tfx=modern?threadEffects(state):{minutes:0,injury:1,goals:1};const cfx=modern?coachSeasonEffects(coach,state):{goals:1,starterMinutes:0};
+ const playRate=bound(({Titular:.88,'Rotación':.62,Suplente:.35,Reserva:.14})[role]+(trust-50)/320-(state.age<=18?.08:0)+prep.minutes+traits.minutes+(agenda.minutes||0)+profile.minutes+persona.minutes+tfx.minutes+(role==='Titular'?cfx.starterMinutes:0),.04,.98);
  const fixtureList=league?.format==='argentina-zones'&&league.zones
   ?(()=>{const za=selected.filter(c=>league.zones.A.includes(c.id)),zb=selected.filter(c=>league.zones.B.includes(c.id));
     const a=calendar(za).filter(f=>f.round<=15),b=calendar(zb).filter(f=>f.round<=15);
@@ -98,7 +107,7 @@ export function playLeague(state){
     return [...first,...second,...inter];
    })()
   :calendar(selected);
- const injuryRoll=r();const prone=(state.injuryProfile==='fragil'?.085:state.injuryProfile==='resistente'?.025:.05)*prep.injury*traits.injury*(agenda.injury||1)*profile.injury*persona.injury;
+ const injuryRoll=r();const prone=(state.injuryProfile==='fragil'?.085:state.injuryProfile==='resistente'?.025:.05)*prep.injury*traits.injury*(agenda.injury||1)*profile.injury*persona.injury*tfx.injury;
  const injuryWeeks=injuryRoll<prone+Math.max(0,state.age-29)*.008?(2+Math.floor(r()*11)):0;
  const absence=injuryAbsenceSlots(fixtureList,state.clubId,injuryWeeks,r);
  const rows=Object.fromEntries(selected.map(t=>[t.id,{id:t.id,name:t.name,level:t.level,played:0,wins:0,draws:0,losses:0,for:0,against:0,gd:0,points:0}]));
@@ -132,7 +141,7 @@ export function playLeague(state){
   if(isOwn){
    let g=0,a=0,clean=0;
    if(plays){matches++;minutes+=gameMinutes;const forGoals=home.id===state.clubId?gh:ga;const against=home.id===state.clubId?ga:gh;
-    const scoringChance={attack:.36,middle:.16,defense:.036,goalkeeper:0}[skillGroup]*(plan==='ataque'?1.18:plan==='defensa'?.82:1)*(state.style==='goleador'?1.10:1)*prep.goals*traits.goals*(agenda.goals||1)*profile.goals*persona.goals*gameMinutes/90;
+    const scoringChance={attack:.36,middle:.16,defense:.036,goalkeeper:0}[skillGroup]*(plan==='ataque'?1.18:plan==='defensa'?.82:1)*(state.style==='goleador'?1.10:1)*prep.goals*traits.goals*(agenda.goals||1)*profile.goals*persona.goals*tfx.goals*cfx.goals*gameMinutes/90;
     const assistingChance={attack:.21,middle:.32,defense:.08,goalkeeper:.01}[skillGroup]*(plan==='ataque'?1.12:1)*(state.style==='creador'?1.15:1)*prep.assists*(agenda.assists||1)*profile.assists*persona.assists*gameMinutes/90;
     // La jugada decisiva agrega exactamente UNA acción atribuida al jugador;
     // no debe entrar también al reparto aleatorio de los goles ordinarios.
