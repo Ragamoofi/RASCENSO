@@ -348,6 +348,16 @@ export function tackleTiming(distance,reach,elapsed,window,skill,difficulty,fati
  return {success:score>=.34,quality:clampN(score,0,1),timing};
 }
 const tackleColor=(m,window)=>tackleTiming(0,1,m.t%m.cycle,window,m.stats.defense,m.ai.d).timing>.65?'#ffe3a8':COLORS.copper;
+// El portador busca alejarse del defensor y elige al receptor con mayor espacio.
+export function recoveryPassingOption(carrier,defender,receivers){
+ const options=receivers.map(receiver=>({receiver,space:segDist(defender,carrier,receiver)})).sort((a,b)=>b.space-a.space);
+ return options[0]?.space>1.6?options[0].receiver:null;
+}
+export function recoveryEscapeY(carrier,defender,time,difficulty){
+ const separation=dist(carrier,defender),pressure=clampN((7-separation)/7,0,1)*clampN(difficulty,0,1);
+ const away=carrier.y>=defender.y?1:-1;
+ return clampN(carrier.y+Math.sin(time*1.6)*1.6+away*pressure*2.2,3,26);
+}
 const recuperacion={
  init(m){m.timer=10;m.rv=makePlayer(16,rnd(m,9,20),{num:'10',speed:m.ai.defSpeed*.62});m.ball=makeBall(0,0);m.ball.owner=m.rv;m.me=makePlayer(27,14.5,{num:'5',team:'us'});
   m.recv=[makePlayer(31,rnd(m,4,8),{num:'9'}),makePlayer(32,rnd(m,21,25),{num:'11'})];m.cycle=rnd(m,.9,1.3);m.passAt=rnd(m,3.2,5.2)+m.ai.d*1.2;m.hint='Acércate · entra cuando el anillo brille más';},
@@ -356,9 +366,9 @@ const recuperacion={
   m.steer(m.me,m.stats.sprint,dt);
   if((timeUp(m)||m.rv.x>FIELD.boxX)&&!m.result){setBanner(m,m.rv.x,m.rv.y);return m.finish(false,'superado',.1);}
   for(const r of m.recv)moveToward(r,r.x+Math.sin(m.t+r.y)*.3,r.y,3,dt);
-  if(m.ball.owner===m.rv){moveToward(m.rv,m.rv.x+3,m.rv.y+Math.sin(m.t*1.6)*1.6,m.rv.speed,dt);m.rv.face=[1,0];
+  if(m.ball.owner===m.rv){moveToward(m.rv,m.rv.x+3,recoveryEscapeY(m.rv,m.me,m.t,m.ai.d),m.rv.speed,dt);m.rv.face=[1,0];
    if(this.exposed(m)){m.ball.owner=null;m.ball.x=m.rv.x+1.1;m.ball.y=m.rv.y;}
-   const open=m.recv.find(r=>segDist(m.me,m.rv,r)>1.6);
+   const open=recoveryPassingOption(m.rv,m.me,m.recv);
    if((m.t>m.passAt&&open)||m.t>m.timer-.5){m.target=open||m.recv[0];kick(m.ball,m.target.x,m.target.y,15,0);m.passing=true;}}
   else if(!m.passing){m.ball.x=m.rv.x+1.1;m.ball.y=m.rv.y;moveToward(m.rv,m.rv.x+3,m.rv.y,m.rv.speed,dt);if(!this.exposed(m))m.ball.owner=m.rv;}
   else{stepBall(m.ball,dt);if(dist(m.me,m.ball)<.9&&!m.result){setBanner(m,m.me.x,m.me.y);return m.finish(true,'corte',.7);}if((dist(m.target,m.ball)<.8||Math.hypot(m.ball.vx,m.ball.vy)<.4)&&!m.result){setBanner(m,m.target.x,m.target.y);return m.finish(false,'superado',.1);}}

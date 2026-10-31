@@ -34,6 +34,8 @@ Rama de trabajo: `rascenso-4-integral`. Base: `bb85f188cf63e016ba8429b8d24b44d53
 - Pase filtrado: alternativa bombeada con clic derecho y desmarque hacia el punto elegido; aún requiere calibración y comprobación visual.
 - Mundo: los juveniles generados se anuncian como incorporaciones, sin presentarlos como revelaciones antes de jugar.
 
+- Recuperación: el portador intenta escapar lateralmente de la presión y escoge la línea de pase con más espacio.
+
 ## Pendiente para considerar 4.0 completo
 - Completar la renovación individual de las 20 jugadas; hay cambios iniciales en penal, pases, duelos de banda, achique, salida aérea, despeje y fuera de juego.
 - Rediseño de interfaz y accesibilidad en resoluciones y navegadores.
