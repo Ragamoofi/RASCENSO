@@ -1,6 +1,8 @@
 # RASCENSO · Del barrio a la historia
 
-**RASCENSO 3.1 — Legado y ADN** · © Ragamoofi.
+**RASCENSO 3.3 — Vestuario, Selección y Escudos** · © Ragamoofi.
+
+Novedades y auditoría: [CHANGELOG-3.3.md](CHANGELOG-3.3.md) · [CREST_AUDIT.md](CREST_AUDIT.md).
 
 Sitio oficial de prueba: https://ragamoofi.github.io/RASCENSO/
 

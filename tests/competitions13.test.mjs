@@ -30,7 +30,7 @@ test('Los torneos se resuelven con fechas y marcadores, el campeón es participa
 });
 test('El motor integra copa local, continental y selección en el mismo año',()=>{
  const top=VERIFIED_LEAGUES.find(l=>l.countryCode==='CL'&&l.tier===1);
- const base={...started('CL','chile13'),ovr:90,coachTrust:95};
+ const base={...started('CL','chile13'),ovr:90,age:22,startAge:22,reputation:70,coachTrust:95,history:[{year:2024,matches:29,nationalCaps:2},{year:2025,matches:28,nationalCaps:2}]};
  const qualified=top.teamIds.find(clubId=>playLeague(syncClub({...base,clubId})).leaguePosition<=8);
  assert(qualified,'debe existir un equipo de primera entre los ocho primeros');
  const s=syncClub({...base,clubId:qualified});
@@ -43,7 +43,7 @@ test('El motor integra copa local, continental y selección en el mismo año',()
  const m=migrateCareer(a);assert.deepEqual(m.lastSeason.competitions,a.lastSeason.competitions);
 });
 test('Nueva Zelanda puede fichar, disputar copa nacional y recibir convocatoria',()=>{
- let s={...started('NZ','oceania13'),ovr:92};
+ let s={...started('NZ','oceania13'),ovr:92,age:22,startAge:22,reputation:75,history:[{year:2024,matches:28,nationalCaps:2},{year:2025,matches:27,nationalCaps:2}]};
  const next=advanceSeason(s);assert(next.lastSeason.competitions.some(c=>c.kind==='national-cup'));
  assert(next.lastSeason.calledUp);assert(next.lastSeason.competitions.some(c=>c.kind==='world-cup'||c.kind==='friendly'));
 });

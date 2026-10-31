@@ -63,9 +63,12 @@ jobs:
           test -s assets/brand/rascenso-icon.png
           test -s favicon.png
           for file in assets/logos-{1..4}.json; do test -s "$file"; done
+          test -s scripts/crest_commons.json
+          python -m py_compile scripts/build_crests.py scripts/audit_crests.py
       - name: Auditar cobertura y equivalencias de los 874 escudos
         run: |
           node scripts/export-clubs.mjs
+          python scripts/audit_crests.py
           python scripts/audit_crests.py
   deploy:
     needs: test
@@ -83,6 +86,7 @@ jobs:
           cp index.html experience.css favicon.svg favicon.png .nojekyll _site/
           cp -R src assets _site/
           node scripts/export-clubs.mjs
+          python scripts/audit_crests.py
           python -m pip install -q pillow cairosvg
           python scripts/build_crests.py _site/assets/crests
           python scripts/build_media12.py _site

@@ -11,7 +11,7 @@ import { initialRelationships, chooseScene, sceneFor, resultOfScene } from './st
 import { playLeague, leagueParticipants, getCompetitionForCareer, nextLeagueRosters } from './league.mjs';
 import { VERIFIED_LEAGUES, getInauguralLeague } from './leagues2026.mjs';
 import { annualSalary, marketClub, clubPrestige, playerDemand, buildTransferOffers, evaluateClubFuture } from './market.mjs';
-import { clamp, rng, yearOf, adjustOvr, ovrFromAttributes, juniorValue, juniorCeiling, finalizeDraft, migrateAttributes, developSeason, seasonRating, seasonObjectives, evaluateObjectives, squadRole, freshSquad, threadEffects, coachSeasonEffects, preparationFocus, addThread, resolveThread, hasThread, activeThreads, KEY_ATTRS, POSITION_WEIGHTS } from './career20.mjs';
+import { clamp, rng, yearOf, adjustOvr, ovrFromAttributes, juniorValue, juniorCeiling, finalizeDraft, migrateAttributes, developSeason, seasonRating, seasonObjectives, evaluateObjectives, squadRole, freshSquad, threadEffects, coachSeasonEffects, socialEffects, preparationFocus, addThread, resolveThread, hasThread, activeThreads, KEY_ATTRS, POSITION_WEIGHTS } from './career20.mjs';
 import { ensureWorld, advanceWorld, pushNews, coachFor, namerFor, worldClub, dynamicPrestige, dynamicLevel, worldRival } from './world20.mjs';
 import { pickWorldScene } from './story20.mjs';
 import { choiceFx, dnaFromPicks, startAttrDelta, creatorCeilings, tagOf, dnaFx, DNA_TAGS, referentRadar, dreamProgress, DREAM_REWARD, marketRarity } from './identity30.mjs';
@@ -355,7 +355,7 @@ export function advanceSeason(input){
  // «Irregularidad»: rachas buenas y malas → la nota de cada temporada oscila más (determinista por semilla).
  if(rating!=null&&s.weakness==='inconstante')rating=Math.round(clamp(rating+(rng(`${s.seed}:variance:${year}`)()-.5)*.5,5.6,8.6)*100)/100;
  // Desarrollo por atributos: edad, minutos, nota, entrenador, pretemporada, promesas y lesiones.
- const cfx=choiceFx(s);
+ const cfx=choiceFx(s);const social=socialEffects(s);
  const dev=developSeason(s,{share,rating:rating??6.2,injuryWeeks,coachFx,threadFx,careerFx:cfx,focus:preparationFocus(prep.id)});
  const ovr=dev.ovr,attributes=dev.attributes,attributeChanges=dev.changes,attributesBefore={...(s.attributes||{})};
  const international=global.international;
@@ -401,7 +401,7 @@ export function advanceSeason(input){
  }
  // Reputación: rendimiento, títulos, selección y premios.
  const awardRep=myAwards.reduce((n,a)=>n+(a.id==='ball'?12:a.global?6:3),0)+(ballPlace?Math.max(0,11-ballPlace)*.6:0);
- let reputation=clamp(Math.round((s.reputation||0)+playFx.rep+cfx.repYear+(leaguePosition<=3?3:0)+Math.min(4,Math.floor((goals+assists)/13))+prep.reputation+Math.min(8,global.competitions.filter(c=>c.championWon).length*3)+Math.min(4,Math.floor(global.nationalCaps/4))+awardRep+((rating??6.4)>=7.2?2:0)),0,100);
+ let reputation=clamp(Math.round((s.reputation||0)+playFx.rep+cfx.repYear+(leaguePosition<=3?3:0)+Math.min(4,Math.floor((goals+assists)/13))+prep.reputation+Math.min(8,global.competitions.filter(c=>c.championWon).length*3)+Math.min(4,Math.floor(global.nationalCaps/4))+awardRep+((rating??6.4)>=7.2?2:0)+social.reputation),0,100);
  // Hilos narrativos: desafíos públicos y promesas se cobran al cierre de la temporada.
  let threads=s.threads||[];
  const challenge=activeThreads(s,year).find(t=>t.kind==='public_challenge');
@@ -411,7 +411,7 @@ export function advanceSeason(input){
  for(const n of dev.notes)moments.push({year,kind:'development',text:n.text});
  for(const a of myAwards)moments.push({year,kind:'award',text:`${a.name}${a.league?` · ${a.league}`:''}`});
  const trophyRecords=[...(s.trophyRecords||[]),...titles.filter(title=>title===league.league).map(title=>({title,year,clubId:club.id,leagueId:league.leagueId||'',kind:'league'})),...global.trophyRecords];
- const morale=clamp(Math.round((s.morale??70)+playFx.morale+cfx.moraleYear+(s.dream==='titulos'?titles.length:0)-((s.morale??70)-68)*.18+prep.morale+identity.morale+coachFx.morale+threadFx.morale+(objScore>=2?3:objScore<1?-4:0)+(myAwards.length?4:0)),0,100);
+ const morale=clamp(Math.round((s.morale??70)+playFx.morale+cfx.moraleYear+(s.dream==='titulos'?titles.length:0)-((s.morale??70)-68)*.18+prep.morale+identity.morale+coachFx.morale+threadFx.morale+social.morale+(objScore>=2?3:objScore<1?-4:0)+(myAwards.length?4:0)),0,100);
  const flags={...(s.storyFlags||{})};if(s.fanClubId&&s.clubId===s.fanClubId)flags.playedForFan=true;
  // Las promesas de esta temporada vencen; quedan registradas para escenas posteriores.
  const next={...s,age:s.age+1,ovr,potential:dev.potential,attributes,attrCeil:dev.attrCeil,reputation,trophyRecords,annualScenes:0,morale,careerEarnings:(s.careerEarnings||0)+wage,leagueRosters,coachTrust,relationships,history:[...s.history,seasonal],trophies:[...s.trophies,...titles],lastSeason:seasonal,recapPending:true,storyFlags:flags,

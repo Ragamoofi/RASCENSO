@@ -170,13 +170,13 @@ export const WORLD_SCENES={
    o('Dedicárselo al equipo','Compartir el mérito con tus compañeros.','«Esto es de todos».',{teammate:8,coach:4,reputation:2},'El vestuario se sintió parte del premio.'),
    o('Prometer más títulos','Elevar la vara de lo que viene.','«¡Esto recién empieza!»',{reputation:4,press:4,morale:2},'La exigencia sobre ti aumenta.')]
  },
- w_national:{tag:'SELECCIÓN',place:'Conferencia de prensa del seleccionador',actor:'press',
-  title:s=>ctx(s).data.called?'La selección llama a tu puerta':'La lista que no te incluyó',
-  paragraphs:s=>ctx(s).data.called?[`El seleccionador destacó tu temporada (${ctx(s).last.matches} partidos, nota ${(ctx(s).last.rating||6.5).toFixed(2)}).`,'Estar en la lista no garantiza minutos: hay que ganarse un lugar.']:[`Con media ${s.ovr} y una buena temporada, esperabas una citación. Tu nombre no apareció.`,'La prensa pregunta qué opinas.'],
-  speech:s=>ctx(s).data.called?'«¿Qué significa para ti vestir esta camiseta?»':'«¿Te sientes ignorado por el seleccionador?»',
+ w_national:{tag:'SELECCIÓN',place:'Entrevista tras la temporada internacional',actor:'press',
+  title:s=>ctx(s).data.called?'Tu debut internacional ya es historia':'La lista que no te incluyó',
+  paragraphs:s=>ctx(s).data.called?[`Ya disputaste ${ctx(s).last.nationalCaps} partido(s) con tu selección durante la temporada ${ctx(s).last.year}. La prensa repasa aquel primer llamado, antes de los encuentros.`,`El seleccionador destacó tu rendimiento en el club (${ctx(s).last.matches} partidos, nota ${(ctx(s).last.rating||6.5).toFixed(2)}). Ahora toca mantener el puesto.`]:[`Con media ${s.ovr} y una buena temporada, esperabas una citación. Tu nombre no apareció.`,'La prensa pregunta qué opinas.'],
+  speech:s=>ctx(s).data.called?'«¿Cómo viviste tus primeros partidos internacionales?»':'«¿Te sientes ignorado por el seleccionador?»',
   options:s=>ctx(s).data.called?[
-   o('Un sueño cumplido','Agradecer con humildad.','«Hoy es el día más feliz de mi familia».',{family:8,morale:5,reputation:2},'Tu familia vivió la convocatoria como un triunfo propio.'),
-   o('Ir a ganarte la titularidad','Ambición desde la primera citación.','«Que se note el hambre».',{reputation:3,press:2,morale:2},'Llegas a la selección con hambre de protagonismo.')]:[
+   o('Recordar a mi familia','Agradecer el apoyo después del debut.','«Fue inolvidable para todos».',{family:8,morale:5,reputation:2},'Tu familia celebró contigo los primeros partidos internacionales.'),
+   o('Pensar en el próximo torneo','Seguir ganándose la camiseta.','«Lo importante es mantener el nivel».',{reputation:3,press:2,morale:2},'Después del debut, te marcas una nueva meta con la selección.')]:[
    o('Trabajar en silencio','Responder con rendimiento.','«Sin polémica».',{morale:-1,coach:3},'Seguirás trabajando para la próxima lista.'),
    o('Criticar al seleccionador','Decir lo que piensas.','«Eso no cae bien en la federación».',{press:4,reputation:1,morale:2,thread:{kind:'national_snub',years:2}},'La federación tomó nota de tus palabras.')]
  },

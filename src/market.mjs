@@ -3,6 +3,7 @@
 import { COUNTRIES } from './countries.mjs';
 import { getInauguralLeague, VERIFIED_LEAGUES } from './leagues2026.mjs';
 import { choiceFx, marketRarity } from './identity30.mjs';
+import { socialEffects } from './career20.mjs';
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function hash(s){let h=2166136261;for(const c of String(s)){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;}
 function random(seed){let x=hash(seed);return ()=>{x+=0x6d2b79f5;let t=Math.imul(x^(x>>>15),1|x);t^=t+Math.imul(t^(t>>>7),61|t);return ((t^(t>>>14))>>>0)/4294967296;};}
@@ -88,6 +89,7 @@ function weightClub(state,c,focus){
  if(focus==='local'&&c.countryCode!==state.country)w*=.16;
  if(focus==='money')w*=clamp(wageCeiling(c)/1600000,.35,4);
  if(focus==='minutes'&&gap>4)w*=.5;
+ const social=socialEffects(state);if(gap>0)w*=1+social.agentQuality*Math.min(1,gap/12);
  if(state.riskProfile==='hogareno')w*=c.countryCode===state.country?1.5:.7;
  if(state.riskProfile==='aventurero'&&c.countryCode!==state.country)w*=1.35;
  if(state.riskProfile==='leal')w*=.75;
@@ -107,7 +109,7 @@ export function buildTransferOffers(state,{attempt=0,focus='balanced',forced=fal
  const r=random(seed),demand=playerDemand(state);
  const selected=[];
  const weighted=eligibleClubs(state).map(c=>({c,w:weightClub(state,c,focus)})).filter(x=>x.w>.00001);
- let count=demand>=84?3:2+Math.floor(r()*2);
+ let count=demand>=84?3:2+Math.floor(r()*2);if(socialEffects(state).agentMarket>1.12&&count<4)count++;
  if(state.age>=35&&state.age<38)count=Math.max(0,count-1-(r()<.4?1:0));
  if(state.age>=38){const probability=clamp(.94-(state.age-38)*.095-(state.ovr<58?.18:0),0,.95);count=Array.from({length:3},()=>r()<probability).filter(Boolean).length;}
  for(let k=0;k<count&&weighted.length;k++){

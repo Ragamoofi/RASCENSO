@@ -1,7 +1,7 @@
 {
   "total": 874,
-  "mapped": 818,
-  "unmatched": 56,
+  "mapped": 826,
+  "unmatched": 48,
   "aliasCount": 241,
   "invalidAliases": [],
   "missing": [
@@ -26,23 +26,8 @@
       "country": "NZ"
     },
     {
-      "id": "nz-5",
-      "name": "Auckland United",
-      "country": "NZ"
-    },
-    {
-      "id": "ar-extra-29",
-      "name": "San Martín de Tucumán",
-      "country": "AR"
-    },
-    {
       "id": "ar-extra-31",
       "name": "Banfield II",
-      "country": "AR"
-    },
-    {
-      "id": "ar-2026-gimnasia-de-mendoza",
-      "name": "Gimnasia de Mendoza",
       "country": "AR"
     },
     {
@@ -63,11 +48,6 @@
     {
       "id": "cl-extra-7",
       "name": "Colo-Colo B",
-      "country": "CL"
-    },
-    {
-      "id": "cl-extra-15",
-      "name": "Santiago Morning",
       "country": "CL"
     },
     {
@@ -106,11 +86,6 @@
       "country": "CL"
     },
     {
-      "id": "cl-extra-31",
-      "name": "Fernández Vial",
-      "country": "CL"
-    },
-    {
       "id": "cl-extra-32",
       "name": "San Antonio Unido",
       "country": "CL"
@@ -136,11 +111,6 @@
       "country": "PY"
     },
     {
-      "id": "py-extra-6",
-      "name": "Tacuary",
-      "country": "PY"
-    },
-    {
       "id": "py-extra-9",
       "name": "12 de Octubre",
       "country": "PY"
@@ -149,11 +119,6 @@
       "id": "py-extra-12",
       "name": "Guaireña",
       "country": "PY"
-    },
-    {
-      "id": "pe-extra-11",
-      "name": "Carlos A. Mannucci",
-      "country": "PE"
     },
     {
       "id": "pe-extra-17",
@@ -188,11 +153,6 @@
     {
       "id": "au-extra-8",
       "name": "Wellington Phoenix",
-      "country": "AU"
-    },
-    {
-      "id": "au-extra-13",
-      "name": "Auckland FC",
       "country": "AU"
     },
     {

@@ -26,6 +26,7 @@ OUT.mkdir(parents=True, exist_ok=True)
 CATALOG = ROOT / 'clubs-export.json'
 CLUBS = json.loads(CATALOG.read_text(encoding='utf8'))
 PINNED_ALIASES = json.loads((ROOT / 'scripts' / 'crest_aliases.json').read_text(encoding='utf8'))
+COMMONS = json.loads((ROOT / 'scripts' / 'crest_commons.json').read_text(encoding='utf8'))
 INDEX = {}
 for part in range(1, 5):
     p = ROOT / 'assets' / f'logos-{part}.json'
@@ -95,20 +96,24 @@ def process(item: dict):
     club=item['club'];code=item['country']; name=club['name']; cid=club['id']
     selected=select_file(code,name,cid)
     matched=False
-    source=f'https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/{DIRS[code]}/{urllib.parse.quote(selected)}' if selected else None
+    commons=COMMONS.get(cid) if not selected else None
+    source=(f'https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/{DIRS[code]}/{urllib.parse.quote(selected)}' if selected else
+            f'https://commons.wikimedia.org/wiki/Special:FilePath/{urllib.parse.quote(commons["file"])}' if commons else None)
     if source and not OFFLINE:
         try:
             req=urllib.request.Request(source,headers={'User-Agent':'RASCENSO/0.5 (independent football career demo)'})
             with urllib.request.urlopen(req,timeout=9) as resp: raw=resp.read(350_000)
             if b'<svg' in raw[:500] or b'<svg' in raw:
-                picture=render_logo(raw)
-                matched=True
+                picture=render_logo(raw);matched=True
+            elif raw.startswith((b'\x89PNG',b'\xff\xd8',b'GIF8',b'RIFF')):
+                icon=Image.open(io.BytesIO(raw)).convert('RGBA');icon.thumbnail((104,104),Image.Resampling.LANCZOS)
+                picture=Image.new('RGBA',(112,112),(0,0,0,0));picture.alpha_composite(icon,((112-icon.width)//2,(112-icon.height)//2));matched=True
         except Exception: pass
     if not matched:picture=fallback(club)
     path=OUT / f'{cid}.png'
     picture.save(path,format='PNG',optimize=True)
     return {'id':cid,'name':name,'country':code,'kind':'reference-crest' if matched else 'source-unavailable' if source else 'original-placeholder',
-            'source':f'JoseArroyave/football-logos/{DIRS[code]}/{selected}' if source else None,
+            'source':(f'JoseArroyave/football-logos/{DIRS[code]}/{selected}' if selected else commons['page'] if commons else None),
             'sourceUrl':source}
 
 with futures.ThreadPoolExecutor(max_workers=16 if not OFFLINE else 6) as pool:

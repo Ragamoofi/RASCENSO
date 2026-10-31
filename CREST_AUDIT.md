@@ -14,3 +14,12 @@ La publicación genera `assets/crest-manifest.json`, que distingue entre escudos
 **Fuente de referencia:** [JoseArroyave/football-logos](https://github.com/JoseArroyave/football-logos), catálogo SVG organizado por país (MIT). Los escudos siguen siendo marcas e identidades de sus respectivos clubes.
 
 Para reproducir la revisión: `node scripts/export-clubs.mjs && python scripts/audit_crests.py --write`. Para generar el sitio: `python scripts/build_crests.py _site/assets/crests` (requiere Pillow, CairoSVG y conexión de red).
+
+
+## Revisión manual adicional · RASCENSO 3.3
+
+Se confirmaron **8 nuevas correspondencias** en Wikimedia Commons (San Martín de Tucumán, Gimnasia de Mendoza, Santiago Morning, Fernández Vial, Tacuary, Carlos A. Mannucci, Auckland United y Auckland FC). Están definidas en `scripts/crest_commons.json`, con páginas de origen y licencias declaradas. Dos archivos neozelandeses están sujetos a procesos de revisión en Commons y podrían dejar de estar disponibles.
+
+Con estas fuentes, el catálogo pasa a **826/874 asignaciones conocidas** y **48 sin fuente confirmada**. Que el origen esté identificado NO garantiza que el PNG se descargue en cada ejecución de CI: el manifiesto final distingue escudos descargados, enlaces fallidos y marcadores genéricos.
+
+No se reutilizó el escudo del primer equipo para filiales como Colo-Colo B o Banfield II.

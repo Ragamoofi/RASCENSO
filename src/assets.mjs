@@ -2,9 +2,9 @@ import { COUNTRIES } from './countries.mjs';
 // Recursos decorativos: escudos de terceros sólo donde existe una URL reconocida;
 // distintivo original de respaldo en caso de error o falta de imagen.
 const crestRegistry=new Map();
-const CREST_MANIFEST='./assets/crest-manifest.json?v=322';
+const CREST_MANIFEST='./assets/crest-manifest.json?v=330';
 function safeReference(source){
- try{const u=new URL(source,location.href);return u.protocol==='https:'&&u.hostname==='raw.githubusercontent.com'&&u.pathname.startsWith('/JoseArroyave/football-logos/main/logos/')?u.href:null;}catch{return null;}
+ try{const u=new URL(source,location.href);return u.protocol==='https:'&&((u.hostname==='raw.githubusercontent.com'&&u.pathname.startsWith('/JoseArroyave/football-logos/main/logos/'))||(u.hostname==='commons.wikimedia.org'&&u.pathname.startsWith('/wiki/Special:FilePath/')))?u.href:null;}catch{return null;}
 }
 function applyCrestSources(){
  if(typeof document==='undefined')return;

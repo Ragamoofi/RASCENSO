@@ -116,6 +116,14 @@ export function coachSeasonEffects(coach,s){
  };
 }
 
+/** Vínculos sociales: efectos limitados, centrados en decisiones persistentes. 50 = neutral. */
+export function socialEffects(s){
+ const affinity=key=>clamp(((s.relationships?.[key]?.trust??50)-50)/50,-1,1);
+ const teammate=affinity('teammate'),agent=affinity('agent'),press=affinity('press'),family=affinity('family');
+ return {minutes:teammate*.025,injury:clamp(1-family*.07,.93,1.07),
+  morale:Math.round(teammate*1+family*2),reputation:Math.round(press*1),
+  agentMarket:clamp(1+agent*.20,.80,1.20),agentQuality:agent*.24};
+}
 /* ---------- Vestuario: competidor directo, directiva y afición ---------- */
 export function rivalTeammate(seedKey,club,position,age,names){
  const r=rng(seedKey+':rival20');

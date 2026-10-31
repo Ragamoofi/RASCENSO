@@ -8,6 +8,7 @@ CATALOG=json.loads((ROOT/'clubs-export.json').read_text(encoding='utf8'))
 INDEX={}
 for i in range(1,5): INDEX.update(json.loads((ROOT/'assets'/f'logos-{i}.json').read_text(encoding='utf8')))
 ALIASES=json.loads((ROOT/'scripts/crest_aliases.json').read_text(encoding='utf8'))
+COMMONS=json.loads((ROOT/'scripts/crest_commons.json').read_text(encoding='utf8'))
 def norm(text):
  text=unicodedata.normalize('NFKD',text)
  return re.sub(r'[^a-z0-9]','', ''.join(c for c in text if not unicodedata.combining(c)).lower())
@@ -27,7 +28,7 @@ def select(c,name,cid):
  rank=sorted(((difflib.SequenceMatcher(None,key,norm(f.removesuffix('.svg'))).ratio(),f) for f in files),reverse=True)
  if rank and rank[0][0]>=.94 and (len(rank)==1 or rank[0][0]-rank[1][0]>=.08):return rank[0][1]
  return None
-rows=[{'id':x['club']['id'],'name':x['club']['name'],'country':x['country'],'filename':select(x['country'],x['club']['name'],x['club']['id'])} for x in CATALOG]
+rows=[{'id':x['club']['id'],'name':x['club']['name'],'country':x['country'],'filename':select(x['country'],x['club']['name'],x['club']['id']) or (COMMONS.get(x['club']['id'],{}).get('file'))} for x in CATALOG]
 byid={x['club']['id']:x for x in CATALOG}
 errors=[cid for cid,v in ALIASES.items() if cid not in byid or byid[cid]['country']!=v['country'] or v['file'] not in INDEX.get(v['country'],[])]
 matched=sum(bool(x['filename']) for x in rows)
@@ -35,4 +36,4 @@ summary={'total':len(rows),'mapped':matched,'unmatched':len(rows)-matched,'alias
 print('Clubes:',len(rows),'fuentes relacionadas:',matched,'pendientes:',len(rows)-matched,'alias inválidos:',len(errors))
 if '--json' in sys.argv:print(json.dumps(summary,ensure_ascii=False,indent=2))
 if '--write' in sys.argv:(ROOT/'assets/crest-audit.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
-if errors or len(rows)!=874 or matched<818:sys.exit('Revisión de escudos incorrecta')
+if errors or len(rows)!=874 or matched<826:sys.exit('Revisión de escudos incorrecta')

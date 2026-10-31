@@ -22,7 +22,12 @@ const threadIcon=kind=>h(THREAD_INFO[kind]?.icon||'•'),threadName=(kind,fallba
 /* ---------- Tarjeta del jugador: proyección y nota ---------- */
 export function cardExtras(s){
  const sp=scoutedPotential(s);const last=s.lastSeason;
- return `${dnaBadge(s)}<div class="v2-card-extra">${sp?`<div><small>PROYECCIÓN</small><strong>${sp.low===sp.high?sp.low:`${sp.low}–${sp.high}`}</strong><em>${h(sp.label)}</em></div>`:''}${last?.rating?`<div><small>NOTA ${h(last.year)}</small><strong>${last.rating.toFixed(2)}</strong><em>${h(last.role||'')}</em></div>`:''}</div>`;
+ return `${dnaBadge(s)}${last?.rating?`<div class="v2-card-extra season-rating"><div><small>NOTA ${h(last.year)}</small><strong>${last.rating.toFixed(2)}</strong><em>${h(last.role||'')}</em></div></div>`:''}`;
+}
+/** Proyección estimada, en una línea limpia junto a los datos del jugador. */
+export function projectionLine(s){
+ const sp=scoutedPotential(s);if(!sp)return '';
+ return `<div class="player-projection-inline" title="Proyección potencial, no media actual"><span>PROYECCIÓN</span><strong>${sp.low===sp.high?sp.low:`${sp.low}–${sp.high}`}</strong><small>${h(sp.label)}</small></div>`;
 }
 export function attributeBar(s,key,label){
  const v=s.attributes?.[key],c=s.attrCeil?.[key],delta=s.lastSeason?.attributeChanges?.[key];
@@ -78,13 +83,14 @@ export function vestuarioView(s){
  const club=worldClub(s.clubId);const coach=coachFor(s,s.clubId);const sq=s.squad||{};const rival=sq.rival;const trend=clubTrend(s,s.clubId);
  const rel=s.relationships||{};const threads=(s.threads||[]).slice().reverse();
  const obj=currentObjectives(s);
- const relCard=(key,label)=>{const r=rel[key];if(!r)return '';return `<div class="v2-rel">${avatar(r.name)}<div><strong>${h(r.name)}</strong><small>${h(label)}</small>${meter('Relación',r.trust??50)}</div></div>`;};
- return `<section class="focus-card v2-vestuario"><div class="section-label">VESTUARIO · ${h(club?.name||'Sin club')}</div><h2>Las personas que deciden tu carrera.</h2>
+ const relationHints={teammate:'Apoyo dentro del plantel: puede mejorar ligeramente tus minutos y la moral al cierre de temporada.',agent:'Mejora las oportunidades de mercado y la calidad de las gestiones de tu representante, sin garantizar ofertas.',press:'Buena relación con la prensa: pequeños efectos sobre la reputación entre temporadas.',family:'Apoyo emocional: influye moderadamente en la moral y en el riesgo de lesión.'};
+ const relCard=(key,label)=>{const r=rel[key];if(!r)return '';return `<div class="v2-rel">${avatar(r.name)}<div><strong>${h(r.name)}</strong><small>${h(label)}</small>${meter('Relación',r.trust??50)}<small class="v2-rel-help" title="${h(relationHints[key])}">${h(relationHints[key])}</small></div></div>`;};
+ return `<section class="focus-card v2-vestuario"><div class="section-label">VESTUARIO · ${h(club?.name||'Sin club')}</div><h2>Las personas que deciden tu carrera.</h2><p class="v2-vest-guide">La confianza importa: entrenador y rival influyen en tus minutos; directiva e hinchada en el ambiente y continuidad. Las relaciones cambian con tus decisiones y aportan efectos moderados, no bonos mágicos.</p>
  <div class="v2-vest-grid">
   <section class="v2-panel v2-coach-card"><header><span>ENTRENADOR</span><b>${h(coach?.styleName||'')}</b></header><div class="v2-coach-line big">${avatar(coach?.name)}<div><strong>${h(coach?.name||'—')}</strong><small>${flag(coach?.nationality||s.country)} ${coach?.age||''} años${coach?.since?` · en el cargo desde ${coach.since}`:''}</small></div></div><p>${h(COACH_STYLES[coach?.style]?.description||'')}</p>${meter('Confianza en ti',s.coachTrust??50,'trust')}</section>
   <section class="v2-panel"><header><span>COMPETIDOR DIRECTO</span><b>${h(s.position)}</b></header>${rival?`<div class="v2-duel"><div class="me"><small>TÚ</small><strong>${s.ovr}</strong><em>${s.age} años</em></div><div class="vs">VS</div><div class="them"><small>${h(rival.name)}</small><strong>${rival.ovr}</strong><em>${rival.age} años${rival.signed?' · fichaje':''}${rival.bond?' · amistad':''}</em></div></div><p class="muted">Rol previsto: <b>${h(currentRole(s)||'—')}</b>. La media, la confianza del técnico, su estilo y tus compromisos deciden quién juega.</p>`:'<p class="muted">Sin competidor asignado.</p>'}</section>
   <section class="v2-panel"><header><span>EL CLUB</span><b>${h(trend.label)}</b></header>${meter('Directiva',sq.board??55,'board')}${meter('Hinchada',sq.fans??50,'fans')}<div class="v2-badges">${sq.captain?'<span>C · Capitán</span>':''}${sq.idol?'<span>★ Ídolo</span>':''}${sq.loyal?'<span>♥ Lealtad</span>':''}<span>${sq.seasons||0} temporada(s) en el club</span><span>Prestigio ${dynamicPrestige(s,club)}</span></div>${obj?`<p class="muted">Objetivo de la directiva: <b>${h(obj.board.text)}</b>.</p>`:''}${trend.hist.length?`<div class="v2-trend">${trend.hist.slice(-8).map(([y,p,t])=>`<span title="${y}: ${p}° de ${t}"><i style="height:${Math.max(8,100-(p-1)/(Math.max(2,t)-1)*92)}%"></i><small>${String(y).slice(2)}</small></span>`).join('')}</div>`:''}</section>
-  <section class="v2-panel v2-rels"><header><span>RELACIONES</span><b>5</b></header>${relCard('teammate','Compañero de confianza')}${relCard('agent','Representante')}${relCard('press','Periodista de cabecera')}${relCard('family','Familia')}</section>
+  <section class="v2-panel v2-rels"><header><span>RELACIONES</span><b>4</b></header>${relCard('teammate','Compañero de confianza')}${relCard('agent','Representante')}${relCard('press','Periodista de cabecera')}${relCard('family','Familia')}</section>
   <section class="v2-panel v2-memory"><header><span>MEMORIA DE TUS DECISIONES</span><b>${threads.length}</b></header>${threads.length?threads.slice(0,10).map(t=>`<div class="v2-thread-row ${t.resolved?'done':''}"><i>${threadIcon(t.kind)}</i><div><strong>${threadName(t.kind)}</strong><small>${t.year}${t.until&&t.until>t.year?`–${t.until}`:''} · ${t.resolved?h(t.outcome||'cerrado'):'activo'}</small></div></div>`).join(''):'<p class="muted">Tus promesas, desafíos y compromisos quedarán registrados aquí. El juego los recuerda.</p>'}</section>
   ${dreamPanel(s)}${dnaPanel(s)}
  </div></section>`;

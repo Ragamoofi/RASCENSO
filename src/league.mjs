@@ -10,7 +10,7 @@ import { fixturePlayDelta } from './plays30.mjs';
 import { choiceFx } from './identity30.mjs';
 import { VERIFIED_LEAGUES, getInauguralLeague } from './leagues2026.mjs';
 import { dynamicLevel, coachFor } from './world20.mjs';
-import { squadRole, threadEffects, coachSeasonEffects } from './career20.mjs';
+import { squadRole, threadEffects, coachSeasonEffects, socialEffects } from './career20.mjs';
 const bound=(v,a,b)=>Math.max(a,Math.min(b,v));
 function rand(seed){let h=2166136261;for(const c of String(seed)){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return ()=>{h+=0x6d2b79f5;let t=Math.imul(h^(h>>>15),1|h);t^=t+Math.imul(t^(t>>>7),61|t);return ((t^(t>>>14))>>>0)/4294967296;};}
 function goals(mean,random){let n=0,p=Math.exp(-mean),prod=1;do{n++;prod*=random();}while(prod>p&&n<=10);return Math.min(8,n-1);}
@@ -98,10 +98,10 @@ export function playLeague(state){
  const coach=state.world&&!state.neutralLeague?coachFor(state,state.clubId):null;
  // Un único algoritmo de rol: squadRole usa al competidor si existe y, si no, el nivel del club.
  // roleOf solo queda para las ligas neutrales (simulaciones de otros campeonatos sin jugador).
- const modern=!state.neutralLeague;
+ const modern=!state.neutralLeague;const social=modern?socialEffects(state):{minutes:0,injury:1};
  const role=modern?squadRole(state,own.level,coach):roleOf(state,own.level);
  const tfx=modern?threadEffects(state):{minutes:0,injury:1,goals:1};const cfx=modern?coachSeasonEffects(coach,state):{goals:1,starterMinutes:0};
- const playRate=bound(({Titular:.88,'Rotación':.62,Suplente:.35,Reserva:.14})[role]+(trust-50)/320-(state.age<=18?.08:0)+prep.minutes+traits.minutes+(agenda.minutes||0)+profile.minutes+persona.minutes+cf.minutes+tfx.minutes+(role==='Titular'?cfx.starterMinutes:0),.04,.98);
+ const playRate=bound(({Titular:.88,'Rotación':.62,Suplente:.35,Reserva:.14})[role]+(trust-50)/320-(state.age<=18?.08:0)+prep.minutes+traits.minutes+(agenda.minutes||0)+profile.minutes+persona.minutes+cf.minutes+tfx.minutes+social.minutes+(role==='Titular'?cfx.starterMinutes:0),.04,.98);
  const fixtureList=league?.format==='argentina-zones'&&league.zones
   ?(()=>{const za=selected.filter(c=>league.zones.A.includes(c.id)),zb=selected.filter(c=>league.zones.B.includes(c.id));
     const a=calendar(za).filter(f=>f.round<=15),b=calendar(zb).filter(f=>f.round<=15);
@@ -111,7 +111,7 @@ export function playLeague(state){
     return [...first,...second,...inter];
    })()
   :calendar(selected);
- const injuryRoll=r();const prone=(state.injuryProfile==='fragil'?.085:state.injuryProfile==='resistente'?.025:.05)*prep.injury*traits.injury*(agenda.injury||1)*profile.injury*persona.injury*cf.injury*tfx.injury;
+ const injuryRoll=r();const prone=(state.injuryProfile==='fragil'?.085:state.injuryProfile==='resistente'?.025:.05)*prep.injury*traits.injury*(agenda.injury||1)*profile.injury*persona.injury*cf.injury*tfx.injury*social.injury;
  const injuryWeeks=injuryRoll<prone+Math.max(0,state.age-29)*.008?(2+Math.floor(r()*11)):0;
  const absence=injuryAbsenceSlots(fixtureList,state.clubId,injuryWeeks,r);
  const rows=Object.fromEntries(selected.map(t=>[t.id,{id:t.id,name:t.name,level:t.level,played:0,wins:0,draws:0,losses:0,for:0,against:0,gd:0,points:0}]));
