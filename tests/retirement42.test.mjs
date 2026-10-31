@@ -15,7 +15,7 @@ const fixture={
  dream:'seleccion',dreamDone:'seleccion'
 };
 const deps={badge:id=>'<span class="crest">'+id+'</span>',trophyImage:()=>'/assets/trophies/league.png',flag:()=>'<span>🇨🇱</span>',
- dreamProgress:()=>({done:true,title:'Jugar por la selección'}),button:(s,action)=>'<button data-action="'+action+'">'+s+'</button>'};
+ dreamProgress:()=>({done:true,title:'Jugar por la selección'}),button:(s,action,cls,more='')=>'<button data-action="'+action+'" '+more+'>'+s+'</button>'};
 test('el retiro reúne estadísticas, años, clubes y palmarés sin duplicar títulos',()=>{
  const d=retirementData(fixture);
  assert.equal(d.a.matches,79);assert.equal(d.a.goals,30);assert.equal(d.a.assists,15);
@@ -24,7 +24,7 @@ test('el retiro reúne estadísticas, años, clubes y palmarés sin duplicar tí
 });
 test('el homenaje tiene portada, curva de progresión, trofeos, premios y acciones',()=>{
  const html=retirementView(fixture,deps);
- for(const term of ['UNA CARRERA.','UNA LEYENDA.','La sala de trofeos','evolución','tu talento','Mejor jugador','Compartir']) {
+ for(const term of ['UNA CARRERA.','UNA HISTORIA.','La sala de trofeos','evolución','tu talento','Mejor jugador','Compartir']) {
   if(term==='Compartir')continue;
   assert.ok(html.includes(term),term);
  }
