@@ -463,7 +463,10 @@ const achique={
  update(m,dt){
   const st=m.stats;
   if(m.ball.owner===m.st){m.steer(m.me,st.speed*.9,dt,[43.5,51.8,8,21]);
-   moveToward(m.st,G.x-2,m.st.y+(FIELD.goalY-m.st.y)*.4,m.st.speed,dt);
+   // Ante una salida cercana, el delantero intenta abrir ángulo hacia el lado libre.
+   const separation=dist(m.st,m.me),escape=clampN((9-separation)/9,0,1)*m.ai.shooterSkill*3;
+   const side=m.st.y>=m.me.y?1:-1;
+   moveToward(m.st,G.x-2,clampN(m.st.y+(FIELD.goalY-m.st.y)*.4+side*escape,4,25),m.st.speed,dt);
    const d=dist(m.st,G);
    if(m.me.dive>0){m.me.dive-=dt;}
    if(timeUp(m))return m.finish(false,'superado',.1);
@@ -475,7 +478,7 @@ const achique={
   else{const previous={x:m.ball.x,y:m.ball.y,z:m.ball.z};stepBall(m.ball,dt);
    if(m.me.diveTime>0){m.me.diveTime=Math.max(0,m.me.diveTime-dt);moveToward(m.me,m.me.diveTarget.x,m.me.diveTarget.y,9+st.reflex*5,dt);}
    else m.steer(m.me,st.speed*.9,dt,[43.5,51.8,8,21]);
-   const coverage=m.me.grounded?.6:st.reach+clampN((52-m.me.x)*.12,0,.6)+(m.me.diveTime>0?.4:0);
+   const coverage=m.me.grounded?.6:st.reach+(m.me.diveTime>0?.4:0);
    if(sweptKeeperContact(previous,m.ball,m.me,coverage)&&!m.result){setBanner(m,m.me.x,m.me.y);return m.finish(true,'atajada',.5+clampN(coverage-dist(m.me,m.ball),0,1)*.5);}
    if(m.ball.x>=FIELD.goalX&&!m.result){setBanner(m,m.ball.x,m.ball.y);return inGoalMouth(m.ball.y,m.ball.z)?m.finish(false,'gol rival',.1):m.finish(true,'fuera',.4);}
    if(Math.hypot(m.ball.vx,m.ball.vy)<.5&&m.ball.z<=0&&!m.result){

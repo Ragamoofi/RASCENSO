@@ -59,3 +59,8 @@ Rama de trabajo: `rascenso-4-integral`. Base: `bb85f188cf63e016ba8429b8d24b44d53
 - Base anterior: 4e63a6aa33813761026b52205f2130bad387725e. En achique, si el remate se detiene lejos, el balón sigue en disputa hasta que llegue el arquero o el delantero. En reflejos, la puntería rival depende de su habilidad y puede elegir el lado libre al preparar el remate, sin cambiar el destino después.
 - Pruebas locales: 216 pruebas completas antes de agregar una prueba específica del rematador, que también pasó por separado. Se ejecutó la matriz automática de 20 jugadas. Falta validar visualmente y con jugadores; el bot conoce el destino del balón y no representa desempeño humano.
 - Siguen pendientes la renovación integral de las 20 jugadas, equilibrio, interfaz, carrera, narrativa, escudos y validación antes de integrar.
+
+## Continuación: equilibrio del achique
+- Base anterior: d282faf8f4a096be44b66c92ac833e711d558a19. El delantero abre ángulo ante el arquero y su habilidad afecta cuánto evade; se quitó alcance extra artificial por adelantarse, manteniendo la ventaja geométrica y la estirada.
+- Matriz de 100 semillas: achique con nivel 55 pasó de 100/100 a 88/86 (dificultad 0,25/0,85); nivel 85 obtuvo 99/100. El bot conoce el estado interno. Persisten tasas extremas y falta prueba humana y visual.
+- Pruebas: 217 locales aprobadas y prueba adicional del desmarque aprobada por separado; matriz completa de 20 jugadas sin casos sin finalizar. Pendientes generales de la sección anterior siguen vigentes; no integrar ni publicar.

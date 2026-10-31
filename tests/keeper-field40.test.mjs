@@ -15,3 +15,7 @@ test('un achique cercano depende de la posición y los reflejos sin tirada ocult
 test('un disparo detenido lejos del arquero sigue en disputa',()=>{
  const {m,scene}=setup();m.ball.owner=null;m.ball.x=44;m.ball.y=10;m.ball.z=0;m.ball.vx=0;m.ball.vy=0;m.ball.vz=0;m.shotAt=m.t;m.st.x=36;m.st.y=10;scene.update(m,.05);assert.equal(m.result,undefined);
 });
+test('el delantero abre el ángulo hacia el lado opuesto al arquero adelantado',()=>{
+ const advance=(keeperY)=>{const {m,scene}=setup();m.st.x=40;m.st.y=14.5;m.me.x=46;m.me.y=keeperY;m.t=1;m.ai.shooterSkill=1;scene.update(m,.1);return m.st.y;};
+ assert.ok(advance(13)>14.5);assert.ok(advance(16)<14.5);
+});
