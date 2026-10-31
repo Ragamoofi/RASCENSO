@@ -20,6 +20,8 @@ test('4.5 · PNG real distintivo para grandes torneos y diseño propio para otro
  assert.equal(trophyIdentity(rec('Copa Argentina',2028,'ar-1','national-cup',{competitionId:'CUP-AR'})).key,'cup-ar');
  assert.equal(trophyIdentity(rec('Mundial de Clubes',2028,'ar-1','club-world-cup')).key,'club-world');
  assert.equal(trophyIdentity(rec('UEFA Europa League',2028,'en-1','continental')).key,'continental-europa');
+ assert.equal(trophyIdentity(rec('CAF Champions League',2028,'eg-1','continental')).key,'real-cafchampions');
+ assert.equal(trophyIdentity(rec('AFC Champions League Elite',2028,'jp-1','continental')).key,'real-afcchampions');
 });
 test('4.5 · títulos ordenados y nombres visibles sin recorte de la colección',()=>{
  const trophies=Array.from({length:23},(_,i)=>rec('Copa '+i,2026+i));
