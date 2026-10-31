@@ -26,6 +26,14 @@ const {chromium}=require('playwright');
   await page.reload();await page.locator('.trophy-showcase').waitFor();
   const count=await page.locator('.trophy-unit').count();
   if(count!==23)throw Error('La vitrina esconde títulos: '+count);
+  await page.locator('.trophy-unit').first().locator('img').evaluate(img=>new Promise((resolve,reject)=>{
+    if(img.complete)return img.naturalWidth>0?resolve():reject(new Error('Trofeo no cargado'));
+    img.addEventListener('load',()=>resolve(),{once:true});
+    img.addEventListener('error',()=>reject(new Error('PNG FM no cargó')),{once:true});
+  }));
+  const art=await page.locator('.trophy-unit').first().locator('img').evaluate(img=>({src:img.getAttribute('src'),width:img.naturalWidth,height:img.naturalHeight}));
+  if(!art.src.includes('/fm/102415.png')||art.width<30)throw Error('No se cargó el trofeo del ZIP original para Libertadores: '+JSON.stringify(art));
+
   const rail=await page.locator('.trophy-showcase').evaluate(el=>({height:el.getBoundingClientRect().height,scroll:el.querySelector('.trophy-grid').scrollWidth,view:el.querySelector('.trophy-grid').clientWidth}));
   if(rail.height>138)throw Error('La vitrina excede el tamaño compacto: '+rail.height);
   // Medidas reales: ni borde de tarjeta ni icono recortado, nombre bajo el PNG.
