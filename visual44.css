@@ -374,3 +374,17 @@
  .legacy-act>small{display:none!important}
 }
 .history .v2-history-grid>.v2-panel:last-child:nth-child(odd){grid-column:1/-1}
+
+
+/* 4.6.2 · Las copas deben leerse junto al nombre del equipo, no junto al OVR. */
+.history .history-club-cell{justify-content:flex-start!important;gap:5px!important}
+.history .history-club-copy{flex:0 1 auto!important;max-width:calc(100% - 106px);margin:0!important}
+.history .history-season-trophies{margin-left:0!important;padding-left:0!important;flex:none!important;max-width:100px}
+.history .history-mini-cup{width:22px;height:25px}
+.history .history-mini-cup img{max-width:20px;max-height:23px}
+@media(max-width:760px){
+ .history .history-club-copy{max-width:calc(100% - 74px)}
+ .history .history-season-trophies{max-width:70px}
+ .history .history-mini-cup{width:16px;height:20px}
+ .history .history-mini-cup img{max-width:15px;max-height:19px}
+}
