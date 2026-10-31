@@ -348,3 +348,29 @@
  .farewell-actions{margin:7px 0!important;gap:6px!important}
  .farewell-actions button{min-height:30px!important;padding:3px 9px!important}
 }
+
+
+/* 4.6.1 · Segunda compactación de la portada y los tres actos, verificada a 1920x1080. */
+@media(min-width:1200px) and (min-height:740px){
+ .farewell-hero-top{padding-top:6px!important}
+ .farewell-hero-row{padding:4px 18px!important;min-height:96px!important}
+ .farewell-hero-text h1{display:flex!important;flex-wrap:wrap!important;align-items:baseline!important;column-gap:10px!important;row-gap:0!important;font-size:36px!important;line-height:.88!important}
+ .farewell-hero-text h1 em{display:inline!important;margin-left:0!important}
+ .farewell-hero .farewell-name{font-size:19px!important;margin-top:2px!important}
+ .farewell-hero-badges{margin-top:3px!important;gap:4px!important}
+ .farewell-hero-badges>span{padding:3px 7px!important;font-size:9px!important}
+ .farewell-hero .farewell-signatures{margin-top:3px!important}
+ .farewell-hero-foot{min-height:27px!important;padding:3px 14px!important}
+ .farewell-acts{padding:7px 10px!important}
+ .legacy-act-heading{margin-bottom:4px!important}
+ .legacy-act-heading h2{font-size:18px!important;margin:1px 0!important}
+ .legacy-act{gap:1px!important;padding:6px 9px!important}
+ .legacy-act-top{font-size:8px!important}
+ .legacy-act-top>b{font-size:12px!important}
+ .legacy-act-year{font-size:25px!important;line-height:1!important}
+ .legacy-act>strong{font-size:14px!important}
+ .legacy-act-metrics{padding-top:2px!important;gap:3px!important}
+ .legacy-act-metrics>span{padding:2px 4px!important;font-size:8px!important}
+ .legacy-act>small{display:none!important}
+}
+.history .v2-history-grid>.v2-panel:last-child:nth-child(odd){grid-column:1/-1}
