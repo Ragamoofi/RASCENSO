@@ -15,7 +15,7 @@ const high={attributes:{shot:86,pace:86,pass:86,defense:86,dribble:86,physical:8
 const low={attributes:{shot:48,pace:48,pass:48,defense:48,dribble:48,physical:48,skills:2,weak:2},morale:75,reputation:40};
 test('4.3 · los 20 minijuegos tienen perfiles mecánicos individuales',()=>{
  assert.equal(PLAY_IDS.length,20);
- assert.deepEqual(Object.keys(PLAY_TUNING).sort(),PLAY_IDS.sort());
+ assert.deepEqual(Object.keys(PLAY_TUNING).sort(),[...PLAY_IDS].sort());
  assert.equal(playBalanceMatrix().length,20);
  for(const id of PLAY_IDS){
   const p={type:id,difficulty:.7,fatigue:.2,pressure:72};
