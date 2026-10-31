@@ -1,7 +1,7 @@
 name: Prueba de jugadas en navegador
 on:
   push:
-    branches: [main, mejora-penales-controles, carrera-mundo35, jugadas36, duelos37]
+    branches: [main, mejora-penales-controles, carrera-mundo35, jugadas36, duelos37, rascenso-4-integral]
   workflow_dispatch:
 permissions:
   contents: read
@@ -18,14 +18,17 @@ jobs:
         run: |
           npm install --no-save --no-package-lock playwright
           npx playwright install --with-deps chromium
-      - name: Simular 20 jugadas
-        run: node tests/browser/scenes-node.mjs
+      - name: Validar motor y simular 20 jugadas
+        run: |
+          node --test tests/*.test.mjs
+          node tests/browser/scenes-node.mjs
       - name: Comprobar escenas en Chromium
         run: |
           mkdir -p /tmp/rascenso-capturas
           python3 -m http.server 8765 >/tmp/rascenso-http.log 2>&1 &
           SHOTS=/tmp/rascenso-capturas node tests/browser/plays-e2e.cjs
           node tests/browser/controls-e2e.cjs
+          node tests/browser/e2e.cjs
       - name: Guardar capturas
         if: always()
         uses: actions/upload-artifact@v4
