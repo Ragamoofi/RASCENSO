@@ -388,8 +388,8 @@ export function advanceSeason(input){
   table:league.standings,fixtures:league.fixtureResults,playerMatches:league.playerMatches,plan:league.plan,champion:league.champion,leagueName:league.league,leagueId:league.leagueId,leagueVerified:league.verified,leagueDivision:league.division,competitionVersion:4,clutchMoment:s.clutchMoment?.year===year?s.clutchMoment:null,plays:s.plays30?.year===year?s.plays30.results:[],competitions:global.competitions,competitionCalendar:global.calendar,calledUp:global.calledUp,nationalCaps:global.nationalCaps,nationalGoals:global.nationalGoals,clubCupMatches:global.totalCupMatches??0,
   captain:!!s.squad?.captain,matchdayImpact:matchImpact,objectives:objectiveResult,devNotes:dev.notes,coachName:coach?.name,coachStyle:coach?.style,rivalName:s.squad?.rival?.name,rivalOvr:s.squad?.rival?.ovr,relegated,promoted};
  // El mundo avanza: clubes, entrenadores, futbolistas, premios y noticias.
- const baseWorld=advanceWorld({...s,ovr,potential:dev.potential,leagueRosters:s.leagueRosters},league,seasonal);
  const fmProgress=advanceFM26Season(s,year);
+ const baseWorld=advanceWorld({...s,fm26:fmProgress.fm26,ovr,potential:dev.potential,leagueRosters:s.leagueRosters},league,seasonal);
  const matchHeadline=matchImpactHeadline(s,year,matchImpact);
  const world={...baseWorld,news:[...baseWorld.news,...(fmProgress.fm26Events||[]),...(matchHeadline?[matchHeadline]:[])].slice(-90)};
  const awardsYear=world.awards.at(-1);
