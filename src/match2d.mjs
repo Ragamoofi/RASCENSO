@@ -57,6 +57,12 @@ export function moveToward(e,tx,ty,speed,dt,stop=.08){
  const sp=Math.min(speed,d/dt);e.vx=dx/d*sp;e.vy=dy/d*sp;e.x+=e.vx*dt;e.y+=e.vy*dt;e.face=[dx/d,dy/d];return false;
 }
 export function keepInField(e){e.x=clampN(e.x,.4,FIELD.len-.2);e.y=clampN(e.y,.4,FIELD.wid-.4);}
+/** WASD y flechas admiten diagonales simultáneas a velocidad normalizada. */
+export function keyboardDirection(keys){
+ const x=Number(keys.has('KeyD')||keys.has('ArrowRight'))-Number(keys.has('KeyA')||keys.has('ArrowLeft'));
+ const y=Number(keys.has('KeyS')||keys.has('ArrowDown'))-Number(keys.has('KeyW')||keys.has('ArrowUp'));
+ const magnitude=Math.hypot(x,y)||1;return {x:x/magnitude,y:y/magnitude};
+}
 /** Distancia de un punto al segmento a→b (para líneas de pase y bloqueos). */
 export function segDist(p,a,b){const dx=b.x-a.x,dy=b.y-a.y,l=dx*dx+dy*dy||1;const t=clampN(((p.x-a.x)*dx+(p.y-a.y)*dy)/l,0,1);return Math.hypot(a.x+dx*t-p.x,a.y+dy*t-p.y);}
 
@@ -89,12 +95,12 @@ export function createMatch(canvas,{play,stats,ai,scene,onEnd,hud={}}){
  const ctxMenu=e=>e.preventDefault();
  canvas.addEventListener('pointermove',onMove);canvas.addEventListener('pointerdown',onDown);canvas.addEventListener('pointerup',onUp);canvas.addEventListener('contextmenu',ctxMenu);
  canvas.addEventListener('pointerleave',()=>{m.pointer.inside=false;});
- globalThis.addEventListener?.('keydown',onKey);globalThis.addEventListener?.('keyup',onKey);
+ const clearKeys=()=>m.keys.clear();
+ globalThis.addEventListener?.('keydown',onKey);globalThis.addEventListener?.('keyup',onKey);globalThis.addEventListener?.('blur',clearKeys);
  /** Dirección de movimiento: teclado (WASD/flechas) o seguir al puntero. */
  m.steer=(e,speed,dt,limit=null)=>{
-  let kx=0,ky=0;const k=m.keys;
-  if(k.has('KeyA')||k.has('ArrowLeft'))kx--;if(k.has('KeyD')||k.has('ArrowRight'))kx++;if(k.has('KeyW')||k.has('ArrowUp'))ky--;if(k.has('KeyS')||k.has('ArrowDown'))ky++;
-  if(kx||ky){const d=Math.hypot(kx,ky);moveToward(e,e.x+kx/d*3,e.y+ky/d*3,speed,dt);}
+  const {x:kx,y:ky}=keyboardDirection(m.keys);
+  if(kx||ky)moveToward(e,e.x+kx*3,e.y+ky*3,speed,dt);
   else if(m.pointer.inside){let tx=m.pointer.wx,ty=m.pointer.wy;if(limit){tx=clampN(tx,limit[0],limit[1]);ty=clampN(ty,limit[2],limit[3]);}moveToward(e,tx,ty,speed,dt,.25);}
   else{e.vx*=.8;e.vy*=.8;}
   keepInField(e);
@@ -125,7 +131,7 @@ export function createMatch(canvas,{play,stats,ai,scene,onEnd,hud={}}){
   g.restore();
  }
  raf=requestAnimationFrame(frame);
- m.destroy=()=>{alive=false;cancelAnimationFrame(raf);canvas.removeEventListener('pointermove',onMove);canvas.removeEventListener('pointerdown',onDown);canvas.removeEventListener('pointerup',onUp);canvas.removeEventListener('contextmenu',ctxMenu);globalThis.removeEventListener?.('keydown',onKey);globalThis.removeEventListener?.('keyup',onKey);};
+ m.destroy=()=>{alive=false;cancelAnimationFrame(raf);canvas.removeEventListener('pointermove',onMove);canvas.removeEventListener('pointerdown',onDown);canvas.removeEventListener('pointerup',onUp);canvas.removeEventListener('contextmenu',ctxMenu);globalThis.removeEventListener?.('keydown',onKey);globalThis.removeEventListener?.('keyup',onKey);globalThis.removeEventListener?.('blur',clearKeys);};
  // Solo para pruebas automáticas: avanzar el tiempo sin esperar al navegador.
  m.tick=(dt=1/60)=>{if(m.phase==='brief'||m.phase==='intro'){m.introT=0;m.phase='play';}if(m.phase!=='done'){m.t+=dt;scene.update(m,dt);syncOwned(m.ball);}};
  return m;

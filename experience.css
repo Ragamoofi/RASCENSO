@@ -834,3 +834,26 @@
 .v2-vest-guide{color:#b5cae1;margin:4px 0 14px;font-size:12px;line-height:1.5}
 .v2-rel .v2-rel-help{display:block;font-size:10px;line-height:1.4;color:#a6c0d6;margin-top:5px;max-width:300px}
 @media(max-width:1100px){.player-projection-inline small{white-space:normal}}
+
+/* RASCENSO 3.4: ambientes de fútbol y controles */
+.app-shell[data-ambience="pitch"]{background:repeating-linear-gradient(90deg,rgba(42,113,67,.09) 0 85px,rgba(20,72,45,.03) 85px 170px),radial-gradient(ellipse at 50% -15%,#294c5d 0%,#112640 45%,#081728 93%)}
+.app-shell[data-ambience="stadium"]{background:radial-gradient(circle at 4% 0%,#6985a640 0%,transparent 23%),radial-gradient(circle at 96% 0%,#6985a640 0%,transparent 23%),radial-gradient(ellipse at 50% -25%,#516481 0%,#182c46 43%,#081728 93%)}
+.app-shell[data-ambience="classic"]{background:radial-gradient(ellipse at 48% -18%,#263c65 0%,#101f37 48%,#081728 90%)}
+.app-shell[data-vivid="1"]{--copper:#eaa572;--blue:#577eec;--bright:#83a8ff}
+.app-shell[data-vivid="0"]{--copper:#c89571;--blue:#446ccc;--bright:#708ed9}
+.app-shell[data-cardfx="1"] .profile-card,.app-shell[data-cardfx="1"] .table-card,.app-shell[data-cardfx="1"] .focus-card,.app-shell[data-cardfx="1"] .rail-panel{box-shadow:0 12px 30px #020a172b,inset 0 1px 0 #ffffff10}
+.app-shell.ui-compact .view{padding:10px}
+.app-shell.ui-compact .playing-layout{gap:10px}
+.gear-trigger{font-size:22px!important;min-width:42px;padding:0 10px!important}
+.modal-dimmer{z-index:30000!important;overflow-y:auto;padding:16px}
+.modal-dimmer .tool-panel{width:min(610px,96vw);max-height:calc(100dvh - 32px);overflow-y:auto;z-index:30001;border:1px solid #6a8ba6;box-shadow:0 24px 75px #0009}
+.settings-section{border-top:1px solid #46627c;margin-top:8px;padding-top:12px}
+.settings-section h3{font-size:21px;margin:2px 0}
+.settings-section p{font-size:11px;color:#b8cce0}
+.settings-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.settings-row{display:flex;flex-direction:column;gap:6px;background:#132f4a;border:1px solid #486582;color:#eef6ff;border-radius:9px;padding:11px;text-align:left}
+.settings-row:hover{background:#234764;border-color:#eaa572}
+.settings-row strong{font-size:12px}
+.settings-row small{font-size:10px;color:#c0d0e0;line-height:1.3}
+.settings-row em{font-size:10px;font-style:normal;color:#f7c398;font-weight:800}
+@media(max-width:600px){.settings-list{grid-template-columns:1fr}}

@@ -37,6 +37,10 @@ const timingAt=elapsed=>{const phase=((elapsed%2400)+2400)%2400/1200;return Math
 const draft={name:'',country:'CL',age:'17',position:'DC',number:'9',foot:'Derecha',city:'',story:'',origin:'barrio',personality:'disciplinado',style:'equilibrado',dream:'seleccion',fanClubId:'',mode:'Clásico',environment:'sin_contactos',publicImage:'reservado',riskProfile:'calculador',developmentPath:'tecnica',roleClass:'cazagoles',strength:'tecnica',weakness:'inconstante'};
 /** El borrador del creador sobrevive a recargas y cierres accidentales. */
 const DRAFT_KEY='rascenso-creator-v31';
+const UI_PREFS_KEY='rascenso-ui-v1';
+const DEFAULT_UI_PREFS={ambience:'pitch',vivid:true,cardFx:true,compact:false};
+function loadUIPrefs(){try{const u=JSON.parse(localStorage.getItem(UI_PREFS_KEY)||'null');return {...DEFAULT_UI_PREFS,...(u&&typeof u==='object'?u:{})};}catch{return {...DEFAULT_UI_PREFS};}}
+function updateUIPrefs(changes){try{localStorage.setItem(UI_PREFS_KEY,JSON.stringify({...loadUIPrefs(),...changes}));}catch{}}
 function loadDraft(){try{const raw=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null');if(raw?.draft){for(const k of Object.keys(draft))if(typeof raw.draft[k]==='string')draft[k]=raw.draft[k];wizard=Math.max(0,Math.min(5,Number(raw.wizard)||0));}}catch{}}
 function saveDraft(){try{localStorage.setItem(DRAFT_KEY,JSON.stringify({draft,wizard}));}catch{}}
 function clearDraft(){try{localStorage.removeItem(DRAFT_KEY);}catch{}}
@@ -75,8 +79,8 @@ function button(label,action,cls='main',more=''){return `<button type="button" c
 const opt=(value,label,active)=>`<option value="${h(value)}" ${active===value?'selected':''}>${h(label)}</option>`;
 function select(label,name,items,value){return `<label class="field"><span>${label}</span><select name="${name}">${items.map(([v,l])=>opt(String(v),l,String(value))).join('')}</select></label>`;}
 function branding(){return `<a class="brand brand-13" href="./" aria-label="RASCENSO"><img src="./assets/brand/rascenso-wordmark.png" alt="RASCENSO · Del barrio a la historia" width="300" height="75"></a>`;}
-function header(){return `<header class="site-head">${branding()}<nav class="main-nav">${state?(['draft','academy'].includes(state.phase)?['carrera']:['carrera','vestuario','historial','mundo']).map(t=>`<button class="navtab ${tab===t?'selected':''}" data-action="nav" data-tab="${t}">${{carrera:'Mi carrera',vestuario:'Vestuario',historial:'Historial',mundo:'Mundo'}[t]}</button>`).join(''):'<span class="navtab selected">Tu historia empieza hoy</span>'}</nav><div class="head-controls"><span class="build">RASCENSO 3.3 · VESTUARIO Y SELECCIÓN</span>${state?`<span class="head-name">${h(state.name)}</span>${button('⋯','tools','ghost')}`:`<span class="live"><i></i> MODO CARRERA</span>`}</div></header>`;}
-function shell(content,extra=''){ROOT.innerHTML=`<div class="app-shell">${header()}<main class="view ${state?'playing':''}">${content}</main><footer class="site-foot"><span>RASCENSO · Una creación de Ragamoofi</span><span>${CATALOG_COUNT} clubes disponibles · 13 ligas iniciales verificadas · copas globales con formato simplificado</span></footer>${extra}</div>${message?`<div class="notification" role="alert">${h(message)}</div>`:''}`;}
+function header(){return `<header class="site-head">${branding()}<nav class="main-nav">${state?(['draft','academy'].includes(state.phase)?['carrera']:['carrera','vestuario','historial','mundo']).map(t=>`<button class="navtab ${tab===t?'selected':''}" data-action="nav" data-tab="${t}">${{carrera:'Mi carrera',vestuario:'Vestuario',historial:'Historial',mundo:'Mundo'}[t]}</button>`).join(''):'<span class="navtab selected">Tu historia empieza hoy</span>'}</nav><div class="head-controls"><span class="build">RASCENSO 3.4 · AMBIENTE Y CONTROLES</span>${state?`<span class="head-name">${h(state.name)}</span>${button('⚙','tools','ghost gear-trigger','aria-label="Ajustes" title="Ajustes"')}`:`<span class="live"><i></i> MODO CARRERA</span>`}</div></header>`;}
+function shell(content,extra=''){const u=loadUIPrefs();ROOT.innerHTML=`<div class="app-shell ${u.compact?'ui-compact':''}" data-ambience="${u.ambience}" data-vivid="${u.vivid?'1':'0'}" data-cardfx="${u.cardFx?'1':'0'}">${header()}<main class="view ${state?'playing':''}">${content}</main><footer class="site-foot"><span>RASCENSO · Una creación de Ragamoofi</span><span>${CATALOG_COUNT} clubes disponibles · 13 ligas iniciales verificadas · copas globales con formato simplificado</span></footer>${extra}</div>${message?`<div class="notification" role="alert">${h(message)}</div>`:''}`;}
 function featureIcon(name){return {glory:'★',home:'⌂',academy:'⚑',form:'◉',tactic:'♟',news:'◎',league:'▥'}[name]||'✦';}
 function createSteps(){return STEPS.map((s,i)=>`<button type="button" class="creation-step ${wizard===i?'active':wizard>i?'past':''}" data-action="step" data-index="${i}"><span>0${i+1}</span>${s}</button>`).join('');}
 function textInput(name,label,placeholder='',extra=''){return `<label class="field"><span>${label}</span><input name="${name}" value="${h(draft[name])}" placeholder="${h(placeholder)}" ${extra}></label>`;}
@@ -211,8 +215,21 @@ async function shareCareerPNG(){
  ctx.fillStyle='#89acc8';ctx.font='12px sans-serif';ctx.fillText('Carrera simulada · Proyecto independiente de Ragamoofi · Sin afiliación oficial a clubes o federaciones',77,960);
  const url=canvas.toDataURL('image/png'),anchor=document.createElement('a');anchor.download=`rascenso-expediente-${state.name.normalize('NFD').replace(/[^a-zA-Z0-9]+/g,'-')}.png`;anchor.href=url;anchor.click();
 }
-function tools(){return `<div class="modal-dimmer" id="modal"><div class="tool-panel"><span class="section-label">GESTIÓN DE CARRERA</span><h2>Tu partida</h2><p>RASCENSO guarda automáticamente en este navegador y conserva un respaldo anterior. Exporta una copia antes de cambiar de dispositivo.</p>${button('Exportar guardado JSON','export','main wide')}${button('Importar guardado JSON','import','secondary wide')}<input type="file" id="import-file" accept="application/json,.json" hidden>${button('Simular hasta el retiro','retire-auto','secondary wide')}${state&&canRetire(state)?button('Anunciar mi retiro ahora','retire-now','ghost wide'):''}${button('Nueva carrera','reset','danger wide')}<p class="credits-note">Créditos de fotografías: <a href="https://commons.wikimedia.org/" target="_blank" rel="noopener">Wikimedia Commons</a>. <a href="./assets/MEDIA_CREDITS.html" target="_blank" rel="noopener">Autores y licencias de cada imagen</a>.</p>${button('Cerrar','tools-close','ghost wide')}</div></div>`;}
-function render(){try{if(!state)return creator();if(state.phase==='draft'){shell(draftScreen());enhanceLegendImages(ROOT);return;}if(state.phase==='academy')return shell(state.dnaReviewed===false?dnaReview():academy());let center=tab==='historial'?history():tab==='mundo'?world():tab==='vestuario'?frame(vestuarioView(state)):state.phase==='season'?season():state.phase==='event'?narrative():state.phase==='transfer'?market():farewell();shell(center,showNew?tools():'');}finally{message='';}}
+function settingsUI(){
+ const u=loadUIPrefs(),modes=['pitch','stadium','classic'],names={pitch:'Césped',stadium:'Estadio',classic:'Clásico'};
+ const items=[
+  ['ui-cycle-ambience','Ambiente de fondo','Césped, luces del estadio o fondo clásico.',names[u.ambience]||'Césped'],
+  ['ui-toggle-vivid','Colores más vivos','Contraste y acentos futboleros.',u.vivid?'Activo':'Desactivado'],
+  ['ui-toggle-cardfx','Profundidad de tarjetas','Sombras suaves para distinguir cada panel.',u.cardFx?'Activo':'Desactivado'],
+  ['ui-toggle-compact','Modo compacto','Más espacio para la carrera sin tanto desplazamiento.',u.compact?'Activo':'Desactivado'],
+  ['ui-reset','Restablecer apariencia','Volver al diseño recomendado.','Restablecer']
+ ];
+ return '<section class="settings-section"><h3>APARIENCIA Y AMBIENTE</h3><p>Elige cómo se ve tu carrera. Estas preferencias se guardan en este navegador.</p><div class="settings-list">'
+  +items.map(([action,title,detail,value])=>'<button type="button" class="settings-row" data-action="'+action+'"><strong>'+title+'</strong><small>'+detail+'</small><em>'+value+'</em></button>').join('')
+  +'</div></section>';
+}
+function tools(){return `<div class="modal-dimmer" id="modal"><div class="tool-panel"><span class="section-label">GESTIÓN DE CARRERA</span><h2>Tu partida</h2><p>RASCENSO guarda automáticamente en este navegador y conserva un respaldo anterior. Exporta una copia antes de cambiar de dispositivo.</p>${button('Exportar guardado JSON','export','main wide')}${button('Importar guardado JSON','import','secondary wide')}<input type="file" id="import-file" accept="application/json,.json" hidden>${button('Simular hasta el retiro','retire-auto','secondary wide')}${state&&canRetire(state)?button('Anunciar mi retiro ahora','retire-now','ghost wide'):''}${button('Nueva carrera','reset','danger wide')}${settingsUI()}<p class="credits-note">Créditos de fotografías: <a href="https://commons.wikimedia.org/" target="_blank" rel="noopener">Wikimedia Commons</a>. <a href="./assets/MEDIA_CREDITS.html" target="_blank" rel="noopener">Autores y licencias de cada imagen</a>.</p>${button('Cerrar','tools-close','ghost wide')}</div></div>`;}
+function render(){try{if(!state)return creator();if(state.phase==='draft'){shell(draftScreen(),showNew?tools():'');enhanceLegendImages(ROOT);return;}if(state.phase==='academy')return shell(state.dnaReviewed===false?dnaReview():academy(),showNew?tools():'');let center=tab==='historial'?history():tab==='mundo'?world():tab==='vestuario'?frame(vestuarioView(state)):state.phase==='season'?season():state.phase==='event'?narrative():state.phase==='transfer'?market():farewell();shell(center,showNew?tools():'');}finally{message='';}}
 function gather(){document.querySelectorAll('#creation-form [name]').forEach(el=>{if(el.type==='radio'&&!el.checked)return;draft[el.name]=el.value;});}
 function begin(){gather();if(!draft.name.trim()){wizard=0;message='Escribe un nombre para tu futbolista.';saveDraft();render();document.querySelector('[name="name"]')?.focus();return;}const number=Number(draft.number);if(!(Number.isInteger(number)&&number>=1&&number<=99)){wizard=0;message='El dorsal debe estar entre 1 y 99.';saveDraft();render();return;}try{if(mutate(newCareer({...draft,seed:`${Date.now()}-${Math.random().toString(36).slice(2)}`})))clearDraft();}catch(e){alert(e.message);}}
 function download(){const data=JSON.stringify(state,null,2);const url=URL.createObjectURL(new Blob([data],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=`rascenso-${state.name.toLowerCase().replace(/[^a-z0-9]+/g,'-')}-${Date.now()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
@@ -264,6 +281,11 @@ ROOT.addEventListener('click',e=>{
  if(action==='nav'){stopNeedle();skillUI.zone=null;skillUI.answers=[];tab=a.dataset.tab;render();return;}
  if(action==='tools'){showNew=true;render();return;}
  if(action==='tools-close'){showNew=false;render();return;}
+ if(action==='ui-cycle-ambience'){const order=['pitch','stadium','classic'],u=loadUIPrefs();updateUIPrefs({ambience:order[(order.indexOf(u.ambience)+1+order.length)%order.length]});render();return;}
+ if(action==='ui-toggle-vivid'){updateUIPrefs({vivid:!loadUIPrefs().vivid});render();return;}
+ if(action==='ui-toggle-cardfx'){updateUIPrefs({cardFx:!loadUIPrefs().cardFx});render();return;}
+ if(action==='ui-toggle-compact'){updateUIPrefs({compact:!loadUIPrefs().compact});render();return;}
+ if(action==='ui-reset'){updateUIPrefs(DEFAULT_UI_PREFS);render();return;}
  if(action==='export'){download();return;}
  if(action==='share-png'){shareCareerPNG().catch(err=>alert('No se pudo generar la imagen: '+err.message));return;}
  if(action==='import'){document.getElementById('import-file')?.click();return;}
@@ -272,6 +294,7 @@ ROOT.addEventListener('click',e=>{
  if(action==='country'){const code=a.dataset.id;document.querySelector('.world-spotlight').innerHTML=`<strong>${flag(code)} ${h(countryName(code))}</strong><small>${getCountry(code).clubs.length} clubes de referencia · ${h(getCountry(code).clubs.slice(0,6).map(x=>x.name).join(' · '))}</small>`;}
 });
 document.addEventListener?.('keydown',e=>{
+ if(e.code==='Escape'&&showNew){showNew=false;render();return;}
  if(e.code==='Space'&&skillUI.zone!==null&&state?.phase==='season'&&tab==='carrera'&&!e.repeat&&!e.target.closest('input,textarea,select')){e.preventDefault();ROOT.querySelector('[data-action="clutch-stop"]')?.click();}
 });
 ROOT.addEventListener('error',e=>{if(e.target.matches('img.badge-img'))e.target.remove();},true);
