@@ -132,7 +132,7 @@ export function historyExtras(s){
  return `<div class="v2-history-grid"><section class="v2-panel"><header><span>EVOLUCIÓN DE LA MEDIA</span><b>${H[0].ovrBefore} → ${H.at(-1).ovrAfter}</b></header>${chart}<small class="muted">Línea cobre: media real. Línea punteada: proyección (techo) estimada al cierre de cada año.</small></section>
  <section class="v2-panel"><header><span>RÉCORDS PERSONALES</span><b>${records.length}</b></header>${records.map(r=>`<div class="v2-record"><strong>${h(r.value)}</strong><div><b>${h(r.label)}</b><small>${h(r.detail)}</small></div></div>`).join('')}</section>
  <section class="v2-panel"><header><span>PREMIOS E HITOS</span><b>${(s.awards||[]).length} premios</b></header><div class="v2-milestones">${milestones.map(m=>`<span class="${m.award?'award':''}">${m.award?'★':'◆'} ${h(m.label)}</span>`).join('')||'<p class="muted">Aún sin hitos.</p>'}</div></section>
- <section class="v2-panel"><header><span>POR CLUB</span><b>${byClub.length}</b></header>${byClub.map(c=>`<div class="v2-club-row byclub">${badge(c.clubId,'tiny')}<span><strong>${h(c.club)}</strong><small>${c.seasons} temp. · ${c.titles} títulos</small></span><i>${c.matches} PJ</i><em>${c.goals} G · ${c.assists} A</em></div>`).join('')}</section></div>`;
+</div>`;
 }
 
 /* ---------- Mercado: contexto y negociación ---------- */

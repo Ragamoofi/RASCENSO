@@ -238,3 +238,113 @@
   .trophy-showcase .trophy-unit-art{width:87px}
   .trophy-showcase .trophy-unit-name{font-size:9px!important}
 }
+
+
+/* RASCENSO 4.6 · Historial sin bloques duplicados. Las copas viven junto al club. */
+.history-club-cell{display:flex!important;align-items:center;min-width:0;gap:6px;white-space:nowrap}
+.history-club-copy{min-width:0;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:750}
+.history-season-trophies{display:inline-flex;align-items:center;gap:3px;flex:none;margin-left:auto;padding-left:4px;max-width:124px}
+.history-mini-cup{width:24px;height:27px;display:grid;place-items:center;flex:none}
+.history-mini-cup img{display:block;max-width:22px;max-height:25px;width:auto;height:auto;object-fit:contain;filter:drop-shadow(0 2px 3px #0008)}
+.history-cup-more{font-size:10px;font-weight:800;color:#f2c08b}
+.history .history-head,.history .history-row{grid-template-columns:minmax(0,1fr) repeat(6,44px)!important}
+.history .history-table{max-height:min(36vh,345px)}
+.selection-report{background:linear-gradient(155deg,#183750,#112b42);border:1px solid #527088;border-radius:11px;padding:14px;margin:11px 0;display:grid;gap:10px}
+.selection-report-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.selection-title{display:flex;align-items:center;gap:10px}
+.selection-title>div{display:grid;gap:3px}
+.selection-title span{color:#f3be8b;font-size:10px;font-weight:900;letter-spacing:1px}
+.selection-title h3{font:900 20px/1.1 'Barlow Condensed',sans-serif;margin:0;color:#fff}
+.selection-report-head>b{font-size:10px;color:#f2c18e}
+.selection-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.selection-stat{background:#122b44;border:1px solid #3c5a70;padding:8px 5px;border-radius:8px;display:grid;justify-items:center;gap:2px;text-align:center}
+.selection-stat strong{font:900 23px/1 'Barlow Condensed',sans-serif;color:#f9debf}
+.selection-stat span{color:#c1d6e7;font-size:9px;font-weight:800;letter-spacing:.02em}
+.selection-stat small{font-size:9px;color:#a1bfd5}
+.selection-extra{font-size:10px;color:#a8cadb;line-height:1.5;margin:0}
+.selection-honours{display:grid;gap:5px;border-top:1px solid #ffffff18;padding-top:8px}
+.selection-honours>b{font-size:10px;color:#f0c18f}
+.selection-honours>div{display:flex;flex-wrap:wrap;gap:5px}
+.selection-honours>div span{background:#28455a;border:1px solid #946f4e;border-radius:6px;padding:5px 7px;font-size:10px}
+.selection-competitions{border-top:1px solid #ffffff20;padding-top:8px}
+.selection-competitions>summary{cursor:pointer;display:flex;justify-content:space-between;font-weight:900;color:#ebbd93;font-size:11px}
+.selection-competition-list{display:grid;gap:4px;margin-top:9px;max-height:175px;overflow-y:auto}
+.selection-competition{display:grid;grid-template-columns:minmax(0,1fr) 44px 40px 40px;gap:8px;align-items:center;padding:7px 9px;border-radius:6px;background:#10283e}
+.selection-competition span{display:grid;gap:3px;min-width:0}
+.selection-competition strong{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.selection-competition small{font-size:9px;color:#a9c5d6}
+.selection-competition>b{text-align:right;font-size:10px}
+.selection-footnote{font-size:9px;color:#90afc5;margin:0}
+
+/* No recortar el texto del palmarés: altura calculada para PNG, nombre y scroll. */
+.right-rail .trophy-showcase{height:135px!important;min-height:135px!important;max-height:135px!important;padding:7px 10px!important;overflow:hidden}
+.trophy-showcase .rail-heading{min-height:14px!important;line-height:14px!important;margin:0 0 5px!important}
+.trophy-showcase .trophy-grid{height:101px!important;min-height:101px!important;max-height:101px!important;align-items:flex-start!important;overflow-x:auto;overflow-y:hidden;padding:0 0 12px!important;gap:9px!important}
+.trophy-showcase .trophy-unit{box-sizing:border-box;flex:0 0 107px!important;width:107px!important;min-width:107px!important;height:89px!important;min-height:89px!important;gap:3px!important;padding:0 2px!important;overflow:visible!important;display:flex!important;flex-direction:column!important;align-items:center!important;background:transparent!important;border:none!important;box-shadow:none!important}
+.trophy-showcase .trophy-unit-art{flex:0 0 51px!important;width:102px!important;height:51px!important;min-height:51px!important;display:flex!important;align-items:center!important;justify-content:center!important}
+.trophy-showcase .trophy-unit-art img{height:50px!important;max-height:50px!important;max-width:79px!important;width:auto!important;object-fit:contain!important}
+.trophy-showcase .trophy-unit-name{display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:3!important;white-space:normal!important;overflow:hidden!important;max-height:33px!important;font-size:10px!important;line-height:11px!important;text-align:center!important;width:100%!important}
+@media(max-width:760px){.history .history-head,.history .history-row{grid-template-columns:minmax(0,1fr) repeat(6,32px)!important}.history-season-trophies{max-width:83px}.history-mini-cup{width:17px}.history-mini-cup img{max-width:16px;max-height:21px}.selection-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.selection-report-head{flex-wrap:wrap}.selection-competition{grid-template-columns:minmax(0,1fr) 32px 28px 28px}}
+
+/* Legado 4.6 · La despedida debe aprovechar la pantalla 1920×1080. */
+@media(min-width:1200px) and (min-height:740px){
+ .farewell-page{gap:9px!important;margin-bottom:8px!important;max-width:1740px}
+ .farewell-hero{min-height:0!important;border-radius:11px}
+ .farewell-hero-top{padding:8px 18px 0;font-size:9px}
+ .farewell-hero-row{padding:6px 20px!important;min-height:120px!important;gap:12px}
+ .farewell-hero-text h1{font-size:clamp(35px,3.2vw,51px)!important;line-height:.91!important;display:block}
+ .farewell-hero-text h1 em{margin-left:9px}
+ .farewell-hero .farewell-name{font-size:23px!important;margin-top:4px!important}
+ .farewell-hero-text>p{font-size:11px!important;line-height:1.3!important}
+ .farewell-hero-badges{margin-top:6px!important;gap:5px!important}
+ .farewell-signatures{margin-top:5px!important;gap:5px!important}
+ .farewell-signatures>span{font-size:9px;padding:3px 6px}
+ .farewell-medallion{width:95px!important;height:95px!important;transform:none!important}
+ .farewell-medallion strong{font-size:42px!important}
+ .farewell-medallion small{font-size:8px}
+ .farewell-hero-foot{padding:5px 16px!important;min-height:30px!important;gap:9px!important}
+ .farewell-hero-foot .team-badge{width:24px!important;height:24px!important}
+ .farewell-acts{padding:10px 12px!important}
+ .legacy-act-heading{margin-bottom:6px!important}
+ .legacy-act-heading h2{font-size:22px!important;margin:3px 0 0!important}
+ .legacy-acts{gap:7px!important}
+ .legacy-acts:before{display:none}
+ .legacy-act{padding:8px 11px!important;gap:3px!important;box-shadow:none!important}
+ .legacy-act-top{font-size:9px}
+ .legacy-act-top>b{font-size:14px!important}
+ .legacy-act-year{font-size:29px!important}
+ .legacy-act>strong{font-size:15px!important}
+ .legacy-act>p{min-height:0!important;font-size:10px}
+ .legacy-act-metrics{padding-top:3px!important;gap:4px!important}
+ .legacy-act-metrics>span{font-size:9px;padding:3px 5px}
+ .legacy-act>small{font-size:9px}
+ .farewell-numbers{display:flex!important;align-items:center!important;gap:12px!important;padding:8px 10px!important}
+ .farewell-numbers>div:first-child{display:grid!important;flex:0 0 168px;align-content:center;gap:2px}
+ .farewell-numbers h2{font-size:19px!important;margin:2px 0!important}
+ .farewell-stats{flex:1;gap:5px!important}
+ .farewell-stat{padding:7px 3px!important;min-height:54px!important}
+ .farewell-stats .farewell-stat b{font-size:26px!important}
+ .farewell-stat small{font-size:9px!important}
+ .farewell-content{gap:9px!important;grid-template-columns:1fr 1fr!important}
+ .farewell-main,.farewell-side{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;align-items:start!important}
+ .farewell-main>.farewell-tribute{grid-column:1/-1}
+ .farewell-section{padding:10px 12px!important;border-radius:9px!important}
+ .farewell-section h2{font-size:20px!important;margin:3px 0 7px!important}
+ .farewell-tribute>p{font-size:11px!important;line-height:1.4!important}
+ .farewell-dates{margin-top:8px!important;padding-top:7px!important}
+ .farewell-dream{margin-top:6px!important;padding:5px!important}
+ .farewell-clubs{max-height:185px!important}
+ .farewell-club{padding:5px 3px!important;gap:6px!important}
+ .farewell-curve svg{height:82px!important}
+ .farewell-best{padding:6px!important;margin-top:6px!important}
+ .farewell-trophies{max-height:170px!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important}
+ .farewell-trophy{min-height:113px!important;padding:5px 3px!important;gap:2px!important}
+ .farewell-trophy-art{height:54px!important}
+ .farewell-trophy-art img{height:52px!important;max-width:60px!important}
+ .farewell-memories,.farewell-awards,.farewell-rivals{max-height:160px;overflow:auto}
+ .farewell-outro{padding:10px 16px!important}
+ .farewell-outro h2{font-size:25px!important;margin:2px 0!important}
+ .farewell-outro p{font-size:11px!important;margin:4px 0!important}
+ .farewell-actions{margin:7px 0!important;gap:6px!important}
+ .farewell-actions button{min-height:30px!important;padding:3px 9px!important}
+}
