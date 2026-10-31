@@ -63,6 +63,15 @@ export function keyboardDirection(keys){
  const y=Number(keys.has('KeyS')||keys.has('ArrowDown'))-Number(keys.has('KeyW')||keys.has('ArrowUp'));
  const magnitude=Math.hypot(x,y)||1;return {x:x/magnitude,y:y/magnitude};
 }
+/** Aceleración y frenado limitados; la velocidad diagonal nunca supera el máximo. */
+export function steerMotion(e,ux,uy,speed,dt){
+ if(dt<=0)return;
+ if(e.stun>0){e.stun=Math.max(0,e.stun-dt);e.vx*=.85;e.vy*=.85;e.x+=e.vx*dt;e.y+=e.vy*dt;return;}
+ const desiredX=ux*speed,desiredY=uy*speed,dx=desiredX-(e.vx||0),dy=desiredY-(e.vy||0),d=Math.hypot(dx,dy);
+ const maxChange=(ux||uy?32:40)*dt,scale=d?Math.min(1,maxChange/d):0;
+ e.vx=(e.vx||0)+dx*scale;e.vy=(e.vy||0)+dy*scale;e.x+=e.vx*dt;e.y+=e.vy*dt;
+ const moving=Math.hypot(e.vx,e.vy);if(moving>.05)e.face=[e.vx/moving,e.vy/moving];
+}
 /** Distancia de un punto al segmento a→b (para líneas de pase y bloqueos). */
 export function segDist(p,a,b){const dx=b.x-a.x,dy=b.y-a.y,l=dx*dx+dy*dy||1;const t=clampN(((p.x-a.x)*dx+(p.y-a.y)*dy)/l,0,1);return Math.hypot(a.x+dx*t-p.x,a.y+dy*t-p.y);}
 
@@ -81,7 +90,7 @@ export function createMatch(canvas,{play,stats,ai,scene,onEnd,hud={}}){
  // ---- Entrada ----
  const rect=()=>canvas.getBoundingClientRect();
  const local=e=>{const r=rect();return [(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H];};
- const onMove=e=>{const [x,y]=local(e);m.pointer.x=x;m.pointer.y=y;[m.pointer.wx,m.pointer.wy]=toWorld(x,y);m.pointer.inside=true;};
+ const onMove=e=>{const [x,y]=local(e);if(e.type==='pointermove'&&Math.hypot(x-m.pointer.x,y-m.pointer.y)>1)m.inputMode='pointer';m.pointer.x=x;m.pointer.y=y;[m.pointer.wx,m.pointer.wy]=toWorld(x,y);m.pointer.inside=true;};
  /** Botón «Empezar» de la pantalla de instrucciones (coordenadas del canvas). */
  const BTN={x:W/2-150,y:H-122,w:300,h:50};
  const overBtn=()=>m.pointer.x>=BTN.x&&m.pointer.x<=BTN.x+BTN.w&&m.pointer.y>=BTN.y&&m.pointer.y<=BTN.y+BTN.h;
@@ -91,6 +100,7 @@ export function createMatch(canvas,{play,stats,ai,scene,onEnd,hud={}}){
  const onDown=e=>{e.preventDefault();canvas.setPointerCapture?.(e.pointerId);onMove(e);if(m.phase==='brief'){if(overBtn())m.begin();return;}m.pointer.down=true;m.pointer.button=e.button;m.pointer.downAt=m.t;if(m.phase==='play')scene.down?.(m,e.button===2?'alt':'main');};
  const onUp=e=>{onMove(e);m.pointer.down=false;if(m.phase==='play')scene.up?.(m,e.button===2?'alt':'main');};
  const onKey=e=>{const down=e.type==='keydown';if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();if(down&&e.repeat)return;
+  if(down&&['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))m.inputMode='keyboard';
   if(m.phase==='brief'){if(down&&(e.code==='Enter'||e.code==='Space'||e.code==='NumpadEnter'))m.begin();return;}if(down)m.keys.add(e.code);else m.keys.delete(e.code);if(m.phase==='play')scene.key?.(m,e.code,down);};
  const ctxMenu=e=>e.preventDefault();
  const cancelInput=()=>{m.pointer.down=false;if(m.charge!=null&&!m.ball)m.charge=null;};
@@ -101,11 +111,14 @@ export function createMatch(canvas,{play,stats,ai,scene,onEnd,hud={}}){
  /** Dirección de movimiento: teclado (WASD/flechas) o seguir al puntero. */
  m.steer=(e,speed,dt,limit=null)=>{
   const {x:kx,y:ky}=keyboardDirection(m.keys);
-  if(kx||ky)moveToward(e,e.x+kx*3,e.y+ky*3,speed,dt);
-  else if(m.pointer.inside){let tx=m.pointer.wx,ty=m.pointer.wy;if(limit){tx=clampN(tx,limit[0],limit[1]);ty=clampN(ty,limit[2],limit[3]);}moveToward(e,tx,ty,speed,dt,.25);}
-  else{e.vx*=.8;e.vy*=.8;}
-  keepInField(e);
-  if(limit){e.x=clampN(e.x,limit[0],limit[1]);e.y=clampN(e.y,limit[2],limit[3]);}
+  let ux=kx,uy=ky;
+  if(!(kx||ky)&&m.pointer.inside&&m.inputMode!=='keyboard'){
+   let tx=m.pointer.wx,ty=m.pointer.wy;if(limit){tx=clampN(tx,limit[0],limit[1]);ty=clampN(ty,limit[2],limit[3]);}
+   const dx=tx-e.x,dy=ty-e.y,d=Math.hypot(dx,dy),factor=d>.25?Math.min(1,(d-.25)/1.2):0;
+   if(d){ux=dx/d*factor;uy=dy/d*factor;}
+  }
+  steerMotion(e,ux,uy,speed,dt);keepInField(e);
+  if(limit){const x=e.x,y=e.y;e.x=clampN(x,limit[0],limit[1]);e.y=clampN(y,limit[2],limit[3]);if(x!==e.x)e.vx=0;if(y!==e.y)e.vy=0;}
  };
  m.aimNoise=(meters)=>(m.rand()*2-1)*meters;
  scene.init(m);
