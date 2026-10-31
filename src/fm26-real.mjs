@@ -85,7 +85,7 @@ export function advanceFM26Season(state,year){
  for(const base of byId.values()){
   const prior=applyDelta(base,{fm26:{changes}});
   if(prior.status!=='active')continue;
-  let p={...prior},fromYear=Number(changes[p.id]?.lastYear??year-1);
+  let p={...prior},fromYear=Number(changes[p.id]?.lastYear??2025);
   // Permite cargar un plantel nuevo años después y ponerlo al día sin reiniciarlo.
   for(let y=Math.max(2026,fromYear+1);y<=year;y++){
    const r=rand(p.id+':year:'+y);const age=p.age;const injured=r()<.09;
