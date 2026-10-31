@@ -21,6 +21,7 @@ test('4.7 · títulos únicos se buscan por nombre normalizado sin crear coincid
  assert.equal(fmTrophyId({title:'Primera División de Chile'}),'5250792');
  assert.equal(fmTrophyId({title:'Trofeo totalmente inventado'}),null);
  assert.ok(Object.keys(FM_UNIQUE_NAMES).length>=850);
+ assert.equal(fmTrophySrc({title:'2016 Copa Bicentenario'}),'./assets/trophies/fm/_2016-copa-bicentenario.png');
 });
 test('4.7 · fallback para Copa Chile y competiciones sin foto en el ZIP',()=>{
  const unknown=trophyIdentity({title:'Copa Chile',competitionId:'CUP-CL',kind:'national-cup'});

@@ -1,7 +1,7 @@
 # RASCENSO 4.7 · Trofeos del ZIP identificado
 
 ## Origen
-Importación del archivo `TROFEOS_IDENTIFICADOS_PARA_JUEGO.zip` aportado por el autor del juego el 31 de octubre de 2026. Contenía 863 PNG identificados (no incluye los 1.318 trofeos sin identificar del archivo original usado para prepararlo). El inventario contenía el nombre de competición y el ID de Football Manager de cada PNG. **Estos ID son referencias de identificación, no certificaciones de licencia o de uso oficial de las imágenes.**
+Importación del archivo `TROFEOS_IDENTIFICADOS_PARA_JUEGO.zip` aportado por el autor del juego el 31 de octubre de 2026. Contenía 863 PNG con nombre de competición (no incluye los 1.318 trofeos sin identificar del archivo original usado para prepararlo). **862 tienen ID de Football Manager; «2016 Copa Bicentenario» venía identificada solo por nombre y se conserva como `_2016-copa-bicentenario.png` sin inventar ID**. **Estos ID son referencias de identificación, no certificaciones de licencia o de uso oficial de las imágenes.**
 
 ## Instalación en el propio GitHub
 - Los PNG se optimizaron a un máximo de **144 × 144 px**, paleta de 128 colores para no sobrecargar la web, preservando transparencia.
