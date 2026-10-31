@@ -75,8 +75,8 @@ const penal={
  update(m,dt){
   if(!m.ball){m.k.x=Math.sin(m.t*1.6)*.35;return;}
   const b=m.ball;b.t+=dt;
-  if(!m.k.diving&&b.t>=m.keeperDelay){const guess=m.keeperGuess;startDive(m.k,guess[0],guess[1],m.ai.keeperReach+1.35);}
-  stepDive(m.k,dt,clampN(.34-m.ai.d*.09,.25,.34));
+  if(!m.k.diving&&b.t>=m.keeperDelay){const guess=m.keeperGuess;startDive(m.k,guess[0],guess[1],m.ai.keeperReach+1.55);}
+  stepDive(m.k,dt,clampN(.285-m.ai.d*.035,.25,.285));
   if(b.t>=b.T&&!m.result){b.t=b.T;arrive(m,b.gx,b.gz,m.k);}
  },
  down(m){if(m.ball||m.charge!=null)return;m.charge=m.t;},
