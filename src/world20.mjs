@@ -139,9 +139,15 @@ function quickTable(state,group,r){
 const NEWS_LIMIT=90;
 export function pushNews(world,item){return {...world,news:[...(world?.news||[]),item].slice(-NEWS_LIMIT)};}
 function news(list,year,kind,title,text,extra={}){list.push({year,kind,title,text,...extra});}
-const KIND_ICON={champion:'🏆',promotion:'▲',relegation:'▼',coach:'♟',transfer:'⇄',retire:'☾',award:'★',crisis:'⚠',investment:'€',prospect:'✦',record:'◆',you:'●',rival:'⚔'};
+const KIND_ICON={champion:'🏆',promotion:'▲',relegation:'▼',coach:'♟',transfer:'⇄',retire:'☾',injury:'✚',award:'★',crisis:'⚠',investment:'€',prospect:'✦',record:'◆',you:'●',rival:'⚔'};
 export const newsIcon=k=>KIND_ICON[k]||'◎';
 
+/** Lesiones reproducibles e independientes de otras tiradas de la temporada. */
+export function npcInjury(seed,age){
+ const r=rng(seed),risk=clamp(.08+Math.max(0,age-29)*.009,.08,.20);
+ const weeks=r()<risk?2+Math.floor(r()*13):0;
+ return {weeks,availability:clamp(1-weeks/45,.5,1)};
+}
 /** Avanza el mundo un año usando la tabla real de tu liga (playedLeague) cuando existe. */
 export function advanceWorld(state,playedLeague,userSeason){
  const base=ensureWorld(state).world;
@@ -208,13 +214,16 @@ export function advanceWorld(state,playedLeague,userSeason){
   const pr=rng(`${world.seed}:npc:${p.id}:${year}`);
   const club=worldClub(p.clubId);const level=dynamicLevel(S,club);
   const share=clamp(.35+(p.ovr-level)*.05+pr()*.25,.05,.97);
-  const apps=Math.round(34*share);
+  const injury=npcInjury(`${world.seed}:npc-injury:${p.id}:${year}`,p.age);
+  const apps=Math.round(34*share*injury.availability);
+  p.lastInjury=injury.weeks?{year,weeks:injury.weeks}:null;
+  if(injury.weeks>=8&&(p.rival||p.kind==='star'||p.clubId===state.clubId))news(fresh,year,'injury',`${p.name} sufre una lesión`,`${p.name} se pierde aproximadamente ${injury.weeks} semanas en ${club?.name||'su club'}. Su participación de esta temporada se reduce.`,{playerId:p.id,clubId:p.clubId,rival:!!p.rival,mine:p.clubId===state.clubId});
   const factor=clamp(1+(p.ovr-level)*.03,.6,1.6)*(p.ovr/80);
   const goals=Math.round(apps*posGoals[p.pos]*factor*(.75+pr()*.5));
   const assists=Math.round(apps*posAssists[p.pos]*factor*(.75+pr()*.5));
   const champion=championIds.has(p.clubId)&&apps>=10;
   p.apps+=apps;p.goals+=goals;p.assists+=assists;if(champion)p.titles++;
-  p.seasons=[...(p.seasons||[]),{year,clubId:p.clubId,apps,goals,assists,ovr:p.ovr,champion}].slice(-4);
+  p.seasons=[...(p.seasons||[]),{year,clubId:p.clubId,apps,goals,assists,ovr:p.ovr,champion,injuryWeeks:injury.weeks}].slice(-4);
   // Desarrollo
   const ageF=p.age<=19?.3:p.age<=22?.22:p.age<=25?.12:p.age<=28?.04:0;
   let delta=(p.pot-p.ovr)*ageF*(.45+share*.8)+(pr()-.5)*2;
