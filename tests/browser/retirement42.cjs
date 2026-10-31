@@ -24,6 +24,8 @@ const {chromium}=require('playwright');
   if(detail.phase!=='retired')throw Error('La carrera no llegó al retiro: '+JSON.stringify(detail));
   await p.reload();await p.locator('.farewell-hero').waitFor({timeout:10000});
   if(await p.locator('.playing-layout').count())throw Error('El retiro sigue usando el viejo panel triple');
+  if(await p.locator('.legacy-act').count()!==3)throw Error('Faltan los tres capítulos históricos de la carrera');
+  if(!await p.locator('.farewell-signatures').count())throw Error('Falta identidad deportiva de la despedida');
   const stats=await p.locator('.farewell-stat').count();
   if(stats!==6)throw Error('Estadísticas incompletas: '+stats);
   if(await p.locator('.farewell-club').count()<1)throw Error('No se muestran clubes');
