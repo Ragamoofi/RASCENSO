@@ -65,7 +65,7 @@ export function createMatch(canvas,{play,stats,ai,scene,onEnd,hud={}}){
  const g=canvas.getContext('2d');
  const dpr=Math.min(2,globalThis.devicePixelRatio||1);
  canvas.width=W*dpr;canvas.height=H*dpr;g.setTransform(dpr,0,0,dpr,0,0);
- const m={play,stats,ai,g,canvas,t:0,phase:'intro',introT:2.4,outT:0,slow:1,shake:0,particles:[],banner:null,result:null,keys:new Set(),
+ const m={play,stats,ai,g,canvas,t:0,phase:'brief',introT:2.4,outT:0,slow:1,shake:0,particles:[],banner:null,result:null,keys:new Set(),
   pointer:{x:W/2,y:H/2,wx:26,wy:14.5,down:false,inside:false,downAt:0,button:0},
   rand:rng(play.seed+':scene'),hud,
   finish(success,detail,quality=.5,extra={}){if(m.result)return;m.result={success,detail,quality:clampN(quality,0,1),...extra};m.phase='outro';m.outT=2.1;m.slow=.35;m.banner={text:success?(play.kind==='attack'?((extra.credit||play.credit)==='assist'?'¡ASISTENCIA!':'¡GOL!'):'¡SALVADA!'):(play.kind==='attack'?'SE FUE…':'GOL RIVAL'),good:success,sub:detail};if(success)m.burst(m.bannerAt||[W/2,H/2],success);m.shake=success?.25:.4;},
@@ -76,9 +76,16 @@ export function createMatch(canvas,{play,stats,ai,scene,onEnd,hud={}}){
  const rect=()=>canvas.getBoundingClientRect();
  const local=e=>{const r=rect();return [(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H];};
  const onMove=e=>{const [x,y]=local(e);m.pointer.x=x;m.pointer.y=y;[m.pointer.wx,m.pointer.wy]=toWorld(x,y);m.pointer.inside=true;};
- const onDown=e=>{e.preventDefault();canvas.setPointerCapture?.(e.pointerId);onMove(e);m.pointer.down=true;m.pointer.button=e.button;m.pointer.downAt=m.t;if(m.phase==='play')scene.down?.(m,e.button===2?'alt':'main');};
+ /** Botón «Empezar» de la pantalla de instrucciones (coordenadas del canvas). */
+ const BTN={x:W/2-150,y:H-122,w:300,h:50};
+ const overBtn=()=>m.pointer.x>=BTN.x&&m.pointer.x<=BTN.x+BTN.w&&m.pointer.y>=BTN.y&&m.pointer.y<=BTN.y+BTN.h;
+ m.btn=BTN;m.overBtn=overBtn;
+ /** Termina la lectura y arranca la cuenta 3-2-1. Nada se mueve hasta que el jugador lo decide. */
+ m.begin=()=>{if(m.phase!=='brief')return;m.phase='intro';m.introT=2.4;m.pointer.down=false;};
+ const onDown=e=>{e.preventDefault();canvas.setPointerCapture?.(e.pointerId);onMove(e);if(m.phase==='brief'){if(overBtn())m.begin();return;}m.pointer.down=true;m.pointer.button=e.button;m.pointer.downAt=m.t;if(m.phase==='play')scene.down?.(m,e.button===2?'alt':'main');};
  const onUp=e=>{onMove(e);m.pointer.down=false;if(m.phase==='play')scene.up?.(m,e.button===2?'alt':'main');};
- const onKey=e=>{const down=e.type==='keydown';if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();if(down&&e.repeat)return;if(down)m.keys.add(e.code);else m.keys.delete(e.code);if(m.phase==='play')scene.key?.(m,e.code,down);};
+ const onKey=e=>{const down=e.type==='keydown';if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();if(down&&e.repeat)return;
+  if(m.phase==='brief'){if(down&&(e.code==='Enter'||e.code==='Space'||e.code==='NumpadEnter'))m.begin();return;}if(down)m.keys.add(e.code);else m.keys.delete(e.code);if(m.phase==='play')scene.key?.(m,e.code,down);};
  const ctxMenu=e=>e.preventDefault();
  canvas.addEventListener('pointermove',onMove);canvas.addEventListener('pointerdown',onDown);canvas.addEventListener('pointerup',onUp);canvas.addEventListener('contextmenu',ctxMenu);
  canvas.addEventListener('pointerleave',()=>{m.pointer.inside=false;});
@@ -99,7 +106,8 @@ export function createMatch(canvas,{play,stats,ai,scene,onEnd,hud={}}){
  function frame(now){
   if(!alive)return;
   let dt=Math.min(.05,(now-last)/1000);last=now;
-  if(m.phase==='intro'){m.introT-=dt;if(m.introT<=0){m.phase='play';}}
+  if(m.phase==='brief'){/* en pausa: la escena no avanza ni el reloj corre */}
+  else if(m.phase==='intro'){m.introT-=dt;if(m.introT<=0){m.phase='play';m.pointer.down=false;m.keys.clear();}}
   else if(m.phase==='play'){m.t+=dt*m.slow;scene.update(m,dt*m.slow);syncOwned(m.ball);if(m.t>40&&!m.result)m.finish(false,'tiempo',.1);}
   else if(m.phase==='outro'){m.outT-=dt;scene.update(m,dt*m.slow);m.slow=Math.min(1,m.slow+dt*.4);if(m.outT<=0){alive=false;draw();onEnd?.(m.result);return;}}
   for(const p of m.particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=380*dt;p.life-=dt;}m.particles=m.particles.filter(p=>p.life>0);
@@ -112,14 +120,14 @@ export function createMatch(canvas,{play,stats,ai,scene,onEnd,hud={}}){
   scene.draw(m,g);
   for(const p of m.particles){g.globalAlpha=Math.max(0,Math.min(1,p.life));g.fillStyle=p.c;g.fillRect(p.x,p.y,4,4);}g.globalAlpha=1;
   drawHud(m,g);
-  if(m.phase==='intro')drawIntro(m,g);
+  if(m.phase==='brief'||m.phase==='intro')drawIntro(m,g);
   if(m.banner)drawBanner(g,m.banner);
   g.restore();
  }
  raf=requestAnimationFrame(frame);
  m.destroy=()=>{alive=false;cancelAnimationFrame(raf);canvas.removeEventListener('pointermove',onMove);canvas.removeEventListener('pointerdown',onDown);canvas.removeEventListener('pointerup',onUp);canvas.removeEventListener('contextmenu',ctxMenu);globalThis.removeEventListener?.('keydown',onKey);globalThis.removeEventListener?.('keyup',onKey);};
  // Solo para pruebas automáticas: avanzar el tiempo sin esperar al navegador.
- m.tick=(dt=1/60)=>{if(m.phase==='intro'){m.introT=0;m.phase='play';}if(m.phase!=='done'){m.t+=dt;scene.update(m,dt);syncOwned(m.ball);}};
+ m.tick=(dt=1/60)=>{if(m.phase==='brief'||m.phase==='intro'){m.introT=0;m.phase='play';}if(m.phase!=='done'){m.t+=dt;scene.update(m,dt);syncOwned(m.ball);}};
  return m;
 }
 
@@ -194,15 +202,30 @@ export function stakes(p){
  return d===0?`Empate en el minuto ${min}: si marcan ellos, se pierde todo.`:d===1?`Ganan por la mínima: este gol rival sería el empate.`:d>1?`Ventaja cómoda, pero un gol rival enciende el partido.`:`Si entra, la derrota se hace más grande.`;
 }
 function drawIntro(m,g){
- g.fillStyle='rgba(6,16,30,.72)';g.fillRect(0,0,W,H);
+ const brief=m.phase==='brief';
+ g.fillStyle=brief?'rgba(6,16,30,.9)':'rgba(6,16,30,.72)';g.fillRect(0,0,W,H);
  const n=Math.ceil(m.introT/0.8);
  g.textAlign='center';g.textBaseline='middle';
- g.fillStyle=COLORS.copper;g.font='900 14px "DM Sans",Arial';g.fillText((m.play.tag||'').toUpperCase(),W/2,H/2-96);
- g.fillStyle='#fff';g.font='900 46px "Barlow Condensed","DM Sans",Arial';g.fillText(m.hud.title||'',W/2,H/2-58);
- g.fillStyle='#ffe2c4';g.font='800 16px "DM Sans",Arial';g.fillText(stakes(m.play),W/2,H/2-22);
+ g.fillStyle=COLORS.copper;g.font='900 14px "DM Sans",Arial';g.fillText((m.play.tag||'').toUpperCase(),W/2,brief?58:H/2-96);
+ g.fillStyle='#fff';g.font='900 46px "Barlow Condensed","DM Sans",Arial';g.fillText(m.hud.title||'',W/2,brief?102:H/2-58);
+ g.fillStyle='#ffe2c4';g.font='800 17px "DM Sans",Arial';g.fillText(stakes(m.play),W/2,brief?150:H/2-22);
+ if(brief){
+  // Pantalla de lectura: sin tiempo límite. Tarjetas con objetivo y controles.
+  const card=(y,h,label,text,color)=>{g.fillStyle='rgba(19,45,71,.92)';roundRect(g,W/2-350,y,700,h,12);g.fill();g.strokeStyle='rgba(122,166,255,.28)';g.lineWidth=1;g.stroke();
+   g.fillStyle=color;g.font='900 11px "DM Sans",Arial';g.textAlign='left';g.fillText(label,W/2-330,y+20);g.textAlign='center';};
+  card(184,86,'EL OBJETIVO','',COLORS.copper);g.fillStyle='#e8f0fa';g.font='600 17px "DM Sans",Arial';wrap(g,m.hud.brief||'',W/2,226,660,23);
+  card(284,86,'CÓMO SE JUEGA','','#7aa6ff');g.fillStyle='#ffe2c4';g.font='700 16px "DM Sans",Arial';wrap(g,m.hud.controls||'',W/2,326,660,23);
+  g.fillStyle='#9fb8d1';g.font='600 13px "DM Sans",Arial';g.fillText(`Dificultad ${Math.round((m.play.difficulty||0)*100)} · Presión ${m.play.pressure} · Cansancio ${Math.round((m.play.fatigue||0)*100)}%  —  tómate el tiempo que necesites`,W/2,396);
+  const b=m.btn,hot=m.overBtn?.()&&m.pointer.inside,pulse=.5+.5*Math.sin(performance.now()/380);
+  g.fillStyle=hot?'#5b82e8':'#3a64d2';roundRect(g,b.x,b.y,b.w,b.h,12);g.fill();g.strokeStyle=`rgba(232,165,116,${hot?1:.45+.4*pulse})`;g.lineWidth=2.5;g.stroke();
+  g.fillStyle='#fff';g.font='900 18px "DM Sans",Arial';g.fillText('▶  ENTENDIDO · EMPEZAR',W/2,b.y+b.h/2+1);
+  g.fillStyle='#9fb8d1';g.font='600 12px "DM Sans",Arial';g.fillText('o pulsa Enter / Espacio · después verás la cuenta 3, 2, 1',W/2,b.y+b.h+22);
+  return;
+ }
  g.fillStyle='#c9d8e8';g.font='600 14px "DM Sans",Arial';wrap(g,m.hud.brief||'',W/2,H/2+4,640,19);
  g.fillStyle='#e8a574';g.font='700 13px "DM Sans",Arial';wrap(g,m.hud.controls||'',W/2,H/2+48,700,18);
  g.fillStyle='#fff';g.font='900 64px "Barlow Condensed","DM Sans",Arial';g.fillText(String(Math.max(1,n)),W/2,H/2+118);
+ g.fillStyle='#9fb8d1';g.font='700 13px "DM Sans",Arial';g.fillText('¡Prepárate!',W/2,H/2+170);
 }
 function drawBanner(g,b){
  g.textAlign='center';g.textBaseline='middle';

@@ -15,6 +15,7 @@ Los minijuegos se reconstruyeron desde cero con un **motor 2D propio en canvas**
   - **Defensa:** duelo defensivo, anticipación, despeje aéreo y línea del fuera de juego.
   - **Arquero:** asedio de remates, penal en contra, achique y salida por arriba.
 - **Hasta 3 jugadas por temporada** según tu rol, en partidos reales del calendario y preferentemente ajustados. Cada una tiene minuto, marcador previo, presión, cansancio y dificultad según el rival y la etapa de la carrera.
+- **Instrucciones sin prisa:** cada jugada empieza en una pantalla de lectura sin límite de tiempo; la cuenta 3, 2, 1 solo arranca cuando pulsas «Empezar» (o Enter/Espacio).
 - **Atributos que importan:** velocidad, pulso al rematar (que tiembla con la presión y la falta de serenidad), alcance de entrada, salto y reflejos salen de tus atributos. Los arqueros rivales recuerdan hacia dónde pateas los penales.
 - **Sin contradicciones con la simulación:** lograr la jugada suma exactamente un gol o una asistencia en ese partido, o evita exactamente un gol rival. Fallar deja el partido como lo simuló el motor. El resto de la temporada no cambia. Puedes resolver una jugada automáticamente (se muestra la probabilidad) o dejarla sin jugar.
 

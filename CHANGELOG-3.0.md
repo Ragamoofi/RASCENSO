@@ -101,3 +101,14 @@ El sistema anterior sigue en el código (`moments15.mjs`) solo por compatibilida
 - El equilibrio se midió con un bot. Puede requerir ajustes finos tras partidas reales de personas.
 - Las jugadas ocurren solo en partidos de liga; las copas y la selección se siguen simulando sin intervención.
 - Algunas jugadas defensivas siguen siendo relativamente fáciles para alguien con buenos reflejos (recuperación, achique).
+
+## 3.0.1 · Tiempo para leer las instrucciones
+
+- Antes, la presentación de cada jugada duraba 2,4 s y avanzaba sola; en jugadas como el cabezazo no daba tiempo de leer cómo se juega.
+- Ahora **las 20 jugadas** arrancan en una **pantalla de instrucciones sin límite de tiempo**:
+  - Muestra qué está en juego (minuto y marcador), el objetivo, los controles, la dificultad, la presión y el cansancio.
+  - No corre ningún reloj ni se mueve nada hasta que pulses **«▶ Entendido · Empezar»** (clic en el botón, **Enter** o **Espacio**).
+  - Un clic fuera del botón no inicia la jugada, para evitar arranques accidentales.
+  - Solo entonces corre la cuenta **3, 2, 1**, y la jugada empieza al llegar a 0.
+- El cambio vive en el motor (`match2d.mjs`), así que cualquier jugada futura lo hereda. El botón ✕ y la tecla Esc siguen permitiendo salir sin jugar.
+- Prueba nueva `tests/browser/brief-e2e.cjs`: para cada jugada comprueba que sigue esperando pasados 3,5 s, que ignora clics fuera del botón, que se inicia con el botón o con Enter, que corre la cuenta atrás y que después se juega.
