@@ -15,3 +15,11 @@ for(const type of ['pase_filtrado','contragolpe'])test(`${type}: el receptor rem
  for(let i=0;i<300&&!m.result;i++){m.t+=1/60;scene.update(m,1/60);}
  assert.ok(m.result);if(m.result.success){assert.equal(m.result.credit,'assist');assert.equal(m.result.detail,'asistencia');}
 });
+for(const type of ['centro','encare'])test(`${type}: el centro conectado conduce a un remate visible`,()=>{
+ const play={type,seed:'cross',difficulty:.5,pressure:40,fatigue:0};const stats=playerStats({attributes:{pace:75,shot:75,pass:75,dribble:75,defense:75,physical:75,skills:3,weak:3}},play);
+ const m={play,stats,ai:aiStats(play),rand:()=>.2,aimNoise:()=>0,t:1,pointer:{wx:44,wy:12},say(){},finish(success,detail,quality,extra){this.result={success,detail,quality,...extra};}};const scene=FIELD_SCENES[type];scene.init(m);m.ball.owner=null;m.ball.x=44;m.ball.y=12;m.ball.z=1;m.ball.vx=0;m.ball.vy=0;m.target={x:44,y:12};m.arrive=m.t;m.quality=.9;m.beaten=true;
+ m.run[0].t.x=44;m.run[0].t.y=12;m.run[0].d.x=37;m.run[0].d.y=20;
+ for(const r of m.run.slice(1)){r.t.x=36;r.t.y=25;r.d.x=35;r.d.y=25;}m.k.x=51;m.k.y=19;
+ scene.update(m,.01);assert.equal(m.finalizing,true);assert.equal(m.result,undefined);assert.ok(m.ball.vx>0);
+ for(let i=0;i<300&&!m.result;i++){m.t+=1/60;scene.update(m,1/60);}assert.ok(m.result);if(m.result.success)assert.equal(m.result.credit,'assist');
+});

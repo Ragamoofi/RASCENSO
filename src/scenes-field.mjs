@@ -69,16 +69,16 @@ function shotFlight(m,ball,k,dt,{reaction=0,credit=null}={}){
 }
 /** El receptor define en pantalla: la calidad y el espacio afectan su remate. */
 function receiverShot(m,receiver,quality,space){
- m.ball.owner=receiver;const side=receiver.y<m.k.y?1:-1;
- const error=(1-clampN(quality,0,1))*1.6+clampN(2-space,0,2)*.5+m.ai.d*.3;
- const target=FIELD.goalY+side*2.1+m.aimNoise(error);
+ m.ball.owner=receiver;
+ // Elegir el palo con más espacio en el cruce con el arquero.
+ const fraction=clampN((m.k.x-receiver.x)/Math.max(.5,FIELD.goalX-receiver.x),0,1);
+ const left=FIELD.goalY-(FIELD.post-.6),right=FIELD.goalY+(FIELD.post-.6);
+ const separation=target=>Math.abs(receiver.y+(target-receiver.y)*fraction-m.k.y);
+ const best=separation(left)>separation(right)?left:right;
+ const error=clampN((1-clampN(quality,0,1))*1.3+clampN(2-space,0,2)*.4+m.ai.d*.2,0,1.2);
+ const target=best+m.aimNoise(error);
  kick(m.ball,FIELD.goalX+.5,target,21+quality*5,Math.max(0,.4+m.rand()*.8));
  m.shotAt=m.t;m.finalizing=true;m.hint='¡Tu compañero define!';
-}
-/** El compañero define un pase: calidad del pase y espacio libre frente al arquero (determinista por semilla). */
-function teammateFinish(m,quality,space){
- const p=clampN(.35+quality*.35+space*.08-m.ai.d*.18,.12,.9);
- return m.rand()<p;
 }
 const timeUp=(m)=>m.timer!=null&&m.t>=m.timer&&!m.result;
 
@@ -206,7 +206,7 @@ function crossArrival(m,list,k,point,quality){
  setBanner(m,point.x,point.y);
  if(keeperClaims)return m.finish(false,'atajado',.2);
  if(!best||best.adv<-.2||dist(best.r.t,point)>2.6)return m.finish(false,'despeje',.2);
- return teammateFinish(m,quality,clampN(best.adv,0,3))?m.finish(true,'asistencia',.5+quality*.5,{credit:'assist'}):m.finish(false,'atajado',.3);
+ receiverShot(m,best.r.t,quality,clampN(best.adv,0,3));
 }
 const centro={
  init(m){m.timer=7;m.me=makePlayer(28,rnd(m,2.2,3.6),{num:'7',team:'us'});m.ball=makeBall(0,0);m.ball.owner=m.me;m.k=makeKeeper(m);m.fb=makePlayer(31,5.5,{num:'2',speed:m.ai.defSpeed*.8});
@@ -216,7 +216,7 @@ const centro={
   if(m.ball.owner===m.me){moveToward(m.me,m.me.x+3,m.me.y,m.stats.sprint*.9,dt);moveToward(m.fb,m.me.x+.4,m.me.y+1.2,m.fb.speed,dt);m.k.y+=(FIELD.goalY-2-m.k.y)*dt;
    if(m.me.x>49.5&&!m.result)return m.finish(false,'perdida',.1);
    if(dist(m.fb,m.me)<.8&&m.t>1.2&&!m.result&&m.rand()<1-Math.exp(-(.9+m.ai.d*1.4)*dt))return m.finish(false,'bloqueado',.15);}
-  else{stepBall(m.ball,dt);moveToward(m.k,clampN(m.target.x,FIELD.sixX,G.x-.5),clampN(m.target.y,FIELD.goalY-4,FIELD.goalY+4),m.k.speed*.8,dt);
+  else{if(m.finalizing)return shotFlight(m,m.ball,m.k,dt,{credit:'assist'});stepBall(m.ball,dt);keeperCover(m,m.k,m.target,dt,{rush:false});
    for(const {t,d} of m.run){moveToward(t,m.target.x,m.target.y,6.2,dt);moveToward(d,m.target.x,m.target.y,d.speed*.95,dt);}
    if(m.t>=m.arrive&&!m.result)crossArrival(m,m.run,m.k,m.target,m.quality);}
  },
@@ -239,7 +239,7 @@ const encare={
    if(m.me.x>51.3&&!m.result)return m.finish(false,'perdida',.1);
    if(timeUp(m))return m.finish(false,'tiempo',.1);}
   else if(m.shot)shotFlight(m,m.ball,m.k,dt,{credit:'goal'});
-  else{stepBall(m.ball,dt);for(const {t,d} of m.run){moveToward(t,m.target.x,m.target.y,6.2,dt);moveToward(d,m.target.x,m.target.y,d.speed*.9,dt);}if(m.t>=m.arrive&&!m.result)crossArrival(m,m.run,m.k,m.target,m.quality*(m.beaten?1:.55));}
+  else{if(m.finalizing)return shotFlight(m,m.ball,m.k,dt,{credit:'assist'});stepBall(m.ball,dt);for(const {t,d} of m.run){moveToward(t,m.target.x,m.target.y,6.2,dt);moveToward(d,m.target.x,m.target.y,d.speed*.9,dt);}if(m.t>=m.arrive&&!m.result)crossArrival(m,m.run,m.k,m.target,m.quality*(m.beaten?1:.55));}
  },
  key(m,code,down){if(down&&code==='Space')feint(m);},
  down(m,b){if(b==='alt')return feint(m);if(m.ball.owner!==m.me)return;

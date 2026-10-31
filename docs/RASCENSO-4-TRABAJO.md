@@ -13,7 +13,7 @@ Rama de trabajo: `rascenso-4-integral`. Base: `bb85f188cf63e016ba8429b8d24b44d53
 - Titularidad: el rendimiento previo en el mismo club influye moderadamente en la competencia por el puesto.
 - Vestuario: una amistad con el competidor aporta moral mientras compartan club y abre una escena contextual con elecciones persistentes.
 - Interfaz: nueva jerarquía visual, foco visible y ajustes de movimiento reducido. Pendiente de validación visual en navegador.
-- Pase filtrado y contragolpe: el receptor define con un remate visible y el arquero puede reaccionar; la calidad del pase y espacio afectan la definición. El arquero de cancha puede equivocarse al anticipar.
+- Pase filtrado, contragolpe, centro y encare: el receptor define con un remate visible y el arquero puede reaccionar; la calidad del pase y espacio afectan la definición. El arquero de cancha puede equivocarse al anticipar.
 - Opciones: engranaje y acceso a importar disponibles también en el creador, con preferencias persistentes. Pendiente de comprobación en navegador.
 - Centro, encare, contragolpe y rondo: señal visual del espacio en la línea de pase al apuntar; no garantiza recepción.
 - Mercado temprano: el peso por país evita que la cantidad de clubes extranjeros domine las ofertas; conserva búsqueda internacional. Pruebas iniciales con semillas de Chile, Argentina, Francia y Japón.
@@ -23,7 +23,7 @@ Rama de trabajo: `rascenso-4-integral`. Base: `bb85f188cf63e016ba8429b8d24b44d53
 - Equilibrio pendiente: el bot obtiene tasas extremas en varias jugadas; conoce información interna y no equivale a pruebas humanas. Se agregó una matriz de 100 semillas con dos niveles y dos dificultades.
 
 ## Pendiente para considerar 4.0 completo
-- Completar la renovación individual de las 20 jugadas; hay cambios iniciales en penal, pase filtrado y contragolpe.
+- Completar la renovación individual de las 20 jugadas; hay cambios iniciales en penal, pases, duelos de banda, achique, salida aérea, despeje y fuera de juego.
 - Rediseño de interfaz y accesibilidad en resoluciones y navegadores.
 - Profundizar carrera, mundo, mercado, relaciones, selección nacional y narrativa; revisar creación y compatibilidad de guardados.
 - Auditoría de escudos y fuentes verificables.
