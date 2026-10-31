@@ -13,7 +13,7 @@ const MARKED=[
  [/recopa sudamericana/,'real-recopa','Supercopa','continental.png'],
  [/sudamericana/,'real-sudamericana','Continental','continental.png'],
  [/copa america/,'real-copaamerica','Selecciones','world.png'],
- [/uefa champions|champions league(?! two| elite)/,'real-champions','Continental','continental.png'],
+ [/^uefa champions league$|^champions league$|liga de campeones de europa/,'real-champions','Continental','continental.png'],
  [/mundial de la fifa|copa mundial de la fifa|fifa world cup/,'real-worldcup','Mundial','world.png'],
  [/copa del rey/,'real-copadelrey','Copa nacional','cup.png'],
  [/copa chile/,'real-copachile','Copa nacional','cup.png'],
