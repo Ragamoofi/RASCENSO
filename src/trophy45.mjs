@@ -69,7 +69,7 @@ export function trophyRail(state,getClub){
  (records.length?records.map((r,i)=>{
   const club=getClub?.(r.clubId),info=trophyIdentity(r,club),label=[info.title,r.year??'Año sin registro',club?.name||'Selección o club sin registro'].join(' · ');
   return '<button type="button" class="trophy-unit" data-action="trophy-detail" data-index="'+i+'" aria-label="'+esc(label)+'" title="'+esc(label)+'">'+
-  '<span class="trophy-unit-art">'+trophyImgTag(r,club)+'</span><span class="trophy-unit-copy"><strong>'+esc(info.title)+'</strong><small>'+esc(r.year??'—')+'</small></span></button>';
+  '<span class="trophy-unit-art">'+trophyImgTag(r,club)+'</span><span class="trophy-unit-name">'+esc(info.title)+'</span></button>';
  }).join(''):'<p>Tu primer título tendrá su lugar acá.</p>')+'</div></section>';
 }
 export function trophyDetail(record,getClub,getCountry){

@@ -28,6 +28,25 @@ const {chromium}=require('playwright');
   if(count!==23)throw Error('La vitrina esconde títulos: '+count);
   const rail=await page.locator('.trophy-showcase').evaluate(el=>({height:el.getBoundingClientRect().height,scroll:el.querySelector('.trophy-grid').scrollWidth,view:el.querySelector('.trophy-grid').clientWidth}));
   if(rail.height>99)throw Error('Se agrandó la vitrina: '+rail.height);
+  // Medidas reales: ni borde de tarjeta ni icono recortado, nombre bajo el PNG.
+  const cards=await page.locator('.trophy-unit').evaluateAll(nodes=>nodes.slice(0,9).map(el=>{
+    const img=el.querySelector('.trophy-unit-art img');
+    const name=el.querySelector('.trophy-unit-name');
+    const card=el.getBoundingClientRect(),picture=img.getBoundingClientRect(),label=name?.getBoundingClientRect();
+    const cs=getComputedStyle(el);
+    return {border:parseFloat(cs.borderTopWidth),background:cs.backgroundColor,
+      imageTop:picture.top, imageBottom:picture.bottom,imageLeft:picture.left,imageRight:picture.right,
+      cardTop:card.top,cardBottom:card.bottom,cardLeft:card.left,cardRight:card.right,
+      labelTop:label?.top,labelBottom:label?.bottom,name:name?.textContent?.trim(),imageHeight:picture.height};
+  }));
+  for(const c of cards){
+    if(c.border!==0||c.background!=='rgba(0, 0, 0, 0)')throw Error('Trofeo conserva tarjeta o borde: '+JSON.stringify(c));
+    if(!c.name||c.imageHeight<35)throw Error('Trofeo sin nombre o icono demasiado pequeño: '+JSON.stringify(c));
+    if(c.imageTop<c.cardTop-1||c.imageBottom>c.cardBottom+1||c.imageLeft<c.cardLeft-1||c.imageRight>c.cardRight+1)throw Error('PNG cortado por su casilla: '+JSON.stringify(c));
+    if(c.labelTop<c.imageBottom-1||c.labelBottom>c.cardBottom+1)throw Error('Nombre no está debajo del trofeo o está cortado: '+JSON.stringify(c));
+  }
+  if(process.env.SHOTS)await page.screenshot({path:process.env.SHOTS+'/trophy-rail-'+width+'.png'});
+
   if(rail.scroll<=rail.view)throw Error('No hay desplazamiento horizontal para las copas');
   if(!await page.getByRole('button',{name:/Copa Libertadores/}).count())throw Error('Nombre no accesible en tarjeta');
   await page.locator('.trophy-unit').first().click();

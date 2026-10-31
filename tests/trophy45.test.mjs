@@ -33,6 +33,9 @@ test('4.5 · títulos ordenados y nombres visibles sin recorte de la colección'
  assert.match(html,/Copa 22/);
  assert.match(html,/2048/);
  assert.match(html,/data-action="trophy-detail"/);
+ assert.match(html,/class="trophy-unit-name">Copa 22<\/span>/);
+ assert.doesNotMatch(html,/trophy-unit-copy/);
+ assert.doesNotMatch(html,/>2048<\/small>/);
  assert.match(html,/Colo-Colo/);
 });
 test('4.5 · ficha táctil muestra nombre, año, club y atribución',()=>{
