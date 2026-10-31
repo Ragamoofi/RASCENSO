@@ -14,6 +14,8 @@ const {chromium}=require('playwright');
    for(let i=0;i<8;i++)await page.locator('[data-action=draft-accept]').first().click();
    await page.locator('[data-action=academy-continue]').click();
    await page.locator('[data-action=academy]').first().click();
+   await page.locator('[data-action=event]').nth(1).click();
+   await page.locator('[data-action=event-finish]').click();
    await page.locator('.matchday-center').waitFor();
    const btn=page.locator('[data-action=match-rhythm][data-rhythm=inmersivo]');await btn.click();
    if(!await btn.evaluate(x=>x.classList.contains('selected')))throw Error('No se activó el modo inmersivo');
