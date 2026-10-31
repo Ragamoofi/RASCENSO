@@ -122,7 +122,7 @@ export function worldView(s,legacy=''){
 /* ---------- Historial: gráfico, récords, hitos ---------- */
 export function historyExtras(s){
  const H=s.history||[];if(!H.length)return '';
- const {records,milestones,byClub}=careerRecords(s);
+ const {records,milestones}=careerRecords(s);
  const w=560,hgt=150,pad=24;const vals=H.map(x=>x.ovrAfter);const pots=H.map(x=>x.potentialAfter||null);
  const min=Math.min(...vals,...H.map(x=>x.ovrBefore))-3,max=Math.max(...vals,...pots.filter(Boolean))+2;
  const X=i=>pad+(H.length===1?w/2:i*(w-pad*2)/(H.length-1)),Y=v=>hgt-pad-(v-min)/(max-min||1)*(hgt-pad*2);

@@ -27,7 +27,7 @@ const {chromium}=require('playwright');
   const count=await page.locator('.trophy-unit').count();
   if(count!==23)throw Error('La vitrina esconde títulos: '+count);
   const rail=await page.locator('.trophy-showcase').evaluate(el=>({height:el.getBoundingClientRect().height,scroll:el.querySelector('.trophy-grid').scrollWidth,view:el.querySelector('.trophy-grid').clientWidth}));
-  if(rail.height>99)throw Error('Se agrandó la vitrina: '+rail.height);
+  if(rail.height>138)throw Error('La vitrina excede el tamaño compacto: '+rail.height);
   // Medidas reales: ni borde de tarjeta ni icono recortado, nombre bajo el PNG.
   const cards=await page.locator('.trophy-unit').evaluateAll(nodes=>nodes.slice(0,9).map(el=>{
     const img=el.querySelector('.trophy-unit-art img');

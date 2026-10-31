@@ -28,6 +28,15 @@ const {chromium}=require('playwright');
   if(!await p.locator('.farewell-signatures').count())throw Error('Falta identidad deportiva de la despedida');
   const stats=await p.locator('.farewell-stat').count();
   if(stats!==6)throw Error('Estadísticas incompletas: '+stats);
+  if(width>=1600){
+   const sizes=await p.evaluate(()=>{
+     const rect=selector=>document.querySelector(selector)?.getBoundingClientRect();
+     const hero=rect('.farewell-hero'),acts=rect('.farewell-acts'),stats=rect('.farewell-numbers');
+     return {hero:hero?.height,acts:acts?.height,stats:stats?.height,firstTop:hero?.top};
+   });
+   if(sizes.hero>235||sizes.acts>190||sizes.stats>125)throw Error('Legado no se compactó para 1920×1080: '+JSON.stringify(sizes));
+  }
+
   if(await p.locator('.farewell-club').count()<1)throw Error('No se muestran clubes');
   if(!await p.getByText('La sala de trofeos').count())throw Error('Falta palmarés');
   if(!await p.locator('[data-action=share-png]').count())throw Error('Falta exportar recuerdo');
