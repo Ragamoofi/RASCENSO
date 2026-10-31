@@ -58,7 +58,8 @@ const {chromium}=require('playwright');
   if(errors.length)throw Error(errors.join(' | '));
   if(process.env.SHOTS)await page.screenshot({path:process.env.SHOTS+'/trophies-'+width+'.png'});
   await page.keyboard.press('Escape');
-  if(await dialog.count())throw Error('La ficha no se cierra con Escape');
+  // dialog.close() dispara el evento close asíncrono: esperar eliminación real.
+  await dialog.waitFor({state:'detached',timeout:5000});
   console.log(width+'x'+height+': vitrina compacta con '+count+' títulos, ficha y cierre verificados');
   await page.close();
  }
