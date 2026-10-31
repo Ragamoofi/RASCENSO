@@ -6,6 +6,7 @@
  */
 import { rng } from './career20.mjs';
 import {drawBroadcast43} from './scene-atmos43.mjs';
+import {drawSceneFilm44,drawBriefFilm44,drawResultFilm44} from './scene-visual44.mjs';
 
 export const W=960,H=540;
 export const FIELD={len:52,wid:29,goalX:52,goalY:14.5,post:3.66,bar:2.44,boxX:35.5,boxY:[4.34,24.66],sixX:46.5,sixY:[9,20],spot:41};
@@ -140,7 +141,9 @@ export function createMatch(canvas,{play,stats,ai,scene,onEnd,hud={}}){
  function draw(){
   g.save();if(m.shake>0){g.translate((m.fxRand()-.5)*m.shake*24,(m.fxRand()-.5)*m.shake*24);}
   scene.draw(m,g);
+  drawSceneFilm44(m,g);
   drawBroadcast43(m,g);
+  drawResultFilm44(m,g);
   for(const p of m.particles){g.globalAlpha=Math.max(0,Math.min(1,p.life));g.fillStyle=p.c;g.fillRect(p.x,p.y,4,4);}g.globalAlpha=1;
   drawHud(m,g);
   if(m.phase==='brief'||m.phase==='intro')drawIntro(m,g);
@@ -235,6 +238,7 @@ export function stakes(p){
 function drawIntro(m,g){
  const brief=m.phase==='brief';
  g.fillStyle=brief?'rgba(6,16,30,.9)':'rgba(6,16,30,.72)';g.fillRect(0,0,W,H);
+ drawBriefFilm44(m,g);
  const n=Math.ceil(m.introT/0.8);
  g.textAlign='center';g.textBaseline='middle';
  g.fillStyle=COLORS.copper;g.font='900 14px "DM Sans",Arial';g.fillText((m.play.tag||'').toUpperCase(),W/2,brief?58:H/2-96);

@@ -1,6 +1,7 @@
 /* RASCENSO 3.0 · Capa de interfaz de las Jugadas Vivas: tarjetas de temporada y ventana de juego. */
 import { PLAYS, playerStats, aiStats, autoChance } from './plays30.mjs';
 import { createMatch } from './match2d.mjs';
+import {sceneVisualStyle44} from './scene-visual44.mjs';
 import { FIELD_SCENES } from './scenes-field.mjs';
 import { GOAL_SCENES } from './scenes-goal.mjs';
 import { POSITION_NAMES } from './career20.mjs';
@@ -29,9 +30,9 @@ export function playsPanel(state,plays,getClub){
 /** Abre la ventana de juego. onDone(report) recibe el resultado; onCancel cierra sin jugar. */
 export function openPlay({state,play,clubName,onDone,onCancel}){
  const scene=SCENES[play.type];if(!scene)return null;
- const info=PLAYS[play.type];
+ const info=PLAYS[play.type],art=sceneVisualStyle44(play.type);
  const wrap=document.createElement('div');wrap.className='play-overlay';wrap.setAttribute('role','dialog');wrap.setAttribute('aria-label',info.name);
- wrap.innerHTML=`<div class="play-window"><header><div><small>JUGADA VIVA · ${h(play.tag)}</small><strong>${h(info.name)}</strong></div><button type="button" class="play-close" aria-label="Salir sin jugar">✕</button></header><div class="play-stage"><canvas width="960" height="540" tabindex="0"></canvas></div><footer>${h(info.controls)}</footer></div>`;
+ wrap.innerHTML=`<div class="play-window play-visual-${art.group}"><header><div><small>RASCENSO LIVE · ${h(play.tag)}</small><strong>${h(info.name)}</strong><span class="play-broadcast-tag">${h(art.label)}</span></div><button type="button" class="play-close" aria-label="Salir sin jugar">✕</button></header><div class="play-stage"><canvas width="960" height="540" tabindex="0"></canvas></div><footer>${h(info.controls)}</footer></div>`;
  document.body.appendChild(wrap);
  const canvas=wrap.querySelector('canvas');canvas.focus();
  const fullPlay={...play,memory:state.playMemory?.penalties||[]};
