@@ -27,5 +27,7 @@ test('3.4: ajustes accesibles durante draft, contratos y carrera',()=>{
  assert.match(ui,/shell\(state\.dnaReviewed===false\?dnaReview\(\):academy\(\),showNew\?tools\(\):''\)/);
  for(const action of ['ui-cycle-ambience','ui-toggle-vivid','ui-toggle-cardfx','ui-toggle-compact','ui-reset'])assert.ok(ui.includes(action));
  assert.ok(css.length>130000&&css.includes('z-index:30000'));
- assert.ok(html.includes('experience.css?v=340'));
+ const cssVersion=html.match(/experience\\.css\\?v=(\\d+)/)?.[1];
+ assert.ok(cssVersion,'El HTML debe declarar versión de caché para CSS');
+ assert.ok(html.includes('src/experience.mjs?v='+cssVersion),'CSS y módulo principal deben usar la misma versión');
 });
