@@ -6,19 +6,20 @@ import {positionCompetition} from '../src/market.mjs';
 import {leagueParticipants} from '../src/league.mjs';
 import {newCareer,syncClub,migrateCareer} from '../src/engine.mjs';
 const candidates=[
- ['es-1','1734'],['es-2','1708'],['cl-1','399'],['cl-2','404'],['ar-1','82'],['ar-2','94']
+ ['es-1','10001'],['es-2','10002'],['cl-1','10003'],['cl-2','10004'],['ar-1','10005'],['ar-2','10006']
 ];
-const verified=(clubId,fmUID)=>({clubId,fmUID,status:'verified',genderVerified:true,countryVerified:true,evidence:'VALIDATED_BY_TEST_FIXTURE_CLUBS_AND_NATIONS'});
+const fmCountry=id=>({'es':'170','cl':'190','ar':'187'})[id.slice(0,2)];
+const verified=(clubId,fmUID)=>({clubId,fmUID,status:'verified',genderVerified:true,countryVerified:true,fmCountryId:fmCountry(clubId),isoCountry:clubId.slice(0,2).toUpperCase(),evidence:'VALIDATED_BY_TEST_FIXTURE_CLUBS_AND_NATIONS'});
 const positions=['GK','DC','DL','DR','DM','MC','AMC','AML','AMR','STC','MC','STC','DC','DL','ML','MR','STC','GK','DC','MC','STC','DL','MC','STC'];
 const fixture=(clubId,fmUID,i)=>({id:'fm26:'+(Number(fmUID)*1000+i),nombre:'Jugador prueba '+clubId+' '+i,edad:21+i%9,
  posiciones:[positions[i%positions.length]],equipo_slot:0,ca_fm:90+i%70,pa_fm:130+i%60,stats:{pase:10,remate:12,velocidad:13},
- club_uid:String(fmUID),nacion_fm:190});
-const clubData=(clubId,fmUID)=>({club_uid:String(fmUID),pais_id_fm:'190',jugadores:Array.from({length:24},(_,i)=>fixture(clubId,fmUID,i))});
+ club_uid:String(fmUID),nacion_fm:fmCountry(clubId)});
+const clubData=(clubId,fmUID)=>({club_uid:String(fmUID),pais_id_fm:fmCountry(clubId),genero:'NO_VERIFICADO',jugadores:Array.from({length:24},(_,i)=>fixture(clubId,fmUID,i))});
 test('los homónimos NO pasan sin evidencia externa de género y país',()=>{
- assert.equal(verifyFM26Mapping({clubId:'es-1',fmUID:'2000167907',status:'pending'}),false);
- assert.equal(verifyFM26Mapping({...verified('es-1','1734'),genderVerified:false}),false);
+ assert.equal(verifyFM26Mapping({clubId:'es-1',fmUID:'99999',status:'pending'}),false);
+ assert.equal(verifyFM26Mapping({...verified('es-1','10001'),genderVerified:false}),false);
  assert.throws(()=>registerFM26Club({clubId:'es-1',fmUID:'1734',status:'pending'},clubData('es-1','1734')),/verificado/);
- assert.throws(()=>registerFM26Club(verified('es-1','1734'),clubData('es-1','2000167907')),/FM UID distinto/);
+ assert.throws(()=>registerFM26Club(verified('es-1','10001'),clubData('es-1','99999')),/FM UID distinto/);
 });
 test('conversor FM26 mantiene escala y posiciones; no inventa nacionalidad ISO',()=>{
  assert.equal(fm26Position(['STC']),'DC');assert.equal(fm26Position(['GK']),'POR');
