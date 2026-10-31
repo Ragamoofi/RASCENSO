@@ -857,3 +857,26 @@
 .settings-row small{font-size:10px;color:#c0d0e0;line-height:1.3}
 .settings-row em{font-size:10px;font-style:normal;color:#f7c398;font-weight:800}
 @media(max-width:600px){.settings-list{grid-template-columns:1fr}}
+
+/* RASCENSO 4.0 · Jerarquía visual y navegación */
+.app-shell{--surface-40:#10283f;--edge-40:#476582;--accent-40:#e8a574}
+.site-head{background:linear-gradient(110deg,#0b192d,#102941 64%,#0b1c30);border-bottom:1px solid #5a789155;box-shadow:0 6px 22px #020a1630}
+.navtab{transition:color .18s ease,background .18s ease}
+.navtab:hover,.navtab:focus-visible{color:#fff;background:#ffffff0b}
+.navtab.selected{color:#ffe1c3}
+.navtab.selected:after{height:3px;box-shadow:0 0 12px #e8a57499}
+.focus-card,.creation-panel,.creation-aside,.profile-card,.table-card,.rail-panel{border-color:#57738c88;box-shadow:0 14px 32px #020a1733,inset 0 1px #ffffff0d}
+.v2-panel,.academy-card,.play-card,.global-competition-item{border-color:#526e8766;background-image:linear-gradient(145deg,#ffffff09,transparent 45%);transition:border-color .18s ease,box-shadow .18s ease}
+.v2-panel:hover,.academy-card:hover,.play-card:hover,.global-competition-item:hover{border-color:#bd896b99}
+.v2-panel>header,.plays-head{border-bottom-color:#a7785d66}
+.section-label{color:#edb98f;letter-spacing:.13em}
+.standings-list .standing-row:nth-child(even){background-color:#ffffff08}
+.standings-list .standing-row.mine{box-shadow:inset 3px 0 #e8a574}
+.action,.navtab,.play-auto,.play-close,.settings-row{touch-action:manipulation}
+button:focus-visible,summary:focus-visible,canvas:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #ffd3a3;outline-offset:3px}
+.play-window{border-color:#ae886e;box-shadow:0 30px 90px #000b,0 0 0 1px #ffffff15}
+.play-window header{background:linear-gradient(105deg,#183857,#0c1d32)}
+.play-window footer{color:#e4edf7;line-height:1.45}
+@media(min-width:1600px){.playing-layout{gap:clamp(14px,1vw,20px)}.focus-card{min-width:0}.v2-vest-grid{gap:12px}}
+@media(max-width:720px){.site-head{gap:7px}.navtab{padding-inline:9px}.play-window{width:98vw;max-height:98dvh}.play-window footer{font-size:11px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}

@@ -120,8 +120,9 @@ export function coachSeasonEffects(coach,s){
 export function socialEffects(s){
  const affinity=key=>clamp(((s.relationships?.[key]?.trust??50)-50)/50,-1,1);
  const teammate=affinity('teammate'),agent=affinity('agent'),press=affinity('press'),family=affinity('family');
+ const rivalBond=s.squad?.clubId===s.clubId&&s.squad?.rival?.bond?1:0;
  return {minutes:teammate*.025,injury:clamp(1-family*.07,.93,1.07),
-  morale:Math.round(teammate*1+family*2),reputation:Math.round(press*1),
+  morale:Math.round(teammate*1+family*2)+rivalBond,reputation:Math.round(press*1),
   agentMarket:clamp(1+agent*.20,.80,1.20),agentQuality:agent*.24};
 }
 /* ---------- Vestuario: competidor directo, directiva y afición ---------- */

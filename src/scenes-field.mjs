@@ -44,18 +44,26 @@ function shotFlight(m,ball,k,dt,{reaction=0,credit=null}={}){
  stepBall(ball,dt);
  const cross=goalCrossing(ball);
  // Estirada: el arquero se lanza hacia la línea del remate (no hacia el arco), con alcance limitado.
- if(k&&m.t-m.shotAt>m.ai.keeperReaction+reaction&&cross){if(!k.diving){const t=Math.max(.05,(k.x-ball.x)/Math.max(1,ball.vx));k.diveTo={x:k.x,y:ball.y+ball.vy*t};}moveToward(k,k.diveTo.x,k.diveTo.y,k.speed*1.15,dt);k.diving=true;}
+ if(k&&m.t-m.shotAt>m.ai.keeperReaction+reaction&&cross){if(!k.diving){const t=Math.max(.05,(k.x-ball.x)/Math.max(1,ball.vx));k.diveTo={x:k.x,y:ball.y+ball.vy*t+(m.rand()*2-1)*(4.2-m.ai.d*1.8)};}moveToward(k,k.diveTo.x,k.diveTo.y,k.speed*1.15,dt);k.diving=true;}
  if(k&&sweptKeeperContact(previous,ball,k,k.reach*(k.diving?1.15:.85))&&!m.result){ball.vx*=-.35;ball.vy=(m.rand()-.5)*12;ball.vz=3;setBanner(m,k.x,k.y);return m.finish(false,'atajado',.2);}
  if(ball.x>=FIELD.goalX&&!m.result){
   const fraction=clampN((FIELD.goalX-previous.x)/(ball.x-previous.x||1),0,1);
   const crossingY=previous.y+(ball.y-previous.y)*fraction,crossingZ=previous.z+(ball.z-previous.z)*fraction;
   const dy=Math.abs(crossingY-FIELD.goalY);setBanner(m,FIELD.goalX,crossingY);
-  if(inGoalMouth(crossingY,crossingZ)){const margin=k?clampN((dist(ball,k)-k.reach)/3,0,1):1;ball.vx=1;ball.vy=0;return m.finish(true,'gol',.5+margin*.5,credit?{credit}:{});}
+  if(inGoalMouth(crossingY,crossingZ)){const margin=k?clampN((dist(ball,k)-k.reach)/3,0,1):1;ball.vx=1;ball.vy=0;return m.finish(true,credit==='assist'?'asistencia':'gol',.5+margin*.5,credit?{credit}:{});}
   if(crossingZ>=FIELD.bar-.05&&crossingZ<FIELD.bar+.3&&dy<FIELD.post)return m.finish(false,'travesaño',.3);
   if(Math.abs(dy-FIELD.post)<.3)return m.finish(false,'poste',.35);
   return m.finish(false,'fuera',.1);
  }
  if(Math.hypot(ball.vx,ball.vy)<.6&&ball.z<=0&&!m.result)return m.finish(false,'atajado',.1);
+}
+/** El receptor define en pantalla: la calidad y el espacio afectan su remate. */
+function receiverShot(m,receiver,quality,space){
+ m.ball.owner=receiver;const side=receiver.y<m.k.y?1:-1;
+ const error=(1-clampN(quality,0,1))*1.6+clampN(2-space,0,2)*.5+m.ai.d*.3;
+ const target=FIELD.goalY+side*2.1+m.aimNoise(error);
+ kick(m.ball,FIELD.goalX+.5,target,21+quality*5,Math.max(0,.4+m.rand()*.8));
+ m.shotAt=m.t;m.finalizing=true;m.say('¡DEFINE EL COMPAÑERO!',null);
 }
 /** El compañero define un pase: calidad del pase y espacio libre frente al arquero (determinista por semilla). */
 function teammateFinish(m,quality,space){
@@ -230,14 +238,14 @@ const pase_filtrado={
    m.line=36+Math.sin(m.t*.9)*2.2;for(const d of m.defs)moveToward(d,m.line,d.y,4,dt);
    for(const s of m.strikers){const burst=Math.sin(m.t*1.3+s.ph);moveToward(s,m.line-.3+burst*1.2,s.y+Math.cos(m.t+s.ph)*.4,6,dt);}
    if(timeUp(m))return m.finish(false,'tiempo',.1);return;}
+  if(m.finalizing){return shotFlight(m,m.ball,m.k,dt,{credit:'assist'});}
   stepBall(m.ball,dt);
   const target=m.receiver;moveToward(target,m.ball.x+m.ball.vx*.25,m.ball.y+m.ball.vy*.25,6.8+m.stats.pass*.5,dt);
   for(const d of m.defs){if(m.t-m.passT>m.ai.defReaction+.12)moveToward(d,m.ball.x+m.ball.vx*.15,m.ball.y+m.ball.vy*.15,d.speed*.75,dt);}
   keeperCover(m,m.k,m.ball,dt);
   for(const d of m.defs)if(dist(d,m.ball)<.6&&m.ball.z<1.2&&!m.result){setBanner(m,d.x,d.y);return m.finish(false,'interceptado',.2);}
   if(dist(m.k,m.ball)<m.k.reach&&!m.result){setBanner(m,m.k.x,m.k.y);return m.finish(false,'atajado',.2);}
-  if(dist(target,m.ball)<.9&&!m.result){const space=Math.min(...m.defs.map(d=>dist(d,target)));setBanner(m,target.x,target.y);
-   return teammateFinish(m,m.quality,space)?m.finish(true,'asistencia',.5+m.quality*.4,{credit:'assist'}):m.finish(false,'atajado',.3);}
+  if(dist(target,m.ball)<.9&&!m.result){const space=Math.min(...m.defs.map(d=>dist(d,target)));setBanner(m,target.x,target.y);receiverShot(m,target,m.quality,space);return;}
   if((m.ball.x>FIELD.goalX-.3||Math.hypot(m.ball.vx,m.ball.vy)<.4)&&!m.result)return m.finish(false,'atajado',.1);
  },
  down(m){if(m.passed)return;const st=m.stats,tx=m.pointer.wx,ty=m.pointer.wy;
@@ -264,9 +272,9 @@ const contragolpe={
    if(lunge&&!m.result){if(!duel(m,d1,m.me)){setBanner(m,m.me.x,m.me.y);return m.finish(false,'robo',.15);}}
    if(timeUp(m))return m.finish(false,'tiempo',.1);}
   else if(m.mode==='shot')shotFlight(m,m.ball,m.k,dt,{credit:'goal'});
-  else{stepBall(m.ball,dt);moveToward(m.receiver,m.ball.x,m.ball.y,6.5,dt);if(m.t-m.passT>m.ai.defReaction)for(const d of m.defs)moveToward(d,m.ball.x,m.ball.y,d.speed*.75,dt);keeperCover(m,m.k,m.ball,dt);
+  else{if(m.finalizing)return shotFlight(m,m.ball,m.k,dt,{credit:'assist'});stepBall(m.ball,dt);moveToward(m.receiver,m.ball.x,m.ball.y,6.5,dt);if(m.t-m.passT>m.ai.defReaction)for(const d of m.defs)moveToward(d,m.ball.x,m.ball.y,d.speed*.75,dt);keeperCover(m,m.k,m.ball,dt);
    for(const d of m.defs)if(dist(d,m.ball)<.6&&!m.result){setBanner(m,d.x,d.y);return m.finish(false,'interceptado',.2);}
-   if(dist(m.receiver,m.ball)<.9&&!m.result){const space=Math.min(...m.defs.map(d=>dist(d,m.receiver)));setBanner(m,m.receiver.x,m.receiver.y);return teammateFinish(m,m.quality,space)?m.finish(true,'asistencia',.5+m.quality*.4,{credit:'assist'}):m.finish(false,space<1.2?'bloqueado':'atajado',.3);}
+   if(dist(m.receiver,m.ball)<.9&&!m.result){const space=Math.min(...m.defs.map(d=>dist(d,m.receiver)));setBanner(m,m.receiver.x,m.receiver.y);receiverShot(m,m.receiver,m.quality,space);return;}
    if(Math.hypot(m.ball.vx,m.ball.vy)<.4&&!m.result)return m.finish(false,'perdida',.1);}
  },
  down(m){if(m.mode!=='carry')return;const tx=m.pointer.wx,ty=m.pointer.wy;

@@ -19,6 +19,15 @@ function buildCtx(s){
 const pct=v=>`${Math.round(v)}%`;
 
 export const WORLD_SCENES={
+ w_friend_competition:{tag:'AMISTAD Y TITULARIDAD',place:'Entrenamiento · Después de la práctica',actor:'teammate',
+  title:s=>`Competir con ${ctx(s).rival?.name||'tu compañero'}`,
+  paragraphs:s=>{const rival=ctx(s).rival;return [`${rival?.name||'Tu compañero'} y tú pelean el mismo puesto. Su amistad no cambia que solo uno puede empezar el próximo partido.`,`La última temporada jugaste ${ctx(s).last.matches||0} partidos. Los dos quieren convencer a ${ctx(s).coach?.name||'su entrenador'} sin romper el vestuario.`];},
+  speech:s=>'«Podemos entrenar juntos y competir de frente. ¿Qué prefieres hacer?»',
+  options:s=>[
+   o('Prepararse juntos','Analizar partidos y apoyarse sin dejar de competir.','«Que juegue quien mejor esté».',{teammate:4,coach:2,rivalBond:true},'La amistad se mantiene y aporta estabilidad a tu moral.'),
+   o('Entrenar doble turno','Dar un esfuerzo extra para ganar el puesto.','«Será una competencia dura».',{coach:3,thread:{kind:'extra_training',years:1}},'Mayor desarrollo esta temporada, con más riesgo de lesión.'),
+   o('Marcar distancia','Priorizar tu preparación individual.','«Espero que esto no cambie lo que construimos».',{morale:2,teammate:-4,rivalDistance:true},'La amistad se enfría; la competencia continúa.')]
+ },
  w_new_coach:{tag:'NUEVO ENTRENADOR',place:'Sala de reuniones · Primer día del nuevo cuerpo técnico',actor:'coach',
   title:s=>`${ctx(s).coach.name} toma el mando`,
   paragraphs:s=>{const {coach,club}=ctx(s);return [`${club.name} presentó a ${coach.name}, ${coach.age} años, conocido como un ${coach.styleName.toLowerCase()}.`,COACH_STYLES[coach.style].description,'Todo lo que ganaste con el anterior cuerpo técnico vuelve a estar en discusión.'];},
@@ -250,6 +259,7 @@ export function worldSceneCandidates(s){
  if(award)add('w_award_gala',75,{award:award.name});
  if(s.age>=34&&!hasThread(s,'last_dance')&&((last.ovrAfter??s.ovr)<(last.ovrBefore??s.ovr)||(last.injuryWeeks||0)>=4)&&!recent('w_veteran_body'))add('w_veteran_body',s.age>=36?60:30);
  // Contextuales
+ if(c.rival?.bond&&s.squad?.clubId===s.clubId&&(last.matches||0)>0&&!seen('w_friend_competition').length)add('w_friend_competition',12);
  if(c.rival&&Math.abs((s.ovr||60)-c.rival.ovr)<=5&&!recent('w_squad_rival'))add('w_squad_rival',8);
  const nb=bestNeighbour(s);if(nb&&!recent('w_position_change')&&!hasThread(s,'position_trial'))add('w_position_change',c.coach?.style==='estratega'?14:7,nb);
  if(last.objectives&&!last.objectives.board.met&&!recent('w_board_pressure'))add('w_board_pressure',(s.squad?.board??50)<40?14:7);
@@ -302,13 +312,14 @@ export function buildWorldScene(s){
 /** Aplica los efectos extendidos de una escena del mundo (después de los efectos clásicos). */
 export function applyWorldEffects(s,effect={}){
  let n={...s};
- if(effect.fans||effect.board||effect.captain||effect.loyal||effect.rivalBond){
+ if(effect.fans||effect.board||effect.captain||effect.loyal||effect.rivalBond||effect.rivalDistance){
   const squad={...(n.squad||{})};
   if(effect.fans)squad.fans=clamp((squad.fans??50)+effect.fans,0,100);
   if(effect.board)squad.board=clamp((squad.board??55)+effect.board,0,100);
   if(effect.captain)squad.captain=true;
   if(effect.loyal)squad.loyal=true;
   if(effect.rivalBond&&squad.rival)squad.rival={...squad.rival,bond:true};
+  if(effect.rivalDistance&&squad.rival)squad.rival={...squad.rival,bond:false};
   n.squad=squad;
  }
  if(effect.resolve)n.threads=resolveThread(n,effect.resolve,'resuelta');

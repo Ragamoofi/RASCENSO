@@ -155,18 +155,22 @@ export function nationalSelectionEligibility(state,league,competition='normal'){
  if(!conf)return {eligible:false,reason:'Sin federación'};
  const appearances=league.matches||0,age=state.age||17,history=state.history||[];
  const club=getInauguralLeague(state.clubId);
- const tier=club?.tier??(league.division||null);
+ const currentTier=Number(league.division);
+ const tier=Number.isFinite(currentTier)&&currentTier>0?currentTier:(club?.tier??null);
  const experience=history.filter(h=>(h.matches||0)>=12).length;
  const caps=history.reduce((sum,h)=>sum+(h.nationalCaps||0),0);
  const reputation=state.reputation||0,ovr=state.ovr||50;
  const productivity=Math.min(4,((league.goals||0)+(league.assists||0))/9);
- const score=ovr+productivity+(appearances>=20?2:-4)+choiceFx(state).callup*.4+Math.min(4,reputation/15)
+ const roleBonus=league.role==='Titular'?1:league.role==='Reserva'?-2:0;
+ const previousRating=Number(history.at(-1)?.rating);
+ const formBonus=Number.isFinite(previousRating)?Math.max(-2,Math.min(2,(previousRating-6.7)*3)):0;
+ const score=ovr+productivity+(appearances>=20?2:-4)+choiceFx(state).callup*.4+Math.min(4,reputation/15)+Math.min(2,caps*.1)+roleBonus+formBonus
   -(tier>=2?9:0)-(age<=18?4:0);
  const threshold={UEFA:77,CONMEBOL:75,CAF:73,AFC:72,CONCACAF:72,OFC:69}[conf]||75;
  // Excepciones para promesas extraordinarias son deliberadamente escasas.
- const exceptional=age>=18&&ovr>=83&&reputation>=45&&appearances>=20&&tier!==2;
+ const exceptional=age>=18&&ovr>=83&&reputation>=45&&appearances>=20&&tier!=null&&tier<2;
  const minMinutes=Math.min(12,Math.max(5,Math.round((league.playerMatches?.length||30)*.5)));
- if(appearances<minMinutes&&!exceptional)return {eligible:false,score,reason:'Pocos minutos profesionales'};
+ if((appearances<minMinutes||(Number.isFinite(league.minutes)&&league.minutes<450))&&!exceptional)return {eligible:false,score,reason:'Pocos minutos profesionales'};
  if(age<18)return {eligible:false,score,reason:'Edad de formación'};
  if(experience===0&&tier>=2&&!exceptional)return {eligible:false,score,reason:'Debutante del ascenso'};
  const major=competition==='world-cup'||competition==='regional';
