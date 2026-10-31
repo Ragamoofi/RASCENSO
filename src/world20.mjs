@@ -262,7 +262,7 @@ export function advanceWorld(state,playedLeague,userSeason){
   const club=pickClubNear(S,62+r()*20,r);if(!club)continue;
   const p=makeNPC(state,`${world.seed}:prospect:${year}:${i}`,{age,ovr:clamp(Math.round(56+r()*10+(pot-80)*.2),50,72),pot,kind:'prospect',clubId:club.id});
   world.players.push(p);
-  if(i===0)news(fresh,year,'prospect',`Nace una estrella en ${club.name}`,`${p.name}, ${age} años, ${POSITION_NAMES[p.pos].toLowerCase()} de ${club.name}, ya despierta el interés de los grandes de Europa.`,{playerId:p.id,clubId:club.id});
+  if(i===0)news(fresh,year,'prospect',`Un juvenil se incorpora a ${club.name}`,`${p.name}, ${age} años, ${POSITION_NAMES[p.pos].toLowerCase()}, inicia su carrera en ${club.name}.`,{playerId:p.id,clubId:club.id});
  }
  // La élite se renueva: si faltan figuras de primer nivel, irrumpen futbolistas consagrados en otras ligas.
  const elite=world.players.filter(p=>p.status==='active'&&p.ovr>=84).length;

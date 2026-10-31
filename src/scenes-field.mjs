@@ -265,20 +265,21 @@ const pase_filtrado={
    if(timeUp(m))return m.finish(false,'tiempo',.1);return;}
   if(m.finalizing){return shotFlight(m,m.ball,m.k,dt,{credit:'assist'});}
   stepBall(m.ball,dt);
-  const target=m.receiver;moveToward(target,m.ball.x+m.ball.vx*.25,m.ball.y+m.ball.vy*.25,6.8+m.stats.pass*.5,dt);
+  const target=m.receiver,lead=m.passTarget&&m.ball.x<m.passTarget.x?m.passTarget:{x:m.ball.x+m.ball.vx*.12,y:m.ball.y+m.ball.vy*.12};moveToward(target,lead.x,lead.y,6.8+m.stats.pass*.5,dt);
   for(const d of m.defs){if(m.t-m.passT>m.ai.defReaction+.12)moveToward(d,m.ball.x+m.ball.vx*.15,m.ball.y+m.ball.vy*.15,d.speed*.75,dt);}
   keeperCover(m,m.k,m.ball,dt);
   for(const d of m.defs)if(dist(d,m.ball)<.6&&m.ball.z<1.2&&!m.result){setBanner(m,d.x,d.y);return m.finish(false,'interceptado',.2);}
-  if(dist(m.k,m.ball)<m.k.reach&&!m.result){setBanner(m,m.k.x,m.k.y);return m.finish(false,'atajado',.2);}
-  if(dist(target,m.ball)<.9&&!m.result){const space=Math.min(...m.defs.map(d=>dist(d,target)));setBanner(m,target.x,target.y);receiverShot(m,target,m.quality,space);return;}
+  if(dist(m.k,m.ball)<m.k.reach&&m.ball.z<2.6&&!m.result){setBanner(m,m.k.x,m.k.y);return m.finish(false,'atajado',.2);}
+  if(dist(target,m.ball)<.9&&m.ball.z<1.4&&!m.result){const space=Math.min(...m.defs.map(d=>dist(d,target)));setBanner(m,target.x,target.y);receiverShot(m,target,m.quality,space);return;}
   if((m.ball.x>FIELD.goalX-.3||Math.hypot(m.ball.vx,m.ball.vy)<.4)&&!m.result)return m.finish(false,'atajado',.1);
  },
- down(m){if(m.passed)return;const st=m.stats,tx=m.pointer.wx,ty=m.pointer.wy;
+ down(m,button){if(m.passed)return;const st=m.stats,tx=m.pointer.wx,ty=m.pointer.wy;
   m.receiver=[...m.strikers].sort((a,b)=>Math.hypot(a.x-tx,a.y-ty)-Math.hypot(b.x-tx,b.y-ty))[0];
   const last=Math.max(...m.defs.map(d=>d.x));m.passed=true;m.passT=m.t;
   if(m.receiver.x>last+.15){setBanner(m,m.receiver.x,m.receiver.y);m.say('¡BANDERA ARRIBA!',false);return m.finish(false,'fuera de juego',.1);}
-  const err=st.passNoise*.45;const t={x:tx+m.aimNoise(err),y:ty+m.aimNoise(err)};m.quality=clampN(1-err/2.5,0,1);
-  kick(m.ball,t.x,t.y,17+st.pass*12,0);m.hint='';},
+  const lofted=button==='alt',err=st.passNoise*(lofted?.55:.45);const t={x:tx+m.aimNoise(err),y:ty+m.aimNoise(err)};m.passTarget=t;m.quality=clampN(1-err/2.5,0,1);
+  if(lofted){const duration=clampN(dist(m.me,t)/(17+st.pass*8),.55,1.45);loft(m.ball,t.x,t.y,duration,2+st.pass*.9);m.hint='Pase bombeado: tarda más en caer';}
+  else{kick(m.ball,t.x,t.y,17+st.pass*12,0);m.hint='Pase raso: cuidado con los defensores';}},
  draw(m,g){drawPitch(g);const last=Math.max(...m.defs.map(d=>d.x));drawLine(g,{x:last,y:1},{x:last,y:28},'rgba(232,165,116,.55)',{dash:[8,6],width:2});
   for(const d of m.defs)them(m,d);for(const s of m.strikers)mate(m,s,{ring:s.x>last+.15?'#f0a08c':null});keeper(m,m.k);us(m,m.me,{highlight:true});drawBall(g,m.ball);if(!m.passed)drawAim(g,m,m.me);}
 };

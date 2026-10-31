@@ -31,6 +31,9 @@ Rama de trabajo: `rascenso-4-integral`. Base: `bb85f188cf63e016ba8429b8d24b44d53
 - Amagues: elegir dirección y ejecutarlos cerca del marcador puede desequilibrarlo según atributos y resistencia. El bot de encare pasó de 0/100 a 22/100 en nivel 55 y dificultad alta en la muestra evaluada.
 - Equilibrio pendiente: el bot obtiene tasas extremas en varias jugadas; conoce información interna y no equivale a pruebas humanas. Se agregó una matriz de 100 semillas con dos niveles y dos dificultades.
 
+- Pase filtrado: alternativa bombeada con clic derecho y desmarque hacia el punto elegido; aún requiere calibración y comprobación visual.
+- Mundo: los juveniles generados se anuncian como incorporaciones, sin presentarlos como revelaciones antes de jugar.
+
 ## Pendiente para considerar 4.0 completo
 - Completar la renovación individual de las 20 jugadas; hay cambios iniciales en penal, pases, duelos de banda, achique, salida aérea, despeje y fuera de juego.
 - Rediseño de interfaz y accesibilidad en resoluciones y navegadores.
