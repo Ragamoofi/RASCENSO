@@ -22,6 +22,7 @@ Rama de trabajo: `rascenso-4-integral`. Base: `bb85f188cf63e016ba8429b8d24b44d53
 - Centro, encare, contragolpe y rondo: señal visual del espacio en la línea de pase al apuntar; no garantiza recepción.
 - Mercado temprano: el peso por país evita que la cantidad de clubes extranjeros domine las ofertas; conserva búsqueda internacional. Pruebas iniciales con semillas de Chile, Argentina, Francia y Japón.
 - Auditoría local de 874 clubes: 826 fuentes identificadas, 48 pendientes y cero alias inválidos; falta revisión externa de las fuentes y su vigencia.
+- Mundo: las promesas con partidos y progreso real pueden convertirse en revelaciones y generar noticias una sola vez.
 - Mundo: lesiones reproducibles de futbolistas del mundo reducen partidos y oportunidades de desarrollo, y generan noticias verificables para figuras y rivales.
 - Amagues: elegir dirección y ejecutarlos cerca del marcador puede desequilibrarlo según atributos y resistencia. El bot de encare pasó de 0/100 a 22/100 en nivel 55 y dificultad alta en la muestra evaluada.
 - Equilibrio pendiente: el bot obtiene tasas extremas en varias jugadas; conoce información interna y no equivale a pruebas humanas. Se agregó una matriz de 100 semillas con dos niveles y dos dificultades.

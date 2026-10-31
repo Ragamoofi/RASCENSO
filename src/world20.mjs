@@ -142,6 +142,8 @@ function news(list,year,kind,title,text,extra={}){list.push({year,kind,title,tex
 const KIND_ICON={champion:'🏆',promotion:'▲',relegation:'▼',coach:'♟',transfer:'⇄',retire:'☾',injury:'✚',award:'★',crisis:'⚠',investment:'€',prospect:'✦',record:'◆',you:'●',rival:'⚔'};
 export const newsIcon=k=>KIND_ICON[k]||'◎';
 
+/** Revelación basada en una temporada efectivamente disputada, una vez por futbolista. */
+export function isBreakoutSeason(player,previousOvr,apps){return !player.breakoutYear&&player.age<=23&&apps>=18&&player.ovr-previousOvr>=3;}
 /** Lesiones reproducibles e independientes de otras tiradas de la temporada. */
 export function npcInjury(seed,age){
  const r=rng(seed),risk=clamp(.08+Math.max(0,age-29)*.009,.08,.20);
@@ -232,7 +234,12 @@ export function advanceWorld(state,playedLeague,userSeason){
   if(p.age>=dAge)delta-=(.6+(p.age-dAge)*.7)*(.6+pr()*.8);
   // Algunas promesas se estancan: el talento no garantiza nada.
   if(p.age<=21&&participation<.25&&pr()<.35)p.pot=Math.max(p.ovr,p.pot-2);
-  p.ovr=clamp(Math.round(p.ovr+delta),40,95);p.peak=Math.max(p.peak||0,p.ovr);p.age++;
+  const beforeOvr=p.ovr;p.ovr=clamp(Math.round(p.ovr+delta),40,95);p.peak=Math.max(p.peak||0,p.ovr);
+  if(isBreakoutSeason(p,beforeOvr,apps)){
+   p.breakoutYear=year;
+   if(p.rival||p.kind==='gen'||p.clubId===state.clubId)news(fresh,year,'prospect',`${p.name} da un salto en ${club?.name||'su club'}`,`${apps} partidos de liga y una evolución de ${beforeOvr} a ${p.ovr} de media. La promesa empieza a hacerse un lugar.`,{playerId:p.id,clubId:p.clubId,rival:!!p.rival,mine:p.clubId===state.clubId});
+  }
+  p.age++;
   // Retiro
   const retireP=p.age>=40?1:p.age>=34?clamp((p.age-33)*.16+(p.ovr<72?.2:0),0,.95):0;
   if(pr()<retireP){p.status='retired';p.retired=year;

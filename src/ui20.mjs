@@ -102,7 +102,7 @@ export function worldView(s,legacy=''){
  const lastAw=s.world?.awards?.at(-1);
  const rival=worldRival(s);
  const gen=generationPlayers(s);const top=topPlayers(s,10);const power=powerRanking(s,10);const rising=risingClubs(s,6);
- const playerRow=(p,i)=>`<div class="v2-player-row ${p.rival?'rival':''}"><b>${i+1}</b>${flag(p.cc)}<span><strong>${h(p.name)}${p.rival?' <em>RIVAL</em>':''}</strong><small>${h(POSITION_NAMES[p.pos])} · ${p.age} años · ${h(clubName(p.clubId))}${p.lastInjury?.weeks?` · lesión ${p.lastInjury.weeks} sem.`:''}</small></span><i class="tier-${tierOf(p.ovr)}">${p.ovr}</i></div>`;
+ const playerRow=(p,i)=>`<div class="v2-player-row ${p.rival?'rival':''}"><b>${i+1}</b>${flag(p.cc)}<span><strong>${h(p.name)}${p.rival?' <em>RIVAL</em>':''}${p.breakoutYear===s.world?.year?' <em>REVELACIÓN</em>':''}</strong><small>${h(POSITION_NAMES[p.pos])} · ${p.age} años · ${h(clubName(p.clubId))}${p.lastInjury?.weeks?` · lesión ${p.lastInjury.weeks} sem.`:''}</small></span><i class="tier-${tierOf(p.ovr)}">${p.ovr}</i></div>`;
  return `<section class="focus-card v2-world"><div class="section-label">EL MUNDO DEL FÚTBOL · ${s.world?.year?`ACTUALIZADO A ${s.world.year}`:'TEMPORADA INAUGURAL'}</div><h2>Un mundo que no te espera.</h2><p class="muted">Clubes que suben y se hunden, entrenadores despedidos, promesas que explotan y figuras que se retiran. Todos los futbolistas y técnicos generados son ficticios.</p>
  <div class="v2-world-grid">
   <section class="v2-panel v2-feed"><header><span>NOTICIAS</span><b>${news.length}</b></header><div class="v2-news">${news.slice(0,24).map(newsItem).join('')||'<p class="muted">Las noticias aparecerán al terminar tu primera temporada.</p>'}</div></section>

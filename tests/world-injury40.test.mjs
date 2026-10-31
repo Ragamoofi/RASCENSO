@@ -15,3 +15,7 @@ test('las lesiones registradas corresponden a temporadas simuladas y noticias ve
   const p=after.world.players.find(p=>p.id===n.playerId);assert.ok(p);assert.ok(p.seasons.some(x=>x.year===year&&x.injuryWeeks>=8));
  }
 });
+test('las revelaciones requieren partidos y progreso real y no se repiten',async()=>{
+ const {isBreakoutSeason}=await import('../src/world20.mjs');const p={age:20,ovr:74};
+ assert.equal(isBreakoutSeason(p,70,25),true);assert.equal(isBreakoutSeason(p,72,25),false);assert.equal(isBreakoutSeason(p,70,5),false);assert.equal(isBreakoutSeason({...p,breakoutYear:2026},70,25),false);
+});
