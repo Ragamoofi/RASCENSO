@@ -3,6 +3,7 @@
 Rama de trabajo: `rascenso-4-integral`. Base: `bb85f188cf63e016ba8429b8d24b44d5320cfd00`.
 
 ## Avance
+- Despeje: el balón se sigue físicamente hasta salir del área, ser interceptado o llegar al arco; se retiró el resultado aleatorio instantáneo.
 - Achique: movimiento manual y estirada tras el remate; el duelo a los pies usa posición y reflejos. Pendiente de probar equilibrio humano.
 - Arquero frontal: silueta articulada con camiseta, pantalón, guantes y botas; falta inspección visual de esta versión.
 - Penal: remate potente o colocado, con diferencias en precisión y velocidad; desvío animado de las atajadas con indicación de guantes o cuerpo. Pruebas unitarias iniciales.

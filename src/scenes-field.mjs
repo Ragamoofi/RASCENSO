@@ -73,7 +73,7 @@ function receiverShot(m,receiver,quality,space){
  const error=(1-clampN(quality,0,1))*1.6+clampN(2-space,0,2)*.5+m.ai.d*.3;
  const target=FIELD.goalY+side*2.1+m.aimNoise(error);
  kick(m.ball,FIELD.goalX+.5,target,21+quality*5,Math.max(0,.4+m.rand()*.8));
- m.shotAt=m.t;m.finalizing=true;m.say('¡DEFINE EL COMPAÑERO!',null);
+ m.shotAt=m.t;m.finalizing=true;m.hint='¡Tu compañero define!';
 }
 /** El compañero define un pase: calidad del pase y espacio libre frente al arquero (determinista por semilla). */
 function teammateFinish(m,quality,space){
@@ -385,16 +385,22 @@ const despeje={
  init(m){m.timer=4.5;setupCross(m,{landing:{x:rnd(m,42,48),y:rnd(m,11,18)},time:rnd(m,1.3,1.55),from:[40,27.5]});m.st=makePlayer(m.landing.x-6.5,m.landing.y+rnd(m,-2.5,2.5),{num:'9',speed:m.ai.defSpeed*.88});
   m.me=makePlayer(m.landing.x+2.2,clampN(m.landing.y+rnd(m,-2,2),9,20),{num:'4',team:'us'});m.k=makePlayer(51.2,14.5,{num:'1',r:.5});m.cleared=false;m.hint='Ve a la sombra · clic para despejar hacia el puntero (lejos del arco)';},
  update(m,dt){
-  if(m.cleared){stepBall(m.ball,dt);return;}
+  if(m.cleared){const previous={x:m.ball.x,y:m.ball.y,z:m.ball.z};stepBall(m.ball,dt);
+   if(m.t-m.clearAt>.18)moveToward(m.st,m.ball.x,m.ball.y,m.st.speed*.8,dt);
+   if(dist(m.st,m.ball)<.8&&m.ball.z<1.6&&!m.result){setBanner(m,m.st.x,m.st.y);return m.finish(false,'superado',.15);}
+   if(m.ball.x>=FIELD.goalX&&!m.result){setBanner(m,m.ball.x,m.ball.y);
+    if(sweptKeeperContact(previous,m.ball,m.k,1.05))return m.finish(true,'atajada',.4);
+    return inGoalMouth(m.ball.y,m.ball.z)?m.finish(false,'gol rival',.1):m.finish(true,'fuera',.45);}
+   if((m.ball.x<FIELD.boxX-2||m.ball.y<0||m.ball.y>FIELD.wid||m.t-m.clearAt>2.5)&&!m.result){setBanner(m,m.ball.x,m.ball.y);return m.finish(true,'despeje',.5+m.stats.jump*.35);}return;}
   stepBall(m.ball,dt);m.steer(m.me,m.stats.sprint,dt);if(m.t>m.ai.defReaction*.6)moveToward(m.st,m.landing.x,m.landing.y,m.st.speed,dt);
   if(dist(m.st,m.ball)<.9&&m.ball.z<2.6&&m.ball.z>.3&&dist(m.st,m.ball)<dist(m.me,m.ball)&&!m.result){setBanner(m,m.st.x,m.st.y);return m.finish(false,'gol rival',.1);}
   if(m.ball.z<=0&&m.t>.3&&!m.result){setBanner(m,m.ball.x,m.ball.y);return m.finish(dist(m.me,m.ball)<dist(m.st,m.ball),dist(m.me,m.ball)<dist(m.st,m.ball)?'controlada':'gol rival',.3);}
  },
  down(m){if(m.cleared)return;const d=dist(m.me,m.ball),top=2.3+m.stats.jump*.9;
   if(d>1.6||m.ball.z>top+.4||m.ball.z<.3){m.say('¡A DESTIEMPO!',false);m.me.stun=.4;return;}
-  m.cleared=true;const tx=m.pointer.wx,ty=m.pointer.wy;const toward=tx>m.me.x+1&&Math.abs(ty-FIELD.goalY)<6;kick(m.ball,tx,ty,14+m.stats.jump*8,4);setBanner(m,m.me.x,m.me.y);
-  if(toward)return m.finish(false,'gol rival',.1);
-  const p=clampN(.58+m.stats.jump*.3-m.ai.d*.25,.25,.93);return m.rand()<p?m.finish(true,'despeje',.5+m.stats.jump*.4):(m.say('DESPEJE CORTO',false),m.finish(false,'gol rival',.15));},
+  m.cleared=true;m.clearAt=m.t;const tx=m.pointer.wx,ty=m.pointer.wy;
+  const err=(1-m.stats.defense)*1.2+m.stats.fatigue*.5;
+  kick(m.ball,tx+m.aimNoise(err),ty+m.aimNoise(err),14+m.stats.jump*8,4);setBanner(m,m.me.x,m.me.y);m.hint='El balón sigue en juego';},
  draw(m,g){drawPitch(g);drawRing(g,m.landing.x,m.landing.y,.5,'rgba(255,255,255,.18)',{dash:[3,4]});keeper(m,m.k,true);them(m,m.st);us(m,m.me,{highlight:true});drawBall(g,m.ball);if(!m.cleared)drawAim(g,m,m.me);}
 };
 
@@ -439,7 +445,7 @@ const achique={
  },
  down(m){if(m.me.stun>0||m.me.diveTime>0||m.result)return;
   if(m.ball.owner!==m.st){if(m.t-(m.me.lastDive??-9)<.65)return;m.me.lastDive=m.t;m.me.diveTime=.35;
-   m.me.diveTarget={x:clampN(m.pointer.wx,43.5,51.8),y:clampN(m.pointer.wy,8,21)};m.say('¡ESTIRADA!',null);return;}
+   m.me.diveTarget={x:clampN(m.pointer.wx,43.5,51.8),y:clampN(m.pointer.wy,8,21)};m.hint='¡Estirada!';return;}
   const d=dist(m.me,m.st),reach=2.1+m.stats.reflex*.5;
   // Distancia, reflejos y habilidad del delantero determinan el achique.
   if(d<reach){const score=(1-d/reach)*.65+m.stats.reflex*.35-m.ai.shooterSkill*.15;setBanner(m,m.me.x,m.me.y);if(score>=.20)return m.finish(true,'atajada',clampN(.5+score*.5,0,1));m.me.stun=.8;m.rounded=true;m.say('TE ESQUIVÓ',false);return;}
