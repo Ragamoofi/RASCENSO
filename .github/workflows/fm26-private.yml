@@ -24,7 +24,7 @@ jobs:
           node --check src/world20.mjs
           node --check src/ui20.mjs
           node --check src/experience.mjs
-          node --test tests/fm26-real.test.mjs
+          node --test tests/fm26-*.test.mjs
       - name: No publicar datos FM26 importados
         run: |
           test ! -d assets/data/fm26
