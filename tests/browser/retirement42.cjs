@@ -61,7 +61,7 @@ const {chromium}=require('playwright');
    localStorage.setItem('rascenso-save-v2',JSON.stringify(s));
   });
   await p.reload();
-  await p.locator('[data-action=nav][data-tab=historial]').click();
+  await p.locator('.main-nav [data-action=nav][data-tab=historial]').click();
   await p.locator('.history-row').first().waitFor();
   if(await p.locator('.history-mini-cup').count()<1)throw Error('Historial sin trofeos junto al club');
   if(await p.locator('.history .v2-panel:has-text("POR CLUB")').count())throw Error('El listado por club sigue duplicado');
