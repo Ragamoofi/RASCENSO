@@ -81,6 +81,7 @@ export function transferFM26(state,id,toClub,year){
  return {...state,fm26:{...(state.fm26||{}),schema:1,changes:{...ownFM26Delta(state),[id]:change}}};
 }
 export function advanceFM26Season(state,year){
+ if(year<2026)return state;
  const changes={...ownFM26Delta(state)},events=[];
  for(const base of byId.values()){
   const prior=applyDelta(base,{fm26:{changes}});
