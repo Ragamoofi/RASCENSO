@@ -41,10 +41,17 @@ LOGOS={
 CUPS={
  'libertadores':'Conmebol Copa Libertadores Trophy45013.png',
  'sudamericana':'CopaSulamericana2002-.png',
- 'recopa':'Taça Recopa Sulamericana.jpg',
+ 'recopa':'Trofeo de la Conmebol Recopa.png',
  'copaamerica':'Copa América de Fútbol.png',
  'champions':'UEFA Champions LeagueTrophy7612.png',
- 'worldcup':'FIFA World Cup Trophy photo by Djuradj Vujcic.jpg'
+ 'worldcup':'FIFA World Cup.png',
+ 'premier':'Premier league trophy icon (adjusted).png',
+ 'eredivisie':'Eredivisie Trophy.png',
+ 'copadelrey':'Copa del Rey Trophy.png',
+ 'copachile':'Copa Chile (transparente).png',
+ 'brasileirao':'BrasileiraoA2014-.png',
+ 'afcchampions':'AFC Champions League Trophy.png',
+ 'cafchampions':'ChampionsLeague.png'
 }
 USER_AGENT='RASCENSO-MediaBot/1.8.2 (https://github.com/Ragamoofi/RASCENSO; Wikimedia-licensed photo credits) Python-urllib/3'
 FAILURES={}
