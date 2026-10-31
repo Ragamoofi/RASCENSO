@@ -31,7 +31,7 @@ test('el homenaje tiene portada, curva de progresión, trofeos, premios y accion
  assert.match(html,/data-action="share-png"/);
  assert.match(html,/data-action="export"/);
  assert.match(html,/data-tab="historial"/);
- assert.match(html,/2 veces/);
+ assert.match(html,/2 títulos/);
  assert.match(html,/EL ÚLTIMO/);
  assert.doesNotMatch(html,/<PEPE>|<Rival>/);
  assert.match(html,/&lt;PEPE&gt;/);
