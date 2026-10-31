@@ -24,7 +24,7 @@ test('el retiro reúne estadísticas, años, clubes y palmarés sin duplicar tí
 });
 test('el homenaje tiene portada, curva de progresión, trofeos, premios y acciones',()=>{
  const html=retirementView(fixture,deps);
- for(const term of ['UNA CARRERA.','UNA LEYENDA.','La sala de trofeos','Evolución','tu talento','Mejor jugador','Compartir']) {
+ for(const term of ['UNA CARRERA.','UNA LEYENDA.','La sala de trofeos','evolución','tu talento','Mejor jugador','Compartir']) {
   if(term==='Compartir')continue;
   assert.ok(html.includes(term),term);
  }
