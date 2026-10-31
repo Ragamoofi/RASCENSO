@@ -66,5 +66,11 @@ window.runSmart=(type,{level=75,difficulty=.5,seed='smart'}={})=>{
  let t=0;try{while(t<30&&!m.result){const dt=1/60;t+=dt;SMART[type](m,m.t,S);m.tick(dt);}}catch(e){return {type,error:String(e.stack||e)};}
  return {type,success:!!m.result?.success,detail:m.result?.detail};
 };
+window.startInteractive=(type)=>{
+ window.activeMatch?.destroy();
+ const play={id:'manual',type,kind:PLAYS[type].kind,credit:PLAYS[type].credit,minute:70,before:{gf:1,ga:1},pressure:40,fatigue:.1,difficulty:.5,seed:'interactive',rival:'Rival',isHome:true,memory:[]};
+ const stats=playerStats({attributes:attrs(75),morale:70},play);
+ window.activeMatch=createMatch(canvas,{play,stats,ai:aiStats(play),scene:SCENES[type],hud:{title:PLAYS[type].name,brief:PLAYS[type].brief,controls:PLAYS[type].controls}});
+};
 window.ready=true;
 </script></body></html>

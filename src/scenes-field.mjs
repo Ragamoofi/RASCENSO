@@ -32,15 +32,18 @@ function shoot(m,ball,from,ty,{noise=1,speed=null,lift=null,curl=0}={}){
 }
 /** Avanza un remate en vuelo: reacción y estirada del arquero, palo, gol o fuera. */
 function shotFlight(m,ball,k,dt,{reaction=0,credit=null}={}){
+ const previous={x:ball.x,y:ball.y,z:ball.z};
  stepBall(ball,dt);
  const cross=goalCrossing(ball);
  // Estirada: el arquero se lanza hacia la línea del remate (no hacia el arco), con alcance limitado.
  if(k&&m.t-m.shotAt>m.ai.keeperReaction+reaction&&cross){if(!k.diving){const t=Math.max(.05,(k.x-ball.x)/Math.max(1,ball.vx));k.diveTo={x:k.x,y:ball.y+ball.vy*t};}moveToward(k,k.diveTo.x,k.diveTo.y,k.speed*1.15,dt);k.diving=true;}
- if(k&&dist(ball,k)<k.reach*(k.diving?1.15:.85)&&ball.z<2.4&&!m.result){ball.vx*=-.35;ball.vy=(m.rand()-.5)*12;ball.vz=3;setBanner(m,k.x,k.y);return m.finish(false,'atajado',.2);}
+ if(k&&segDist(k,previous,ball)<k.reach*(k.diving?1.15:.85)&&Math.min(previous.z,ball.z)<2.4&&!m.result){ball.vx*=-.35;ball.vy=(m.rand()-.5)*12;ball.vz=3;setBanner(m,k.x,k.y);return m.finish(false,'atajado',.2);}
  if(ball.x>=FIELD.goalX&&!m.result){
-  const dy=Math.abs(ball.y-FIELD.goalY);setBanner(m,ball.x,ball.y);
-  if(inGoalMouth(ball.y,ball.z)){const margin=k?clampN((dist(ball,k)-k.reach)/3,0,1):1;ball.vx=1;ball.vy=0;return m.finish(true,'gol',.5+margin*.5,credit?{credit}:{});}
-  if(ball.z>=FIELD.bar-.05&&ball.z<FIELD.bar+.3&&dy<FIELD.post)return m.finish(false,'travesaño',.3);
+  const fraction=clampN((FIELD.goalX-previous.x)/(ball.x-previous.x||1),0,1);
+  const crossingY=previous.y+(ball.y-previous.y)*fraction,crossingZ=previous.z+(ball.z-previous.z)*fraction;
+  const dy=Math.abs(crossingY-FIELD.goalY);setBanner(m,FIELD.goalX,crossingY);
+  if(inGoalMouth(crossingY,crossingZ)){const margin=k?clampN((dist(ball,k)-k.reach)/3,0,1):1;ball.vx=1;ball.vy=0;return m.finish(true,'gol',.5+margin*.5,credit?{credit}:{});}
+  if(crossingZ>=FIELD.bar-.05&&crossingZ<FIELD.bar+.3&&dy<FIELD.post)return m.finish(false,'travesaño',.3);
   if(Math.abs(dy-FIELD.post)<.3)return m.finish(false,'poste',.35);
   return m.finish(false,'fuera',.1);
  }
@@ -65,7 +68,7 @@ const mano_a_mano={
    keeperCover(m,m.k,m.me,dt);
    if(dist(m.def,m.me)<.85&&!m.result){m.ball.owner=m.def;setBanner(m,m.me.x,m.me.y);return m.finish(false,'bloqueado',.2);}
    // El arquero se lanza a los pies si llega: el control y la gambeta pueden evitarlo.
-   if(dist(m.k,m.me)<1.25&&m.me.x<m.k.x+.2&&!m.result){const dodge=m.stats.control*.6+m.stats.skills*.3-m.ai.d*.35;if(m.rand()>clampN(dodge,.1,.85)){setBanner(m,m.k.x,m.k.y);return m.finish(false,'atajado',.2);}m.k.stun=.9;m.say('¡LO GAMBETEÓ!',true);}
+   if(m.k.stun<=0&&dist(m.k,m.me)<1.25&&m.me.x<m.k.x+.2&&!m.result){const dodge=m.stats.control*.6+m.stats.skills*.3-m.ai.d*.35;if(m.rand()>clampN(dodge,.1,.85)){setBanner(m,m.k.x,m.k.y);return m.finish(false,'atajado',.2);}m.k.stun=.9;m.say('¡LO GAMBETEÓ!',true);}
    if(timeUp(m))return m.finish(false,'tiempo',.1);
   }else shotFlight(m,m.ball,m.k,dt);
  },
@@ -171,7 +174,7 @@ const centro={
   moveRunners(m,m.run,dt);
   if(m.ball.owner===m.me){moveToward(m.me,m.me.x+3,m.me.y,m.stats.sprint*.9,dt);moveToward(m.fb,m.me.x+.4,m.me.y+1.2,m.fb.speed,dt);m.k.y+=(FIELD.goalY-2-m.k.y)*dt;
    if(m.me.x>49.5&&!m.result)return m.finish(false,'perdida',.1);
-   if(dist(m.fb,m.me)<.8&&m.t>1.2&&!m.result&&m.rand()<.02+m.ai.d*.03)return m.finish(false,'bloqueado',.15);}
+   if(dist(m.fb,m.me)<.8&&m.t>1.2&&!m.result&&m.rand()<1-Math.exp(-(.9+m.ai.d*1.4)*dt))return m.finish(false,'bloqueado',.15);}
   else{stepBall(m.ball,dt);moveToward(m.k,clampN(m.target.x,FIELD.sixX,G.x-.5),clampN(m.target.y,FIELD.goalY-4,FIELD.goalY+4),m.k.speed*.8,dt);
    for(const {t,d} of m.run){moveToward(t,m.target.x,m.target.y,6.2,dt);moveToward(d,m.target.x,m.target.y,d.speed*.95,dt);}
    if(m.t>=m.arrive&&!m.result)crossArrival(m,m.run,m.k,m.target,m.quality);}

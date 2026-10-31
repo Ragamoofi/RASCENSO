@@ -8,46 +8,59 @@ const POST=3.66,BAR=2.44;
 const rc=m=>m._rc||(m._rc=rivalColor(m.play.rivalId||m.play.rival));
 
 function stadium(g,t){
- const sky=g.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#0a1730');sky.addColorStop(.42,'#13284a');sky.addColorStop(.43,'#1d5a3a');sky.addColorStop(1,'#123d27');g.fillStyle=sky;g.fillRect(0,0,W,H);
- // tribuna con público
- for(let row=0;row<7;row++)for(let i=0;i<64;i++){const x=i*15+(row%2)*7,y=60+row*17;const h=((i*928371+row*1237)%97)/97;g.fillStyle=h>.86?'rgba(232,165,116,.55)':h>.6?'rgba(160,190,230,.32)':'rgba(255,255,255,.12)';g.fillRect(x,y+Math.sin(t*3+i)*1.2,6,8);}
- // focos
- for(const x of [90,W-90]){const lg=g.createRadialGradient(x,30,4,x,30,120);lg.addColorStop(0,'rgba(255,250,230,.55)');lg.addColorStop(1,'rgba(255,250,230,0)');g.fillStyle=lg;g.fillRect(x-130,0,260,160);}
- // franjas de césped en perspectiva
- for(let i=0;i<8;i++){g.fillStyle=i%2?'rgba(255,255,255,.035)':'rgba(0,0,0,.05)';const y0=232+i*i*5.4,y1=232+(i+1)*(i+1)*5.4;g.fillRect(0,y0,W,y1-y0);}
- // área en perspectiva
- g.strokeStyle='rgba(255,255,255,.75)';g.lineWidth=2;g.beginPath();g.moveTo(40,GY);g.lineTo(W-40,GY);g.stroke();
- g.beginPath();g.moveTo(CX-330,GY);g.lineTo(CX-430,H);g.moveTo(CX+330,GY);g.lineTo(CX+430,H);g.stroke();
+ const sky=g.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#091628');sky.addColorStop(.42,'#1c3146');sky.addColorStop(.43,'#276346');sky.addColorStop(1,'#173e2c');g.fillStyle=sky;g.fillRect(0,0,W,H);
+ // Tribunas, gradas y público: el patrón es estable para evitar parpadeos.
+ for(let row=0;row<8;row++){
+  const y=35+row*19;g.fillStyle=row%2?'#17283c':'#203247';g.fillRect(0,y,W,18);
+  for(let i=0;i<80;i++){const x=i*12+(row%2)*6,h=((i*928371+row*1237)%97)/97;
+   g.fillStyle=h>.91?'#d9a077':h>.72?'#8ea6b3':h>.42?'#40586b':'#263a4b';
+   g.beginPath();g.arc(x+4,y+5,2.4,0,Math.PI*2);g.fill();g.fillRect(x+1,y+8,6,7);
+  }
+ }
+ g.fillStyle='#0c1c2c';g.fillRect(0,188,W,38);g.fillStyle='#c69268';g.fillRect(0,187,W,2);
+ g.textAlign='center';g.textBaseline='middle';g.font='800 12px Arial';
+ for(let i=0;i<6;i++){g.fillStyle=i%2?'#ac7a56':'#83abc2';g.fillText(i%2?'RASCENSO  ·  CARRERA':'EL FÚTBOL ES TUYO',80+i*160,207);}
+ for(const x of [90,W-90]){const lg=g.createRadialGradient(x,20,2,x,20,150);lg.addColorStop(0,'rgba(255,248,220,.6)');lg.addColorStop(1,'rgba(255,248,220,0)');g.fillStyle=lg;g.fillRect(x-150,0,300,190);}
+ const turf=g.createLinearGradient(0,226,0,H);turf.addColorStop(0,'#38704b');turf.addColorStop(1,'#17452c');g.fillStyle=turf;g.fillRect(0,226,W,H-226);
+ for(let i=0;i<8;i++){g.fillStyle=i%2?'rgba(218,244,197,.035)':'rgba(0,0,0,.045)';const y0=226+i*i*5.4,y1=226+(i+1)*(i+1)*5.4;g.fillRect(0,y0,W,y1-y0);}
+ // Vetas discretas de césped, sin depender del azar del partido.
+ g.strokeStyle='rgba(196,230,174,.10)';g.lineWidth=1;g.beginPath();for(let i=0;i<180;i++){const x=(i*137)%W,y=235+(i*71)%(H-235);g.moveTo(x,y);g.lineTo(x+2,y-2);}g.stroke();
+ g.strokeStyle='rgba(255,255,255,.68)';g.lineWidth=2;g.beginPath();g.moveTo(40,GY);g.lineTo(W-40,GY);g.moveTo(CX-330,GY);g.lineTo(CX-430,H);g.moveTo(CX+330,GY);g.lineTo(CX+430,H);g.stroke();
+ void t;
 }
 function goalFrame(g,shake=0){
- const [l,t]=gs(-POST,BAR),[r]=gs(POST,0);
- g.fillStyle='rgba(255,255,255,.06)';g.fillRect(l,t,r-l,GY-t);
- g.strokeStyle='rgba(255,255,255,.28)';g.lineWidth=1;
- for(let x=l;x<=r;x+=18){g.beginPath();g.moveTo(x+Math.sin(x)*shake,t);g.lineTo(x,GY);g.stroke();}
- for(let y=t;y<=GY;y+=16){g.beginPath();g.moveTo(l,y);g.lineTo(r,y+Math.cos(y)*shake);g.stroke();}
- g.strokeStyle='#fff';g.lineWidth=8;g.lineCap='round';g.beginPath();g.moveTo(l,GY);g.lineTo(l,t);g.lineTo(r,t);g.lineTo(r,GY);g.stroke();g.lineCap='butt';
+ const [l,t]=gs(-POST,BAR),[r]=gs(POST,0),depth=25;
+ // Red con profundidad y postes iluminados.
+ g.fillStyle='rgba(7,22,27,.18)';g.beginPath();g.moveTo(l,t);g.lineTo(l+depth,t+16);g.lineTo(r-depth,t+16);g.lineTo(r,t);g.lineTo(r,GY);g.lineTo(l,GY);g.closePath();g.fill();
+ g.strokeStyle='rgba(234,245,239,.23)';g.lineWidth=1;
+ for(let x=l;x<=r;x+=18){g.beginPath();g.moveTo(x+Math.sin(x)*shake,t);g.lineTo(lerp(x,CX,.075),GY-10);g.stroke();}
+ for(let y=t;y<=GY;y+=15){g.beginPath();g.moveTo(l,y);g.quadraticCurveTo(CX,y+7+Math.cos(y)*shake,r,y);g.stroke();}
+ g.strokeStyle='rgba(0,0,0,.25)';g.lineWidth=12;g.lineCap='round';g.beginPath();g.moveTo(l+3,GY+3);g.lineTo(l+3,t+3);g.lineTo(r+3,t+3);g.lineTo(r+3,GY+3);g.stroke();
+ g.strokeStyle='#e8f0e9';g.lineWidth=8;g.beginPath();g.moveTo(l,GY);g.lineTo(l,t);g.lineTo(r,t);g.lineTo(r,GY);g.stroke();g.strokeStyle='rgba(255,255,255,.8)';g.lineWidth=2;g.beginPath();g.moveTo(l-2,GY);g.lineTo(l-2,t-2);g.lineTo(r,t-2);g.stroke();g.lineCap='butt';
 }
-/** Arquero: centro (kx), estirada hacia (dx,dz) con progreso p. */
+/** Geometría compartida por el dibujo y la colisión en la línea de gol. */
+export function keeperPose(k){
+ const p=clampN(k.p||0,0,1),hx=lerp(k.x,k.dx??k.x,p),hz=lerp(1.25,k.dz??1.25,p);
+ return {hx,hz,bx:lerp(k.x,hx,.55),bz:lerp(.95,Math.max(.35,hz*.75),p),p};
+}
 function drawKeeper(g,k,color,dark){
- const p=k.p||0,hx=lerp(k.x,k.dx??k.x,p),hz=lerp(1.25,k.dz??1.25,p);
- const [bx,by]=gs(lerp(k.x,hx,.45),lerp(.95,Math.max(.45,hz*.7),p));
- const ang=Math.atan2(-(hz-1.25),hx-k.x)*p;
- g.save();g.translate(bx,by);g.rotate(p?(hx<k.x?-1:1)*Math.min(1.3,Math.abs(hx-k.x)/2.2)*p:0);
- g.fillStyle='rgba(0,0,0,.3)';g.beginPath();g.ellipse(0,0.9*PX+(1-p)*4,30,7,0,0,7);g.fill();
- g.fillStyle=dark;roundRect(g,-15,-30,30,62,10);g.fill();g.fillStyle=color;roundRect(g,-13,-28,26,40,9);g.fill();
- g.fillStyle='#f2d2b6';g.beginPath();g.arc(0,-42,11,0,7);g.fill();
- g.strokeStyle=color;g.lineWidth=9;g.lineCap='round';g.beginPath();g.moveTo(-12,-20);g.lineTo(-30-p*18,-44-p*6);g.moveTo(12,-20);g.lineTo(30+p*18,-44-p*6);g.stroke();
- g.fillStyle='#fff';g.beginPath();g.arc(-30-p*18,-46-p*6,6,0,7);g.arc(30+p*18,-46-p*6,6,0,7);g.fill();
- g.strokeStyle=dark;g.lineWidth=9;g.beginPath();g.moveTo(-7,30);g.lineTo(-10,58);g.moveTo(7,30);g.lineTo(10,58);g.stroke();g.lineCap='butt';
- g.restore();void ang;
+ const {hx,hz,bx,bz,p}=keeperPose(k), [x,y]=gs(bx,bz), [handX,handY]=gs(hx,hz);
+ const dir=Math.sign(hx-k.x)||1;
+ g.fillStyle='rgba(0,0,0,.28)';g.beginPath();g.ellipse(x,GY+4,27+20*p,7,0,0,Math.PI*2);g.fill();
+ // El guante adelantado está exactamente en el centro usado por la colisión.
+ g.strokeStyle=dark;g.lineWidth=11;g.lineCap='round';g.beginPath();g.moveTo(x-7,y+16);g.lineTo(x-15-dir*p*30,y+48);g.moveTo(x+7,y+16);g.lineTo(x+14-dir*p*20,y+48);g.stroke();
+ g.strokeStyle=color;g.lineWidth=26;g.beginPath();g.moveTo(x,y+12);g.lineTo(x-dir*p*14,y-20);g.stroke();
+ g.fillStyle='#f2d2b6';g.beginPath();g.arc(x-dir*p*18,y-32,11,0,Math.PI*2);g.fill();
+ g.strokeStyle=color;g.lineWidth=9;g.beginPath();g.moveTo(x,y-12);g.lineTo(handX,handY);g.moveTo(x,y-12);g.lineTo(x-dir*(25+p*15),y-30);g.stroke();
+ g.fillStyle='#fff';g.beginPath();g.arc(handX,handY,8,0,Math.PI*2);g.arc(x-dir*(25+p*15),y-30,6,0,Math.PI*2);g.fill();g.lineCap='butt';
 }
-/** ¿Cubre el arquero el punto (gx,gz)? Manos según la estirada + cuerpo. */
-function covers(k,gx,gz,extra=0){
- const p=k.p||0,hx=lerp(k.x,k.dx??k.x,p),hz=lerp(1.25,k.dz??1.25,p);
- const hand=Math.hypot(gx-hx,gz-hz)<.55+extra;
- const body=Math.abs(gx-lerp(k.x,hx,.5))<.38+extra*.5&&gz<1.95;
+export function keeperCovers(k,gx,gz,extra=0){
+ const {hx,hz,bx,bz}=keeperPose(k);
+ const hand=Math.hypot(gx-hx,gz-hz)<.48+extra;
+ const body=Math.hypot((gx-bx)/.42,(gz-bz)/.75)<1+extra;
  return hand||body;
 }
+const covers=keeperCovers;
 function startDive(k,gx,gz,reach){const dx=gx-k.x,dz=gz-1.25,d=Math.hypot(dx,dz);const s=d>reach?reach/d:1;k.dx=k.x+dx*s;k.dz=clampN(1.25+dz*s,.15,2.6);k.diveT=0;k.diving=true;}
 function stepDive(k,dt,time=.34){if(k.diving){k.diveT+=dt;k.p=clampN(k.diveT/time,0,1);}}
 function drawBallAt(g,x,y,r){g.fillStyle='rgba(0,0,0,.3)';g.beginPath();g.ellipse(x+3,y+r*.9,r,r*.35,0,0,7);g.fill();g.fillStyle='#fbfbf6';g.beginPath();g.arc(x,y,r,0,7);g.fill();g.fillStyle='#1a1a1a';g.beginPath();g.arc(x+r*.25,y-r*.2,r*.33,0,7);g.fill();g.strokeStyle='rgba(0,0,0,.35)';g.lineWidth=1;g.beginPath();g.arc(x,y,r,0,7);g.stroke();}
@@ -72,18 +85,25 @@ const penal={
  power(m){if(m.charge==null)return 0;const e=(m.t-m.charge)/1.15;const ph=e%2;return ph<1?ph:2-ph;},
  update(m,dt){
   if(!m.ball){m.k.x=Math.sin(m.t*1.6)*.35;return;}
-  const b=m.ball;b.t+=dt;stepDive(m.k,dt);
-  if(!m.k.diving&&b.t>=m.ai.keeperReaction*.35){const guess=m.keeperGuess;startDive(m.k,guess[0],guess[1],m.ai.keeperReach+1.35);}
-  if(b.t>=b.T&&!m.result)arrive(m,b.gx,b.gz,m.k);
+  const b=m.ball;b.t+=dt;
+  if(!m.k.diving&&b.t>=m.keeperDelay){const guess=m.keeperGuess;startDive(m.k,guess[0],guess[1],m.ai.keeperReach+1.55);}
+  stepDive(m.k,dt,clampN(.285-m.ai.d*.035,.25,.285));
+  if(b.t>=b.T&&!m.result){b.t=b.T;arrive(m,b.gx,b.gz,m.k);}
  },
  down(m){if(m.ball||m.charge!=null)return;m.charge=m.t;},
  up(m){if(m.ball||m.charge==null)return;const pw=this.power(m);const [ax,ay]=this.aim(m);let [gx,gz]=toGoal(ax,ay);
   const err=m.stats.aimNoise*.32;gx+=m.aimNoise(err);gz+=m.aimNoise(err*.6);if(pw>.9)gz+=(pw-.9)*14;if(pw<.35)gz=Math.max(0,gz-.4);
-  const T=clampN(.62-pw*.24,.36,.62);m.ball={t:0,T,gx,gz:Math.max(0,gz),pw};m.charge=null;m.hint='';
+  const T=clampN(.62-pw*.24-(m.stats.power-.5)*.09,.32,.66);m.ball={t:0,T,gx,gz:Math.max(0,gz),pw};m.charge=null;m.hint='';
   // El arquero elige lado: tus penales anteriores y su lectura pesan en la decisión.
-  const side=gx<0?-1:1,bias=m.tendency<.5?-1:1;const readP=m.ai.d*.38+(pw<.45?.2:0);const stud=Math.abs(m.tendency-.5)*1.4;
-  let dir=m.rand()<readP?side:(m.rand()<.5+stud*.5?bias:-bias);if(m.rand()<.14)dir=0;
-  m.keeperGuess=[dir*(1.6+m.rand()*1.6),.3+m.rand()*1.6];m.report={dir:(gx+POST)/(2*POST)};},
+  const side=gx<0?-1:1,bias=m.tendency<.5?-1:1;
+  const readP=clampN(.25+m.ai.d*.30+(1-pw)*.12,.25,.68);
+  const stud=clampN(Math.abs(m.tendency-.5)*1.2,0,.55);
+  let dir=m.rand()<readP?side:(m.rand()<.5+stud*.5?bias:-bias);
+  if(Math.abs(gx)<.65&&m.rand()<.5)dir=0;else if(m.rand()<.08)dir=0;
+  const accuracy=.35+(1-m.ai.d)*.65;
+  m.keeperGuess=[dir===0?0:dir*clampN(Math.abs(gx)+(m.rand()-.5)*accuracy,1.0,3.5),clampN(gz+(m.rand()-.5)*(1.1+(1-m.ai.d)*.9),.25,2.3)];
+  m.keeperDelay=clampN(m.ai.keeperReaction*(.65+m.rand()*.7),.10,.42);
+  m.report={dir:(gx+POST)/(2*POST)};},
  draw(m,g){stadium(g,m.t);goalFrame(g,m.result?.success?4:0);drawKeeper(g,m.k,COLORS.keeperThem,'#9a7d12');
   if(m.ball){const b=m.ball,t=clampN(b.t/b.T,0,1),e=1-Math.pow(1-t,2);const [tx,ty]=gs(b.gx,b.gz);const x=lerp(CX,tx,e),y=lerp(H-30,ty,e)-Math.sin(t*Math.PI)*30*b.pw;drawBallAt(g,x,y,lerp(22,9,e));}
   else{drawBallAt(g,CX,H-30,22);const [ax,ay]=this.aim(m);crosshair(g,ax,ay);powerBar(g,this.power(m));}
