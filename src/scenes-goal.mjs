@@ -27,27 +27,29 @@ function goalFrame(g,shake=0){
  for(let y=t;y<=GY;y+=16){g.beginPath();g.moveTo(l,y);g.lineTo(r,y+Math.cos(y)*shake);g.stroke();}
  g.strokeStyle='#fff';g.lineWidth=8;g.lineCap='round';g.beginPath();g.moveTo(l,GY);g.lineTo(l,t);g.lineTo(r,t);g.lineTo(r,GY);g.stroke();g.lineCap='butt';
 }
-/** Arquero: centro (kx), estirada hacia (dx,dz) con progreso p. */
-function drawKeeper(g,k,color,dark){
- const p=k.p||0,hx=lerp(k.x,k.dx??k.x,p),hz=lerp(1.25,k.dz??1.25,p);
- const [bx,by]=gs(lerp(k.x,hx,.45),lerp(.95,Math.max(.45,hz*.7),p));
- const ang=Math.atan2(-(hz-1.25),hx-k.x)*p;
- g.save();g.translate(bx,by);g.rotate(p?(hx<k.x?-1:1)*Math.min(1.3,Math.abs(hx-k.x)/2.2)*p:0);
- g.fillStyle='rgba(0,0,0,.3)';g.beginPath();g.ellipse(0,0.9*PX+(1-p)*4,30,7,0,0,7);g.fill();
- g.fillStyle=dark;roundRect(g,-15,-30,30,62,10);g.fill();g.fillStyle=color;roundRect(g,-13,-28,26,40,9);g.fill();
- g.fillStyle='#f2d2b6';g.beginPath();g.arc(0,-42,11,0,7);g.fill();
- g.strokeStyle=color;g.lineWidth=9;g.lineCap='round';g.beginPath();g.moveTo(-12,-20);g.lineTo(-30-p*18,-44-p*6);g.moveTo(12,-20);g.lineTo(30+p*18,-44-p*6);g.stroke();
- g.fillStyle='#fff';g.beginPath();g.arc(-30-p*18,-46-p*6,6,0,7);g.arc(30+p*18,-46-p*6,6,0,7);g.fill();
- g.strokeStyle=dark;g.lineWidth=9;g.beginPath();g.moveTo(-7,30);g.lineTo(-10,58);g.moveTo(7,30);g.lineTo(10,58);g.stroke();g.lineCap='butt';
- g.restore();void ang;
+/** Geometría compartida por el dibujo y la colisión en la línea de gol. */
+export function keeperPose(k){
+ const p=clampN(k.p||0,0,1),hx=lerp(k.x,k.dx??k.x,p),hz=lerp(1.25,k.dz??1.25,p);
+ return {hx,hz,bx:lerp(k.x,hx,.55),bz:lerp(.95,Math.max(.35,hz*.75),p),p};
 }
-/** ¿Cubre el arquero el punto (gx,gz)? Manos según la estirada + cuerpo. */
-function covers(k,gx,gz,extra=0){
- const p=k.p||0,hx=lerp(k.x,k.dx??k.x,p),hz=lerp(1.25,k.dz??1.25,p);
- const hand=Math.hypot(gx-hx,gz-hz)<.55+extra;
- const body=Math.abs(gx-lerp(k.x,hx,.5))<.38+extra*.5&&gz<1.95;
+function drawKeeper(g,k,color,dark){
+ const {hx,hz,bx,bz,p}=keeperPose(k), [x,y]=gs(bx,bz), [handX,handY]=gs(hx,hz);
+ const dir=Math.sign(hx-k.x)||1;
+ g.fillStyle='rgba(0,0,0,.28)';g.beginPath();g.ellipse(x,GY+4,27+20*p,7,0,0,Math.PI*2);g.fill();
+ // El guante adelantado está exactamente en el centro usado por la colisión.
+ g.strokeStyle=dark;g.lineWidth=11;g.lineCap='round';g.beginPath();g.moveTo(x-7,y+16);g.lineTo(x-15-dir*p*30,y+48);g.moveTo(x+7,y+16);g.lineTo(x+14-dir*p*20,y+48);g.stroke();
+ g.strokeStyle=color;g.lineWidth=26;g.beginPath();g.moveTo(x,y+12);g.lineTo(x-dir*p*14,y-20);g.stroke();
+ g.fillStyle='#f2d2b6';g.beginPath();g.arc(x-dir*p*18,y-32,11,0,Math.PI*2);g.fill();
+ g.strokeStyle=color;g.lineWidth=9;g.beginPath();g.moveTo(x,y-12);g.lineTo(handX,handY);g.moveTo(x,y-12);g.lineTo(x-dir*(25+p*15),y-30);g.stroke();
+ g.fillStyle='#fff';g.beginPath();g.arc(handX,handY,8,0,Math.PI*2);g.arc(x-dir*(25+p*15),y-30,6,0,Math.PI*2);g.fill();g.lineCap='butt';
+}
+export function keeperCovers(k,gx,gz,extra=0){
+ const {hx,hz,bx,bz}=keeperPose(k);
+ const hand=Math.hypot(gx-hx,gz-hz)<.48+extra;
+ const body=Math.hypot((gx-bx)/.42,(gz-bz)/.75)<1+extra;
  return hand||body;
 }
+const covers=keeperCovers;
 function startDive(k,gx,gz,reach){const dx=gx-k.x,dz=gz-1.25,d=Math.hypot(dx,dz);const s=d>reach?reach/d:1;k.dx=k.x+dx*s;k.dz=clampN(1.25+dz*s,.15,2.6);k.diveT=0;k.diving=true;}
 function stepDive(k,dt,time=.34){if(k.diving){k.diveT+=dt;k.p=clampN(k.diveT/time,0,1);}}
 function drawBallAt(g,x,y,r){g.fillStyle='rgba(0,0,0,.3)';g.beginPath();g.ellipse(x+3,y+r*.9,r,r*.35,0,0,7);g.fill();g.fillStyle='#fbfbf6';g.beginPath();g.arc(x,y,r,0,7);g.fill();g.fillStyle='#1a1a1a';g.beginPath();g.arc(x+r*.25,y-r*.2,r*.33,0,7);g.fill();g.strokeStyle='rgba(0,0,0,.35)';g.lineWidth=1;g.beginPath();g.arc(x,y,r,0,7);g.stroke();}
@@ -72,18 +74,25 @@ const penal={
  power(m){if(m.charge==null)return 0;const e=(m.t-m.charge)/1.15;const ph=e%2;return ph<1?ph:2-ph;},
  update(m,dt){
   if(!m.ball){m.k.x=Math.sin(m.t*1.6)*.35;return;}
-  const b=m.ball;b.t+=dt;stepDive(m.k,dt);
-  if(!m.k.diving&&b.t>=m.ai.keeperReaction*.35){const guess=m.keeperGuess;startDive(m.k,guess[0],guess[1],m.ai.keeperReach+1.35);}
-  if(b.t>=b.T&&!m.result)arrive(m,b.gx,b.gz,m.k);
+  const b=m.ball;b.t+=dt;
+  if(!m.k.diving&&b.t>=m.keeperDelay){const guess=m.keeperGuess;startDive(m.k,guess[0],guess[1],m.ai.keeperReach+1.35);}
+  stepDive(m.k,dt,clampN(.34-m.ai.d*.09,.25,.34));
+  if(b.t>=b.T&&!m.result){b.t=b.T;arrive(m,b.gx,b.gz,m.k);}
  },
  down(m){if(m.ball||m.charge!=null)return;m.charge=m.t;},
  up(m){if(m.ball||m.charge==null)return;const pw=this.power(m);const [ax,ay]=this.aim(m);let [gx,gz]=toGoal(ax,ay);
   const err=m.stats.aimNoise*.32;gx+=m.aimNoise(err);gz+=m.aimNoise(err*.6);if(pw>.9)gz+=(pw-.9)*14;if(pw<.35)gz=Math.max(0,gz-.4);
   const T=clampN(.62-pw*.24,.36,.62);m.ball={t:0,T,gx,gz:Math.max(0,gz),pw};m.charge=null;m.hint='';
   // El arquero elige lado: tus penales anteriores y su lectura pesan en la decisión.
-  const side=gx<0?-1:1,bias=m.tendency<.5?-1:1;const readP=m.ai.d*.38+(pw<.45?.2:0);const stud=Math.abs(m.tendency-.5)*1.4;
-  let dir=m.rand()<readP?side:(m.rand()<.5+stud*.5?bias:-bias);if(m.rand()<.14)dir=0;
-  m.keeperGuess=[dir*(1.6+m.rand()*1.6),.3+m.rand()*1.6];m.report={dir:(gx+POST)/(2*POST)};},
+  const side=gx<0?-1:1,bias=m.tendency<.5?-1:1;
+  const readP=clampN(.25+m.ai.d*.30+(1-pw)*.12,.25,.68);
+  const stud=clampN(Math.abs(m.tendency-.5)*1.2,0,.55);
+  let dir=m.rand()<readP?side:(m.rand()<.5+stud*.5?bias:-bias);
+  if(Math.abs(gx)<.65&&m.rand()<.5)dir=0;else if(m.rand()<.08)dir=0;
+  const accuracy=.35+(1-m.ai.d)*.65;
+  m.keeperGuess=[dir===0?0:dir*clampN(Math.abs(gx)+(m.rand()-.5)*accuracy,1.0,3.5),clampN(gz+(m.rand()-.5)*(1.1+(1-m.ai.d)*.9),.25,2.3)];
+  m.keeperDelay=clampN(m.ai.keeperReaction*(.65+m.rand()*.7),.10,.42);
+  m.report={dir:(gx+POST)/(2*POST)};},
  draw(m,g){stadium(g,m.t);goalFrame(g,m.result?.success?4:0);drawKeeper(g,m.k,COLORS.keeperThem,'#9a7d12');
   if(m.ball){const b=m.ball,t=clampN(b.t/b.T,0,1),e=1-Math.pow(1-t,2);const [tx,ty]=gs(b.gx,b.gz);const x=lerp(CX,tx,e),y=lerp(H-30,ty,e)-Math.sin(t*Math.PI)*30*b.pw;drawBallAt(g,x,y,lerp(22,9,e));}
   else{drawBallAt(g,CX,H-30,22);const [ax,ay]=this.aim(m);crosshair(g,ax,ay);powerBar(g,this.power(m));}

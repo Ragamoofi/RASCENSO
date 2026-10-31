@@ -95,7 +95,7 @@ export function createMatch(canvas,{play,stats,ai,scene,onEnd,hud={}}){
  const ctxMenu=e=>e.preventDefault();
  canvas.addEventListener('pointermove',onMove);canvas.addEventListener('pointerdown',onDown);canvas.addEventListener('pointerup',onUp);canvas.addEventListener('contextmenu',ctxMenu);
  canvas.addEventListener('pointerleave',()=>{m.pointer.inside=false;});
- const clearKeys=()=>m.keys.clear();
+ const clearKeys=()=>{m.keys.clear();m.pointer.down=false;};
  globalThis.addEventListener?.('keydown',onKey);globalThis.addEventListener?.('keyup',onKey);globalThis.addEventListener?.('blur',clearKeys);
  /** Dirección de movimiento: teclado (WASD/flechas) o seguir al puntero. */
  m.steer=(e,speed,dt,limit=null)=>{
@@ -104,6 +104,7 @@ export function createMatch(canvas,{play,stats,ai,scene,onEnd,hud={}}){
   else if(m.pointer.inside){let tx=m.pointer.wx,ty=m.pointer.wy;if(limit){tx=clampN(tx,limit[0],limit[1]);ty=clampN(ty,limit[2],limit[3]);}moveToward(e,tx,ty,speed,dt,.25);}
   else{e.vx*=.8;e.vy*=.8;}
   keepInField(e);
+  if(limit){e.x=clampN(e.x,limit[0],limit[1]);e.y=clampN(e.y,limit[2],limit[3]);}
  };
  m.aimNoise=(meters)=>(m.rand()*2-1)*meters;
  scene.init(m);
