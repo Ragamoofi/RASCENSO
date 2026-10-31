@@ -121,3 +121,13 @@
 }
 @media(max-width:420px){.matchday-team{font-size:11px!important}.matchday-scoreboard>strong{gap:4px!important;font-size:31px!important}.matchday-scoreboard>strong span{min-width:18px}.farewell-medallion{display:none}}
 @media(prefers-reduced-motion:reduce){.matchday-center *, .farewell-page *, .play-window *{animation:none!important;transition:none!important}}
+
+
+/* Identidad propia del overlay de cada jugada */
+.play-broadcast-tag{display:inline-flex;margin-top:5px;padding:3px 9px;color:#f3d6bc;font-size:10px;font-weight:850;letter-spacing:.12em;border:1px solid #bb916e88;background:#172f40;border-radius:4px}
+.play-visual-duelo{border-color:#e9ba86!important}
+.play-visual-vuelo{border-color:#82ced6!important}
+.play-visual-lectura{border-color:#9da9e8!important}
+.play-visual-presion{border-color:#e4a48f!important}
+.play-visual-velocidad{border-color:#8dcea7!important}
+@media(max-height:680px){.play-window header{padding:6px 12px}.play-broadcast-tag{display:none}.play-window footer{padding:5px 10px;font-size:11px}}
