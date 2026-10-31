@@ -33,21 +33,28 @@ export function openPlay({state,play,clubName,onDone,onCancel}){
  const info=PLAYS[play.type],art=sceneVisualStyle44(play.type);
  const priorFocus=document.activeElement,priorOverflow=document.body.style.overflow;
  const wrap=document.createElement('div');wrap.className='play-overlay';wrap.setAttribute('role','dialog');wrap.setAttribute('aria-modal','true');wrap.setAttribute('aria-label',info.name);
- wrap.innerHTML=`<div class="play-window play-visual-${art.group}"><header><div><small>RASCENSO LIVE · ${h(play.tag)}</small><strong>${h(info.name)}</strong><span class="play-broadcast-tag">${h(art.label)}</span></div><button type="button" class="play-close" aria-label="Salir sin jugar">✕</button></header><div class="play-stage"><canvas width="960" height="540" tabindex="0"></canvas></div><footer>${h(info.controls)}</footer></div>`;
+ wrap.innerHTML=`<div class="play-window play-visual-${art.group}"><header><div><small>RASCENSO LIVE · ${h(play.tag)}</small><strong>${h(info.name)}</strong><span class="play-broadcast-tag">${h(art.label)}</span></div><button type="button" class="play-close" aria-label="Salir sin jugar">✕</button></header><div class="play-stage"><canvas width="960" height="540" tabindex="0"></canvas></div><div class="play-mobile-brief"><strong>EL OBJETIVO</strong><p>${h(info.brief)}</p><strong>CÓMO SE JUEGA</strong><p>${h(info.controls)}</p><button class="play-mobile-start" type="button">▶ Entendido, empezar</button></div><footer>${h(info.controls)}</footer></div>`;
  document.body.appendChild(wrap);document.body.style.overflow='hidden';
  const canvas=wrap.querySelector('canvas');canvas.focus();
  const fullPlay={...play,memory:state.playMemory?.penalties||[]};
  let match=null,closed=false;
  const close=()=>{if(closed)return;closed=true;match?.destroy();wrap.remove();document.body.style.overflow=priorOverflow;document.removeEventListener('keydown',esc);if(priorFocus?.isConnected)priorFocus.focus({preventScroll:true});};
  const esc=e=>{if(e.key==='Escape'&&match?.phase!=='outro'){e.preventDefault();close();onCancel?.();}};
- const keepFocus=e=>{if(e.key!=='Tab')return;const first=wrap.querySelector('.play-close'),last=canvas;
-  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
-  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+ const keepFocus=e=>{if(e.key!=='Tab')return;
+  const controls=[...wrap.querySelectorAll('button:not([disabled]),canvas[tabindex]')].filter(x=>x.getClientRects().length&&!x.closest('[hidden]'));
+  const first=controls[0],last=controls.at(-1);
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}
+  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}
  };
  wrap.addEventListener('keydown',keepFocus);
  document.addEventListener('keydown',esc);
  wrap.querySelector('.play-close').addEventListener('click',()=>{if(match?.phase==='outro')return;close();onCancel?.();});
  match=createMatch(canvas,{play:fullPlay,stats:playerStats(state,play),ai:aiStats(play),scene,hud:{title:info.name,brief:info.brief,controls:info.controls,us:clubName,them:play.rival},
   onEnd:res=>{close();onDone?.(res);}});
+ const mobileHelp=wrap.querySelector('.play-mobile-brief');
+ const hideHelp=()=>{if(match?.phase!=='brief')mobileHelp.hidden=true;};
+ wrap.querySelector('.play-mobile-start').addEventListener('click',()=>{if(match?.phase==='brief')match.begin();hideHelp();canvas.focus();});
+ canvas.addEventListener('pointerup',hideHelp);
+ wrap.addEventListener('keyup',e=>{if(['Enter','Space','NumpadEnter'].includes(e.code))hideHelp();});
  return {close,match};
 }

@@ -38,6 +38,9 @@
 - La descarga del recuerdo PNG se prueba de forma real al llegar al retiro; no se limita a comprobar que existe el botón.
 - La matriz automática todavía muestra extremos (p. ej. Recuperación y Entrada sobre 95/100 en varios escenarios, y Salida aérea con hasta 100/100). El bot tiene información interna: **estos valores no son tasas humanas**, ni se declaran equilibrados. Queda pendiente medir dificultad y satisfacción con jugadores.
 
+- En móvil vertical, el texto dibujado en Canvas se veía minúsculo al reducir de 960 a 390 píxeles. Se incorporó una **guía HTML accesible**, con objetivo, controles y botón de inicio; se oculta al comenzar y respeta el ciclo del minijuego. El teclado permanece atrapado en los controles realmente visibles.
+- Los recursos de interfaz pasan a la versión de caché `441` para mostrar el ajuste tras la publicación.
+
 ## Regla de publicación
 
 Integrar a `main` solo cuando la última revisión en GitHub Actions pase y comprobar el despliegue de GitHub Pages antes de anunciarlo como publicado.

@@ -131,3 +131,16 @@
 .play-visual-presion{border-color:#e4a48f!important}
 .play-visual-velocidad{border-color:#8dcea7!important}
 @media(max-height:680px){.play-window header{padding:6px 12px}.play-broadcast-tag{display:none}.play-window footer{padding:5px 10px;font-size:11px}}
+
+/* 4.4.1 · Las instrucciones Canvas a 960×540 se vuelven ilegibles en móvil vertical.
+   Presentar un resumen HTML grande, con botón equivalente al de la cancha. */
+.play-mobile-brief{display:none}
+.play-mobile-brief[hidden]{display:none!important}
+@media (max-width:700px) and (orientation:portrait){
+ .play-window{overflow:hidden}
+ .play-mobile-brief{display:grid;gap:5px;padding:11px 13px;max-height:min(34dvh,230px);overflow-y:auto;background:#122b40;border-top:1px solid #6993a0;border-bottom:1px solid #6993a0}
+ .play-mobile-brief strong{font-size:11px;letter-spacing:.09em;color:#f1ba88}
+ .play-mobile-brief p{margin:0 0 5px;color:#eff5fb;font-size:13px;line-height:1.38;overflow-wrap:anywhere}
+ .play-mobile-start{width:100%;min-height:40px;border:1px solid #f4c091;border-radius:8px;background:#3865c7;color:#fff;font-size:13px;font-weight:800;cursor:pointer;margin-top:2px}
+ .play-mobile-start:focus-visible{outline:3px solid #ffd3a3;outline-offset:2px}
+}

@@ -30,6 +30,16 @@ const {chromium}=require('playwright');
    if(!modalBounds||modalBounds.x<0||modalBounds.x+modalBounds.width>width+1)throw Error('La ventana jugable se sale de la pantalla '+width);
    if(process.env.SHOTS){await page.waitForTimeout(130);await page.screenshot({path:process.env.SHOTS+'/play-modal-'+width+'.png'});}
    if(!await page.locator('.play-stage canvas').evaluate(x=>document.activeElement===x))throw Error('El minijuego no recibe el foco');
+   if(width<=700){
+    if(!await page.locator('.play-mobile-brief').isVisible())throw Error('Falta la ayuda legible en móvil');
+    if((await page.locator('.play-mobile-brief').innerText()).length<70)throw Error('Ayuda móvil incompleta');
+    await page.keyboard.press('Tab');
+    if(!await page.locator('.play-mobile-start').evaluate(x=>document.activeElement===x))throw Error('Tab no llega al botón de inicio móvil');
+    await page.keyboard.press('Tab');
+    if(!await page.locator('.play-close').evaluate(x=>document.activeElement===x))throw Error('Foco escapó fuera del diálogo móvil');
+    await page.locator('.play-mobile-start').click();
+    if(await page.locator('.play-mobile-brief').isVisible())throw Error('No se ocultó la ayuda al comenzar');
+   }
    if(!await page.evaluate(()=>document.body.style.overflow==='hidden'))throw Error('El fondo se desplaza durante el minijuego');
    await page.keyboard.press('Tab');
    if(!await page.locator('.play-close').evaluate(x=>document.activeElement===x))throw Error('El foco no permanece dentro de la ventana');
