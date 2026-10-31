@@ -215,7 +215,8 @@ export function advanceWorld(state,playedLeague,userSeason){
   const club=worldClub(p.clubId);const level=dynamicLevel(S,club);
   const share=clamp(.35+(p.ovr-level)*.05+pr()*.25,.05,.97);
   const injury=npcInjury(`${world.seed}:npc-injury:${p.id}:${year}`,p.age);
-  const apps=Math.round(34*share*injury.availability);
+  const participation=share*injury.availability;
+  const apps=Math.round(34*participation);
   p.lastInjury=injury.weeks?{year,weeks:injury.weeks}:null;
   if(injury.weeks>=8&&(p.rival||p.kind==='star'||p.clubId===state.clubId))news(fresh,year,'injury',`${p.name} sufre una lesión`,`${p.name} se pierde aproximadamente ${injury.weeks} semanas en ${club?.name||'su club'}. Su participación de esta temporada se reduce.`,{playerId:p.id,clubId:p.clubId,rival:!!p.rival,mine:p.clubId===state.clubId});
   const factor=clamp(1+(p.ovr-level)*.03,.6,1.6)*(p.ovr/80);
@@ -226,11 +227,11 @@ export function advanceWorld(state,playedLeague,userSeason){
   p.seasons=[...(p.seasons||[]),{year,clubId:p.clubId,apps,goals,assists,ovr:p.ovr,champion,injuryWeeks:injury.weeks}].slice(-4);
   // Desarrollo
   const ageF=p.age<=19?.3:p.age<=22?.22:p.age<=25?.12:p.age<=28?.04:0;
-  let delta=(p.pot-p.ovr)*ageF*(.45+share*.8)+(pr()-.5)*2;
+  let delta=(p.pot-p.ovr)*ageF*(.45+participation*.8)+(pr()-.5)*2;
   const dAge=29+Math.floor(hash(p.id)%4)+(p.pos==='POR'?3:0);
   if(p.age>=dAge)delta-=(.6+(p.age-dAge)*.7)*(.6+pr()*.8);
   // Algunas promesas se estancan: el talento no garantiza nada.
-  if(p.age<=21&&share<.25&&pr()<.35)p.pot=Math.max(p.ovr,p.pot-2);
+  if(p.age<=21&&participation<.25&&pr()<.35)p.pot=Math.max(p.ovr,p.pot-2);
   p.ovr=clamp(Math.round(p.ovr+delta),40,95);p.peak=Math.max(p.peak||0,p.ovr);p.age++;
   // Retiro
   const retireP=p.age>=40?1:p.age>=34?clamp((p.age-33)*.16+(p.ovr<72?.2:0),0,.95):0;
