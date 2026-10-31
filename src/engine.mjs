@@ -5,6 +5,7 @@ import { upcomingMoment, solveMoment } from './moments15.mjs';
 import { identityTraits, identitySeasonEffects, preparationEffects, PREPARATIONS, archetypeFor } from './career08.mjs';
 import { DRAFT_REFERENTS, DRAFT_TIERS, draftPotentialAdjustment } from './draft09.mjs';
 import { chooseSeasonAgenda, seasonAgendaEffects } from './agenda09.mjs';
+import {seasonMatchImpact,matchImpactHeadline} from './play-impact43.mjs';
 export { chooseSeasonAgenda } from './agenda09.mjs';
 
 import { initialRelationships, chooseScene, sceneFor, resultOfScene } from './story.mjs';
@@ -345,7 +346,8 @@ export function advanceSeason(input){
  const objectives=currentObjectives(s);
  // Jugadas Vivas: el efecto anímico se aplica ahora, cuando la temporada ya quedó simulada.
  const playRes=s.plays30?.year===year?s.plays30.results:[];
- const playFx=playRes.reduce((a,r)=>{const w=r.decisive?1.5:1;a.morale+=(r.success?3:-2)*w;a.trust+=(r.success?1.5:-.5)*w;a.rep+=r.success&&r.decisive?1:0;return a;},{morale:0,trust:0,rep:0});
+ const matchImpact=seasonMatchImpact(playRes);
+ const playFx={morale:matchImpact.effect.morale,trust:matchImpact.effect.trust,rep:matchImpact.effect.reputation,fans:matchImpact.effect.fans};
 
  const comp=getCompetitionForCareer(s);
  const league=playLeague(s),leagueRosters=nextLeagueRosters(s,league),{matches,goals,assists,cleanSheets,goalsConceded,injuryWeeks,leaguePosition,role,minutes}=league;
@@ -359,6 +361,8 @@ export function advanceSeason(input){
  for(const name of global.titles)titles.push(name);
  const partial={matches,minutes,goals,assists,cleanSheets,leaguePosition,injuryWeeks,table:league.standings};
  let rating=seasonRating(partial,s.position);
+ // La actuación personal puede influir modestamente en la nota, sin sustituir los goles y minutos reales.
+ if(rating!=null&&matchImpact.manual)rating=Math.round(clamp(rating+(matchImpact.successes-(matchImpact.total-matchImpact.successes))*.025,-.18+rating,.18+rating)*100)/100;
  // «Irregularidad»: rachas buenas y malas → la nota de cada temporada oscila más (determinista por semilla).
  if(rating!=null&&s.weakness==='inconstante')rating=Math.round(clamp(rating+(rng(`${s.seed}:variance:${year}`)()-.5)*.5,5.6,8.6)*100)/100;
  // Desarrollo por atributos: edad, minutos, nota, entrenador, pretemporada, promesas y lesiones.
@@ -377,9 +381,11 @@ export function advanceSeason(input){
  const objectiveResult=evaluateObjectives(objectives,{...partial,matches});
  const seasonal={salaryEarned:wage,attributesBefore,attributesAfter:{...attributes},attributeChanges,age:s.age,year,clubId:club.id,club:club.name,country:club.country,ovrBefore:s.ovr,ovrAfter:ovr,potentialAfter:dev.potential,role,matches,minutes,goals,assists,cleanSheets,goalsConceded,international,injuryWeeks,leaguePosition,titles,worldCupResult,rating,
   table:league.standings,fixtures:league.fixtureResults,playerMatches:league.playerMatches,plan:league.plan,champion:league.champion,leagueName:league.league,leagueId:league.leagueId,leagueVerified:league.verified,leagueDivision:league.division,competitionVersion:4,clutchMoment:s.clutchMoment?.year===year?s.clutchMoment:null,plays:s.plays30?.year===year?s.plays30.results:[],competitions:global.competitions,competitionCalendar:global.calendar,calledUp:global.calledUp,nationalCaps:global.nationalCaps,nationalGoals:global.nationalGoals,clubCupMatches:global.totalCupMatches??0,
-  captain:!!s.squad?.captain,objectives:objectiveResult,devNotes:dev.notes,coachName:coach?.name,coachStyle:coach?.style,rivalName:s.squad?.rival?.name,rivalOvr:s.squad?.rival?.ovr,relegated,promoted};
+  captain:!!s.squad?.captain,matchdayImpact:matchImpact,objectives:objectiveResult,devNotes:dev.notes,coachName:coach?.name,coachStyle:coach?.style,rivalName:s.squad?.rival?.name,rivalOvr:s.squad?.rival?.ovr,relegated,promoted};
  // El mundo avanza: clubes, entrenadores, futbolistas, premios y noticias.
- const world=advanceWorld({...s,ovr,potential:dev.potential,leagueRosters:s.leagueRosters},league,seasonal);
+ const baseWorld=advanceWorld({...s,ovr,potential:dev.potential,leagueRosters:s.leagueRosters},league,seasonal);
+ const matchHeadline=matchImpactHeadline(s,year,matchImpact);
+ const world=matchHeadline?{...baseWorld,news:[...baseWorld.news,matchHeadline].slice(-90)}:baseWorld;
  const awardsYear=world.awards.at(-1);
  const myAwards=(awardsYear?.list||[]).filter(a=>a.winner?.you).map(a=>({year,id:a.id,name:a.name,league:a.league||null,global:!!a.global}));
  const ballPlace=awardsYear?.youPlace||null;
@@ -394,7 +400,7 @@ export function advanceSeason(input){
  const squad={...(s.squad||{})};
  squad.seasons=(squad.seasons||0)+1;
  squad.board=clamp(Math.round((squad.board??55)+cfx.boardYear+(objectiveResult?(objectiveResult.board.met?7:-9)+(objectiveResult.personal.met?2:-1):0)+(titles.length?5:0)),0,100);
- squad.fans=clamp(Math.round((squad.fans??50)+cfx.fansYear+(goals+assists)/5+((rating??6.4)-6.5)*6+titles.length*5+(objectiveResult?.board.met?3:-3)+(squad.seasons>=3?1:0)+threadFx.morale*.5),0,100);
+ squad.fans=clamp(Math.round((squad.fans??50)+cfx.fansYear+(goals+assists)/5+((rating??6.4)-6.5)*6+titles.length*5+(objectiveResult?.board.met?3:-3)+(squad.seasons>=3?1:0)+threadFx.morale*.5+playFx.fans),0,100);
  if(squad.fans>=86&&squad.seasons>=4)squad.idol=true;
  // Competidor directo: envejece, progresa o se marcha; el club puede fichar otro.
  if(squad.rival){

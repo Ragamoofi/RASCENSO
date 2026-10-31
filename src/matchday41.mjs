@@ -1,5 +1,7 @@
 /* RASCENSO 4.1 · Centro de partido y memoria deportiva. Sin dependencias de DOM. */
 import { PLAYS, autoChance } from './plays30.mjs';
+import {impactPreview} from './play-impact43.mjs';
+import {tuningFor} from './play-tuning43.mjs';
 
 const h=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=n=>Number.isFinite(Number(n))?Math.round(Number(n)):0;
@@ -29,12 +31,13 @@ export function matchdayPanel(s,plays,getClub){
  <div class="matchday-feature">
   <div class="matchday-context"><span>${tag(p)} · FECHA ${fmt(p.round)}</span><span>MIN ${fmt(p.minute)}'</span></div>
   <div class="matchday-scoreboard"><div class="matchday-team">${h(sc.local)}</div><strong>${fmt(sc.home)} <i>:</i> ${fmt(sc.visitor)}</strong><div class="matchday-team">${h(sc.away)}</div></div>
-  <div class="matchday-rival">${h(club?.country||'')} · ${p.isHome?'LOCAL':'VISITANTE'} · ${typeLabel(p)}</div>
+  <div class="matchday-rival">${h(club?.country||'')} · ${p.isHome?'LOCAL':'VISITANTE'} · ${typeLabel(p)}</div><div class="matchday-identity">${h(tuningFor(p.type).tag)}</div>
   <h3>${h(info.name)}</h3><p>${roleText(p)} ${h(info.brief)}</p>
   <div class="matchday-indicators"><span>Presión <b>${fmt(p.pressure)}/100</b></span><span>Rival <b>${fmt(p.difficulty*100)}/100</b></span><span>Tu oportunidad <b>${fmt(autoChance(s,p)*100)}%*</b></span></div>
   <div class="matchday-cta">${outcome?`<strong class="matchday-result ${win?'good':'bad'}">${win?'✓ MOMENTO CONSEGUIDO':'✕ OCASIÓN PERDIDA'}</strong>`:`${action('play-open',p.id,'▶ ENTRAR A LA CANCHA','primary')}${action('play-auto',p.id,'Simular jugada','secondary')}`}</div>
  </div>
  <details class="matchday-calendar"><summary><span>📅 Calendario de momentos · ${max} partidos</span><b>VER JORNADAS ▾</b></summary><div class="matchday-schedule">${plays.map(mini).join('')}</div></details>
+ <div class="matchday-projection">${h(impactPreview(plays.map(p=>p.result).filter(Boolean)))}</div>
  <small class="matchday-note">*Probabilidad orientativa para resolución automática. Si juegas, tus decisiones y habilidades influyen. Las jugadas no disputadas se simulan al avanzar la temporada.</small>
  </section>`;
 }

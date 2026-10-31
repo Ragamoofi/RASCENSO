@@ -9,6 +9,7 @@
 import { rng, hash, clamp, yearOf, positionGroup } from './career20.mjs';
 import { fixtureContext } from './career15.mjs';
 import { choiceFx } from './identity30.mjs';
+import {tuningFor,tunedAI,tunedChance} from './play-tuning43.mjs';
 
 export const PLAYS={
  mano_a_mano:{name:'Mano a mano',kind:'attack',credit:'goal',view:'field',attr:['shot','dribble','pace'],brief:'Encara al arquero: muévete, amaga y define antes de que llegue el defensor.',controls:'Ratón o WASD/flechas para conducir · clic izquierdo potente o derecho colocado'},
@@ -87,7 +88,7 @@ export function playerStats(s,play){
 /** Dificultad del rival: nivel del club contrario, categoría, presión y etapa de la carrera. */
 export function aiStats(play){
  const d=clamp(play?.difficulty??.5,.1,.98);
- return {d,keeperReaction:.34-d*.14,keeperSpeed:4.4+d*2.2,keeperReach:.95+d*.38,defSpeed:5.2+d*2.4,defReaction:.5-d*.28,feintResist:.25+d*.5,passTell:.9-d*.5,shooterSkill:.45+d*.45};
+ return tunedAI({d,keeperReaction:.34-d*.14,keeperSpeed:4.4+d*2.2,keeperReach:.95+d*.38,defSpeed:5.2+d*2.4,defReaction:.5-d*.28,feintResist:.25+d*.5,passTell:.9-d*.5,shooterSkill:.45+d*.45},play?.type);
 }
 
 /* ---------- Selección de jugadas de la temporada ---------- */
@@ -158,7 +159,8 @@ export function autoChance(s,play){
  const st=playerStats(s,play),info=PLAYS[play.type];
  const attr=info.attr.reduce((n,k)=>n+(['skills','weak'].includes(k)?(st[k]||.4)*100:(Number(s.attributes?.[k])||50)),0)/info.attr.length;
  const base={attack:.40,defend:.52}[info.kind];
- return clamp(base+(attr-(45+play.difficulty*40))/120-st.nerves*.12-st.fatigue*.06,.08,.85);
+ const chance=base+(attr-(45+play.difficulty*40))/120-st.nerves*.12-st.fatigue*.06;
+ return tunedChance(chance,play.type);
 }
 export function autoReport(s,play){
  const p=autoChance(s,play),roll=rng(play.seed+':auto')();
