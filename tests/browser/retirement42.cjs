@@ -31,6 +31,8 @@ const {chromium}=require('playwright');
   if(await p.locator('.farewell-club').count()<1)throw Error('No se muestran clubes');
   if(!await p.getByText('La sala de trofeos').count())throw Error('Falta palmarés');
   if(!await p.locator('[data-action=share-png]').count())throw Error('Falta exportar recuerdo');
+  const [download]=await Promise.all([p.waitForEvent('download',{timeout:45000}),p.locator('[data-action=share-png]').click()]);
+  if(!download.suggestedFilename().endsWith('.png'))throw Error('El recuerdo no se descargó como imagen PNG');
   const overflow=await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);
   if(overflow)throw Error('Desbordamiento horizontal '+width);
   if(errors.length)throw Error(errors.join(' | '));

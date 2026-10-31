@@ -31,14 +31,20 @@ export function playsPanel(state,plays,getClub){
 export function openPlay({state,play,clubName,onDone,onCancel}){
  const scene=SCENES[play.type];if(!scene)return null;
  const info=PLAYS[play.type],art=sceneVisualStyle44(play.type);
- const wrap=document.createElement('div');wrap.className='play-overlay';wrap.setAttribute('role','dialog');wrap.setAttribute('aria-label',info.name);
+ const priorFocus=document.activeElement,priorOverflow=document.body.style.overflow;
+ const wrap=document.createElement('div');wrap.className='play-overlay';wrap.setAttribute('role','dialog');wrap.setAttribute('aria-modal','true');wrap.setAttribute('aria-label',info.name);
  wrap.innerHTML=`<div class="play-window play-visual-${art.group}"><header><div><small>RASCENSO LIVE · ${h(play.tag)}</small><strong>${h(info.name)}</strong><span class="play-broadcast-tag">${h(art.label)}</span></div><button type="button" class="play-close" aria-label="Salir sin jugar">✕</button></header><div class="play-stage"><canvas width="960" height="540" tabindex="0"></canvas></div><footer>${h(info.controls)}</footer></div>`;
- document.body.appendChild(wrap);
+ document.body.appendChild(wrap);document.body.style.overflow='hidden';
  const canvas=wrap.querySelector('canvas');canvas.focus();
  const fullPlay={...play,memory:state.playMemory?.penalties||[]};
  let match=null,closed=false;
- const close=()=>{if(closed)return;closed=true;match?.destroy();wrap.remove();document.removeEventListener('keydown',esc);};
- const esc=e=>{if(e.key==='Escape'&&match?.phase!=='outro'){close();onCancel?.();}};
+ const close=()=>{if(closed)return;closed=true;match?.destroy();wrap.remove();document.body.style.overflow=priorOverflow;document.removeEventListener('keydown',esc);if(priorFocus?.isConnected)priorFocus.focus({preventScroll:true});};
+ const esc=e=>{if(e.key==='Escape'&&match?.phase!=='outro'){e.preventDefault();close();onCancel?.();}};
+ const keepFocus=e=>{if(e.key!=='Tab')return;const first=wrap.querySelector('.play-close'),last=canvas;
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+ };
+ wrap.addEventListener('keydown',keepFocus);
  document.addEventListener('keydown',esc);
  wrap.querySelector('.play-close').addEventListener('click',()=>{if(match?.phase==='outro')return;close();onCancel?.();});
  match=createMatch(canvas,{play:fullPlay,stats:playerStats(state,play),ai:aiStats(play),scene,hud:{title:info.name,brief:info.brief,controls:info.controls,us:clubName,them:play.rival},

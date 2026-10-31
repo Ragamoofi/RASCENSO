@@ -18,7 +18,7 @@ export function matchdayPanel(s,plays,getClub,badgeFn){
  const clubName=getClub(s.clubId)?.name||'Tu club';
  const crest=id=>badgeFn?badgeFn(id,'tiny'):'<span aria-hidden="true">⚽</span>';
  const done=plays.filter(p=>p.result).length,remaining=plays.filter(p=>!p.result);
- const main=remaining[0]||plays.at(-1);
+ const main=remaining[0]||plays.at(-1),inPlay=remaining.length>0;
  if(!plays.length)return `<section class="matchday-center"><div class="matchday-top"><span>⚽ CENTRO DE PARTIDO</span><small>Sin momentos disponibles</small></div><p>Esta temporada todavía no tienes minutos decisivos. Tus actuaciones y tu rol influyen en las oportunidades.</p></section>`;
  const outcome=main?.result,sc=score(main,clubName),win=outcome?.success;
  const p=main,info=PLAYS[p.type],club=getClub(p.rivalId);
@@ -27,13 +27,13 @@ export function matchdayPanel(s,plays,getClub,badgeFn){
   <div class="matchday-fixture-info"><small>FECHA ${fmt(r.round)} · ${tag(r)}</small><strong>${h(sc.local)} <span>vs</span> ${h(sc.away)}</strong><em>MIN ${fmt(r.minute)}' · ${h(inf.name)}</em></div>
   <div class="matchday-fixture-actions">${res?`<b class="${res.success?'good':'bad'}">${res.success?'✓ LOGRADA':'✕ FALLADA'}</b>${res.finalScore?`<small>Final ${h(res.finalScore)}</small>`:''}`:`${action('play-open',r.id,'Jugar ▶','compact')}${action('play-auto',r.id,'Simular','secondary compact')}`}</div></div>`};
  return `<section class="matchday-center" aria-label="Centro de partido">
- <div class="matchday-top"><span>⚽ CENTRO DE PARTIDO</span><div><b>${done}/${max} JUGADAS</b><small>${remaining.length?'Momentos por disputar':'Temporada preparada'}</small></div></div>
+ <div class="matchday-top"><span>⚽ CENTRO DE PARTIDO</span><div><b>${done}/${max} JUGADAS</b><small>${remaining.length?'Momentos por disputar':'Momentos completados'}</small></div></div>
  <div class="matchday-progress" role="progressbar" aria-valuenow="${done}" aria-valuemin="0" aria-valuemax="${max}"><span style="width:${100*done/max}%"></span></div>
  <div class="matchday-feature ${p.kind==='defend'?'defensive':'offensive'}">
-  <div class="matchday-arena"><span class="matchday-arena-glow"></span><div class="matchday-arena-heading"><span>RASCENSO <b>LIVE</b></span><span>${p.isHome?'EN CASA':'FUERA DE CASA'}</span></div><div class="matchday-arena-pitch"><span></span><i></i><b></b></div></div>
+  <div class="matchday-arena"><span class="matchday-arena-glow"></span><div class="matchday-arena-heading"><span>RASCENSO <b>${inPlay?'LIVE':'ARCHIVO'}</b></span><span>${inPlay?(p.isHome?'EN CASA':'FUERA DE CASA'):'PARTIDO REGISTRADO'}</span></div><div class="matchday-arena-pitch"><span></span><i></i><b></b></div></div>
   <div class="matchday-context"><span>${tag(p)} · FECHA ${fmt(p.round)}</span><span>MIN ${fmt(p.minute)}'</span></div>
   <div class="matchday-scoreboard"><div class="matchday-team"><span class="matchday-team-crest">${crest(p.isHome?s.clubId:p.rivalId)}</span><span>${h(sc.local)}</span></div><strong aria-label="Marcador ${fmt(sc.home)} a ${fmt(sc.visitor)}"><span>${fmt(sc.home)}</span><i>:</i><span>${fmt(sc.visitor)}</span></strong><div class="matchday-team"><span class="matchday-team-crest">${crest(p.isHome?p.rivalId:s.clubId)}</span><span>${h(sc.away)}</span></div></div>
-  <div class="matchday-rival">${h(club?.country||'')} · ${p.isHome?'LOCAL':'VISITANTE'} · ${typeLabel(p)}</div><div class="matchday-situation"><b>${p.minute>=80?'ÚLTIMOS MINUTOS':p.decisive?'PARTIDO DECISIVO':'EL PARTIDO ESTÁ EN JUEGO'}</b><span>${roleText(p)}</span></div><div class="matchday-identity">${h(tuningFor(p.type).tag)}</div>
+  <div class="matchday-rival">${h(club?.country||'')} · RIVAL ${p.isHome?'VISITANTE':'LOCAL'} · ${typeLabel(p)}</div><div class="matchday-situation"><b>${!inPlay?'MOMENTO REGISTRADO':p.minute>=80?'ÚLTIMOS MINUTOS':p.decisive?'PARTIDO DECISIVO':'EL PARTIDO ESTÁ EN JUEGO'}</b><span>${inPlay?roleText(p):(win?'La jugada quedó registrada como momento logrado.':'La jugada quedó registrada sin éxito.')}</span></div><div class="matchday-identity">${h(tuningFor(p.type).tag)}</div>
   <h3>${h(info.name)}</h3><p>${h(info.brief)}</p>
   <div class="matchday-indicators"><span>Presión <b>${fmt(p.pressure)}/100</b></span><span>Rival <b>${fmt(p.difficulty*100)}/100</b></span><span>Tu oportunidad <b>${fmt(autoChance(s,p)*100)}%*</b></span></div>
   <div class="matchday-cta">${outcome?`<strong class="matchday-result ${win?'good':'bad'}">${win?'✓ MOMENTO CONSEGUIDO':'✕ OCASIÓN PERDIDA'}</strong>`:`${action('play-open',p.id,'▶ ENTRAR A LA CANCHA','primary')}${action('play-auto',p.id,'Simular jugada','secondary')}`}</div>

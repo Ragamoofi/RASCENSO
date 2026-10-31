@@ -64,3 +64,20 @@ test('marcador muestra escudos de los clubes correctos sin alterar las jugadas',
  assert.match(html,/1.*:.*2/s);
  assert.equal(JSON.stringify(plays),original);
 });
+
+
+test('4.4 · localía del rival y estado del archivo coinciden con los partidos registrados',()=>{
+ const s={clubId:'local',position:'DC',attributes:{shot:70,pace:70,pass:70,physical:70,defense:70,dribble:70}};
+ const p={id:'local-test',type:'penal',kind:'attack',credit:'goal',rival:'Visita',rivalId:'visitante',
+  isHome:true,before:{gf:0,ga:0},minute:70,round:1,pressure:35,difficulty:.3,fatigue:.1};
+ const club=id=>({name:id,country:'Chile'}),badge=id=>'<span>'+id+'</span>';
+ const home=matchdayPanel(s,[p],club,badge);
+ assert.match(home,/RIVAL VISITANTE/);
+ assert.match(home,/RASCENSO <b>LIVE<\/b>/);
+ const away=matchdayPanel(s,[{...p,isHome:false}],club,badge);
+ assert.match(away,/RIVAL LOCAL/);
+ const finished=matchdayPanel(s,[{...p,result:{success:true,detail:'gol'}}],club,badge);
+ assert.match(finished,/RASCENSO <b>ARCHIVO<\/b>/);
+ assert.match(finished,/MOMENTO REGISTRADO/);
+ assert.doesNotMatch(finished,/EL PARTIDO ESTÁ EN JUEGO/);
+});
