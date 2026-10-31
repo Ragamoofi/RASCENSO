@@ -31,9 +31,10 @@ def build():
         ids = set()
         for m in members:
             match = re.fullmatch(r"fm/([0-9]+)\.png", m.filename)
-            if not match:
+            if not match and m.filename != "fm/.png":
                 raise ValueError("Ruta inesperada: " + m.filename)
-            ident = match.group(1)
+            # 862 copas traen ID FM; una fue identificada solo por nombre.
+            ident = match.group(1) if match else "_2016-copa-bicentenario"
             if ident in ids:
                 raise ValueError("ID duplicado: " + ident)
             ids.add(ident)
