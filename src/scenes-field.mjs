@@ -332,7 +332,7 @@ const rondo={
    moveToward(p,target.x,target.y,p.speed*(.68+m.ai.d*.12),dt);
   });
    for(const p of m.press)if(dist(p,m.ball)<.6&&!m.result){setBanner(m,p.x,p.y);return m.finish(false,'interceptado',.2);}
-   if(dist(m.target,m.ball)<.8){m.ball.owner=m.target;m.holdT=0;m.done++;m.hint=`${m.done}/${m.need} pases`;if(m.done>=m.need&&!m.result){setBanner(m,m.target.x,m.target.y);return m.finish(true,'posesión',.6+m.stats.pass*.3);}}}
+   if(dist(m.target,m.ball)<.82+m.stats.pass*.28){m.ball.owner=m.target;m.holdT=0;m.done++;m.hint=`${m.done}/${m.need} pases`;if(m.done>=m.need&&!m.result){setBanner(m,m.target.x,m.target.y);return m.finish(true,'posesión',.6+m.stats.pass*.3);}}}
   if(timeUp(m)){setBanner(m,m.c.x,m.c.y);return m.finish(true,'posesión',.5);}
  },
  down(m){if(!m.ball.owner)return;const tx=m.pointer.wx,ty=m.pointer.wy;const t=m.spots.filter(p=>p!==m.ball.owner).sort((a,b)=>Math.hypot(a.x-tx,a.y-ty)-Math.hypot(b.x-tx,b.y-ty))[0];if(Math.hypot(t.x-tx,t.y-ty)>3)return;
@@ -500,7 +500,7 @@ const achique={
 };
 
 const salida_aerea={
- init(m){m.timer=4.5;setupCross(m,{landing:{x:rnd(m,46,50),y:rnd(m,11,18)},time:rnd(m,1.3,1.55),peak:3.4,contact:2.4,from:[40,rnd(m,0,1)<.5?1.5:27.5]});m.st=makePlayer(m.landing.x-3.7,m.landing.y+rnd(m,-2,2),{num:'9',speed:m.ai.defSpeed*.94});m.def=makePlayer(m.st.x+.8,m.st.y+.6,{num:'4',team:'us',speed:5});
+ init(m){m.timer=4.5;setupCross(m,{landing:{x:rnd(m,46,50),y:rnd(m,11,18)},time:rnd(m,1.3,1.55),peak:3.4,contact:2.4,from:[40,rnd(m,0,1)<.5?1.5:27.5]});m.st=makePlayer(m.landing.x-3.2,m.landing.y+rnd(m,-2,2),{num:'9',speed:m.ai.defSpeed*.94});m.def=makePlayer(m.st.x+.8,m.st.y+.6,{num:'4',team:'us',speed:5});
   m.me=makePlayer(51,14.5,{num:'1',team:'us',r:.5});m.hint='Muévete hacia la sombra · clic para atrapar con las manos';},
  update(m,dt){
   if(m.caught)return;stepBall(m.ball,dt);m.steer(m.me,m.stats.sprint,dt,[44,51.8,6,23]);if(m.t>m.ai.defReaction*.5)moveToward(m.st,m.landing.x,m.landing.y,m.st.speed,dt);moveToward(m.def,m.st.x+.6,m.st.y,5.5,dt);
@@ -518,7 +518,7 @@ const salida_aerea={
   const positioning=clampN(1-d/reach,0,1),height=clampN(1-Math.abs(m.ball.z-2.0)/2.5,0,1);
   const pressure=clampN(1-dist(m.st,m.me)/2,0,1);
   const control=positioning*.45+height*.25+m.stats.reflex*.25+m.stats.jump*.15-pressure*.12-m.ai.d*.12;
-  if(control>=.40+m.ai.d*.045){m.caught=true;m.ball.owner=m.me;return m.finish(true,'atajada',clampN(control,0,1));}
+  if(control>=.38+m.ai.d*.018){m.caught=true;m.ball.owner=m.me;return m.finish(true,'atajada',clampN(control,0,1));}
   // Si no logra asegurarla, la pelota queda viva y el delantero puede disputar el rebote.
   m.ball.owner=null;m.ball.vx=-3;m.ball.vy=(m.ball.y<m.me.y?-1:1)*2;m.ball.vz=1.8;m.ball.g=9.8;m.me.stun=.45;m.hint='¡Se escapó! Ve por el rebote';},
  draw(m,g){drawPitch(g);drawRing(g,m.landing.x,m.landing.y,.5,'rgba(255,255,255,.18)',{dash:[3,4]});them(m,m.st);us(m,m.def);keeper(m,m.me,true);drawBall(g,m.ball);}
