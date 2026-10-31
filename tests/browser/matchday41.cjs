@@ -26,8 +26,17 @@ const {chromium}=require('playwright');
    if(overflow)throw Error('Desbordamiento horizontal '+width);
    await page.locator('.matchday-calendar').evaluate(x=>x.open=true);
    if(process.env.SHOTS)await page.screenshot({path:process.env.SHOTS+'/matchday-'+width+'.png',fullPage:true});
+   // Simular la temporada debe registrar TODOS los momentos pendientes, no descartarlos.
+   const available=await page.locator('.matchday-fixture').count();
+   await page.locator('[data-action=season-next]').click();
+   const completed=await page.evaluate(()=>JSON.parse(localStorage.getItem('rascenso-save-v2')));
+   const season=completed.lastSeason;
+   if(!season||!season.matchdayImpact)throw Error('No se guardó el impacto al cerrar temporada');
+   if(season.plays.length!==available)throw Error('Se perdieron jugadas: '+season.plays.length+'/'+available);
+   if(!season.plays.every(p=>p.auto===true))throw Error('Quedaron jugadas sin resolver en modo rápido');
+   if(season.matchdayImpact.total!==available)throw Error('No coincide el impacto con el calendario');
    if(errors.length)throw Error(errors.join(' | '));
-   console.log(width+'x'+height+': Centro de Partido, guardado y ritmo inmersivo correctos');
+   console.log(width+'x'+height+': Centro de Partido y modo rápido completos, '+available+' jugadas registradas');
    await page.close();
   }
  }finally{await browser.close();}
