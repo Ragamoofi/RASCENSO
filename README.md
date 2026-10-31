@@ -1,10 +1,24 @@
 # RASCENSO · Del barrio a la historia
 
-**RASCENSO 2.0 — Mundo Vivo** · © Ragamoofi.
+**RASCENSO 3.0 — Jugadas Vivas** · © Ragamoofi.
 
 Sitio oficial de prueba: https://ragamoofi.github.io/RASCENSO/
 
-## Novedades 2.0 · Mundo Vivo
+## Novedades 3.0 · Jugadas Vivas
+
+Los minijuegos se reconstruyeron desde cero con un **motor 2D propio en canvas** (sin dependencias): cancha vista desde arriba y vista de portería, física de pelota con altura y sombra, rivales con IA, efectos y control por ratón, táctil o teclado.
+
+- **20 jugadas distintas, repartidas por posición.** Cada puesto tiene situaciones y controles propios:
+  - **Delantero:** mano a mano, penal, cabezazo y remate de primera.
+  - **Extremo:** duelo contra el lateral, diagonal con rosca, centro a la carrera y tiro libre.
+  - **Mediocampista:** pase filtrado (con línea de fuera de juego), contragolpe 3 contra 2, control del ritmo y recuperación.
+  - **Defensa:** duelo defensivo, anticipación, despeje aéreo y línea del fuera de juego.
+  - **Arquero:** asedio de remates, penal en contra, achique y salida por arriba.
+- **Hasta 3 jugadas por temporada** según tu rol, en partidos reales del calendario y preferentemente ajustados. Cada una tiene minuto, marcador previo, presión, cansancio y dificultad según el rival y la etapa de la carrera.
+- **Atributos que importan:** velocidad, pulso al rematar (que tiembla con la presión y la falta de serenidad), alcance de entrada, salto y reflejos salen de tus atributos. Los arqueros rivales recuerdan hacia dónde pateas los penales.
+- **Sin contradicciones con la simulación:** lograr la jugada suma exactamente un gol o una asistencia en ese partido, o evita exactamente un gol rival. Fallar deja el partido como lo simuló el motor. El resto de la temporada no cambia. Puedes resolver una jugada automáticamente (se muestra la probabilidad) o dejarla sin jugar.
+
+
 
 El mundo ya no espera al jugador: clubes, entrenadores y futbolistas evolucionan cada temporada, y cada decisión deja huella.
 
@@ -28,12 +42,15 @@ node --test tests/*.test.mjs
 node tests/ui-smoke.mjs
 ```
 
-Prueba de navegador opcional (requiere Playwright y un servidor estático en la raíz):
+Pruebas de navegador opcionales (requieren Playwright y un servidor estático en la raíz):
 
 ```bash
 python3 -m http.server 8765
 node tests/browser/e2e.cjs http://localhost:8765/index.html chromium
+node tests/browser/plays-e2e.cjs
 ```
+
+`tests/browser/plays-harness.html` es un banco de pruebas de las 20 jugadas: incluye un bot aleatorio y uno competente (`runSmart`) para medir el equilibrio.
 
 ---
 

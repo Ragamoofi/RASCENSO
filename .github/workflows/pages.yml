@@ -22,6 +22,7 @@ jobs:
         run: |
           for file in src/*.mjs tests/*.mjs; do node --check "$file"; done
           node --check tests/browser/e2e.cjs
+          node --check tests/browser/plays-e2e.cjs
       - name: Validar motor e interfaz
         run: |
           node --test tests/*.test.mjs
@@ -49,6 +50,11 @@ jobs:
           test -s src/world20.mjs
           test -s src/story20.mjs
           test -s src/ui20.mjs
+          test -s src/plays30.mjs
+          test -s src/match2d.mjs
+          test -s src/scenes-field.mjs
+          test -s src/scenes-goal.mjs
+          test -s src/plays-ui.mjs
           test -s assets/brand/rascenso-wordmark.png
           test -s assets/brand/rascenso-icon.png
           test -s favicon.png

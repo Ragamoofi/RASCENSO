@@ -6,6 +6,7 @@ import { COUNTRIES } from './countries.mjs';
 import { identitySeasonEffects, preparationEffects, creatorIdentityEffects } from './career08.mjs';
 import { seasonAgendaEffects } from './agenda09.mjs';
 import { momentScoreDelta } from './moments15.mjs';
+import { fixturePlayDelta } from './plays30.mjs';
 import { VERIFIED_LEAGUES, getInauguralLeague } from './leagues2026.mjs';
 import { dynamicLevel, coachFor } from './world20.mjs';
 import { squadRole, threadEffects, coachSeasonEffects } from './career20.mjs';
@@ -128,7 +129,8 @@ export function playLeague(state){
   let gh=goals(lambdaHome,r),ga=goals(lambdaAway,r);
   if(plays&&plan==='ataque'){if(r()<.18){if(home.id===state.clubId)gh=Math.min(8,gh+1);else ga=Math.min(8,ga+1);}}
   if(plays&&plan==='defensa'){if(r()<.20){if(home.id===state.clubId)ga=Math.max(0,ga-1);else gh=Math.max(0,gh-1);}}
-  const clutch=momentScoreDelta(state.clutchMoment,f,plays);
+  // Jugadas Vivas 3.0 (varias por temporada) o la jugada única de partidas anteriores.
+  const clutch=fixturePlayDelta(state.plays30?.year===year?state.plays30.results:null,f,plays)||momentScoreDelta(state.clutchMoment,f,plays);
   if(clutch?.attack){if(f.home===state.clubId)gh=Math.min(9,gh+1);else ga=Math.min(9,ga+1);}
   if(clutch?.defend){if(f.home===state.clubId)ga=Math.max(0,ga-1);else gh=Math.max(0,gh-1);}
   const homeRow=rows[f.home],awayRow=rows[f.away];
@@ -147,7 +149,7 @@ export function playLeague(state){
     // no debe entrar también al reparto aleatorio de los goles ordinarios.
     const regularGoals=Math.max(0,forGoals-(clutch?.attack?1:0));
     for(let k=0;k<regularGoals;k++){if(r()<scoringChance)g++;else if(r()<assistingChance)a++;}
-    if(clutch?.attack){if(['pase','corner','centro'].includes(clutch.type))a++;else g++;}
+    if(clutch?.attack){if(clutch.credit?clutch.credit==='assist':['pase','corner','centro'].includes(clutch.type))a++;else g++;}
     userGoals+=g;userAssists+=a;
     if(skillGroup==='goalkeeper'){goalsConceded+=against;if(against===0){cleanSheets++;clean=1;}}
    }

@@ -5,6 +5,7 @@ import { COACH_STYLES, THREAD_INFO, activeThreads, scoutedPotential, careerRecor
 import { coachFor, worldClub, worldRival, topPlayers, generationPlayers, powerRanking, risingClubs, clubTrend, newsIcon, dynamicPrestige, AWARD_NAMES } from './world20.mjs';
 import { currentObjectives, currentRole, canRetire, NEGOTIATION_ASKS } from './engine.mjs';
 import { annualSalaryLabel } from './market.mjs';
+import { PLAYS } from './plays30.mjs';
 
 // Utilidades compartidas con experience.mjs (único escapador HTML del juego).
 export const h=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -65,7 +66,9 @@ export function recapExtras(s){
  const awards=aw?`<section class="v2-panel v2-awards"><header><span>PREMIOS ${x.year}</span><b>${mine.length?`${mine.length} ganado(s)`:'—'}</b></header>${mine.map(a=>`<div class="v2-award won"><i>★</i><div><strong>${h(a.name)}</strong><small>${h(a.text)}</small></div></div>`).join('')}${leagueAwards.filter(a=>!a.winner?.you).map(a=>`<div class="v2-award"><i>☆</i><div><strong>${h(a.name)}</strong><small>${h(a.text)}</small></div></div>`).join('')}${aw.ranking?.length?`<div class="v2-ballot"><small>${h(AWARD_NAMES.ball)} · TOP 5</small>${aw.ranking.slice(0,5).map(r=>`<span class="${r.you?'you':''}"><b>${r.place}</b>${h(r.name)}<em>${h(clubName(r.clubId))}</em></span>`).join('')}${aw.youPlace&&aw.youPlace>5?`<span class="you"><b>${aw.youPlace}</b>${h(s.name)}<em>Tu puesto</em></span>`:''}</div>`:''}</section>`:'';
  const growth=(x.devNotes||[]).length||x.rivalChange?`<section class="v2-panel"><header><span>DESARROLLO Y VESTUARIO</span><b>Media ${x.ovrBefore} → ${x.ovrAfter}</b></header>${(x.devNotes||[]).map(d=>`<p class="v2-note ${d.kind}">${h(d.text)}</p>`).join('')}${x.rivalChange?`<p class="v2-note">${h(x.rivalChange)}</p>`:''}${x.relegated?'<p class="v2-note injury">El club descendió de categoría.</p>':''}${x.promoted?'<p class="v2-note breakout">¡El club consiguió el ascenso!</p>':''}</section>`:'';
  const headlines=yearNews.length?`<section class="v2-panel"><header><span>EL MUNDO ESTE AÑO</span><b>${yearNews.length} titulares</b></header><div class="v2-news compact">${yearNews.map(newsItem).join('')}</div></section>`:'';
- return `<div class="v2-recap-grid">${objectives}${awards}${growth}${headlines}</div>`;
+ const plays=(x.plays||[]);
+ const playBlock=plays.length?`<section class="v2-panel"><header><span>TUS JUGADAS VIVAS</span><b>${plays.filter(p=>p.success).length}/${plays.length} logradas</b></header>${plays.map(p=>`<div class="v2-award ${p.success?'won':''}"><i>${p.success?'★':'☆'}</i><div><strong>${h(PLAYS[p.type]?.name||p.type)} · min ${p.minute}' ante ${h(p.rival)}</strong><small>${p.success?(p.kind==='attack'?(p.credit==='assist'?'Asistencia de gol':'Gol'):'Evitaste el gol rival'):'No salió: '+h(p.detail)}${p.finalScore?` · resultado final ${h(p.finalScore)}`:''}${p.auto?' · resuelta automáticamente':''}</small></div></div>`).join('')}</section>`:'';
+ return `<div class="v2-recap-grid">${playBlock}${objectives}${awards}${growth}${headlines}</div>`;
 }
 function newsItem(nw){return `<article class="v2-news-item ${nw.mine?'mine':''} k-${h(nw.kind)}"><i>${newsIcon(nw.kind)}</i><div><strong>${h(nw.title)}</strong><small>${h(nw.year)} · ${h(nw.text)}</small></div>${nw.clubId?badge(nw.clubId,'tiny'):''}</article>`;}
 
