@@ -140,6 +140,22 @@ const NEWS_LIMIT=90;
 export function pushNews(world,item){return {...world,news:[...(world?.news||[]),item].slice(-NEWS_LIMIT)};}
 function news(list,year,kind,title,text,extra={}){list.push({year,kind,title,text,...extra});}
 const KIND_ICON={champion:'🏆',promotion:'▲',relegation:'▼',coach:'♟',transfer:'⇄',retire:'☾',injury:'✚',award:'★',crisis:'⚠',investment:'€',prospect:'✦',record:'◆',you:'●',rival:'⚔'};
+/** Selección editorial: dar variedad a las noticias reales sin inventar sucesos. */
+export function selectWorldHeadlines(fresh){
+ const limit={coach:2,transfer:3,retire:2,injury:2,prospect:2,award:2,record:2,crisis:1,investment:1,rival:2,you:2};
+ const rank={you:0,rival:1,record:2,transfer:3,prospect:4,award:5,injury:6,retire:7,investment:8,crisis:9,coach:10};
+ const sort=(a,b)=>(b.mine?1:0)-(a.mine?1:0)||(rank[a.kind]??11)-(rank[b.kind]??11)||(b.weight||0)-(a.weight||0);
+ const champions=fresh.filter(x=>x.kind==='champion').sort(sort).slice(0,5);
+ const used={},others=[];
+ for(const x of fresh.filter(x=>x.kind!=='champion').sort(sort)){
+  if(others.length>=13)break;
+  const cap=limit[x.kind]??2;
+  if((used[x.kind]||0)>=cap)continue;
+  used[x.kind]=(used[x.kind]||0)+1;others.push(x);
+ }
+ return [...champions,...others];
+}
+
 export const newsIcon=k=>KIND_ICON[k]||'◎';
 
 /** Revelación basada en una temporada efectivamente disputada, una vez por futbolista. */
@@ -279,12 +295,26 @@ export function advanceWorld(state,playedLeague,userSeason){
  const awardsYear=worldAwards(S,world,year,userSeason,tables);
  world.awards=[...world.awards,awardsYear].slice(-30);
  for(const a of awardsYear.list){if(a.winner?.you)news(fresh,year,'award',`${state.name} gana: ${a.name}`,a.text,{mine:true,weight:200});else if(a.global)news(fresh,year,'award',`${a.winner.name}: ${a.name}`,a.text,{playerId:a.winner.id});}
+ // Noticias sobre partidos realmente disputados, no escenas inventadas.
+ if(userSeason&&(userSeason.matches||0)>=5){
+  const clubName=worldClub(state.clubId)?.name||'su club';
+  const m=userSeason.matches||0,g=userSeason.goals||0,a=userSeason.assists||0,cs=userSeason.cleanSheets||0;
+  let title='';
+  if(g>=20)title=`${state.name} protagoniza una campaña goleadora`;
+  else if(a>=12)title=`${state.name}, entre los grandes asistentes`;
+  else if(state.position==='POR'&&cs>=12)title=`${state.name} destaca bajo los tres palos`;
+  else if(userSeason.leaguePosition===1)title=`${state.name} celebra el campeonato con ${clubName}`;
+  else if(m>=25&&Number(userSeason.rating)>=7.3)title=`${state.name} se consolida en ${clubName}`;
+  if(title)news(fresh,year,'you',title,`En ${m} partidos con ${clubName}, ${state.name} registró ${g} goles, ${a} asistencias y una nota media de ${Number(userSeason.rating||0).toFixed(1)}.`,{mine:true,clubId:state.clubId,weight:180});
+ }
+ // Las figuras del mundo también tienen temporadas destacadas, con estadísticas verificables.
+ const scorers=world.players.filter(p=>p.seasons?.at(-1)?.year===year&&p.seasons.at(-1).goals>=22).sort((a,b)=>b.seasons.at(-1).goals-a.seasons.at(-1).goals);
+ if(scorers[0]){const p=scorers[0],last=p.seasons.at(-1),club=worldClub(last.clubId);
+  news(fresh,year,p.rival?'rival':'record',`${p.name} firma una temporada goleadora`,`${last.goals} goles en ${last.apps} partidos con ${club?.name||'su club'} durante ${year}.`,{playerId:p.id,clubId:p.clubId,rival:!!p.rival,weight:last.goals});
+ }
  world.year=year;
- // Variedad: como máximo cinco campeones (los más relevantes) y el resto de historias del año.
- const relevance=(a,b)=>(b.mine?1:0)-(a.mine?1:0)||(b.weight||0)-(a.weight||0);
- const champs=fresh.filter(x=>x.kind==='champion').sort(relevance).slice(0,5);
- const others=fresh.filter(x=>x.kind!=='champion').sort(relevance).slice(0,13);
- world.news=[...world.news,...champs,...others].slice(-NEWS_LIMIT);
+ // Portada deportiva con cupos por tema: sin saturar de cambios de entrenador.
+ world.news=[...world.news,...selectWorldHeadlines(fresh)].slice(-NEWS_LIMIT);
  return world;
 }
 
