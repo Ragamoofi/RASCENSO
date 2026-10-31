@@ -30,6 +30,14 @@ function shoot(m,ball,from,ty,{noise=1,speed=null,lift=null,curl=0}={}){
  kick(ball,G.x+.5,target,sp,lift??Math.max(0,m.rand()*1.8*(st.aimNoise*.6)+(d>16?1.4:.4)),curl);
  m.shotAt=m.t;m.shotTarget=target;
 }
+/** Colisión sobre el recorrido anterior a la línea de gol, con altura interpolada. */
+export function sweptKeeperContact(previous,ball,k,reach){
+ const dx=ball.x-previous.x,dy=ball.y-previous.y,len=dx*dx+dy*dy;
+ const end=dx>0&&ball.x>FIELD.goalX?clampN((FIELD.goalX-previous.x)/dx,0,1):1;
+ const t=len?clampN(((k.x-previous.x)*dx+(k.y-previous.y)*dy)/len,0,end):0;
+ const x=previous.x+dx*t,y=previous.y+dy*t,z=previous.z+(ball.z-previous.z)*t;
+ return z<2.4&&Math.hypot(x-k.x,y-k.y)<reach;
+}
 /** Avanza un remate en vuelo: reacción y estirada del arquero, palo, gol o fuera. */
 function shotFlight(m,ball,k,dt,{reaction=0,credit=null}={}){
  const previous={x:ball.x,y:ball.y,z:ball.z};
@@ -37,7 +45,7 @@ function shotFlight(m,ball,k,dt,{reaction=0,credit=null}={}){
  const cross=goalCrossing(ball);
  // Estirada: el arquero se lanza hacia la línea del remate (no hacia el arco), con alcance limitado.
  if(k&&m.t-m.shotAt>m.ai.keeperReaction+reaction&&cross){if(!k.diving){const t=Math.max(.05,(k.x-ball.x)/Math.max(1,ball.vx));k.diveTo={x:k.x,y:ball.y+ball.vy*t};}moveToward(k,k.diveTo.x,k.diveTo.y,k.speed*1.15,dt);k.diving=true;}
- if(k&&segDist(k,previous,ball)<k.reach*(k.diving?1.15:.85)&&Math.min(previous.z,ball.z)<2.4&&!m.result){ball.vx*=-.35;ball.vy=(m.rand()-.5)*12;ball.vz=3;setBanner(m,k.x,k.y);return m.finish(false,'atajado',.2);}
+ if(k&&sweptKeeperContact(previous,ball,k,k.reach*(k.diving?1.15:.85))&&!m.result){ball.vx*=-.35;ball.vy=(m.rand()-.5)*12;ball.vz=3;setBanner(m,k.x,k.y);return m.finish(false,'atajado',.2);}
  if(ball.x>=FIELD.goalX&&!m.result){
   const fraction=clampN((FIELD.goalX-previous.x)/(ball.x-previous.x||1),0,1);
   const crossingY=previous.y+(ball.y-previous.y)*fraction,crossingZ=previous.z+(ball.z-previous.z)*fraction;

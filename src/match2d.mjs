@@ -93,9 +93,10 @@ export function createMatch(canvas,{play,stats,ai,scene,onEnd,hud={}}){
  const onKey=e=>{const down=e.type==='keydown';if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();if(down&&e.repeat)return;
   if(m.phase==='brief'){if(down&&(e.code==='Enter'||e.code==='Space'||e.code==='NumpadEnter'))m.begin();return;}if(down)m.keys.add(e.code);else m.keys.delete(e.code);if(m.phase==='play')scene.key?.(m,e.code,down);};
  const ctxMenu=e=>e.preventDefault();
- canvas.addEventListener('pointermove',onMove);canvas.addEventListener('pointerdown',onDown);canvas.addEventListener('pointerup',onUp);canvas.addEventListener('contextmenu',ctxMenu);
- canvas.addEventListener('pointerleave',()=>{m.pointer.inside=false;});
- const clearKeys=()=>{m.keys.clear();m.pointer.down=false;};
+ const cancelInput=()=>{m.pointer.down=false;if(m.charge!=null&&!m.ball)m.charge=null;};
+ const onLeave=()=>{m.pointer.inside=false;};
+ canvas.addEventListener('pointermove',onMove);canvas.addEventListener('pointerdown',onDown);canvas.addEventListener('pointerup',onUp);canvas.addEventListener('pointercancel',cancelInput);canvas.addEventListener('pointerleave',onLeave);canvas.addEventListener('contextmenu',ctxMenu);
+ const clearKeys=()=>{m.keys.clear();cancelInput();};
  globalThis.addEventListener?.('keydown',onKey);globalThis.addEventListener?.('keyup',onKey);globalThis.addEventListener?.('blur',clearKeys);
  /** Dirección de movimiento: teclado (WASD/flechas) o seguir al puntero. */
  m.steer=(e,speed,dt,limit=null)=>{
@@ -132,7 +133,7 @@ export function createMatch(canvas,{play,stats,ai,scene,onEnd,hud={}}){
   g.restore();
  }
  raf=requestAnimationFrame(frame);
- m.destroy=()=>{alive=false;cancelAnimationFrame(raf);canvas.removeEventListener('pointermove',onMove);canvas.removeEventListener('pointerdown',onDown);canvas.removeEventListener('pointerup',onUp);canvas.removeEventListener('contextmenu',ctxMenu);globalThis.removeEventListener?.('keydown',onKey);globalThis.removeEventListener?.('keyup',onKey);globalThis.removeEventListener?.('blur',clearKeys);};
+ m.destroy=()=>{alive=false;cancelAnimationFrame(raf);canvas.removeEventListener('pointermove',onMove);canvas.removeEventListener('pointerdown',onDown);canvas.removeEventListener('pointerup',onUp);canvas.removeEventListener('pointercancel',cancelInput);canvas.removeEventListener('pointerleave',onLeave);canvas.removeEventListener('contextmenu',ctxMenu);globalThis.removeEventListener?.('keydown',onKey);globalThis.removeEventListener?.('keyup',onKey);globalThis.removeEventListener?.('blur',clearKeys);};
  // Solo para pruebas automáticas: avanzar el tiempo sin esperar al navegador.
  m.tick=(dt=1/60)=>{if(m.phase==='brief'||m.phase==='intro'){m.introT=0;m.phase='play';}if(m.phase!=='done'){m.t+=dt;scene.update(m,dt);syncOwned(m.ball);}};
  return m;
@@ -166,7 +167,7 @@ export function drawPlayer(g,p,{color=COLORS.us,dark=COLORS.usDark,ring=null,hig
  g.fillStyle=COLORS.shadow;g.beginPath();g.ellipse(x+3,y+4,r*1.05,r*.7,0,0,7);g.fill();
  if(highlight){g.strokeStyle=COLORS.copper;g.lineWidth=2.5;g.beginPath();g.arc(x,y,r+7+Math.sin(performance.now()/160)*1.5,0,7);g.stroke();}
  if(ring){g.strokeStyle=ring;g.lineWidth=2;g.setLineDash([4,4]);g.beginPath();g.arc(x,y,r+12,0,7);g.stroke();g.setLineDash([]);}
- const f=p.face||[1,0],moving=Math.hypot(p.vx||0,p.vy||0),stride=Math.sin(performance.now()/115+(p.num||0))*Math.min(1,moving/4);
+ const f=p.face||[1,0],moving=Math.hypot(p.vx||0,p.vy||0),stride=Math.sin(performance.now()/115+(Number(p.num)||0))*Math.min(1,moving/4);
  // Silueta cenital: cabeza, brazos, camiseta, pantalón y piernas orientadas al movimiento.
  g.save();g.translate(x,y);g.rotate(Math.atan2(f[1],f[0]));g.lineCap='round';
  g.strokeStyle=dark;g.lineWidth=r*.42;g.beginPath();g.moveTo(-r*.45,-r*.34);g.lineTo(-r*.95-stride*r*.25,-r*.42);g.moveTo(-r*.45,r*.34);g.lineTo(-r*.95+stride*r*.25,r*.42);g.stroke();
@@ -210,8 +211,8 @@ function drawHud(m,g){
 /** Lo que está en juego, en una frase: depende del marcador, del minuto y del tipo de jugada. */
 export function stakes(p){
  const d=p.before.gf-p.before.ga,min=p.minute;
- if(p.kind==='attack')return d===0?`Empate en el minuto ${min}: un gol vale la victoria.`:d===-1?`Pierden por uno: el empate está en tus pies.`:d<=-2?`Un gol para soñar con la remontada.`:`Ganan por ${d}: un gol más sentencia el partido.`;
- return d===0?`Empate en el minuto ${min}: si marcan ellos, se pierde todo.`:d===1?`Ganan por la mínima: este gol rival sería el empate.`:d>1?`Ventaja cómoda, pero un gol rival enciende el partido.`:`Si entra, la derrota se hace más grande.`;
+ if(p.kind==='attack')return d===0?`Con el partido empatado, un gol pone a tu equipo en ventaja.`:d===-1?`Pierden por uno: un gol iguala el marcador.`:d<=-2?`Un gol reduce la diferencia y mantiene viva la remontada.`:`Ya van arriba: un gol aumenta la ventaja.`;
+ return d===0?`El partido está empatado: evita que el rival tome ventaja.`:d===1?`Ganan por la mínima: evita el empate.`:d>1?`Defiende la ventaja y mantén al rival a distancia.`:`Evita que el rival aumente la diferencia.`;
 }
 function drawIntro(m,g){
  const brief=m.phase==='brief';
