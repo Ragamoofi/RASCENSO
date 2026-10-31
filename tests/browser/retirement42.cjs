@@ -46,6 +46,34 @@ const {chromium}=require('playwright');
   if(overflow)throw Error('Desbordamiento horizontal '+width);
   if(errors.length)throw Error(errors.join(' | '));
   if(process.env.SHOTS)await p.screenshot({path:process.env.SHOTS+'/retirement-'+width+'.png',fullPage:true});
+  // Historial 4.6: comprobar asociación de copas por club y estadísticas de selección.
+  await p.evaluate(()=>{
+   const s=JSON.parse(localStorage.getItem('rascenso-save-v2')),y=s.history[0];
+   s.trophyRecords=(s.trophyRecords||[]).concat({title:'Liga de Primera',year:y.year,clubId:y.clubId,kind:'league',leagueId:y.leagueId});
+   y.nationalCaps=2;y.nationalGoals=1;
+   y.competitions=(y.competitions||[]).concat({
+    id:'NAT-CONMEBOL',kind:'international',name:'Copa América',played:2,goals:1,assists:1,minutes:170,
+    championWon:true,playerFixtures:[
+     {home:s.country,away:'AR',score:'2-1',playerPlayed:true,playerMinutes:85},
+     {home:'UY',away:s.country,score:'0-0',playerPlayed:true,playerMinutes:85}
+    ]
+   });
+   localStorage.setItem('rascenso-save-v2',JSON.stringify(s));
+  });
+  await p.reload();
+  await p.locator('[data-action=nav][data-tab=historial]').click();
+  await p.locator('.history-row').first().waitFor();
+  if(await p.locator('.history-mini-cup').count()<1)throw Error('Historial sin trofeos junto al club');
+  if(await p.locator('.history .v2-panel:has-text("POR CLUB")').count())throw Error('El listado por club sigue duplicado');
+  const selection=p.locator('.selection-report');
+  await selection.waitFor();
+  if(!await selection.getByText('Copa América').count()){
+   await selection.locator('.selection-competitions summary').click();
+   if(!await selection.getByText('Copa América').count())throw Error('Falta desglose por selección');
+  }
+  if(!await selection.getByText(/Mi selección/).count())throw Error('Falta encabezado de selección');
+  if(process.env.SHOTS)await p.screenshot({path:process.env.SHOTS+'/history46-'+width+'.png'});
+
   console.log(width+'x'+height+': final de carrera verificado, '+JSON.stringify(detail));
   await p.close();
  }

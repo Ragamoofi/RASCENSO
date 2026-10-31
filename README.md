@@ -1,6 +1,8 @@
 # RASCENSO · Del barrio a la historia
 
-**RASCENSO 4.5 — Vitrina de Trofeos** · © Ragamoofi.
+**RASCENSO 4.6 — Historial, Selección y Legado** · © Ragamoofi.
+
+**Novedad 4.6:** minitrofeos junto a cada temporada/club en Historial, eliminación del bloque redundante «Por club», nuevo informe de selección (solo estadísticas registradas), Legado compacto a 1920×1080 y vitrina con espacio suficiente para copas y nombres completos. [Detalles y pruebas](docs/RASCENSO-4-6.md).
 
 **Novedad 4.5:** vitrina lateral sin aumentar su altura, trofeos PNG distintivos por competición, nombre y año visibles; detalle táctil con club y temporada, y palmarés de retiro más legible. Las copas con imágenes libres verificables muestran reproducciones acreditadas; las demás usan ilustraciones originales distintas, nunca imágenes oficiales inventadas. [Detalles y fuentes](docs/RASCENSO-4-5.md).
 
