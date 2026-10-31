@@ -466,7 +466,7 @@ const achique={
    moveToward(m.st,G.x-2,m.st.y+(FIELD.goalY-m.st.y)*.4,m.st.speed,dt);
    const d=dist(m.st,G);
    if(m.me.dive>0){m.me.dive-=dt;}
-   if(timeUp(m))return m.finish(true,'atajada',.4);
+   if(timeUp(m))return m.finish(false,'superado',.1);
    if(d<m.shootAt||dist(m.st,m.me)<3.2||m.rounded){
     // Dispara al lado más abierto respecto de tu posición.
     const left=FIELD.goalY-FIELD.post+.4,right=FIELD.goalY+FIELD.post-.4;const side=Math.abs(m.me.y-left)>Math.abs(m.me.y-right)?left:right;
@@ -497,7 +497,12 @@ const salida_aerea={
  update(m,dt){
   if(m.caught)return;stepBall(m.ball,dt);m.steer(m.me,m.stats.sprint,dt,[44,51.8,6,23]);if(m.t>m.ai.defReaction*.5)moveToward(m.st,m.landing.x,m.landing.y,m.st.speed,dt);moveToward(m.def,m.st.x+.6,m.st.y,5.5,dt);
   if(dist(m.st,m.ball)<.9&&m.ball.z<2.6&&m.ball.z>.3&&dist(m.st,m.ball)<dist(m.me,m.ball)-.2&&!m.result){setBanner(m,m.st.x,m.st.y);return m.finish(false,'gol rival',.1);}
-  if(m.ball.z<=0&&m.t>.3&&!m.result){setBanner(m,m.ball.x,m.ball.y);const mine=dist(m.me,m.ball)<dist(m.st,m.ball);return m.finish(mine,mine?'controlada':'gol rival',.3);}
+  if(m.ball.z<=0&&m.t>.3&&!m.result){
+   const keeperDistance=dist(m.me,m.ball),strikerDistance=dist(m.st,m.ball);
+   if(keeperDistance<.85&&keeperDistance<strikerDistance){setBanner(m,m.ball.x,m.ball.y);return m.finish(true,'controlada',.3);}
+   if(strikerDistance<.85&&strikerDistance<keeperDistance){setBanner(m,m.ball.x,m.ball.y);return m.finish(false,'gol rival',.1);}
+   if(timeUp(m)){setBanner(m,m.ball.x,m.ball.y);return m.finish(false,'balón suelto',.1);}
+  }
  },
  down(m){if(m.caught||m.me.stun>0||m.result)return;const d=dist(m.me,m.ball),top=2.6+m.stats.jump*.8,reach=1.35+m.stats.reach*.2;
   if(d>reach||m.ball.z>top){m.say('¡NO LLEGA!',false);m.me.stun=.35;return;}

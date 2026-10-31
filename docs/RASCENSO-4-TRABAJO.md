@@ -50,3 +50,7 @@ Rama de trabajo: `rascenso-4-integral`. Base: `bb85f188cf63e016ba8429b8d24b44d53
 - La matriz sigue mostrando extremos en recuperación, achique, salida aérea y reflejos; priorizar su calibración sin resultados arbitrarios. El pase filtrado sigue difícil con dificultad alta.
 - Pendientes: renovación individual y pruebas manuales de los 20 minijuegos, interfaz, mundo y narrativa; revisar los 48 escudos sin fuente y verificar externamente los demás. No fusionar ni desplegar hasta completar y validar.
 - Antes de este ajuste: 214 pruebas locales aprobadas, cuatro carreras simuladas completas; pruebas de navegador anteriores aprobadas, sin validar visualmente este ajuste.
+
+## Continuación: balones sueltos y achique
+- Base anterior: 82054601d18bf68a2eabe2501b4168cd451abacd. La salida aérea ya no resuelve a favor del jugador solo por estar más cerca de un balón lejano: ambos deben llegar a disputar el rebote, con límite de tiempo. En achique, agotar el tiempo con el rival en posesión ya no concede una atajada.
+- La batería automática del commit 8205460 terminó correctamente en GitHub Actions. Estos ajustes nuevos todavía requieren revisión visual y humana. El bot omnisciente sigue logrando 98–100 % en salida aérea y 100 % en achique: no se considera resuelto el equilibrio.
