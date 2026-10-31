@@ -80,7 +80,7 @@ function arrive(m,gx,gz,k,{shooter=true}={}){
 
 /* ---------- Penal (pateador) ---------- */
 const penal={
- init(m){m.k={x:0,p:0};m.charge=null;m.ball=null;const mem=m.play.memory||[];m.tendency=mem.length?mem.reduce((a,b)=>a+b,0)/mem.length:.5;m.hint='Apunta · mantén pulsado para cargar · suelta para patear';m.bannerAt=[CX,GY-90];},
+ init(m){m.k={x:0,p:0};m.charge=null;m.ball=null;const mem=m.play.memory||[];m.tendency=mem.length?mem.reduce((a,b)=>a+b,0)/mem.length:.5;m.hint='Apunta · mantén clic izquierdo para potencia o derecho para colocar · suelta para patear';m.bannerAt=[CX,GY-90];},
  aim(m){const n=m.stats.nerves*42,t=m.t;return [m.pointer.x+Math.sin(t*2.1)*n+Math.sin(t*3.7)*n*.6,m.pointer.y+Math.cos(t*1.7)*n*.7];},
  power(m){if(m.charge==null)return 0;const e=(m.t-m.charge)/1.15;const ph=e%2;return ph<1?ph:2-ph;},
  update(m,dt){
@@ -88,12 +88,17 @@ const penal={
   const b=m.ball;b.t+=dt;
   if(!m.k.diving&&b.t>=m.keeperDelay){const guess=m.keeperGuess;startDive(m.k,guess[0],guess[1],m.ai.keeperReach+1.55);}
   stepDive(m.k,dt,clampN(.285-m.ai.d*.035,.25,.285));
-  if(b.t>=b.T&&!m.result){b.t=b.T;arrive(m,b.gx,b.gz,m.k);}
+  if(b.saved){if(b.t>=b.T+.45&&!m.result)m.finish(false,'atajado',.2);return;}
+  if(b.t>=b.T&&!m.result){
+   if(Math.abs(b.gx)<POST-.11&&b.gz<BAR-.06&&b.gz>=0&&covers(m.k,b.gx,b.gz)){
+    const pose=keeperPose(m.k);b.saved=true;b.contact=Math.hypot(b.gx-pose.hx,b.gz-pose.hz)<.48?'guantes':'cuerpo';b.deflect=(b.gx-pose.bx)>=0?1:-1;
+   }else{b.t=b.T;arrive(m,b.gx,b.gz,m.k);}
+  }
  },
- down(m){if(m.ball||m.charge!=null)return;m.charge=m.t;},
+ down(m,button){if(m.ball||m.charge!=null)return;m.charge=m.t;m.shotStyle=button==='alt'?'placed':'power';},
  up(m){if(m.ball||m.charge==null)return;const pw=this.power(m);const [ax,ay]=this.aim(m);let [gx,gz]=toGoal(ax,ay);
-  const err=m.stats.aimNoise*.32;gx+=m.aimNoise(err);gz+=m.aimNoise(err*.6);if(pw>.9)gz+=(pw-.9)*14;if(pw<.35)gz=Math.max(0,gz-.4);
-  const T=clampN(.62-pw*.24-(m.stats.power-.5)*.09,.32,.66);m.ball={t:0,T,gx,gz:Math.max(0,gz),pw};m.charge=null;m.hint='';
+  const placed=m.shotStyle==='placed',err=m.stats.aimNoise*(placed?.22:.32);gx+=m.aimNoise(err);gz+=m.aimNoise(err*.6);if(pw>.9)gz+=(pw-.9)*(placed?8:14);if(pw<.35)gz=Math.max(0,gz-.4);
+  const T=clampN(.62-pw*.24-(m.stats.power-.5)*.09+(placed?.075:0),.32,.72);m.ball={t:0,T,gx,gz:Math.max(0,gz),pw,placed};m.charge=null;m.hint='';
   // El arquero elige lado: tus penales anteriores y su lectura pesan en la decisión.
   const side=gx<0?-1:1,bias=m.tendency<.5?-1:1;
   const readP=clampN(.25+m.ai.d*.30+(1-pw)*.12,.25,.68);
@@ -105,8 +110,10 @@ const penal={
   m.keeperDelay=clampN(m.ai.keeperReaction*(.65+m.rand()*.7),.10,.42);
   m.report={dir:(gx+POST)/(2*POST)};},
  draw(m,g){stadium(g,m.t);goalFrame(g,m.result?.success?4:0);drawKeeper(g,m.k,COLORS.keeperThem,'#9a7d12');
-  if(m.ball){const b=m.ball,t=clampN(b.t/b.T,0,1),e=1-Math.pow(1-t,2);const [tx,ty]=gs(b.gx,b.gz);const x=lerp(CX,tx,e),y=lerp(H-30,ty,e)-Math.sin(t*Math.PI)*30*b.pw;drawBallAt(g,x,y,lerp(22,9,e));}
-  else{drawBallAt(g,CX,H-30,22);const [ax,ay]=this.aim(m);crosshair(g,ax,ay);powerBar(g,this.power(m));}
+  if(m.ball){const b=m.ball,t=clampN(b.t/b.T,0,1),e=1-Math.pow(1-t,2);const [tx,ty]=gs(b.gx,b.gz);let x=lerp(CX,tx,e),y=lerp(H-30,ty,e)-Math.sin(t*Math.PI)*30*b.pw,r=lerp(22,9,e);
+   if(b.saved){const rebound=clampN((b.t-b.T)/.45,0,1);x=tx+b.deflect*90*rebound;y=ty+95*rebound-28*Math.sin(Math.PI*rebound);r=9+rebound*4;g.fillStyle='#fff';g.font='800 14px Arial';g.textAlign='center';g.fillText(b.contact==='guantes'?'¡DESVÍO CON LOS GUANTES!':'¡ATAJÓ CON EL CUERPO!',CX,72);}
+   drawBallAt(g,x,y,r);}
+  else{drawBallAt(g,CX,H-30,22);const [ax,ay]=this.aim(m);crosshair(g,ax,ay);powerBar(g,this.power(m));if(m.charge!=null){g.fillStyle='#fff';g.font='800 13px Arial';g.textAlign='right';g.fillText(m.shotStyle==='placed'?'COLOCADO':'POTENTE',W-80,130);}}
  }
 };
 // La dirección del penal se guarda para que los arqueros futuros estudien tu tendencia.
