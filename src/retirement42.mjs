@@ -1,5 +1,6 @@
 /* RASCENSO 4.2: retiro y legado con cifras tomadas del historial real. */
 import {careerAchievements,careerHeadline} from './career15.mjs';
+import {renderCareerActs,careerSignature} from './legacy-presentation44.mjs';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const n=x=>new Intl.NumberFormat('es-CL').format(Number(x)||0);
 const year=x=>Number.isFinite(+x)?+x:'—';
@@ -41,6 +42,7 @@ function chart(h){
 }
 export function retirementView(s,{badge,trophyImage,flag,dreamProgress,button}){
  const d=retirementData(s),a=d.a,club=d.last?.club||d.most?.name||'Fútbol profesional';
+ const signature=careerSignature(s,d);
  const stat=(value,label)=>`<div class="farewell-stat"><b>${n(value)}</b><small>${label}</small></div>`;
  const goalkeeping=s.position==='POR';
  const cleanSheets=d.history.reduce((total,y)=>total+(Number(y.cleanSheets)||0),0);
@@ -54,7 +56,7 @@ export function retirementView(s,{badge,trophyImage,flag,dreamProgress,button}){
  ];
 
  const clubs=d.clubs.map((c,i)=>`<div class="farewell-club"><span class="farewell-numeral">${String(i+1).padStart(2,'0')}</span>${badge(c.id,'large')}<div><strong>${esc(c.name)}</strong><small>${year(Math.min(...c.years))}–${year(Math.max(...c.years))} · ${c.years.length} temporada${c.years.length===1?'':'s'}</small></div><b>${n(c.matches)} PJ</b></div>`).join('');
- const trophies=d.unique.slice(0,12).map(t=>`<div class="farewell-trophy"><img src="${esc(trophyImage({title:t.name,kind:t.kind}))}" alt="" loading="lazy"><strong>${esc(t.name)}</strong><small>${n(t.count)} veces · ${esc(t.years.reverse().slice(0,4).join(' / ')||'Año sin registro')}</small></div>`).join('');
+ const trophies=d.unique.slice(0,12).map(t=>`<div class="farewell-trophy"><img src="${esc(trophyImage({title:t.name,kind:t.kind}))}" alt="" loading="lazy"><strong>${esc(t.name)}</strong><small>${n(t.count)} veces · ${esc(t.years.slice().reverse().slice(0,4).join(' / ')||'Año sin registro')}</small></div>`).join('');
  const memories=d.highlights.slice(0,6).map((m,i)=>`<div class="farewell-memory"><b>${String(i+1).padStart(2,'0')}</b><div><small>${esc(m.year||'—')}</small><p>${esc(m.text)}</p></div></div>`).join('');
  const rivals=d.rivalries.map(r=>`<div class="farewell-rival"><strong>${esc(r.name)}</strong><span>${n(r.duels)} momentos decisivos · ${n(r.successes)} favorables</span><small>${n(r.years.size)} temporadas</small></div>`).join('');
  const awards=d.awards.map(m=>`<div class="farewell-award">✦ <strong>${esc(m.title||m.name||m.type||'Reconocimiento')}</strong> <span>${esc(m.year||'')}</span></div>`).join('');
@@ -64,10 +66,11 @@ export function retirementView(s,{badge,trophyImage,flag,dreamProgress,button}){
  return `<div class="farewell-page">
  <section class="farewell-hero" aria-label="Homenaje de carrera"><div class="farewell-hero-top"><span>RASCENSO · DEL BARRIO A LA HISTORIA</span><span>${flag(s.country)} · ${esc(s.position)} · #${n(s.number)}</span></div>
  <div class="farewell-hero-row"><div class="farewell-hero-text"><span class="farewell-kicker">EL ÚLTIMO SILBATAZO · ${year(d.last?.year)}</span>
- <h1>UNA CARRERA.<em>${d.stature==='UNA LEYENDA'?'UNA LEYENDA.':'UNA HISTORIA.'}</em></h1><p class="farewell-name">${esc(s.name)}</p><p>${esc(careerHeadline(s))}</p>
- <div class="farewell-hero-badges"><span>${d.stature}</span><span>${year(d.first?.year)} — ${year(d.last?.year)}</span><span>${n(d.clubs.length)} clubes</span></div>
+ <h1>EL ÚLTIMO<em>SILBATAZO.</em></h1><p class="farewell-name">${esc(s.name)}</p><p>${esc(careerHeadline(s))}</p>
+ <div class="farewell-hero-badges"><span>${d.stature}</span><span>${year(d.first?.year)} — ${year(d.last?.year)}</span><span>${n(d.clubs.length)} clubes</span></div><div class="farewell-signatures">${signature.map(x=>`<span>✦ ${esc(x)}</span>`).join('')}</div>
  </div><div class="farewell-medallion"><span>✦</span><strong>${n(d.history.length)}</strong><small>TEMPORADAS<br>DE HISTORIA</small></div></div>
  <div class="farewell-hero-foot"><span>ÚLTIMA CAMISETA</span><b>${esc(club)}</b>${d.last?.clubId?badge(d.last.clubId,'large'):''}</div></section>
+ ${renderCareerActs(s)}
  <section class="farewell-numbers"><div><span class="farewell-kicker">LOS NÚMEROS DE TU HISTORIA</span><h2>La huella que dejaste</h2></div>
  <div class="farewell-stats">${stats.map(([value,label])=>stat(value,label)).join('')}</div></section>
  <div class="farewell-content"><div class="farewell-main">
