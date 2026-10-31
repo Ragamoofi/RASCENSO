@@ -1,6 +1,7 @@
 /* RASCENSO 4.2: retiro y legado con cifras tomadas del historial real. */
 import {careerAchievements,careerHeadline} from './career15.mjs';
 import {renderCareerActs,careerSignature} from './legacy-presentation44.mjs';
+import {trophyRetirementGrid} from './trophy45.mjs';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const n=x=>new Intl.NumberFormat('es-CL').format(Number(x)||0);
 const year=x=>Number.isFinite(+x)?+x:'—';
@@ -11,7 +12,7 @@ export function retirementData(s){
   return !b||score(x)>score(b)?x:b;
  },null);
  const trophies=[...a.titles].reverse(),unique=new Map();
- for(const t of trophies){const k=String(t.name||'').trim();if(!k)continue;const v=unique.get(k)||{...t,years:[],count:0};v.count++;if(t.year!=null)v.years.push(t.year);unique.set(k,v);}
+ for(const t of trophies){const k=String(t.name||'').trim();if(!k)continue;const v=unique.get(k)||{...t,years:[],entries:[],count:0};v.count++;v.entries.push(t);if(t.year!=null)v.years.push(t.year);unique.set(k,v);}
  const highlights=(s.careerMoments||[]).filter(x=>x.text&&(
  x.kind==='award'||x.kind==='on-field'&&/¡gol!|asistencia de gol|evitaste el gol rival/i.test(x.text)||
  x.kind==='story'&&/Ganaste|cumplid|consagraste|récord/i.test(x.text)
@@ -40,7 +41,7 @@ function chart(h){
  <polyline points="${points}" fill="none" stroke="url(#farewell-line)" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
  </svg><div class="farewell-curve-caption"><span>DEBUT ${year(h[0]?.year)} · ${n(all[0])} MED</span><span>PICO · ${n(Math.max(...all))} MED</span><span>RETIRO ${year(h.at(-1)?.year)} · ${n(all.at(-1))} MED</span></div></div>`;
 }
-export function retirementView(s,{badge,trophyImage,flag,dreamProgress,button}){
+export function retirementView(s,{badge,trophyImage,flag,dreamProgress,button,getClub}){
  const d=retirementData(s),a=d.a,club=d.last?.club||d.most?.name||'Fútbol profesional';
  const signature=careerSignature(s,d);
  const stat=(value,label)=>`<div class="farewell-stat"><b>${n(value)}</b><small>${label}</small></div>`;
@@ -56,7 +57,7 @@ export function retirementView(s,{badge,trophyImage,flag,dreamProgress,button}){
  ];
 
  const clubs=d.clubs.map((c,i)=>`<div class="farewell-club"><span class="farewell-numeral">${String(i+1).padStart(2,'0')}</span>${badge(c.id,'large')}<div><strong>${esc(c.name)}</strong><small>${year(Math.min(...c.years))}–${year(Math.max(...c.years))} · ${c.years.length} temporada${c.years.length===1?'':'s'}</small></div><b>${n(c.matches)} PJ</b></div>`).join('');
- const trophies=d.unique.slice(0,12).map(t=>`<div class="farewell-trophy"><img src="${esc(trophyImage({title:t.name,kind:t.kind}))}" alt="" loading="lazy"><strong>${esc(t.name)}</strong><small>${n(t.count)} veces · ${esc(t.years.slice().reverse().slice(0,4).join(' / ')||'Año sin registro')}</small></div>`).join('');
+ const trophies=trophyRetirementGrid(d.unique,getClub);
  const memories=d.highlights.slice(0,6).map((m,i)=>`<div class="farewell-memory"><b>${String(i+1).padStart(2,'0')}</b><div><small>${esc(m.year||'—')}</small><p>${esc(m.text)}</p></div></div>`).join('');
  const rivals=d.rivalries.map(r=>`<div class="farewell-rival"><strong>${esc(r.name)}</strong><span>${n(r.duels)} momentos decisivos · ${n(r.successes)} favorables</span><small>${n(r.years.size)} temporadas</small></div>`).join('');
  const awards=d.awards.map(m=>`<div class="farewell-award">✦ <strong>${esc(m.title||m.name||m.type||'Reconocimiento')}</strong> <span>${esc(m.year||'')}</span></div>`).join('');
