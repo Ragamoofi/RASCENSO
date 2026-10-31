@@ -11,7 +11,7 @@ assert.match(root.innerHTML,/playing-layout/);
 assert.match(root.innerHTML,/right-tabs/);
 assert.match(root.innerHTML,/playing-layout/);
 assert.match(root.innerHTML,/standing-row/);
-assert.match(root.innerHTML,/RASCENSO 4\\.1/);
+assert.ok(root.innerHTML.includes('RASCENSO 4.1'));
 assert.match(root.innerHTML,/v2-season-grid/);
 assert.match(root.innerHTML,/OBJETIVOS/);
 assert.match(root.innerHTML,/LUCHA POR EL PUESTO/);
