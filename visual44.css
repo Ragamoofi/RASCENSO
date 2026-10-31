@@ -1,0 +1,123 @@
+/* RASCENSO 4.4 · Renovación visual cinematográfica. Archivo independiente y reversible. */
+:root{--rv44-copper:#f5b880;--rv44-ice:#c6e4eb;--rv44-ink:#f7f5ef;--rv44-depth:#091b2c}
+.matchday-center{background:linear-gradient(160deg,#132a40 0%,#0b2238 100%);border-color:#648198;box-shadow:0 15px 38px #03101d66;gap:12px}
+.matchday-top{align-items:center!important}.matchday-top>span{color:#f2c29c!important;font-size:12px!important;letter-spacing:.18em!important}
+.matchday-top>div>b{color:#ffca98!important;font-size:14px!important}
+.matchday-progress{height:6px;background:#071b2b}.matchday-progress span{background:linear-gradient(90deg,#3a9d9b,#f7b27e)}
+.matchday-feature{overflow:hidden;position:relative;background:linear-gradient(150deg,#102b3c,#091a2b)!important;border-color:#4b7982!important;padding:0 0 14px!important;gap:9px!important}
+.matchday-feature.defensive{--rv44-accent:#89d7df}.matchday-feature.offensive{--rv44-accent:#f2b484}
+.matchday-arena{height:116px;position:relative;overflow:hidden;background:
+ radial-gradient(ellipse at 50% 95%,#3c7d6666,transparent 67%),
+ repeating-linear-gradient(90deg,#142b3b 0 10px,#1a3343 11px 20px),
+ linear-gradient(#18364a,#0d273b);border-bottom:1px solid #88aca33f}
+.matchday-arena:before,.matchday-arena:after{content:'';position:absolute;top:18px;width:170px;height:115px;background:radial-gradient(ellipse at center,#e5faf55e,transparent 68%);filter:blur(7px);pointer-events:none}
+.matchday-arena:before{left:-58px}.matchday-arena:after{right:-58px}
+.matchday-arena-glow{position:absolute;left:50%;bottom:-90px;transform:translateX(-50%);width:470px;height:170px;background:radial-gradient(ellipse,#5cbe8d55,transparent 70%);pointer-events:none}
+.matchday-arena-heading{position:relative;z-index:1;display:flex;justify-content:space-between;padding:11px 17px;color:#b7d6d8;font-weight:850;letter-spacing:.14em;font-size:9px}
+.matchday-arena-heading b{color:#f2b184;margin-left:5px;border:1px solid #d49a6577;padding:2px 5px;border-radius:3px}
+.matchday-arena-pitch{position:absolute;bottom:-78px;left:50%;width:65%;height:138px;transform:translateX(-50%) perspective(170px) rotateX(42deg);border:2px solid #c5e2c377;background:repeating-linear-gradient(90deg,#0e62447d 0 34px,#1c755381 35px 69px);box-shadow:0 0 25px #1b795861;opacity:.66}
+.matchday-arena-pitch span{position:absolute;inset:0 42%;border:1px solid #e0f7df9c}.matchday-arena-pitch i{position:absolute;left:44%;top:34%;height:50px;width:50px;border:1px solid #e0f7df9c;border-radius:50%}.matchday-arena-pitch b{position:absolute;inset:15px;border:1px solid #e0f7df76}
+.matchday-context{position:relative;z-index:2;align-items:center;padding:0 16px;margin-top:-5px;font-size:10px!important}
+.matchday-context>span{background:#061d30e0;color:#f3c19a;padding:6px 9px;border:1px solid #a87e618a;border-radius:5px}
+.matchday-scoreboard{margin:0 14px;position:relative;z-index:2;gap:10px!important;min-height:92px!important;border:1px solid #75a6a450;border-radius:13px;padding:9px 10px;background:linear-gradient(90deg,#112f4194,#071b2bd4 45%,#112f4194);box-shadow:0 10px 30px #0005}
+.matchday-team{display:grid;justify-items:center;align-content:center;gap:5px;font-size:clamp(11px,1.12vw,15px)!important;font-weight:900;min-width:0}
+.matchday-team>span:last-child{display:block;max-width:100%;text-align:center;overflow-wrap:anywhere}
+.matchday-team-crest{height:35px;width:35px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 3px 6px #0008)}
+.matchday-team-crest img{width:33px;height:33px;object-fit:contain}
+.matchday-scoreboard>strong{display:flex;align-items:center;gap:7px;font:900 clamp(32px,3.2vw,52px)/1 'Barlow Condensed',sans-serif!important;letter-spacing:.02em}
+.matchday-scoreboard>strong span{min-width:27px;text-align:center}.matchday-scoreboard>strong i{color:var(--rv44-accent);font-size:.7em}
+.matchday-rival{color:#9bc9ce!important;letter-spacing:.11em;font-weight:800}
+.matchday-situation{margin:4px 14px 1px;border-left:3px solid var(--rv44-accent);background:#173448bb;display:grid;gap:3px;padding:8px 11px}
+.matchday-situation b{font-size:10px;letter-spacing:.1em;color:var(--rv44-accent)}.matchday-situation span{font-size:12px;color:#e5eff4;line-height:1.4}
+.matchday-feature .matchday-identity{justify-self:start;margin-left:14px;letter-spacing:.06em}
+.matchday-feature h3{font:900 clamp(20px,1.85vw,28px)/1 'Barlow Condensed',sans-serif!important;margin:1px 14px!important;letter-spacing:.015em}
+.matchday-feature>p{margin:0 14px!important;font-size:12px;color:#d2e4ed}
+.matchday-indicators{margin:2px 14px!important;gap:7px!important}
+.matchday-indicators span{background:#092538;border-color:#536c7a;padding:7px 9px!important;border-radius:7px}
+.matchday-indicators span b{color:#f6c198}
+.matchday-cta{margin:4px 14px 0!important}
+.matchday-button.primary{min-height:43px;font-size:13px;letter-spacing:.03em;box-shadow:0 4px 14px #b97c4860}
+.matchday-button.secondary{min-height:43px}
+.matchday-calendar summary{font-size:12px!important;padding:5px 0}
+.matchday-fixture{position:relative;gap:10px;padding:11px!important;border-color:#3d5d75!important;background:linear-gradient(100deg,#132c40,#0c263a)!important}
+.matchday-fixture.up-next:not(.finished){border-color:#c29a6e!important;box-shadow:inset 3px 0 0 #deac77}
+.matchday-fixture-number{font:900 22px 'Barlow Condensed',sans-serif;color:#64869e;flex-shrink:0;min-width:25px}
+.matchday-fixture-info{flex:1}.matchday-fixture-info strong{font-size:12px}
+.matchday-projection{border-left:3px solid #e0a676;background:linear-gradient(120deg,#1b3c46,#0e2a3d)!important}
+
+/* PANTALLA FINAL — escenografía de estadio, tres actos y sala de recuerdos */
+.farewell-page{gap:18px!important}
+.farewell-hero{min-height:340px;background:
+ radial-gradient(ellipse 90% 88% at 50% 130%,#3c8c7566,transparent 67%),
+ radial-gradient(ellipse at 95% 25%,#c3a47925,transparent 45%),
+ linear-gradient(125deg,#071a2c,#174254 53%,#0d253c)!important;border:1px solid #b996726e!important}
+.farewell-hero:before{left:24%;right:-12%!important;top:-35%!important;width:105%!important;height:200%!important;border:1px solid #bce9e229!important;box-shadow:0 0 0 42px #ecf7e608,0 0 0 105px #e3f6e60b,0 0 0 190px #e6efe707!important}
+.farewell-hero:after{background:repeating-linear-gradient(90deg,transparent 0 67px,#b5dfbd0c 68px 70px)!important;mask-image:linear-gradient(0deg,#000 0%,transparent 62%)!important}
+.farewell-hero-row{min-height:245px}
+.farewell-hero-text h1{font-size:clamp(48px,5vw,84px)!important;letter-spacing:-.01em;text-transform:uppercase}
+.farewell-hero-text h1 em{text-shadow:0 0 25px #e0a46d35}
+.farewell-hero .farewell-name{font-size:clamp(27px,2.8vw,42px);margin-top:15px!important;color:#fff}
+.farewell-signatures{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.farewell-signatures>span{background:#071d30ae;border:1px solid #81a6a280;color:#e1e9ea;font-size:10px;font-weight:800;padding:7px 10px;border-radius:5px}
+.farewell-hero-foot{min-height:55px!important;background:#071b2ee5!important;gap:15px!important}
+.farewell-medallion{width:180px!important;height:180px!important;transform:rotate(-7deg);border-color:#f2c38a!important;background:radial-gradient(circle,#274e5b,#092337 72%)!important}
+.farewell-medallion strong{font-size:71px!important}
+.farewell-acts{border:1px solid #45687b;border-radius:14px;background:linear-gradient(125deg,#112b3e,#122b40);padding:17px 18px;overflow:hidden}
+.legacy-act-heading{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px}
+.legacy-act-heading h2{font:900 clamp(24px,2.4vw,33px)/1 'Barlow Condensed',sans-serif;margin:6px 0 0}
+.legacy-act-heading>span{color:#d0aa83;font-size:10px;letter-spacing:.13em;font-weight:850}
+.legacy-acts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;position:relative}
+.legacy-acts:before{content:'';position:absolute;left:12%;right:12%;top:36px;height:1px;background:linear-gradient(90deg,#f0a879,#8bbebc,#f0a879);opacity:.35;pointer-events:none}
+.legacy-act{position:relative;isolation:isolate;display:grid;align-content:start;gap:8px;min-width:0;border:1px solid #547185;border-radius:11px;background:linear-gradient(160deg,#1d4050,#0a2237);padding:16px;box-shadow:0 7px 17px #03121c4d}
+.legacy-act:nth-child(2){border-color:#c99a6e;background:linear-gradient(155deg,#564032,#18364b 65%,#0c2939)}
+.legacy-act-top{display:flex;justify-content:space-between;align-items:center;color:#f1c49c;letter-spacing:.12em;font-size:10px;font-weight:850}
+.legacy-act-top>b{font-size:23px;color:#f5cf9e}
+.legacy-act-year{font:900 clamp(35px,3.3vw,49px)/1 'Barlow Condensed',sans-serif;color:#f5f3ee}
+.legacy-act>strong{font:900 19px/1 'Barlow Condensed',sans-serif;color:#fff}
+.legacy-act>p{font-size:12px;color:#cfe0e8;min-height:19px}
+.legacy-act-metrics{display:flex;flex-wrap:wrap;gap:6px;padding-top:8px;border-top:1px solid #ffffff30}
+.legacy-act-metrics>span{font-size:10px;color:#eac4a7;background:#051a2d83;padding:5px 7px;border-radius:4px;font-weight:750}
+.legacy-act>small{font-size:10px;color:#adc2d2}
+.farewell-numbers{border-color:#8b796974;background:linear-gradient(130deg,#183d4b,#0b2338)!important}
+.farewell-stats .farewell-stat{padding:16px 6px;background:radial-gradient(ellipse at 50% 0%,#51717346,transparent 80%),#0b2437;border-color:#577689}
+.farewell-stats .farewell-stat b{color:#f5d0aa;font-size:clamp(29px,2.7vw,43px)}
+.farewell-content{gap:18px!important}
+.farewell-section{background:linear-gradient(146deg,#193c4d,#0c263d)!important;border-color:#537284!important}
+.farewell-tribute{background:linear-gradient(130deg,#34404a,#153a49)!important;border-left:4px solid #edb17d!important}
+.farewell-trophy{background:linear-gradient(158deg,#31536a,#162f47)!important;min-height:127px;border-color:#708496!important}
+.farewell-trophy img{height:55px;filter:drop-shadow(0 5px 9px #0008)}
+.farewell-club{padding:12px 4px}
+.farewell-club:nth-child(even){background:#b4dff008}
+.farewell-best{background:linear-gradient(110deg,#344b53,#1b3b4d)!important;border-color:#d2a97d}
+.farewell-outro{padding:38px 22px!important;background:radial-gradient(ellipse at 50% 100%,#7ba48a45,transparent 60%),linear-gradient(145deg,#113549,#081e31)!important}
+.farewell-outro h2{font-size:clamp(34px,3.9vw,56px)}
+.play-overlay{backdrop-filter:blur(8px);background:rgba(2,11,19,.88)}
+.play-window{border:1px solid #8798a374!important;border-radius:15px;box-shadow:0 35px 95px #010912c9,0 0 38px #cb995023!important}
+.play-window header{background:linear-gradient(90deg,#163d4b,#091e32)!important;border-bottom:2px solid #bc906b}
+.play-window header strong{font-size:clamp(24px,2.2vw,31px)!important;letter-spacing:.02em}
+.play-window header small{color:#f1c198!important}
+.play-window footer{border-top:1px solid #547087;background:#0a2436;color:#c8e0e9;line-height:1.5}
+.play-stage{background:radial-gradient(ellipse at 50% 50%,#1e694b,#0b2033)}
+.play-stage canvas:focus-visible{outline:3px solid #ebbc93;outline-offset:-3px}
+@media(max-width:1020px){
+ .farewell-medallion{width:130px!important;height:130px!important}.farewell-medallion strong{font-size:54px!important}
+ .legacy-act{padding:12px}.legacy-act-metrics{gap:4px}
+}
+@media(max-width:700px){
+ .matchday-arena{height:90px}.matchday-context{padding:0 10px}.matchday-scoreboard{margin:0 8px;padding:8px;min-height:80px!important}
+ .matchday-team-crest,.matchday-team-crest img{width:28px;height:28px}
+ .matchday-situation,.matchday-feature .matchday-identity,.matchday-feature h3,.matchday-feature>p{margin-left:10px!important;margin-right:10px!important}
+ .matchday-indicators,.matchday-cta{margin-left:10px!important;margin-right:10px!important}
+ .farewell-hero-row{min-height:190px;padding:20px 15px!important}
+ .farewell-hero-text h1{font-size:clamp(36px,9vw,59px)!important}
+ .farewell-hero .farewell-name{font-size:clamp(24px,6vw,34px)!important}
+ .farewell-medallion{width:86px!important;height:86px!important}.farewell-medallion strong{font-size:34px!important}
+ .farewell-acts{padding:13px 10px}
+ .legacy-acts{grid-template-columns:1fr;gap:9px}.legacy-acts:before{display:none}
+ .legacy-act{grid-template-columns:1fr auto;row-gap:4px}
+ .legacy-act-top,.legacy-act-metrics,.legacy-act>small{grid-column:1/-1}.legacy-act-year{font-size:38px}
+ .legacy-act>p{grid-column:1/-1}
+ .farewell-signatures{gap:5px}.farewell-signatures>span{padding:5px 7px;font-size:9px}
+}
+@media(max-width:420px){.matchday-team{font-size:11px!important}.matchday-scoreboard>strong{gap:4px!important;font-size:31px!important}.matchday-scoreboard>strong span{min-width:18px}.farewell-medallion{display:none}}
+@media(prefers-reduced-motion:reduce){.matchday-center *, .farewell-page *, .play-window *{animation:none!important;transition:none!important}}
