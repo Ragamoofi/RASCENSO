@@ -19,6 +19,10 @@ const {chromium}=require('playwright');
   await page.waitForFunction(()=>window.activeMatch.result,{timeout:5000});
   const result=await page.evaluate(()=>({result:activeMatch.result,dive:activeMatch.k.diving,p:activeMatch.k.p}));
   if(!result.dive||!result.result||result.p<=0)throw Error(`No hubo disparo o reacción: ${JSON.stringify(result)}`);
+  await page.evaluate(()=>window.startInteractive('penal'));
+  await page.keyboard.press('Enter');await page.waitForFunction(()=>window.activeMatch.phase==='play');
+  await page.mouse.move(630,275);await page.mouse.down({button:'right'});await page.waitForTimeout(500);await page.mouse.up({button:'right'});
+  const placed=await page.evaluate(()=>activeMatch.ball?.placed);if(placed!==true)throw Error('El clic derecho no produjo un remate colocado');
   if(errors.length)throw Error(errors.join('\n'));
   console.log('Controles reales: inicio, diagonal y penal correctos',JSON.stringify(result));
  }finally{await browser.close();}
