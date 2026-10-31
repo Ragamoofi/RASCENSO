@@ -14,3 +14,9 @@ test('la escena de amistad aparece con historia y no se repite',()=>{
  assert.ok(worldSceneCandidates(ready).some(c=>c.id==='w_friend_competition'));
  assert.ok(!worldSceneCandidates({...ready,storyLog:[{id:'w_friend_competition'}]}).some(c=>c.id==='w_friend_competition'));
 });
+test('la última temporada influye en el rol solo si fue en el mismo club',async()=>{
+ const {squadRole}=await import('../src/career20.mjs');const s=career();const rival={...s.squad.rival,ovr:70};const base={...s,ovr:70,coachTrust:50,morale:70,squad:{...s.squad,clubId:s.clubId,rival}};
+ const good={...base,lastSeason:{clubId:s.clubId,matches:20,rating:7.5}},bad={...base,lastSeason:{clubId:s.clubId,matches:20,rating:5.9}};
+ assert.equal(squadRole(good,70,null),'Titular');assert.equal(squadRole(bad,70,null),'Rotación');
+ assert.equal(squadRole({...good,lastSeason:{...good.lastSeason,clubId:'es-1'}},70,null),squadRole(base,70,null));
+});

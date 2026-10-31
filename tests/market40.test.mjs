@@ -12,3 +12,9 @@ test('el mercado temprano sigue siendo determinista y admite interés internacio
  let foreign=0;for(let i=0;i<50;i++)foreign+=buildTransferOffers({...s,seed:'international-'+i},{focus:'international'}).filter(x=>x.countryCode!=='CL').length;
  assert.ok(foreign>0);
 });
+test('el criterio local funciona en distintos países y ligas',()=>{
+ for(const [country,clubId] of [['AR','ar-1'],['FR','fr-1'],['JP','jp-1']]){let home=0,total=0;
+  for(let i=0;i<80;i++)for(const o of buildTransferOffers({...base,country,clubId,seed:`${country}-${i}`})){total++;if(o.countryCode===country)home++;}
+  assert.ok(total>100&&home/total>.35,`${country}: ${home}/${total}`);
+ }
+});

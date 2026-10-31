@@ -142,9 +142,13 @@ export function squadRole(s,clubLevel,coach){
  const rival=s.squad?.clubId===s.clubId?s.squad.rival:null;
  const trust=s.coachTrust??50;
  const fx=threadEffects(s);
+ const previous=s.lastSeason;
+ // El rendimiento reciente pesa de forma acotada y solo en el club donde se produjo.
+ const form=previous?.clubId===s.clubId&&(previous.matches||0)>=8&&Number.isFinite(previous.rating)?clamp((previous.rating-6.6)*2.5,-2,2):0;
  let score;
  if(rival){score=(s.ovr||60)-rival.ovr+(trust-50)*.11+coachRoleBias(coach,s)+((s.morale??70)-70)*.03+fx.role;}
  else score=(s.ovr||60)-clubLevel+3+(trust-50)*.075+coachRoleBias(coach,s)+fx.role;
+ score+=form;
  // Nadie es titular indiscutido en un club muy superior a su nivel.
  const gap=(s.ovr||60)-clubLevel;
  let role=score>=1?'Titular':score>=-5?'Rotación':score>=-11?'Suplente':'Reserva';
