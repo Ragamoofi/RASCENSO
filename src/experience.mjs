@@ -266,7 +266,13 @@ ROOT.addEventListener('click',e=>{
  if(action==='play-open'){const play=seasonPlays(state).find(p=>p.id===a.dataset.id);if(!play||play.result)return;const id=play.id;
   openPlay({state,play,clubName:getClub(state.clubId)?.name,onDone:res=>mutate(resolveSeasonPlay(state,id,res))});return;}
  if(action==='play-auto')return mutate(autoResolveSeasonPlay(state,a.dataset.id));
- if(action==='season-next'){const pending=seasonPlays(state).filter(p=>!p.result).length;if(pending&&!confirm(`Tienes ${pending} jugada(s) sin jugar. Si simulas ahora, esos partidos quedarán como los calcule el motor. ¿Continuar?`))return;return mutate(advanceSeason(state));}
+ if(action==='season-next'){
+  // Modo rápido: completar realmente los momentos pendientes usando el mismo motor de probabilidades.
+  // La simulación registra sus resultados y consecuencias; no ignora las jugadas al avanzar.
+  let next=state;const pending=seasonPlays(next).filter(p=>!p.result);
+  for(const play of pending)next=autoResolveSeasonPlay(next,play.id);
+  return mutate(advanceSeason(next));
+ }
  if(action==='agent-open'){agentFocusOpen=!agentFocusOpen;render();return;}
  if(action==='agent-focus'){agentFocusOpen=false;return mutate(openAgentMarket(state,a.dataset.focus||'balanced'));}
  if(action==='agent-search')return mutate(askAgentForMore(state));
