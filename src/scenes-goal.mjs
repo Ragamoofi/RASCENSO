@@ -190,13 +190,13 @@ const penal_atajado={
 
 /* ---------- Asedio: tres remates seguidos (arquero) ---------- */
 const reflejos={
- init(m){m.k={x:0,p:0};m.shots=0;m.need=3;m.next(m);m.hint='Muévete con el ratón · clic para estirarte hacia el puntero';m.bannerAt=[CX,GY-90];},
+ init(m){m.k={x:0,p:0};m.shots=0;m.need=m.ai.d>.75?4:3;m.next(m);m.hint='Muévete con el ratón · clic para estirarte hacia el puntero';m.bannerAt=[CX,GY-90];},
  update(m,dt){
-  const k=m.k;stepDive(k,dt,.28-m.stats.reflex*.07);
+  const k=m.k;stepDive(k,dt,.30-m.stats.reflex*.055+m.ai.d*.045);
   if(k.diving&&k.p>=1&&m.t-k.diveAt>.68-m.stats.reflex*.16+(m.stats.fatigue||0)*.14){k.diving=false;k.p=0;k.x=k.dx;k.dx=k.x;k.dz=1.25;}
-  if(!k.diving){const [gx]=toGoal(m.pointer.x,m.pointer.y);const sp=2.4+m.stats.speed*.25;k.x+=clampN(clampN(gx,-3.2,3.2)-k.x,-sp*dt,sp*dt);}
+  if(!k.diving){const [gx]=toGoal(m.pointer.x,m.pointer.y);const sp=2.0+m.stats.speed*.2;k.x+=clampN(clampN(gx,-3.2,3.2)-k.x,-sp*dt,sp*dt);}
   const s=m.shot;
-  if(!s.ball&&m.t>=s.at){s.ball={t:0,T:.45+(1-m.ai.shooterSkill)*.2};}
+  if(!s.ball&&m.t>=s.at){s.ball={t:0,T:.40+(1-m.ai.shooterSkill)*.19-m.ai.d*.045};}
   if(s.ball){s.ball.t+=dt;if(s.ball.t>=s.ball.T){
    const [gx,gz]=s.target;const onTarget=Math.abs(gx)<POST-.11&&gz<BAR-.06;
    if(onTarget&&!covers(k,gx,gz,.05)){m.bannerAt=gs(gx,gz);return m.finish(false,'gol rival',.1);}
@@ -211,7 +211,7 @@ const reflejos={
   const aimed=m.rand()<skill*.55&&Math.abs(m.k.x)>.45;
   const horizontal=off?(m.rand()<.5?-1:1)*(POST+.6):aimed?(m.k.x>0?-1:1)*(.8+m.rand()*(POST-1.2)):(m.rand()*2-1)*(POST-.4);
   m.shot={from:rebound?m.shot?.from??0:from,at:m.t+(rebound?.45:.9+m.rand()*.6),target:[horizontal,.2+m.rand()*1.9],ball:null,rebound};},
- down(m){if(m.k.diving)return;const [gx,gz]=toGoal(m.pointer.x,m.pointer.y);m.k.diveAt=m.t;startDive(m.k,gx,gz,1.4+m.stats.reach*.9);},
+ down(m){if(m.k.diving)return;const [gx,gz]=toGoal(m.pointer.x,m.pointer.y);m.k.diveAt=m.t;startDive(m.k,gx,gz,1.15+m.stats.reach*.75);},
  draw(m,g){stadium(g,m.t);goalFrame(g);const s=m.shot;
   const sx=CX+s.from,sy=H-46;g.fillStyle=rc(m).dark;roundRect(g,sx-16,sy-60,32,64,10);g.fill();g.fillStyle=rc(m).body;roundRect(g,sx-14,sy-58,28,38,9);g.fill();g.fillStyle='#f2d2b6';g.beginPath();g.arc(sx,sy-70,12,0,7);g.fill();
   if(!s.ball){const w=clampN((s.at-m.t)/1,0,1);g.strokeStyle=`rgba(240,160,140,${1-w})`;g.lineWidth=3;g.beginPath();g.arc(sx,sy-20,28+w*20,0,7);g.stroke();drawBallAt(g,sx+18,sy-4,16);}
@@ -221,6 +221,6 @@ const reflejos={
   if(!m.k.diving)crosshair(g,m.pointer.x,m.pointer.y,'#7cddb7');
  }
 };
-reflejos.init=function(m){m.k={x:0,p:0};m.shots=0;m.need=3;m.next=(mm,r)=>reflejos.next(mm,r);reflejos.next(m);m.hint='Muévete con el ratón · clic para estirarte hacia el puntero';m.bannerAt=[CX,GY-90];};
+reflejos.init=function(m){m.k={x:0,p:0};m.shots=0;m.need=m.ai.d>.75?4:3;m.next=(mm,r)=>reflejos.next(mm,r);reflejos.next(m);m.hint='Muévete con el ratón · clic para estirarte hacia el puntero';m.bannerAt=[CX,GY-90];};
 
 export const GOAL_SCENES={penal,tiro_libre,penal_atajado,reflejos};
