@@ -28,13 +28,16 @@ export function convertFM26(fm,clubId,year=2026){
 export function verifyFM26Mapping(mapping,expectedClubId=null){
  return !!(mapping&&mapping.status==='verified'&&mapping.genderVerified===true&&mapping.countryVerified===true&&
   typeof mapping.evidence==='string'&&mapping.evidence.trim().length>=12&&
-  /^\d+$/.test(String(mapping.fmUID))&&
+  /^\d+$/.test(String(mapping.fmUID))&& /^\d+$/.test(String(mapping.fmCountryId))&&
+  String(mapping.isoCountry||'')===String(mapping.clubId||'').slice(0,2).toUpperCase()&&
   (!expectedClubId||mapping.clubId===expectedClubId)&&/^[a-z]{2}-\d+$/.test(String(mapping.clubId)));
 }
 export function clearFM26Memory(){baseClubs.clear();approved.clear();byId.clear()}
 export function registerFM26Club(mapping,clubData,{year=2026}={}){
  if(!verifyFM26Mapping(mapping))throw Error('Club FM26 sin mapeo verificado de país y género');
  if(String(clubData?.club_uid)!==String(mapping.fmUID))throw Error('FM UID distinto: NO asignar un club homónimo');
+ if(String(clubData?.pais_id_fm)!==String(mapping.fmCountryId))throw Error('País FM distinto: equivalencia descartada');
+ if(clubData?.genero==='FEMENINO')throw Error('Club femenino excluido del modo actual');
  const candidates=(clubData?.jugadores||[]).filter(p=>Number(p.equipo_slot)===0);
  const players=[],seen=new Set();
  for(const fm of candidates){try{const p=convertFM26(fm,mapping.clubId,year);if(seen.has(p.id))continue;seen.add(p.id);
@@ -87,6 +90,7 @@ export function advanceFM26Season(state,year){
   for(let y=Math.max(2026,fromYear+1);y<=year;y++){
    const r=rand(p.id+':year:'+y);const age=p.age;const injured=r()<.09;
    const availability=injured?.4:1;const games=Math.round((9+r()*21)*availability);
+   if(injured&&p.clubId)events.push({year:y,kind:'injury',title:p.name+' se lesiona',text:'Baja médica aproximada de '+Math.round(4+r()*10)+' semanas.',playerId:p.id,clubId:p.clubId});
    const goalRate={DC:.45,EI:.29,ED:.29,MCO:.19,MC:.07,MI:.09,MD:.09,POR:0,DFC:.018,LI:.03,LD:.03,MCD:.03}[p.pos]||.05;
    const goals=Math.round(games*goalRate*(.5+r())*p.ovr/75);
    const assists=Math.round(games*(p.pos==='POR'?.005:.1)*(r()+.4));
@@ -103,7 +107,9 @@ export function advanceFM26Season(state,year){
     if(others.length){const to=others[Math.floor(r()*others.length)];p.transferHistory=[...(p.transferHistory||[]),{year:y,from:p.clubId,to}].slice(-20);p.clubId=to;
       events.push({year:y,kind:'transfer',title:p.name+' ficha por otro club',text:'Traspaso de '+p.transferHistory.at(-1).from+' a '+to,playerId:p.id,clubId:to});}}
   }
-  changes[p.id]={...changes[p.id],...p,lastYear:year};
+  // Guardar solo evolución y movimientos, NO duplicar nombre, atributos y demás ficha estática.
+  const {id,name,pos,attributes,kind,origin,teamSlot,cc,fmNationId,...evolved}=p;
+  changes[p.id]={...changes[p.id],...evolved,lastYear:year};
  }
  return {...state,fm26:{schema:1,changes},fm26Events:events.slice(-20)};
 }
