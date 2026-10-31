@@ -1,5 +1,5 @@
 /* RASCENSO 4.3 — realización televisiva Canvas para todas las jugadas. Sin recursos externos. */
-import {W,H} from './match2d.mjs';
+const W=960,H=540;
 import {tuningFor} from './play-tuning43.mjs';
 const S={bg:'#061c30',copper:'#f3ba82',pale:'#d9ebf4',muted:'#9fbccc'};
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));

@@ -5,6 +5,7 @@
  * Coordenadas de cancha en metros: x 0→52 (arco en x=52), y 0→29 (centro del arco y=14.5).
  */
 import { rng } from './career20.mjs';
+import {drawBroadcast43} from './scene-atmos43.mjs';
 
 export const W=960,H=540;
 export const FIELD={len:52,wid:29,goalX:52,goalY:14.5,post:3.66,bar:2.44,boxX:35.5,boxY:[4.34,24.66],sixX:46.5,sixY:[9,20],spot:41};
@@ -139,6 +140,7 @@ export function createMatch(canvas,{play,stats,ai,scene,onEnd,hud={}}){
  function draw(){
   g.save();if(m.shake>0){g.translate((m.fxRand()-.5)*m.shake*24,(m.fxRand()-.5)*m.shake*24);}
   scene.draw(m,g);
+  drawBroadcast43(m,g);
   for(const p of m.particles){g.globalAlpha=Math.max(0,Math.min(1,p.life));g.fillStyle=p.c;g.fillRect(p.x,p.y,4,4);}g.globalAlpha=1;
   drawHud(m,g);
   if(m.phase==='brief'||m.phase==='intro')drawIntro(m,g);
