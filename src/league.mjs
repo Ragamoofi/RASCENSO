@@ -11,6 +11,7 @@ import { choiceFx } from './identity30.mjs';
 import { VERIFIED_LEAGUES, getInauguralLeague } from './leagues2026.mjs';
 import { dynamicLevel, coachFor } from './world20.mjs';
 import { squadRole, threadEffects, coachSeasonEffects, socialEffects } from './career20.mjs';
+import {getFM26Squad,isRealClubReady} from './fm26-real.mjs';
 const bound=(v,a,b)=>Math.max(a,Math.min(b,v));
 function rand(seed){let h=2166136261;for(const c of String(seed)){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return ()=>{h+=0x6d2b79f5;let t=Math.imul(h^(h>>>15),1|h);t^=t+Math.imul(t^(t>>>7),61|t);return ((t^(t>>>14))>>>0)/4294967296;};}
 function goals(mean,random){let n=0,p=Math.exp(-mean),prod=1;do{n++;prod*=random();}while(prod>p&&n<=10);return Math.min(8,n-1);}
@@ -28,7 +29,10 @@ export function leagueParticipants(countryCode,clubId,state={}){
  const league=getCompetitionForCareer({...state,clubId});
  const country=COUNTRIES.find(c=>c.code===countryCode);
  if(!country)return [];
- const live=list=>list.map(c=>({...c,level:dynamicLevel(state,c)}));
+ const live=list=>list.map(c=>{const level=dynamicLevel(state,c);if(!isRealClubReady(c.id))return {...c,level};
+ const squad=getFM26Squad(c.id,state).slice(0,11);if(squad.length<11)return {...c,level};
+ const avg=squad.reduce((n,p)=>n+p.ovr,0)/squad.length;
+ return {...c,level:bound(Math.round(level+(avg-level)*.18),40,94)};});
  if(league?.verified)return live(league.teamIds.map(id=>country.clubs.find(c=>c.id===id)).filter(Boolean));
  // Unverified countries: explicitly fictional grouping, never presented as a real 2026 league.
  const active=country.clubs.filter(c=>!c.inactive);
