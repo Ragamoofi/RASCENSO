@@ -144,3 +144,38 @@
  .play-mobile-start{width:100%;min-height:40px;border:1px solid #f4c091;border-radius:8px;background:#3865c7;color:#fff;font-size:13px;font-weight:800;cursor:pointer;margin-top:2px}
  .play-mobile-start:focus-visible{outline:3px solid #ffd3a3;outline-offset:2px}
 }
+
+/* 4.5 · Vitrina compacta: mismo alto anterior, nombres visibles y copa identificable. */
+.right-rail .trophy-showcase{box-sizing:border-box;height:97px;max-height:97px;overflow:hidden;padding:7px 10px!important;background:linear-gradient(145deg,#142b44,#10253b)!important;border-color:#715e53!important}
+.trophy-showcase .rail-heading{margin-bottom:4px;min-height:12px}
+.trophy-grid{min-height:0;height:64px;max-height:64px;align-items:stretch;gap:7px;scrollbar-width:thin;padding-bottom:3px}
+.trophy-unit{box-sizing:border-box;display:grid;grid-template-columns:33px minmax(0,1fr);align-items:center;flex:none;gap:5px;width:114px;height:60px;text-align:left;padding:4px 5px;background:linear-gradient(150deg,#30485e,#1a3247);border:1px solid #8b745a;border-radius:7px;color:#f7ede2;cursor:pointer;font:inherit;transition:border-color .15s,background .15s}
+.trophy-unit:hover,.trophy-unit:focus-visible{border-color:#e7bd81;background:#3a5367;outline-offset:1px}
+.trophy-unit-art{display:grid;place-items:center;width:33px;height:51px;min-width:0}
+.trophy-unit-art img{display:block;width:32px;height:48px;max-width:100%;object-fit:contain;filter:drop-shadow(0 4px 5px #08131ca8)}
+.trophy-unit-copy{display:grid;align-content:center;gap:4px;min-width:0}
+.trophy-unit-copy strong{font-size:9px;line-height:1.16;font-weight:900;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;color:#fff6e7}
+.trophy-unit-copy small{font-size:9px;color:#f2c596;font-weight:800}
+.trophy-spotlight{width:min(430px,calc(100vw - 30px));max-height:min(86dvh,720px);overflow:auto;border:1px solid #d6a878;border-radius:15px;background:linear-gradient(140deg,#102c43,#061b2e);box-shadow:0 25px 80px #000c;color:#f7f0e6;padding:0}
+.trophy-spotlight::backdrop{background:#010713ba;backdrop-filter:blur(5px)}
+.trophy-detail-body{padding:16px 22px 24px;display:grid;justify-items:center;gap:10px;text-align:center}
+.trophy-detail-head{width:100%;display:flex;justify-content:space-between;align-items:center;color:#e9bd8d;font-size:10px;font-weight:900;letter-spacing:.13em}
+.trophy-detail-close{color:#fff;font-size:18px;background:#233c56;border:1px solid #857b6f;border-radius:7px;min-width:36px;min-height:36px;cursor:pointer}
+.trophy-detail-art{height:185px;width:100%;display:grid;place-items:center;background:radial-gradient(ellipse,#a7814140,transparent 63%)}
+.trophy-detail-art img{height:178px;max-width:190px;width:auto;object-fit:contain;filter:drop-shadow(0 12px 15px #000a)}
+.trophy-detail-category{font-size:10px;font-weight:900;letter-spacing:.17em;color:#ebbe89;text-transform:uppercase}
+.trophy-detail-body h2{font:900 clamp(24px,6vw,34px)/1.12 'Barlow Condensed',sans-serif;margin:0}
+.trophy-detail-facts{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.trophy-detail-facts>div{display:grid;gap:4px;background:#233d53;border:1px solid #567185;border-radius:8px;padding:10px 6px}
+.trophy-detail-facts small{font-size:9px;color:#e8b480;letter-spacing:.07em}
+.trophy-detail-facts strong{font-size:12px;color:#fff;overflow-wrap:anywhere}
+.trophy-detail-body p{font-size:11px;line-height:1.5;color:#bbcfdd;margin:4px 0 0}
+.trophy-detail-body a{font-size:11px;color:#f1cc9e;text-decoration:underline}
+.farewell-trophies{max-height:370px!important;overflow-y:auto}
+.farewell-trophy{box-sizing:border-box;min-height:127px;gap:3px!important;padding:8px 5px!important}
+.farewell-trophy-art{height:63px;width:100%;display:grid;place-items:center;background:radial-gradient(ellipse,#b68d5040,transparent 70%)}
+.farewell-trophy-art img{display:block;width:auto;max-width:65px;height:61px;object-fit:contain;filter:drop-shadow(0 5px 9px #000a)}
+.farewell-trophy strong{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:10px;line-height:1.2;overflow-wrap:anywhere}
+.farewell-trophy small{font-size:9px;line-height:1.25}
+.farewell-trophy-club{font-size:9px;color:#eac39e;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:700px){.trophy-detail-art{height:145px}.trophy-detail-art img{height:139px}}
