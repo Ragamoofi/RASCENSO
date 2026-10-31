@@ -1,4 +1,7 @@
-# RASCENSO 4.0 · Estado de desarrollo
+# RASCENSO 4.0 · Registro histórico de desarrollo
+
+> Documento histórico de la fase 4.0, no del estado actual publicado. Para el estado de la renovación visual y los pendientes vigentes consulta [RASCENSO 4.4](RASCENSO-4-4.md); para los ajustes deportivos consulta [RASCENSO 4.3](RASCENSO-4-3.md).
+
 
 Rama de trabajo: `rascenso-4-integral`. Base: `bb85f188cf63e016ba8429b8d24b44d5320cfd00`.
 

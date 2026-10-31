@@ -26,6 +26,9 @@ const {chromium}=require('playwright');
    await launch.click();
    const overlay=page.locator('.play-overlay[role=dialog][aria-modal=true]');
    await overlay.waitFor();
+   const modalBounds=await page.locator('.play-window').boundingBox();
+   if(!modalBounds||modalBounds.x<0||modalBounds.x+modalBounds.width>width+1)throw Error('La ventana jugable se sale de la pantalla '+width);
+   if(process.env.SHOTS){await page.waitForTimeout(130);await page.screenshot({path:process.env.SHOTS+'/play-modal-'+width+'.png'});}
    if(!await page.locator('.play-stage canvas').evaluate(x=>document.activeElement===x))throw Error('El minijuego no recibe el foco');
    if(!await page.evaluate(()=>document.body.style.overflow==='hidden'))throw Error('El fondo se desplaza durante el minijuego');
    await page.keyboard.press('Tab');

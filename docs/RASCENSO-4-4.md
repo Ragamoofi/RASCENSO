@@ -16,7 +16,7 @@
 
 ## Validaciones
 
-- **244/244 pruebas unitarias aprobadas** en la rama de desarrollo.
+- **245/245 pruebas unitarias aprobadas** tras el parche de accesibilidad y coherencia visual.
 - Los 20 escenarios siguen completándose en las simulaciones de CI.
 - Pruebas reales en Chromium, Firefox y WebKit.
 - Carrera hasta el retiro y panel de temporada comprobados en 1920×1080 y 390×844.
@@ -29,6 +29,14 @@
 - El catálogo completo de escudos continúa sujeto a auditoría; los tests sin recursos precompilados pueden mostrar iniciales en lugar de los escudos.
 - Se mantienen los sistemas narrativos, IA y dificultades de 4.3. Este parche es visual, no una reescritura deportiva.
 - Sonidos y compatibilidad con versiones antiguas de partidas no se priorizan.
+
+## Revisión final de interacción
+
+- El Centro de Partido distingue al **rival local o visitante** desde la perspectiva correcta y pasa de LIVE a ARCHIVO al completar las jugadas.
+- Las ventanas de jugada se anuncian como diálogos modales; al abrirlas se concentra el foco en la cancha, Tab/Mayús+Tab mantienen el foco dentro, Escape permite volver sin jugar y se restaura el desplazamiento.
+- El test de navegador abre y cierra jugadas reales en escritorio y móvil. Las capturas de `play-modal-1920.png` y `play-modal-390.png` se guardan en el artefacto del flujo cuando se ejecuta con capturas habilitadas.
+- La descarga del recuerdo PNG se prueba de forma real al llegar al retiro; no se limita a comprobar que existe el botón.
+- La matriz automática todavía muestra extremos (p. ej. Recuperación y Entrada sobre 95/100 en varios escenarios, y Salida aérea con hasta 100/100). El bot tiene información interna: **estos valores no son tasas humanas**, ni se declaran equilibrados. Queda pendiente medir dificultad y satisfacción con jugadores.
 
 ## Regla de publicación
 
