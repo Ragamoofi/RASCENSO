@@ -1,0 +1,33 @@
+name: Verificar integración privada FM26
+on:
+  push:
+    branches: [fm26-mundo-real-privado]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: fm26-local-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Comprobar módulos FM26 y motor del juego
+        run: |
+          node --check src/fm26-real.mjs
+          node --check src/fm26-local.mjs
+          node --check src/engine.mjs
+          node --check src/world20.mjs
+          node --check src/ui20.mjs
+          node --check src/experience.mjs
+          node --test tests/fm26-real.test.mjs
+      - name: No publicar datos FM26 importados
+        run: |
+          test ! -d assets/data/fm26
+          test ! -d runtime/por_pais
+          test ! -f runtime/indice_clubes.json
+          test ! -f assets/fm26-players.json
