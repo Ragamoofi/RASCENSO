@@ -11,7 +11,7 @@ import { initialRelationships, chooseScene, sceneFor, resultOfScene } from './st
 import { playLeague, leagueParticipants, getCompetitionForCareer, nextLeagueRosters } from './league.mjs';
 import { VERIFIED_LEAGUES, getInauguralLeague } from './leagues2026.mjs';
 import { annualSalary, marketClub, clubPrestige, playerDemand, buildTransferOffers, evaluateClubFuture } from './market.mjs';
-import { clamp, rng, yearOf, adjustOvr, ovrFromAttributes, juniorValue, juniorCeiling, finalizeDraft, migrateAttributes, developSeason, seasonRating, seasonObjectives, evaluateObjectives, squadRole, freshSquad, threadEffects, coachSeasonEffects, socialEffects, preparationFocus, addThread, resolveThread, hasThread, activeThreads, KEY_ATTRS, POSITION_WEIGHTS } from './career20.mjs';
+import { clamp, rng, yearOf, adjustOvr, ovrFromAttributes, juniorValue, juniorCeiling, finalizeDraft, migrateAttributes, developSeason, seasonRating, seasonObjectives, evaluateObjectives, squadRole, freshSquad, threadEffects, coachSeasonEffects, socialEffects, preparationFocus, addThread, resolveThread, hasThread, activeThreads, compareChallenge, KEY_ATTRS, POSITION_WEIGHTS } from './career20.mjs';
 import { ensureWorld, advanceWorld, pushNews, coachFor, namerFor, worldClub, dynamicPrestige, dynamicLevel, worldRival } from './world20.mjs';
 import { pickWorldScene } from './story20.mjs';
 import { choiceFx, dnaFromPicks, startAttrDelta, creatorCeilings, tagOf, dnaFx, DNA_TAGS, referentRadar, dreamProgress, DREAM_REWARD, marketRarity } from './identity30.mjs';
@@ -360,7 +360,9 @@ export function advanceSeason(input){
  const ovr=dev.ovr,attributes=dev.attributes,attributeChanges=dev.changes,attributesBefore={...(s.attributes||{})};
  const international=global.international;
  const worldCupResult=global.worldCupResult;
- const wage=s.contract?.currency==='EUR'?s.contract.salary:annualSalary(club,s.ovr);
+ const baseWage=s.contract?.currency==='EUR'?s.contract.salary:annualSalary(club,s.ovr);
+ const temporaryCut=s.contract?.temporaryCut;
+ const wage=temporaryCut?.year===year&&temporaryCut.clubId===s.clubId?Math.round(baseWage*(1-clamp(Number(temporaryCut.rate)||0,0,1))):baseWage;
  // Ascensos y descensos del club del jugador.
  const nextComp=getCompetitionForCareer({...s,leagueRosters});
  const relegated=!!(comp?.tier===1&&nextComp?.tier===2);
@@ -405,9 +407,18 @@ export function advanceSeason(input){
  // Hilos narrativos: desafíos públicos y promesas se cobran al cierre de la temporada.
  let threads=s.threads||[];
  const challenge=activeThreads(s,year).find(t=>t.kind==='public_challenge');
- const nemesis=world.players.find(p=>p.rival);
+ const nemesis=challenge&&world.players.find(p=>challenge.data?.vs?p.id===challenge.data.vs:p.rival);
  const moments=[...(s.careerMoments||[])];
- if(challenge&&nemesis){const theirs=nemesis.seasons?.at(-1);const mine=(goals+assists)+(rating??6)*2;const them=theirs?(theirs.goals+theirs.assists)+(nemesis.ovr/12):0;const won=mine>=them;reputation=clamp(reputation+(won?4:-3),0,100);moments.push({year,kind:'story',text:won?`Ganaste el duelo público con ${nemesis.name}.`:`${nemesis.name} ganó el duelo que le planteaste en la prensa.`});threads=threads.map(t=>t===challenge?{...t,resolved:true,outcome:won?'ganado':'perdido'}:t);}
+ if(challenge){
+  const theirs=nemesis?.seasons?.find(season=>season.year===year);
+  const comparison=compareChallenge({goals,assists},theirs);
+  const outcome=comparison?.outcome||'sin datos';
+  if(comparison){reputation=clamp(reputation+(outcome==='ganado'?4:outcome==='perdido'?-3:0),0,100);
+   const result=outcome==='ganado'?'Ganaste':outcome==='perdido'?'Perdiste':'Empataste';
+   moments.push({year,kind:'story',text:`${result} el duelo con ${nemesis.name}: ${comparison.us} a ${comparison.them} entre goles y asistencias en liga.`});
+  }else moments.push({year,kind:'story',text:'El duelo público quedó sin resultado: no hay estadísticas comparables del rival.'});
+  threads=threads.map(t=>t===challenge?{...t,resolved:true,outcome}:t);
+ }
  for(const n of dev.notes)moments.push({year,kind:'development',text:n.text});
  for(const a of myAwards)moments.push({year,kind:'award',text:`${a.name}${a.league?` · ${a.league}`:''}`});
  const trophyRecords=[...(s.trophyRecords||[]),...titles.filter(title=>title===league.league).map(title=>({title,year,clubId:club.id,leagueId:league.leagueId||'',kind:'league'})),...global.trophyRecords];
@@ -549,7 +560,7 @@ export function chooseTransfer(s,id=null){
  if(offer){
   contract={clubId:nextClubId,ends:careerYear(s)+(offer.years||3),salary:offer.salary,currency:'EUR',estimated:true,kind:offer.kind};
   if(offer.kind==='loan')contract={...contract,parentClubId:s.clubId,parentContract:s.contract};
- }else if(s.market?.renewal){contract={clubId:s.clubId,...s.market.renewal,currency:'EUR',estimated:true,kind:'permanent'};}
+ }else if(s.market?.renewal){contract={clubId:s.clubId,...s.market.renewal,currency:'EUR',estimated:true,kind:'permanent',...(s.contract?.temporaryCut?{temporaryCut:s.contract.temporaryCut}:{})};}
  else if(!contract||contract.ends<=careerYear(s))contract={clubId:s.clubId,ends:careerYear(s)+2,salary:annualSalary(marketClub(s.clubId),s.ovr),currency:'EUR',estimated:true};
  let threads=resolveThread(s,'big_club_interest','mercado cerrado');
  threads=threads.map(t=>offer&&!t.resolved&&['captain','mentor','fans_conflict','board_ultimatum','promise_minutes'].includes(t.kind)?{...t,resolved:true,outcome:'cambio de club'}:t);
