@@ -1002,3 +1002,21 @@ button:focus-visible,summary:focus-visible,canvas:focus-visible,input:focus-visi
 .farewell-rival strong{font-size:13px;color:#f1f4f7;overflow-wrap:anywhere}
 .farewell-rival span{font-size:11px;color:#e1b188}.farewell-rival small{font-size:10px;color:#a3bece}
 @media(max-width:700px){.farewell-rivals{grid-template-columns:1fr}}
+
+
+/* RASCENSO 4.3 · Las decisiones deportivas quedan visibles */
+.matchday-identity{justify-self:center;display:inline-flex;align-items:center;border:1px solid #7c6b6385;padding:3px 9px;border-radius:99px;color:#eac9a3;font-size:10px;font-weight:850;letter-spacing:.06em;background:#352a2f77}
+.matchday-projection{font-size:11px;line-height:1.55;color:#d9e9ed;padding:10px 12px;border-radius:9px;border:1px solid #496b77;background:linear-gradient(120deg,#153d49,#122c41)}
+.v43-impact{border-color:#ad825d!important;background:linear-gradient(125deg,#1d3a4d,#2c3847)!important}
+.v43-impact>p{font-size:12px;line-height:1.5;color:#cce0ed;margin:8px 0}
+.v43-impact>small{font-size:10px;color:#b3ccda}
+.v43-impact-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:10px 0}
+.v43-impact-stats>div{display:grid;place-items:center;gap:2px;padding:11px 5px;background:#0b2a3a;border-radius:9px;border:1px solid #476b78}
+.v43-impact-stats b{font:900 27px 'Barlow Condensed',sans-serif}.v43-impact-stats small{color:#a9c5d2;font-size:10px;text-align:center}
+.v43-impact-stats .positive b{color:#8bd5b5}.v43-impact-stats .negative b{color:#ef9d8e}
+.v43-headlines{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0}
+.v43-headlines>div{display:grid;align-content:start;gap:6px;min-width:0;border:1px solid #7b695e;border-radius:12px;padding:13px 15px;background:linear-gradient(125deg,#223d51,#172c44)}
+.v43-headlines span{font-size:10px;letter-spacing:.1em;color:#efb78e;font-weight:900}
+.v43-headlines strong{font:850 17px 'Barlow Condensed',sans-serif;color:#eef6ff}
+.v43-headlines small{font-size:11px;line-height:1.5;color:#b8d0df}
+@media(max-width:650px){.v43-impact-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.v43-headlines{grid-template-columns:1fr}}
