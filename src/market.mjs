@@ -104,11 +104,26 @@ function weightClub(state,c,focus){
  if(c.id===state.fanClubId)w*=1.0; // El equipo favorito no tiene fichaje garantizado.
  return w;
 }
+/** En etapas tempranas, el tamaño del catálogo extranjero no debe dominar el sorteo. */
+function balanceEarlyMarket(state,focus,weighted){
+ if((state.age||20)>=23||(state.history||[]).length>=3||focus==='international')return;
+ const home=marketClub(state.clubId)?.countryCode||state.country;
+ const conf=COUNTRIES.find(c=>c.code===home)?.confederation;
+ const totals=new Map();for(const x of weighted)totals.set(x.c.countryCode,(totals.get(x.c.countryCode)||0)+x.w);
+ for(const x of weighted){const country=x.c.countryCode,regional=COUNTRIES.find(c=>c.code===country)?.confederation===conf;
+  let factor=country===home?12:regional?.65:.12;
+  if(country!==home&&state.age<18)factor*=.08;
+  if(country===home&&focus==='local')factor*=2;
+  if(country!==home&&state.riskProfile==='aventurero')factor*=1.6;
+  x.w=x.w/(totals.get(country)||1)*factor;
+ }
+}
 export function buildTransferOffers(state,{attempt=0,focus='balanced',forced=false}={}){
  const seed=`${state.seed}:mercado07:${state.age}:${state.clubId}:${attempt}:${focus}`;
  const r=random(seed),demand=playerDemand(state);
  const selected=[];
  const weighted=eligibleClubs(state).map(c=>({c,w:weightClub(state,c,focus)})).filter(x=>x.w>.00001);
+ balanceEarlyMarket(state,focus,weighted);
  let count=demand>=84?3:2+Math.floor(r()*2);if(socialEffects(state).agentMarket>1.12&&count<4)count++;
  if(state.age>=35&&state.age<38)count=Math.max(0,count-1-(r()<.4?1:0));
  if(state.age>=38){const probability=clamp(.94-(state.age-38)*.095-(state.ovr<58?.18:0),0,.95);count=Array.from({length:3},()=>r()<probability).filter(Boolean).length;}
