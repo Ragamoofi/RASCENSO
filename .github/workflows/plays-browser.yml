@@ -21,7 +21,7 @@ jobs:
       - name: Validar motor y simular 20 jugadas
         run: |
           node --test tests/*.test.mjs
-          node tests/browser/scenes-node.mjs
+          node tests/browser/balance40.mjs
       - name: Comprobar escenas en Chromium
         run: |
           mkdir -p /tmp/rascenso-capturas

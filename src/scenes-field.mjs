@@ -173,9 +173,24 @@ const diagonal={
  key(m,code,down){if(down&&code==='Space')feint(m);},
  // La rosca curva el balón hacia el palo lejano: desde arriba (y pequeña) dobla hacia y mayor, y viceversa.
  down(m,b){if(b==='alt')return feint(m);if(m.ball.owner!==m.me)return;const curl=(m.me.y<FIELD.goalY?1:-1)*(1.5+m.stats.skills*3);shoot(m,m.ball,m.me,m.pointer.wy,{noise:1,curl});m.hint='';},
- draw(m,g){drawPitch(g);them(m,m.fb);keeper(m,m.k);us(m,m.me,{highlight:true});drawBall(g,m.ball);if(m.ball.owner===m.me)drawAim(g,m,m.me);}
+ draw(m,g){drawPitch(g);if(m.t-(m.lastFeint??-9)<.35)drawRing(g,m.me.x,m.me.y,1.15,COLORS.copper,{dash:[4,4]});them(m,m.fb,{ghost:m.fb.stun>0});keeper(m,m.k);us(m,m.me,{highlight:true});drawBall(g,m.ball);if(m.ball.owner===m.me)drawAim(g,m,m.me);}
 };
-function feint(m){if(m.ball?.owner!==m.me||m.t-(m.lastFeint??-9)<.7)return;m.lastFeint=m.t;const side=m.me.y<FIELD.goalY?1:-1;m.me.y+=side*1.1*(.6+m.stats.control*.6);m.me.x+=.4;keepInField(m.me);m.say('AMAGUE',null);}
+/** El amague premia ejecutarlo cerca del marcador y permite elegir salida. */
+export function feintImpact(distance,skill,resistance){
+ const proximity=clampN(1-distance/3,0,1);
+ return skill*.7+proximity*.4-resistance*.45;
+}
+function feint(m){
+ if(m.ball?.owner!==m.me||m.t-(m.lastFeint??-9)<.7)return;m.lastFeint=m.t;
+ const opponent=m.fb||m.defs?.[0],distance=opponent?dist(opponent,m.me):Infinity;
+ const keys=m.keys||new Set(),vertical=Number(keys.has('KeyS')||keys.has('ArrowDown'))-Number(keys.has('KeyW')||keys.has('ArrowUp'));
+ const pointerDelta=m.pointer.inside?m.pointer.wy-m.me.y:0;
+ const side=vertical|| (Math.abs(pointerDelta)>.4?Math.sign(pointerDelta):(m.me.y<FIELD.goalY?1:-1));
+ m.me.y+=side*1.1*(.6+m.stats.control*.6);m.me.x+=.4;keepInField(m.me);
+ if(opponent&&opponent.stun<=0&&distance<3&&feintImpact(distance,m.stats.feint,m.ai.feintResist)>=.24){
+  opponent.stun=.65+m.stats.feint*.8;opponent.reach=0;m.hint='¡Marcador engañado! Acelera al espacio';
+ }else m.hint='Amague: acércate al marcador y elige el lado';
+}
 
 /** Compañeros que atacan el área con un marcador que se despega o se pega según el tiempo. */
 function runners(m,spots){
