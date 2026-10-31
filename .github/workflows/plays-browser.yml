@@ -25,6 +25,7 @@ jobs:
           mkdir -p /tmp/rascenso-capturas
           python3 -m http.server 8765 >/tmp/rascenso-http.log 2>&1 &
           SHOTS=/tmp/rascenso-capturas node tests/browser/plays-e2e.cjs
+          node tests/browser/controls-e2e.cjs
       - name: Guardar capturas
         if: always()
         uses: actions/upload-artifact@v4

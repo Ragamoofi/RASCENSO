@@ -8,24 +8,35 @@ const POST=3.66,BAR=2.44;
 const rc=m=>m._rc||(m._rc=rivalColor(m.play.rivalId||m.play.rival));
 
 function stadium(g,t){
- const sky=g.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#0a1730');sky.addColorStop(.42,'#13284a');sky.addColorStop(.43,'#1d5a3a');sky.addColorStop(1,'#123d27');g.fillStyle=sky;g.fillRect(0,0,W,H);
- // tribuna con público
- for(let row=0;row<7;row++)for(let i=0;i<64;i++){const x=i*15+(row%2)*7,y=60+row*17;const h=((i*928371+row*1237)%97)/97;g.fillStyle=h>.86?'rgba(232,165,116,.55)':h>.6?'rgba(160,190,230,.32)':'rgba(255,255,255,.12)';g.fillRect(x,y+Math.sin(t*3+i)*1.2,6,8);}
- // focos
- for(const x of [90,W-90]){const lg=g.createRadialGradient(x,30,4,x,30,120);lg.addColorStop(0,'rgba(255,250,230,.55)');lg.addColorStop(1,'rgba(255,250,230,0)');g.fillStyle=lg;g.fillRect(x-130,0,260,160);}
- // franjas de césped en perspectiva
- for(let i=0;i<8;i++){g.fillStyle=i%2?'rgba(255,255,255,.035)':'rgba(0,0,0,.05)';const y0=232+i*i*5.4,y1=232+(i+1)*(i+1)*5.4;g.fillRect(0,y0,W,y1-y0);}
- // área en perspectiva
- g.strokeStyle='rgba(255,255,255,.75)';g.lineWidth=2;g.beginPath();g.moveTo(40,GY);g.lineTo(W-40,GY);g.stroke();
- g.beginPath();g.moveTo(CX-330,GY);g.lineTo(CX-430,H);g.moveTo(CX+330,GY);g.lineTo(CX+430,H);g.stroke();
+ const sky=g.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#091628');sky.addColorStop(.42,'#1c3146');sky.addColorStop(.43,'#276346');sky.addColorStop(1,'#173e2c');g.fillStyle=sky;g.fillRect(0,0,W,H);
+ // Tribunas, gradas y público: el patrón es estable para evitar parpadeos.
+ for(let row=0;row<8;row++){
+  const y=35+row*19;g.fillStyle=row%2?'#17283c':'#203247';g.fillRect(0,y,W,18);
+  for(let i=0;i<80;i++){const x=i*12+(row%2)*6,h=((i*928371+row*1237)%97)/97;
+   g.fillStyle=h>.91?'#d9a077':h>.72?'#8ea6b3':h>.42?'#40586b':'#263a4b';
+   g.beginPath();g.arc(x+4,y+5,2.4,0,Math.PI*2);g.fill();g.fillRect(x+1,y+8,6,7);
+  }
+ }
+ g.fillStyle='#0c1c2c';g.fillRect(0,188,W,38);g.fillStyle='#c69268';g.fillRect(0,187,W,2);
+ g.textAlign='center';g.textBaseline='middle';g.font='800 12px Arial';
+ for(let i=0;i<6;i++){g.fillStyle=i%2?'#ac7a56':'#83abc2';g.fillText(i%2?'RASCENSO  ·  CARRERA':'EL FÚTBOL ES TUYO',80+i*160,207);}
+ for(const x of [90,W-90]){const lg=g.createRadialGradient(x,20,2,x,20,150);lg.addColorStop(0,'rgba(255,248,220,.6)');lg.addColorStop(1,'rgba(255,248,220,0)');g.fillStyle=lg;g.fillRect(x-150,0,300,190);}
+ const turf=g.createLinearGradient(0,226,0,H);turf.addColorStop(0,'#38704b');turf.addColorStop(1,'#17452c');g.fillStyle=turf;g.fillRect(0,226,W,H-226);
+ for(let i=0;i<8;i++){g.fillStyle=i%2?'rgba(218,244,197,.035)':'rgba(0,0,0,.045)';const y0=226+i*i*5.4,y1=226+(i+1)*(i+1)*5.4;g.fillRect(0,y0,W,y1-y0);}
+ // Vetas discretas de césped, sin depender del azar del partido.
+ g.strokeStyle='rgba(196,230,174,.10)';g.lineWidth=1;g.beginPath();for(let i=0;i<180;i++){const x=(i*137)%W,y=235+(i*71)%(H-235);g.moveTo(x,y);g.lineTo(x+2,y-2);}g.stroke();
+ g.strokeStyle='rgba(255,255,255,.68)';g.lineWidth=2;g.beginPath();g.moveTo(40,GY);g.lineTo(W-40,GY);g.moveTo(CX-330,GY);g.lineTo(CX-430,H);g.moveTo(CX+330,GY);g.lineTo(CX+430,H);g.stroke();
+ void t;
 }
 function goalFrame(g,shake=0){
- const [l,t]=gs(-POST,BAR),[r]=gs(POST,0);
- g.fillStyle='rgba(255,255,255,.06)';g.fillRect(l,t,r-l,GY-t);
- g.strokeStyle='rgba(255,255,255,.28)';g.lineWidth=1;
- for(let x=l;x<=r;x+=18){g.beginPath();g.moveTo(x+Math.sin(x)*shake,t);g.lineTo(x,GY);g.stroke();}
- for(let y=t;y<=GY;y+=16){g.beginPath();g.moveTo(l,y);g.lineTo(r,y+Math.cos(y)*shake);g.stroke();}
- g.strokeStyle='#fff';g.lineWidth=8;g.lineCap='round';g.beginPath();g.moveTo(l,GY);g.lineTo(l,t);g.lineTo(r,t);g.lineTo(r,GY);g.stroke();g.lineCap='butt';
+ const [l,t]=gs(-POST,BAR),[r]=gs(POST,0),depth=25;
+ // Red con profundidad y postes iluminados.
+ g.fillStyle='rgba(7,22,27,.18)';g.beginPath();g.moveTo(l,t);g.lineTo(l+depth,t+16);g.lineTo(r-depth,t+16);g.lineTo(r,t);g.lineTo(r,GY);g.lineTo(l,GY);g.closePath();g.fill();
+ g.strokeStyle='rgba(234,245,239,.23)';g.lineWidth=1;
+ for(let x=l;x<=r;x+=18){g.beginPath();g.moveTo(x+Math.sin(x)*shake,t);g.lineTo(lerp(x,CX,.075),GY-10);g.stroke();}
+ for(let y=t;y<=GY;y+=15){g.beginPath();g.moveTo(l,y);g.quadraticCurveTo(CX,y+7+Math.cos(y)*shake,r,y);g.stroke();}
+ g.strokeStyle='rgba(0,0,0,.25)';g.lineWidth=12;g.lineCap='round';g.beginPath();g.moveTo(l+3,GY+3);g.lineTo(l+3,t+3);g.lineTo(r+3,t+3);g.lineTo(r+3,GY+3);g.stroke();
+ g.strokeStyle='#e8f0e9';g.lineWidth=8;g.beginPath();g.moveTo(l,GY);g.lineTo(l,t);g.lineTo(r,t);g.lineTo(r,GY);g.stroke();g.strokeStyle='rgba(255,255,255,.8)';g.lineWidth=2;g.beginPath();g.moveTo(l-2,GY);g.lineTo(l-2,t-2);g.lineTo(r,t-2);g.stroke();g.lineCap='butt';
 }
 /** Geometría compartida por el dibujo y la colisión en la línea de gol. */
 export function keeperPose(k){

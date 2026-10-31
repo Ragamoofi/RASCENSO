@@ -166,11 +166,16 @@ export function drawPlayer(g,p,{color=COLORS.us,dark=COLORS.usDark,ring=null,hig
  g.fillStyle=COLORS.shadow;g.beginPath();g.ellipse(x+3,y+4,r*1.05,r*.7,0,0,7);g.fill();
  if(highlight){g.strokeStyle=COLORS.copper;g.lineWidth=2.5;g.beginPath();g.arc(x,y,r+7+Math.sin(performance.now()/160)*1.5,0,7);g.stroke();}
  if(ring){g.strokeStyle=ring;g.lineWidth=2;g.setLineDash([4,4]);g.beginPath();g.arc(x,y,r+12,0,7);g.stroke();g.setLineDash([]);}
- const f=p.face||[1,0];
- g.fillStyle=dark;g.beginPath();g.ellipse(x-f[0]*2,y-f[1]*2,r,r*.92,Math.atan2(f[1],f[0]),0,7);g.fill();
- g.fillStyle=color;g.beginPath();g.arc(x+f[0]*1.5,y+f[1]*1.5,r*.82,0,7);g.fill();
- g.fillStyle='rgba(255,255,255,.9)';g.beginPath();g.arc(x+f[0]*r*.55,y+f[1]*r*.55,r*.28,0,7);g.fill();
- if(p.num){g.fillStyle='#fff';g.font=`800 ${Math.round(r*.95)}px "DM Sans",Arial`;g.textAlign='center';g.textBaseline='middle';g.fillText(p.num,x,y+1);}
+ const f=p.face||[1,0],moving=Math.hypot(p.vx||0,p.vy||0),stride=Math.sin(performance.now()/115+(p.num||0))*Math.min(1,moving/4);
+ // Silueta cenital: cabeza, brazos, camiseta, pantalón y piernas orientadas al movimiento.
+ g.save();g.translate(x,y);g.rotate(Math.atan2(f[1],f[0]));g.lineCap='round';
+ g.strokeStyle=dark;g.lineWidth=r*.42;g.beginPath();g.moveTo(-r*.45,-r*.34);g.lineTo(-r*.95-stride*r*.25,-r*.42);g.moveTo(-r*.45,r*.34);g.lineTo(-r*.95+stride*r*.25,r*.42);g.stroke();
+ g.strokeStyle='#d7a986';g.lineWidth=r*.24;g.beginPath();g.moveTo(0,-r*.65);g.lineTo(-r*.3,-r*.95);g.moveTo(0,r*.65);g.lineTo(-r*.3,r*.95);g.stroke();
+ g.fillStyle=dark;g.beginPath();g.ellipse(-r*.38,0,r*.48,r*.66,0,0,Math.PI*2);g.fill();
+ g.fillStyle=color;g.beginPath();g.ellipse(0,0,r*.68,r*.78,0,0,Math.PI*2);g.fill();
+ g.fillStyle='rgba(255,255,255,.18)';g.beginPath();g.ellipse(r*.07,-r*.3,r*.3,r*.37,0,0,Math.PI*2);g.fill();
+ g.fillStyle='#dbad89';g.beginPath();g.arc(r*.63,0,r*.34,0,Math.PI*2);g.fill();g.fillStyle='#49382e';g.beginPath();g.arc(r*.72,0,r*.23,-Math.PI/2,Math.PI/2);g.fill();g.restore();
+ if(p.num){g.fillStyle='#fff';g.font=`800 ${Math.round(r*.8)}px "DM Sans",Arial`;g.textAlign='center';g.textBaseline='middle';g.fillText(p.num,x-1,y+1);}
  if(p.label){g.font='700 11px "DM Sans",Arial';g.textAlign='center';g.fillStyle='rgba(8,23,40,.75)';const w=g.measureText(p.label).width+10;g.fillRect(x-w/2,y-r-24,w,16);g.fillStyle='#fff';g.fillText(p.label,x,y-r-16);}
  g.globalAlpha=1;
 }
