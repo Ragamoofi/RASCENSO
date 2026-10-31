@@ -3,7 +3,7 @@
 import { COUNTRIES } from './countries.mjs';
 import { getInauguralLeague, VERIFIED_LEAGUES } from './leagues2026.mjs';
 import { choiceFx, marketRarity } from './identity30.mjs';
-import { socialEffects } from './career20.mjs';
+import { socialEffects, activeThreads } from './career20.mjs';
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function hash(s){let h=2166136261;for(const c of String(s)){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;}
 function random(seed){let x=hash(seed);return ()=>{x+=0x6d2b79f5;let t=Math.imul(x^(x>>>15),1|x);t^=t+Math.imul(t^(t>>>7),61|t);return ((t^(t>>>14))>>>0)/4294967296;};}
@@ -123,8 +123,8 @@ export function buildTransferOffers(state,{attempt=0,focus='balanced',forced=fal
   selected.push({...c,prestige,kind,role,years,salary,fee:Math.round((state.ovr||60)*90000*(prestige/85)),project:gap>6?'Competencia por minutos':gap<-5?'Jugador importante':'Pieza de primer equipo'});
  }
  // Un grande que preguntó por ti durante la temporada concreta su oferta si tu nivel acompaña.
- const interest=(state.threads||[]).find(t=>t.kind==='big_club_interest'&&!t.resolved);
- if(interest&&byId[interest.data?.clubId]&&!selected.some(x=>x.id===interest.data.clubId)){
+ const interest=activeThreads(state).find(t=>t.kind==='big_club_interest');
+ if(interest&&byId[interest.data?.clubId]&&interest.data.clubId!==state.clubId&&eligibleClubs(state).some(c=>c.id===interest.data.clubId)&&!selected.some(x=>x.id===interest.data.clubId)){
   const c=byId[interest.data.clubId],prestige=livePrestige(state,c);
   if(demand>=prestige-11){const role=prestige-demand>6?'Rotación':'Titular';selected.unshift({...c,prestige,kind:'transfer',role,years:3+(r()<.5?1:0),salary:annualSalary(c,state.ovr,role,seed+':interest'),fee:Math.round((state.ovr||60)*110000*(prestige/85)),project:'Te seguían desde hace meses',highlight:true});}
  }

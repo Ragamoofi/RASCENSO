@@ -73,9 +73,9 @@ function arrive(m,gx,gz,k,{shooter=true}={}){
   if(covers(k,gx,gz)){return m.finish(!shooter,shooter?'atajado':'atajada',shooter?.2:.6);}
   return m.finish(shooter,shooter?'gol':'gol rival',shooter?clampN(.5+(Math.abs(gx)/POST)*.3+(gz/BAR)*.2,0,1):.1);
  }
- if(gz>=BAR-.06&&gz<BAR+.18&&Math.abs(gx)<POST)return m.finish(!shooter,shooter?'travesaño':'atajada',.3);
- if(Math.abs(Math.abs(gx)-POST)<.15&&gz<BAR)return m.finish(!shooter,shooter?'poste':'atajada',.3);
- return m.finish(!shooter,shooter?'fuera':'atajada',shooter?.1:.5);
+ if(gz>=BAR-.06&&gz<BAR+.18&&Math.abs(gx)<POST)return m.finish(!shooter,'travesaño',.3);
+ if(Math.abs(Math.abs(gx)-POST)<.15&&gz<BAR)return m.finish(!shooter,'poste',.3);
+ return m.finish(!shooter,'fuera',shooter?.1:.5);
 }
 
 /* ---------- Penal (pateador) ---------- */

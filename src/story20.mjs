@@ -314,7 +314,7 @@ export function applyWorldEffects(s,effect={}){
  if(effect.resolve)n.threads=resolveThread(n,effect.resolve,'resuelta');
  if(effect.thread)n.threads=addThread(n,effect.thread.kind,effect.thread.data||{},effect.thread.years||1);
  if(effect.money)n.careerEarnings=Math.max(0,(n.careerEarnings||0)+effect.money);
- if(effect.salaryCut&&n.contract?.salary)n.contract={...n.contract,salary:Math.round(n.contract.salary*(1-effect.salaryCut)/1000)*1000};
+ if(effect.salaryCut&&n.contract?.salary)n.contract={...n.contract,temporaryCut:{year:yearOf(n),clubId:n.clubId,rate:clamp(effect.salaryCut,0,1)}};
  if(effect.raise&&n.contract?.salary)n.contract={...n.contract,salary:Math.round(n.contract.salary*(1+effect.raise)/1000)*1000};
  if(effect.preparation){const year=yearOf(n);n.preparation={year,id:effect.preparation};}
  if(effect.heal&&n.attributes){const a={...n.attributes};for(const k of ['pace','physical'])if(Number.isFinite(a[k]))a[k]=Math.min(99,a[k]+1);n.attributes=a;n.ovr=ovrFromAttributes(n.position,a);}

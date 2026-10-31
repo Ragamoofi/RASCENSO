@@ -153,6 +153,12 @@ export function squadRole(s,clubLevel,coach){
 }
 
 /* ---------- Promesas, compromisos y deudas narrativas ---------- */
+/** Compara producción de liga con la misma métrica para ambos futbolistas. */
+export function compareChallenge(player,rival){
+ if(!rival||!Number.isFinite(rival.goals)||!Number.isFinite(rival.assists))return null;
+ const us=(player.goals||0)+(player.assists||0),them=rival.goals+rival.assists;
+ return {us,them,outcome:us>them?'ganado':us<them?'perdido':'empatado'};
+}
 export const THREAD_INFO={
  promise_minutes:{name:'Promesa de minutos',icon:'⏱'},
  transfer_request:{name:'Pediste salir',icon:'✈'},

@@ -13,8 +13,10 @@ export function marketValueEUR(s,club){
 export function contractSnapshot(s){
  const end=s.contract?.ends;
  const remaining=Number.isFinite(end)?Math.max(0,end-((s.startYear||2026)+(s.age-(s.startAge||16)))):0;
- const annual=Number(s.contract?.salary)||0;
- return {annual,monthly:Math.round(annual/12),remaining,expires:end??null,valid:!!s.contract&&remaining>0};
+ const baseAnnual=Number(s.contract?.salary)||0,year=(s.startYear||2026)+(s.age-(s.startAge||16)),cut=s.contract?.temporaryCut;
+ const cutRate=cut?.year===year&&cut.clubId===s.clubId?clamp(Number(cut.rate)||0,0,1):0;
+ const annual=Math.round(baseAnnual*(1-cutRate));
+ return {annual,baseAnnual,cutRate,monthly:Math.round(annual/12),remaining,expires:end??null,valid:!!s.contract&&remaining>0};
 }
 const pairs=[
  ['Colo-Colo','Universidad de Chile'],['Universidad Católica','Universidad de Chile'],['Colo-Colo','Universidad Católica'],
