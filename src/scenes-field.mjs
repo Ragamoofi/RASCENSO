@@ -406,16 +406,18 @@ const despeje={
 
 const fuera_juego={
  init(m){m.timer=7;m.line=40;m.defs=[6.5,11.5,17.5,22.5].map((y,i)=>makePlayer(40,y,{num:String([2,4,5,3][i]),team:'us'}));m.atts=[makePlayer(39,rnd(m,9,12),{num:'9'}),makePlayer(39,rnd(m,16,20),{num:'11'})];
-  m.p=makePlayer(22,14.5,{num:'10'});m.ball=makeBall(0,0);m.ball.owner=m.p;m.passT=rnd(m,2.6,4.6);m.fakeT=m.ai.d>.45?m.passT-rnd(m,1,1.6):null;m.k=makePlayer(51.2,14.5,{num:'1',r:.5});m.hint='Mantén pulsado para adelantar la línea · sube justo cuando el 10 patee';},
+  m.p=makePlayer(22,14.5,{num:'10'});m.ball=makeBall(0,0);m.ball.owner=m.p;m.passT=rnd(m,2.6,4.6);m.fakeT=m.ai.d>.45?m.passT-rnd(m,1,1.6):null;m.k=makePlayer(51.2,14.5,{num:'1',r:.5});m.actualLine=40;m.hint='Mantén pulsado para adelantar · observa al último defensor';},
  update(m,dt){
-  const hold=m.pointer.down||m.keys.has('Space');m.line=clampN(m.line+(hold?-3.4:2.6)*dt,33,44);for(const d of m.defs)moveToward(d,m.line,d.y,6,dt);
+  const hold=m.pointer.down||m.keys.has('Space'),lineSpeed=2.8+m.stats.defense*.9;m.line=clampN(m.line+(hold?-lineSpeed:2.6)*dt,33,44);
+  m.defs.forEach((d,i)=>moveToward(d,m.line,d.y,4.5+m.stats.defense*1.6+i*.25,dt));
+  m.actualLine=Math.max(...m.defs.map(d=>d.x));
   const windup=t=>m.t>t-.55&&m.t<t;m.windup=windup(m.passT)||(m.fakeT&&windup(m.fakeT));
   // Los delanteros miran la línea cada cierto tiempo: subir justo antes del pase los sorprende.
-  if(m.ball.owner===m.p){const scan=.75-m.ai.d*.4;for(const a of m.atts){if(m.t-(a.seen??-9)>=scan){a.seen=m.t+m.rand()*.1;a.tx=m.line-.35;}moveToward(a,a.tx??a.x,a.y,6,dt);}
-   if(m.t>=m.passT){const r=m.atts.sort((a,b)=>b.x-a.x)[0];m.target=r;const off=r.x>m.line+.25;m.offside=off;kick(m.ball,Math.min(50,m.line+5),r.y,17,0);m.passed=true;if(off){setBanner(m,r.x,r.y);m.say('¡FUERA DE JUEGO!',true);return m.finish(true,'fuera de juego',.5+clampN((r.x-m.line)/2,0,.45));}}}
+  if(m.ball.owner===m.p){const scan=.75-m.ai.d*.4;for(const a of m.atts){if(m.t-(a.seen??-9)>=scan){a.seen=m.t+m.rand()*.1;a.tx=m.actualLine-.35;}moveToward(a,a.tx??a.x,a.y,6,dt);}
+   if(m.t>=m.passT){const r=m.atts.sort((a,b)=>b.x-a.x)[0];m.target=r;const off=r.x>m.actualLine+.25;m.offside=off;kick(m.ball,Math.min(50,m.line+5),r.y,17,0);m.passed=true;if(off){setBanner(m,r.x,r.y);m.say('¡FUERA DE JUEGO!',true);return m.finish(true,'fuera de juego',.5+clampN((r.x-m.actualLine)/2,0,.45));}}}
   else{stepBall(m.ball,dt);moveToward(m.target,m.ball.x,m.ball.y,8,dt);if(dist(m.target,m.ball)<.9&&!m.result){setBanner(m,m.target.x,m.target.y);return m.finish(false,'superado',.1);}}
  },
- draw(m,g){drawPitch(g);drawLine(g,{x:m.line,y:1},{x:m.line,y:28},m.windup?'rgba(240,160,140,.9)':'rgba(122,166,255,.6)',{dash:[8,6],width:2.5});keeper(m,m.k,true);for(const d of m.defs)us(m,d,{highlight:false});for(const a of m.atts)them(m,a,{ring:a.x>m.line?'#f0a08c':null});them(m,m.p,{ring:m.windup?COLORS.copper:null});drawBall(g,m.ball);}
+ draw(m,g){drawPitch(g);drawLine(g,{x:m.actualLine,y:1},{x:m.actualLine,y:28},m.windup?'rgba(240,160,140,.9)':'rgba(122,166,255,.6)',{dash:[8,6],width:2.5});keeper(m,m.k,true);for(const d of m.defs)us(m,d,{highlight:false});for(const a of m.atts)them(m,a,{ring:a.x>m.actualLine?'#f0a08c':null});them(m,m.p,{ring:m.windup?COLORS.copper:null});drawBall(g,m.ball);}
 };
 
 /* ======================================================================
