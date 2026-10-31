@@ -72,15 +72,21 @@ function performance(state){
  return score+(last.leaguePosition<=3?4:0)+(last.international?3:0)+(last.rating?clamp((last.rating-6.6)*6,-4,6):0);
 }
 export function playerDemand(state){const age=state.age||20;const veteran=Math.max(0,age-31)*1.7;return clamp((state.ovr||60)+marketRarity(state)+(performance(state)-9)*.32+((state.reputation||0)-35)*.036-veteran,42,98);}
+/** Competencia conocida dentro del mundo simulado; ausencia de datos no implica vacante. */
+export function positionCompetition(state,clubId){
+ return (state.world?.players||[]).filter(p=>p.status==='active'&&p.clubId===clubId&&p.pos===state.position&&Number.isFinite(p.ovr)).sort((a,b)=>b.ovr-a.ovr)[0]||null;
+}
+function competitionWeight(state,competitor){return competitor?clamp(1-((competitor.ovr-(state.ovr||60))*.025),.72,1.16):1;}
+export function positionCompetitionWeight(state,clubId){return competitionWeight(state,positionCompetition(state,clubId));}
 function eligibleClubs(state){return CLUBS.filter(c=>c.id!==state.clubId&&(!validLeagueCountry.has(c.countryCode)||!!getInauguralLeague(c.id)));}
-function weightClub(state,c,focus){
+function weightClub(state,c,focus,competitor=null){
  const prestige=livePrestige(state,c),demand=playerDemand(state),gap=prestige-demand;
  const elite=demand>=84;
  if(elite&&prestige<79)return 0;
  if(demand>=77&&prestige<68)return 0;
  if(demand<76&&gap>20)return 0;
  if(gap<-12||gap>16)return 0;
- let w=Math.exp(-Math.pow((gap+(elite?1:2))/10,2));
+ let w=Math.exp(-Math.pow((gap+(elite?1:2))/10,2))*competitionWeight(state,competitor);
  if(state.age>=34){const years=state.age-33;w*=clamp(1-years*.09,.2,1);}
  if(state.age>=38){const years=state.age-37;w*=clamp(1-years*.065,.10,.95);if(prestige>=82)w*=clamp(1-years*.09,.04,.92);if(c.countryCode===state.country)w*=1.5;}
  const recent=(state.history||[]).length;
@@ -121,8 +127,9 @@ function balanceEarlyMarket(state,focus,weighted){
 export function buildTransferOffers(state,{attempt=0,focus='balanced',forced=false}={}){
  const seed=`${state.seed}:mercado07:${state.age}:${state.clubId}:${attempt}:${focus}`;
  const r=random(seed),demand=playerDemand(state);
- const selected=[];
- const weighted=eligibleClubs(state).map(c=>({c,w:weightClub(state,c,focus)})).filter(x=>x.w>.00001);
+ const selected=[],knownCompetition=new Map();
+ for(const p of state.world?.players||[]){if(p.status!=='active'||p.pos!==state.position||!Number.isFinite(p.ovr))continue;const old=knownCompetition.get(p.clubId);if(!old||p.ovr>old.ovr)knownCompetition.set(p.clubId,p);}
+ const weighted=eligibleClubs(state).map(c=>({c,w:weightClub(state,c,focus,knownCompetition.get(c.id))})).filter(x=>x.w>.00001);
  balanceEarlyMarket(state,focus,weighted);
  let count=demand>=84?3:2+Math.floor(r()*2);if(socialEffects(state).agentMarket>1.12&&count<4)count++;
  if(state.age>=35&&state.age<38)count=Math.max(0,count-1-(r()<.4?1:0));
@@ -132,10 +139,11 @@ export function buildTransferOffers(state,{attempt=0,focus='balanced',forced=fal
   let index=weighted.findIndex(x=>(roll-=x.w)<=0);if(index<0)index=weighted.length-1;
   const {c}=weighted.splice(index,1)[0];const prestige=livePrestige(state,c);const gap=prestige-demand;
   const kind=state.age<=23&&gap<-3&&r()<.12?'loan':'transfer';
-  const role=gap>7?'Rotación':gap<-5?'Titular':r()<.22?'Rotación':'Titular';
+  const competitor=knownCompetition.get(c.id);
+  const role=gap>7||(competitor&&competitor.ovr>=(state.ovr||60)+5)?'Rotación':gap<-5?'Titular':r()<.22?'Rotación':'Titular';
   const years=kind==='loan'?1:state.age>=36?1+(r()<.20?1:0):2+Math.floor(r()*3);
   const salary=annualSalary(c,state.ovr,role,seed+':'+k);
-  selected.push({...c,prestige,kind,role,years,salary,fee:Math.round((state.ovr||60)*90000*(prestige/85)),project:gap>6?'Competencia por minutos':gap<-5?'Jugador importante':'Pieza de primer equipo'});
+  selected.push({...c,prestige,kind,role,years,salary,fee:Math.round((state.ovr||60)*90000*(prestige/85)),project:competitor?(competitor.ovr>=(state.ovr||60)+5?'Competencia fuerte en tu puesto':'Competencia abierta en tu puesto'):gap>6?'Competencia por minutos':gap<-5?'Jugador importante':'Pieza de primer equipo'});
  }
  // Un grande que preguntó por ti durante la temporada concreta su oferta si tu nivel acompaña.
  const interest=activeThreads(state).find(t=>t.kind==='big_club_interest');

@@ -18,3 +18,14 @@ test('el criterio local funciona en distintos países y ligas',()=>{
   assert.ok(total>100&&home/total>.35,`${country}: ${home}/${total}`);
  }
 });
+test('las ofertas consideran competencia real del mundo simulado sin inventar una vacante',async()=>{
+ const {positionCompetition,positionCompetitionWeight}=await import('../src/market.mjs');const s={...base,world:{players:[{id:'rival',name:'Competidor',clubId:'ar-1',pos:'DC',ovr:76,status:'active'}]}};
+ assert.equal(positionCompetition(s,'ar-1').name,'Competidor');assert.ok(positionCompetitionWeight(s,'ar-1')<1);
+ assert.equal(positionCompetition(s,'fr-1'),null);assert.equal(positionCompetitionWeight(s,'fr-1'),1);
+ assert.equal(positionCompetition({...s,position:'POR'},'ar-1'),null);
+});
+test('una oferta refleja la competencia conocida por el puesto y ajusta el rol',()=>{
+ const s={...base,country:'AR',clubId:'ar-2',ovr:80,world:{players:[{id:'nine',name:'Delantero rival',clubId:'ar-1',pos:'DC',ovr:88,status:'active'}]}};
+ let offer=null;for(let i=0;i<400&&!offer;i++)offer=buildTransferOffers({...s,seed:`competition-${i}`},{focus:'local'}).find(x=>x.id==='ar-1');
+ assert.ok(offer,'debe ser posible recibir la oferta');assert.equal(offer.role,'Rotación');assert.match(offer.project,/Competencia fuerte/);
+});
