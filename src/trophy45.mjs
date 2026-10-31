@@ -1,4 +1,5 @@
-/* RASCENSO 4.5: catálogo estable de trofeos, sin alterar guardados ni simulación. */
+/* RASCENSO 4.7: catálogo estable y 863 PNG aportados por el usuario. */
+import { fmTrophySrc } from './fm-trophy-catalog.mjs';
 const normal=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const COUNTRY=/^[a-z]{2}$/;
@@ -56,7 +57,10 @@ export function trophyIdentity(record,club=null){
  if(key==='league-en1'){key='real-premier';fallback='league.png';}
  if(key==='league-br1'){key='real-brasileirao';fallback='league.png';}
  if(key==='league-nl1'){key='real-eredivisie';fallback='league.png';}
- return {title,key,category,src:'./assets/trophies/'+key+'.png',fallback:'./assets/trophies/'+fallback,year:record?.year??null,clubId:record?.clubId??null};
+ const priorSrc='./assets/trophies/'+key+'.png';
+ const fmSrc=fmTrophySrc({...record,title});
+ return {title,key,category,src:fmSrc||priorSrc,fallback:fmSrc?priorSrc:'./assets/trophies/'+fallback,
+  source:fmSrc?'fm-pack':'rascenso-original',year:record?.year??null,clubId:record?.clubId??null};
 }
 export const trophyImage=record=>trophyIdentity(record).src;
 export const trophyImgTag=(record,club=null,className='')=>{
@@ -78,7 +82,7 @@ export function trophyDetail(record,getClub,getCountry){
  return '<div class="trophy-detail-body"><div class="trophy-detail-head"><span>RASCENSO · PALMARÉS</span><button type="button" data-action="trophy-close" class="trophy-detail-close" aria-label="Cerrar detalle">✕</button></div><div class="trophy-detail-art">'+trophyImgTag(record,club)+'</div>'+
  '<span class="trophy-detail-category">'+esc(info.category)+'</span><h2 id="trophy-modal-title">'+esc(info.title)+'</h2>'+
  '<div class="trophy-detail-facts"><div><small>TEMPORADA</small><strong>'+esc(record.year??'Sin registro')+'</strong></div><div><small>CONSEGUIDO CON</small><strong>'+esc(context)+'</strong></div></div>'+
- '<p>Imagen de referencia del trofeo. Cuando existe una reproducción con licencia libre se utiliza esa; los demás diseños son ilustraciones propias de RASCENSO.</p>'+
+ '<p>'+(info.source==='fm-pack'?'Trofeo del paquete gráfico proporcionado para RASCENSO. Su nombre se vinculó por identificador de competición o nombre inequívoco; la licencia de redistribución no está verificada.':'Imagen de referencia o ilustración original de RASCENSO; conserva el diseño anterior cuando no hay una equivalencia exacta.')+'</p>'+
  '<a href="./assets/MEDIA_CREDITS.html" target="_blank" rel="noopener">Ver créditos y licencias de imágenes</a></div>';
 }
 export function trophyRetirementGrid(groups,getClub){

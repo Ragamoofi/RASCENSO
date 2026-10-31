@@ -1,7 +1,7 @@
 name: Prueba de jugadas en navegador
 on:
   push:
-    branches: [main, mejora-penales-controles, carrera-mundo35, jugadas36, duelos37, rascenso-4-integral, rascenso-4-1-centro-partidos, rascenso-4-2-legado-final, rascenso-4-3-gran-parche, rascenso-4-4-renovacion-visual, rascenso-4-5-vitrina-trofeos, rascenso-4-6-historial-legado-seleccion]
+    branches: [main, mejora-penales-controles, carrera-mundo35, jugadas36, duelos37, rascenso-4-integral, rascenso-4-1-centro-partidos, rascenso-4-2-legado-final, rascenso-4-3-gran-parche, rascenso-4-4-renovacion-visual, rascenso-4-5-vitrina-trofeos, rascenso-4-6-historial-legado-seleccion, rascenso-4-7-trofeos-fm]
   workflow_dispatch:
 permissions:
   contents: read
@@ -29,6 +29,10 @@ jobs:
           test -s assets/trophies/cup-cl.png
           test -s assets/trophies/real-libertadores.png
           test -s assets/trophies/club-world.png
+          python scripts/build_fm_trophy_pack.py .
+          test -s assets/trophies/fm/102415.png
+          test -s assets/trophies/fm/1301394.png
+          test -s assets/trophies/fm/5250792.png
       - name: Validar motor y simular 20 jugadas
         run: |
           node --test tests/*.test.mjs

@@ -1,6 +1,8 @@
 # RASCENSO · Del barrio a la historia
 
-**RASCENSO 4.6 — Historial, Selección y Legado** · © Ragamoofi.
+**RASCENSO 4.7 — Trofeos identificados de Football Manager** · © Ragamoofi.
+
+**Novedad 4.7:** se incorporan 863 PNG optimizados del archivo aportado por el usuario, identificados por su ID de competición de FM. 48 equivalencias directas con competiciones de RASCENSO y reconocimiento adicional por nombre único. En las copas sin correspondencia segura, se mantiene la imagen anterior. [Detalles y créditos](docs/RASCENSO-4-7.md).
 
 **Novedad 4.6:** minitrofeos junto a cada temporada/club en Historial, eliminación del bloque redundante «Por club», nuevo informe de selección (solo estadísticas registradas), Legado compacto a 1920×1080 y vitrina con espacio suficiente para copas y nombres completos. [Detalles y pruebas](docs/RASCENSO-4-6.md).
 

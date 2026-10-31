@@ -64,7 +64,7 @@ jobs:
           test -s favicon.png
           for file in assets/logos-{1..4}.json; do test -s "$file"; done
           test -s scripts/crest_commons.json
-          python -m py_compile scripts/build_crests.py scripts/audit_crests.py scripts/build_trophy_gallery.py
+          python -m py_compile scripts/build_crests.py scripts/audit_crests.py scripts/build_trophy_gallery.py scripts/build_fm_trophy_pack.py
       - name: Auditar cobertura y equivalencias de los 874 escudos
         run: |
           node scripts/export-clubs.mjs
@@ -91,6 +91,7 @@ jobs:
           python scripts/build_crests.py _site/assets/crests
           python scripts/build_media12.py _site
           python scripts/build_trophy_gallery.py _site
+          python scripts/build_fm_trophy_pack.py _site
           python scripts/restore_portraits.py _site
           mkdir -p /tmp/rascenso-previous-photo-cache
           if git fetch -q origin media-audit:refs/remotes/origin/media-audit; then
@@ -112,6 +113,9 @@ jobs:
           test -s _site/assets/trophies/league-cl1.png
           test -s _site/assets/trophies/cup-cl.png
           test -s _site/assets/trophies/club-world.png
+          test -s _site/assets/trophies/fm/102415.png
+          test -s _site/assets/trophies/fm/1301394.png
+          test -s _site/assets/trophies/fm/5250792.png
           test -s _site/assets/crests/cl-1.png
           test -s _site/assets/crest-manifest.json
           test -s _site/assets/crest-audit.json
