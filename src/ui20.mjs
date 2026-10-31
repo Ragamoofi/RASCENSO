@@ -5,6 +5,7 @@ import { COACH_STYLES, THREAD_INFO, activeThreads, scoutedPotential, careerRecor
 import { coachFor, worldClub, worldRival, topPlayers, generationPlayers, powerRanking, risingClubs, clubTrend, newsIcon, dynamicPrestige, AWARD_NAMES } from './world20.mjs';
 import { currentObjectives, currentRole, canRetire, NEGOTIATION_ASKS } from './engine.mjs';
 import { annualSalaryLabel } from './market.mjs';
+import {isRealClubReady,getFM26Squad} from './fm26-real.mjs';
 import { PLAYS } from './plays30.mjs';
 import { DNA_TAGS, dreamProgress, dnaFx } from './identity30.mjs';
 
@@ -88,6 +89,8 @@ export function vestuarioView(s){
  const obj=currentObjectives(s);
  const relationHints={teammate:'Apoyo dentro del plantel: puede mejorar ligeramente tus minutos y la moral al cierre de temporada.',agent:'Mejora las oportunidades de mercado y la calidad de las gestiones de tu representante, sin garantizar ofertas.',press:'Buena relación con la prensa: pequeños efectos sobre la reputación entre temporadas.',family:'Apoyo emocional: influye moderadamente en la moral y en el riesgo de lesión.'};
  const relCard=(key,label)=>{const r=rel[key];if(!r)return '';return `<div class="v2-rel">${avatar(r.name)}<div><strong>${h(r.name)}</strong><small>${h(label)}</small>${meter('Relación',r.trust??50)}<small class="v2-rel-help" title="${h(relationHints[key])}">${h(relationHints[key])}</small></div></div>`;};
+ const fmRoster=isRealClubReady(s.clubId)?getFM26Squad(s.clubId,s):[];
+ const fmtRoster=fmRoster.length?`<section class="v2-panel fm26-roster"><header><span>PLANTILLA REAL · FM26 PRIVADO</span><b>${fmRoster.length} jugadores</b></header><div class="fm26-roster-grid">${fmRoster.slice(0,35).map(p=>`<div class="fm26-player" title="${h(p.name)}"><span>${h(p.pos)}</span><b>${h(p.name)}</b><strong>${p.ovr}</strong><small>${p.age} a.</small></div>`).join('')}</div><small>Plantilla local privada: los jugadores evolucionan y cambian de club durante la carrera.</small></section>`:'';
  return `<section class="focus-card v2-vestuario"><div class="section-label">VESTUARIO · ${h(club?.name||'Sin club')}</div><h2>Las personas que deciden tu carrera.</h2><p class="v2-vest-guide">La confianza importa: entrenador y rival influyen en tus minutos; directiva e hinchada en el ambiente y continuidad. Las relaciones cambian con tus decisiones y aportan efectos moderados, no bonos mágicos.</p>
  <div class="v2-vest-grid">
   <section class="v2-panel v2-coach-card"><header><span>ENTRENADOR</span><b>${h(coach?.styleName||'')}</b></header><div class="v2-coach-line big">${avatar(coach?.name)}<div><strong>${h(coach?.name||'—')}</strong><small>${flag(coach?.nationality||s.country)} ${coach?.age||''} años${coach?.since?` · en el cargo desde ${coach.since}`:''}</small></div></div><p>${h(COACH_STYLES[coach?.style]?.description||'')}</p>${meter('Confianza en ti',s.coachTrust??50,'trust')}</section>
@@ -95,7 +98,7 @@ export function vestuarioView(s){
   <section class="v2-panel"><header><span>EL CLUB</span><b>${h(trend.label)}</b></header>${meter('Directiva',sq.board??55,'board')}${meter('Hinchada',sq.fans??50,'fans')}<div class="v2-badges">${sq.captain?'<span>C · Capitán</span>':''}${sq.idol?'<span>★ Ídolo</span>':''}${sq.loyal?'<span>♥ Lealtad</span>':''}<span>${sq.seasons||0} temporada(s) en el club</span><span>Prestigio ${dynamicPrestige(s,club)}</span></div>${obj?`<p class="muted">Objetivo de la directiva: <b>${h(obj.board.text)}</b>.</p>`:''}${trend.hist.length?`<div class="v2-trend">${trend.hist.slice(-8).map(([y,p,t])=>`<span title="${y}: ${p}° de ${t}"><i style="height:${Math.max(8,100-(p-1)/(Math.max(2,t)-1)*92)}%"></i><small>${String(y).slice(2)}</small></span>`).join('')}</div>`:''}</section>
   <section class="v2-panel v2-rels"><header><span>RELACIONES</span><b>4</b></header>${relCard('teammate','Compañero de confianza')}${relCard('agent','Representante')}${relCard('press','Periodista de cabecera')}${relCard('family','Familia')}</section>
   <section class="v2-panel v2-memory"><header><span>MEMORIA DE TUS DECISIONES</span><b>${threads.length}</b></header>${threads.length?threads.slice(0,10).map(t=>`<div class="v2-thread-row ${t.resolved?'done':''}"><i>${threadIcon(t.kind)}</i><div><strong>${threadName(t.kind)}</strong><small>${t.year}${t.until&&t.until>t.year?`–${t.until}`:''} · ${t.resolved?h(t.outcome||'cerrado'):'activo'}</small></div></div>`).join(''):'<p class="muted">Tus promesas, desafíos y compromisos quedarán registrados aquí. El juego los recuerda.</p>'}</section>
-  ${dreamPanel(s)}${dnaPanel(s)}
+  ${fmtRoster}${dreamPanel(s)}${dnaPanel(s)}
  </div></section>`;
 }
 
