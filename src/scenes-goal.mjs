@@ -44,15 +44,25 @@ export function keeperPose(k){
  return {hx,hz,bx:lerp(k.x,hx,.55),bz:lerp(.95,Math.max(.35,hz*.75),p),p};
 }
 function drawKeeper(g,k,color,dark){
- const {hx,hz,bx,bz,p}=keeperPose(k), [x,y]=gs(bx,bz), [handX,handY]=gs(hx,hz);
- const dir=Math.sign(hx-k.x)||1;
+ const {hx,hz,bx,bz,p}=keeperPose(k),[x,y]=gs(bx,bz),[handX,handY]=gs(hx,hz);
+ const dir=Math.sign(hx-k.x)||1,lean=dir*p*1.05;
  g.fillStyle='rgba(0,0,0,.28)';g.beginPath();g.ellipse(x,GY+4,27+20*p,7,0,0,Math.PI*2);g.fill();
- // El guante adelantado está exactamente en el centro usado por la colisión.
- g.strokeStyle=dark;g.lineWidth=11;g.lineCap='round';g.beginPath();g.moveTo(x-7,y+16);g.lineTo(x-15-dir*p*30,y+48);g.moveTo(x+7,y+16);g.lineTo(x+14-dir*p*20,y+48);g.stroke();
- g.strokeStyle=color;g.lineWidth=26;g.beginPath();g.moveTo(x,y+12);g.lineTo(x-dir*p*14,y-20);g.stroke();
- g.fillStyle='#f2d2b6';g.beginPath();g.arc(x-dir*p*18,y-32,11,0,Math.PI*2);g.fill();
- g.strokeStyle=color;g.lineWidth=9;g.beginPath();g.moveTo(x,y-12);g.lineTo(handX,handY);g.moveTo(x,y-12);g.lineTo(x-dir*(25+p*15),y-30);g.stroke();
- g.fillStyle='#fff';g.beginPath();g.arc(handX,handY,8,0,Math.PI*2);g.arc(x-dir*(25+p*15),y-30,6,0,Math.PI*2);g.fill();g.lineCap='butt';
+ // Silueta articulada: el guante adelantado conserva la coordenada exacta de colisión.
+ g.save();g.translate(x,y);g.rotate(lean);g.lineCap='round';
+ g.strokeStyle=dark;g.lineWidth=10;g.beginPath();g.moveTo(-8,17);g.lineTo(-12,35);g.lineTo(-17,48);g.moveTo(8,17);g.lineTo(12,34);g.lineTo(17,47);g.stroke();
+ g.strokeStyle='#ebf0e8';g.lineWidth=7;g.beginPath();g.moveTo(-12,35);g.lineTo(-17,48);g.moveTo(12,34);g.lineTo(17,47);g.stroke();
+ g.strokeStyle='#182534';g.lineWidth=8;g.beginPath();g.moveTo(-18,48);g.lineTo(-23,50);g.moveTo(17,47);g.lineTo(22,49);g.stroke();
+ g.fillStyle=dark;roundRect(g,-16,6,32,21,5);g.fill();
+ g.fillStyle=color;g.beginPath();g.moveTo(-19,-22);g.quadraticCurveTo(0,-30,19,-22);g.lineTo(15,10);g.quadraticCurveTo(0,15,-15,10);g.closePath();g.fill();
+ g.fillStyle='rgba(255,255,255,.22)';g.fillRect(-13,-19,26,3);
+ g.fillStyle='#fff';g.font='bold 12px Arial';g.textAlign='center';g.textBaseline='middle';g.fillText('1',0,-4);
+ g.fillStyle='#dcae8b';g.beginPath();g.arc(0,-37,11,0,Math.PI*2);g.fill();
+ g.fillStyle='#3c3029';g.beginPath();g.arc(0,-40,10,Math.PI,Math.PI*2);g.fill();
+ g.restore();
+ const shoulderX=x+Math.sin(lean)*15,shoulderY=y-Math.cos(lean)*15;
+ const otherX=x-dir*(25+p*15),otherY=y-30;
+ g.strokeStyle=color;g.lineWidth=10;g.lineCap='round';g.beginPath();g.moveTo(shoulderX,shoulderY);g.quadraticCurveTo((shoulderX+handX)/2,(shoulderY+handY)/2-6,handX,handY);g.moveTo(shoulderX,shoulderY);g.lineTo(otherX,otherY);g.stroke();
+ g.fillStyle='#f8faf5';g.strokeStyle='#71818d';g.lineWidth=1.5;g.beginPath();g.arc(handX,handY,8,0,Math.PI*2);g.arc(otherX,otherY,6,0,Math.PI*2);g.fill();g.stroke();g.lineCap='butt';
 }
 export function keeperCovers(k,gx,gz,extra=0){
  const {hx,hz,bx,bz}=keeperPose(k);

@@ -416,7 +416,7 @@ const fuera_juego={
    ARQUEROS (cancha)
    ====================================================================== */
 const achique={
- init(m){m.timer=9;m.st=makePlayer(32,rnd(m,10,19),{num:'9',speed:m.ai.defSpeed*.82});m.ball=makeBall(0,0);m.ball.owner=m.st;m.me=makePlayer(51,14.5,{num:'1',team:'us',r:.5});m.shootAt=rnd(m,10.5,14.5);m.hint='Reduce el ángulo moviéndote · clic para lanzarte a sus pies';},
+ init(m){m.timer=9;m.st=makePlayer(32,rnd(m,10,19),{num:'9',speed:m.ai.defSpeed*.82});m.ball=makeBall(0,0);m.ball.owner=m.st;m.me=makePlayer(51,14.5,{num:'1',team:'us',r:.5});m.shootAt=rnd(m,10.5,14.5);m.hint='Muévete para achicar · clic hacia el balón para lanzarte';},
  update(m,dt){
   const st=m.stats;
   if(m.ball.owner===m.st){m.steer(m.me,st.speed*.9,dt,[43.5,51.8,8,21]);
@@ -429,18 +429,23 @@ const achique={
     const left=FIELD.goalY-FIELD.post+.4,right=FIELD.goalY+FIELD.post-.4;const side=Math.abs(m.me.y-left)>Math.abs(m.me.y-right)?left:right;
     if(m.rounded){m.st.x=Math.max(m.st.x,m.me.x+1);m.me.grounded=true;}
     const skill=m.ai.shooterSkill;kick(m.ball,G.x+.4,side+(m.rand()-.5)*(2.4-skill*1.6),18+skill*8,.6);m.shotAt=m.t;}}
-  else{stepBall(m.ball,dt);const cross=goalCrossing(m.ball);if(cross&&m.t-m.shotAt>.12+(1-st.reflex)*.18)moveToward(m.me,m.me.x,clampN(cross.y,FIELD.goalY-4,FIELD.goalY+4),st.speed*1.9,dt);
-   const coverage=m.me.grounded?.6:st.reach+clampN((52-m.me.x)*.12,0,.6);
-   if(dist(m.me,m.ball)<coverage&&!m.result){setBanner(m,m.me.x,m.me.y);return m.finish(true,'atajada',.5+clampN(coverage-dist(m.me,m.ball),0,1)*.5);}
+  else{const previous={x:m.ball.x,y:m.ball.y,z:m.ball.z};stepBall(m.ball,dt);
+   if(m.me.diveTime>0){m.me.diveTime=Math.max(0,m.me.diveTime-dt);moveToward(m.me,m.me.diveTarget.x,m.me.diveTarget.y,9+st.reflex*5,dt);}
+   else m.steer(m.me,st.speed*.9,dt,[43.5,51.8,8,21]);
+   const coverage=m.me.grounded?.6:st.reach+clampN((52-m.me.x)*.12,0,.6)+(m.me.diveTime>0?.4:0);
+   if(sweptKeeperContact(previous,m.ball,m.me,coverage)&&!m.result){setBanner(m,m.me.x,m.me.y);return m.finish(true,'atajada',.5+clampN(coverage-dist(m.me,m.ball),0,1)*.5);}
    if(m.ball.x>=FIELD.goalX&&!m.result){setBanner(m,m.ball.x,m.ball.y);return inGoalMouth(m.ball.y,m.ball.z)?m.finish(false,'gol rival',.1):m.finish(true,'fuera',.4);}
    if(Math.hypot(m.ball.vx,m.ball.vy)<.5&&m.ball.z<=0&&!m.result){setBanner(m,m.ball.x,m.ball.y);return m.finish(true,'atajada',.4);}}
  },
- down(m){if(m.ball.owner!==m.st||m.me.stun>0)return;const d=dist(m.me,m.st);
-  // Salir a los pies tiene riesgo: cuanto más cerca y mejores reflejos, más probable que la atrapes.
-  if(d<2.1+m.stats.reflex*.5){const p=clampN(.4+m.stats.reflex*.35+(d<1.4?.12:0)-m.ai.shooterSkill*.3,.15,.85);setBanner(m,m.me.x,m.me.y);if(m.rand()<p)return m.finish(true,'atajada',.7);m.me.stun=.8;m.rounded=true;m.say('TE ESQUIVÓ',false);return;}
+ down(m){if(m.me.stun>0||m.me.diveTime>0||m.result)return;
+  if(m.ball.owner!==m.st){if(m.t-(m.me.lastDive??-9)<.65)return;m.me.lastDive=m.t;m.me.diveTime=.35;
+   m.me.diveTarget={x:clampN(m.pointer.wx,43.5,51.8),y:clampN(m.pointer.wy,8,21)};m.say('¡ESTIRADA!',null);return;}
+  const d=dist(m.me,m.st),reach=2.1+m.stats.reflex*.5;
+  // Distancia, reflejos y habilidad del delantero determinan el achique.
+  if(d<reach){const score=(1-d/reach)*.65+m.stats.reflex*.35-m.ai.shooterSkill*.15;setBanner(m,m.me.x,m.me.y);if(score>=.20)return m.finish(true,'atajada',clampN(.5+score*.5,0,1));m.me.stun=.8;m.rounded=true;m.say('TE ESQUIVÓ',false);return;}
   // Salida en falso: el delantero te esquiva y define con el arco más abierto.
   m.me.stun=.8;m.say('TE ESQUIVÓ',false);m.rounded=true;},
- draw(m,g){drawPitch(g);them(m,m.st);keeper(m,m.me,true);const l={x:G.x,y:FIELD.goalY-FIELD.post},r={x:G.x,y:FIELD.goalY+FIELD.post};drawLine(g,m.st,l,'rgba(255,255,255,.18)',{dash:[4,6]});drawLine(g,m.st,r,'rgba(255,255,255,.18)',{dash:[4,6]});drawBall(g,m.ball);}
+ draw(m,g){drawPitch(g);if(m.me.diveTime>0&&m.me.diveTarget)drawLine(g,m.me,m.me.diveTarget,'rgba(124,221,183,.7)',{dash:[4,4]});them(m,m.st);keeper(m,m.me,true);const l={x:G.x,y:FIELD.goalY-FIELD.post},r={x:G.x,y:FIELD.goalY+FIELD.post};drawLine(g,m.st,l,'rgba(255,255,255,.18)',{dash:[4,6]});drawLine(g,m.st,r,'rgba(255,255,255,.18)',{dash:[4,6]});drawBall(g,m.ball);}
 };
 
 const salida_aerea={

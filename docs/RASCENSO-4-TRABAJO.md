@@ -3,6 +3,8 @@
 Rama de trabajo: `rascenso-4-integral`. Base: `bb85f188cf63e016ba8429b8d24b44d5320cfd00`.
 
 ## Avance
+- Achique: movimiento manual y estirada tras el remate; el duelo a los pies usa posición y reflejos. Pendiente de probar equilibrio humano.
+- Arquero frontal: silueta articulada con camiseta, pantalón, guantes y botas; falta inspección visual de esta versión.
 - Penal: remate potente o colocado, con diferencias en precisión y velocidad; desvío animado de las atajadas con indicación de guantes o cuerpo. Pruebas unitarias iniciales.
 - Selección: la división actual prevalece tras ascensos o descensos; la evaluación incluye minutos, titularidad, forma previa y experiencia internacional.
 - Vestuario: una amistad con el competidor aporta moral mientras compartan club y abre una escena contextual con elecciones persistentes.
