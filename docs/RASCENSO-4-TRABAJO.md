@@ -3,6 +3,9 @@
 Rama de trabajo: `rascenso-4-integral`. Base: `bb85f188cf63e016ba8429b8d24b44d5320cfd00`.
 
 ## Avance
+- Mano a mano: elección entre definición colocada y potente. Cabezazo y remate: momento de contacto influye en potencia.
+- Recuperación y entrada: el cansancio reduce el margen. Anticipación: intercepción por trayectoria continua.
+- Tiro libre: salto temporal de la barrera. Penal en contra: desvío visible. Reflejos: rebote según contacto y recuperación afectada por reflejos y cansancio.
 - Fuera de juego: la decisión usa la posición real del último defensor, y la defensa del futbolista influye en la velocidad de la línea.
 - Salida aérea: la captura depende de posición, altura, reflejos y presión; una falla deja rebote en juego.
 - Despeje: el balón se sigue físicamente hasta salir del área, ser interceptado o llegar al arco; se retiró el resultado aleatorio instantáneo.

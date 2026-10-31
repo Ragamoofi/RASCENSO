@@ -11,7 +11,7 @@ import { fixtureContext } from './career15.mjs';
 import { choiceFx } from './identity30.mjs';
 
 export const PLAYS={
- mano_a_mano:{name:'Mano a mano',kind:'attack',credit:'goal',view:'field',attr:['shot','dribble','pace'],brief:'Encara al arquero: muévete, amaga y define antes de que llegue el defensor.',controls:'Ratón o WASD/flechas (W+D, W+A, S+D, S+A) para conducir · clic para rematar'},
+ mano_a_mano:{name:'Mano a mano',kind:'attack',credit:'goal',view:'field',attr:['shot','dribble','pace'],brief:'Encara al arquero: muévete, amaga y define antes de que llegue el defensor.',controls:'Ratón o WASD/flechas para conducir · clic izquierdo potente o derecho colocado'},
  penal:{name:'Penal',kind:'attack',credit:'goal',view:'goal',attr:['shot','skills'],brief:'Once pasos de soledad. El arquero estudió tus penales anteriores.',controls:'Apunta con el ratón · mantén clic izquierdo para potencia o derecho para colocar · suelta para patear'},
  cabezazo:{name:'Cabezazo',kind:'attack',credit:'goal',view:'field',attr:['physical','shot'],brief:'Centro desde la banda: gana la posición a tu marcador y cabecea.',controls:'Muévete con ratón o WASD/flechas · clic para saltar y cabecear hacia el ratón'},
  remate:{name:'Remate de primera',kind:'attack',credit:'goal',view:'field',attr:['shot','weak'],brief:'Pase atrás desde el fondo: el balón no se controla, se impacta.',controls:'Apunta al arco con el ratón · clic cuando la pelota entre en tu anillo'},

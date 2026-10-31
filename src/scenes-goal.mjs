@@ -136,7 +136,8 @@ const tiro_libre={
  aim(m){const n=m.stats.nerves*30;return [m.pointer.x+Math.sin(m.t*2.3)*n,m.pointer.y+Math.cos(m.t*1.9)*n*.6];},
  update(m,dt){
   if(!m.ball){m.k.x=.9+Math.sin(m.t)*.25;return;}
-  const b=m.ball;b.t+=dt;stepDive(m.k,dt);m.wallJump=Math.min(1,m.wallJump+dt*4);
+  const b=m.ball;b.t+=dt;stepDive(m.k,dt);
+  const jumpPhase=(b.t-b.wallDelay)/.55;m.wallJump=jumpPhase>0&&jumpPhase<1?Math.sin(Math.PI*jumpPhase):0;
   // Paso por la barrera (mitad del recorrido): altura y posición lateral del balón.
   if(!b.wallChecked&&b.t>=b.T*.48){b.wallChecked=true;const wx=b.gx*.45-b.curl*.6,wz=b.gz*.55+b.pw*1.6;const inWall=m.wall.some(w=>Math.abs(w.x-wx)<.42);if(inWall&&wz<1.85+m.wallJump*.3&&!m.result){m.bannerAt=[CX+wx*PX*.6,300];return m.finish(false,'barrera',.15);}}
   if(!m.k.diving&&b.t>=b.T*.42+m.ai.keeperReaction*.4){startDive(m.k,b.gx+(m.rand()-.5)*(1.4-m.ai.d),b.gz,m.ai.keeperReach+1.1);}
@@ -145,7 +146,7 @@ const tiro_libre={
  down(m){if(m.ball||m.charge!=null)return;m.charge=m.t;m.chargeX=m.pointer.x;},
  up(m){if(m.ball||m.charge==null)return;const pw=this.power(m);const [ax,ay]=this.aim(m);let [gx,gz]=toGoal(ax,ay);
   const curl=clampN((m.pointer.x-m.chargeX)/90,-1.5,1.5)*(.5+m.stats.skills*.6);const err=m.stats.aimNoise*.36;gx+=m.aimNoise(err);gz+=m.aimNoise(err*.6);if(pw>.88)gz+=(pw-.88)*12;
-  m.ball={t:0,T:clampN(1.05-pw*.3,.72,1.05),gx,gz:Math.max(0,gz),pw,curl};m.charge=null;m.hint='';},
+  m.ball={t:0,T:clampN(1.05-pw*.3,.72,1.05),gx,gz:Math.max(0,gz),pw,curl,wallDelay:clampN(.28-m.ai.d*.14+(m.rand()-.5)*.08,.08,.34)};m.charge=null;m.hint='';},
  draw(m,g){stadium(g,m.t);goalFrame(g,m.result?.success?4:0);drawKeeper(g,m.k,COLORS.keeperThem,'#9a7d12');
   // barrera
   // La barrera está más cerca de la cámara que el arquero: se dibuja más grande.
@@ -165,7 +166,13 @@ const penal_atajado={
    // Si el arquero ya se tiró con anticipación, el pateador cambia de lado.
    if(m.k.diving&&m.k.diveAt<m.kickT-.12&&m.rand()<.45+m.ai.d*.5){m.target=[-Math.sign(m.k.dx||1)*(1.3+m.rand()*1.8),.3+m.rand()*1.4];m.say('TE LEYÓ',false);}
    m.ball={t:0,T:.42+(1-m.ai.shooterSkill)*.12};}
-  if(m.ball){m.ball.t+=dt;if(m.ball.t>=m.ball.T&&!m.result)arrive(m,m.target[0],m.target[1],m.k,{shooter:false});}
+  if(m.ball){const b=m.ball;b.t+=dt;
+   if(b.saved){if(b.t>=b.T+.45&&!m.result)m.finish(true,'atajada',.5+m.stats.reflex*.3);return;}
+   if(b.t>=b.T&&!m.result){const [gx,gz]=m.target;
+    if(Math.abs(gx)<POST-.11&&gz<BAR-.06&&gz>=0&&covers(m.k,gx,gz)){const pose=keeperPose(m.k);b.saved=true;b.deflect=gx>=pose.bx?1:-1;b.contact=Math.hypot(gx-pose.hx,gz-pose.hz)<.48?'guantes':'cuerpo';}
+    else{b.t=b.T;arrive(m,gx,gz,m.k,{shooter:false});}
+   }
+  }
  },
  down(m){if(m.k.diving)return;const [gx,gz]=toGoal(m.pointer.x,m.pointer.y);m.k.diveAt=m.t;startDive(m.k,gx,gz,1.5+m.stats.reach*.9);m.hint='';},
  draw(m,g){stadium(g,m.t);goalFrame(g,m.result&&!m.result.success?4:0);
@@ -175,7 +182,8 @@ const penal_atajado={
    const hip=(m.honest?m.side:-m.side)*(p>.55?1:0);g.strokeStyle='rgba(232,165,116,.8)';g.lineWidth=3;g.beginPath();g.moveTo(-18,-20);g.lineTo(18,-20+hip*8);g.stroke();g.restore();
    drawBallAt(g,CX,H-36,20);}
   drawKeeper(g,m.k,COLORS.keeperUs,'#127a4c');
-  if(m.ball){const t=clampN(m.ball.t/m.ball.T,0,1);const [tx,ty]=gs(m.target[0],m.target[1]);drawBallAt(g,lerp(CX,tx,t),lerp(H-36,ty,t),lerp(20,10,t));}
+  if(m.ball){const b=m.ball,t=clampN(b.t/b.T,0,1);const [tx,ty]=gs(m.target[0],m.target[1]);let x=lerp(CX,tx,t),y=lerp(H-36,ty,t),radius=lerp(20,10,t);
+   if(b.saved){const rebound=clampN((b.t-b.T)/.45,0,1);x=tx+b.deflect*90*rebound;y=ty+90*rebound-25*Math.sin(Math.PI*rebound);radius=10+rebound*4;g.fillStyle='#fff';g.font='800 14px Arial';g.textAlign='center';g.fillText(b.contact==='guantes'?'¡DESVÍO CON LOS GUANTES!':'¡ATAJÓ CON EL CUERPO!',CX,72);}drawBallAt(g,x,y,radius);} 
   if(!m.k.diving)crosshair(g,m.pointer.x,m.pointer.y,'#7cddb7');
  }
 };
@@ -185,16 +193,18 @@ const reflejos={
  init(m){m.k={x:0,p:0};m.shots=0;m.need=3;m.next(m);m.hint='Muévete con el ratón · clic para estirarte hacia el puntero';m.bannerAt=[CX,GY-90];},
  update(m,dt){
   const k=m.k;stepDive(k,dt,.28-m.stats.reflex*.07);
-  if(k.diving&&k.p>=1&&m.t-k.diveAt>.7){k.diving=false;k.p=0;k.x=k.dx;k.dx=k.x;k.dz=1.25;}
+  if(k.diving&&k.p>=1&&m.t-k.diveAt>.68-m.stats.reflex*.16+(m.stats.fatigue||0)*.14){k.diving=false;k.p=0;k.x=k.dx;k.dx=k.x;k.dz=1.25;}
   if(!k.diving){const [gx]=toGoal(m.pointer.x,m.pointer.y);const sp=2.4+m.stats.speed*.25;k.x+=clampN(clampN(gx,-3.2,3.2)-k.x,-sp*dt,sp*dt);}
   const s=m.shot;
   if(!s.ball&&m.t>=s.at){s.ball={t:0,T:.45+(1-m.ai.shooterSkill)*.2};}
   if(s.ball){s.ball.t+=dt;if(s.ball.t>=s.ball.T){
    const [gx,gz]=s.target;const onTarget=Math.abs(gx)<POST-.11&&gz<BAR-.06;
    if(onTarget&&!covers(k,gx,gz,.05)){m.bannerAt=gs(gx,gz);return m.finish(false,'gol rival',.1);}
-   m.shots++;m.say(onTarget?'¡ATAJADA!':'¡AFUERA!',true);
-   if(m.shots>=m.need){return m.finish(true,'atajada',.6+m.stats.reflex*.3);}
-   this.next(m,onTarget&&m.rand()<.5);}}
+   m.shots++;
+   if(m.shots>=m.need){return m.finish(true,onTarget?'atajada':'fuera',.6+m.stats.reflex*.3);}
+   const pose=keeperPose(k),reachError=Math.hypot(gx-pose.hx,gz-pose.hz);
+   const rebound=onTarget&&reachError>.28;m.hint=rebound?'¡Rebote! Prepárate para el siguiente remate':onTarget?'¡Controlada! Atención al siguiente':'¡Afuera! Atención al siguiente';
+   this.next(m,rebound);}}
  },
  next(m,rebound=false){const from=[-260,0,260][Math.floor(m.rand()*3)];const off=m.rand()<.16;m.shot={from:rebound?m.shot?.from??0:from,at:m.t+(rebound?.45:.9+m.rand()*.6),target:[off?(m.rand()<.5?-1:1)*(POST+.6):(m.rand()*2-1)*(POST-.4),.2+m.rand()*1.9],ball:null,rebound};},
  down(m){if(m.k.diving)return;const [gx,gz]=toGoal(m.pointer.x,m.pointer.y);m.k.diveAt=m.t;startDive(m.k,gx,gz,1.4+m.stats.reach*.9);},
