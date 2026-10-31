@@ -1,6 +1,8 @@
 # RASCENSO · Del barrio a la historia
 
-**RASCENSO 4.4 — Renovación Visual** · © Ragamoofi.
+**RASCENSO 4.5 — Vitrina de Trofeos** · © Ragamoofi.
+
+**Novedad 4.5:** vitrina lateral sin aumentar su altura, trofeos PNG distintivos por competición, nombre y año visibles; detalle táctil con club y temporada, y palmarés de retiro más legible. Las copas con imágenes libres verificables muestran reproducciones acreditadas; las demás usan ilustraciones originales distintas, nunca imágenes oficiales inventadas. [Detalles y fuentes](docs/RASCENSO-4-5.md).
 
 Novedades actuales: [RASCENSO 4.4](docs/RASCENSO-4-4.md) · [RASCENSO 4.3](docs/RASCENSO-4-3.md). La 4.4 incorpora el nuevo Centro de Partido con escudos y estadio, 20 jugadas con cinco identidades gráficas y despedida deportiva en tres actos basada en datos reales de tu carrera. Conserva las mecánicas y la dificultad deportiva de 4.3; las pruebas automatizadas no sustituyen partidas humanas.
 
