@@ -42,6 +42,17 @@ function chart(h){
 export function retirementView(s,{badge,trophyImage,flag,dreamProgress,button}){
  const d=retirementData(s),a=d.a,club=d.last?.club||d.most?.name||'Fútbol profesional';
  const stat=(value,label)=>`<div class="farewell-stat"><b>${n(value)}</b><small>${label}</small></div>`;
+ const goalkeeping=s.position==='POR';
+ const cleanSheets=d.history.reduce((total,y)=>total+(Number(y.cleanSheets)||0),0);
+ const goalsConceded=d.history.reduce((total,y)=>total+(Number(y.goalsConceded)||0),0);
+ const stats=goalkeeping?[
+  [a.matches,'PARTIDOS'],[cleanSheets,'VALLAS INVICTAS'],[goalsConceded,'GOLES RECIBIDOS'],
+  [d.trophies.length,'TÍTULOS'],[a.caps,'SELECCIÓN'],[d.peak,'MEJOR MEDIA']
+ ]:[
+  [a.matches,'PARTIDOS'],[a.goals,'GOLES'],[a.assists,'ASISTENCIAS'],
+  [d.trophies.length,'TÍTULOS'],[a.caps,'SELECCIÓN'],[d.peak,'MEJOR MEDIA']
+ ];
+
  const clubs=d.clubs.map((c,i)=>`<div class="farewell-club"><span class="farewell-numeral">${String(i+1).padStart(2,'0')}</span>${badge(c.id,'large')}<div><strong>${esc(c.name)}</strong><small>${year(Math.min(...c.years))}–${year(Math.max(...c.years))} · ${c.years.length} temporada${c.years.length===1?'':'s'}</small></div><b>${n(c.matches)} PJ</b></div>`).join('');
  const trophies=d.unique.slice(0,12).map(t=>`<div class="farewell-trophy"><img src="${esc(trophyImage({title:t.name,kind:t.kind}))}" alt="" loading="lazy"><strong>${esc(t.name)}</strong><small>${n(t.count)} veces · ${esc(t.years.reverse().slice(0,4).join(' / ')||'Año sin registro')}</small></div>`).join('');
  const memories=d.highlights.slice(0,6).map((m,i)=>`<div class="farewell-memory"><b>${String(i+1).padStart(2,'0')}</b><div><small>${esc(m.year||'—')}</small><p>${esc(m.text)}</p></div></div>`).join('');
@@ -58,7 +69,7 @@ export function retirementView(s,{badge,trophyImage,flag,dreamProgress,button}){
  </div><div class="farewell-medallion"><span>✦</span><strong>${n(d.history.length)}</strong><small>TEMPORADAS<br>DE HISTORIA</small></div></div>
  <div class="farewell-hero-foot"><span>ÚLTIMA CAMISETA</span><b>${esc(club)}</b>${d.last?.clubId?badge(d.last.clubId,'large'):''}</div></section>
  <section class="farewell-numbers"><div><span class="farewell-kicker">LOS NÚMEROS DE TU HISTORIA</span><h2>La huella que dejaste</h2></div>
- <div class="farewell-stats">${stat(a.matches,'PARTIDOS')}${stat(a.goals,'GOLES')}${stat(a.assists,'ASISTENCIAS')}${stat(d.trophies.length,'TÍTULOS')}${stat(a.caps,'SELECCIÓN')}${stat(d.peak,'MEJOR MEDIA')}</div></section>
+ <div class="farewell-stats">${stats.map(([value,label])=>stat(value,label)).join('')}</div></section>
  <div class="farewell-content"><div class="farewell-main">
  <section class="farewell-section farewell-tribute"><span class="farewell-kicker">EL VEREDICTO FINAL</span><h2>${esc(careerHeadline(s))}</h2><p>${summary}</p><div class="farewell-dates"><span>DEBUT · ${year(d.first?.year)}</span><span>RETIRO · ${year(d.last?.year)} · ${n(s.age)} AÑOS</span></div>${dreamHtml}</section>
  <section class="farewell-section"><div class="farewell-section-head"><span class="farewell-kicker">EL CAMINO RECORRIDO</span><b>${n(d.clubs.length)} CLUBES</b></div><h2>Las camisetas de tu vida</h2><div class="farewell-clubs">${clubs||'<p>Sin clubes registrados.</p>'}</div></section>
