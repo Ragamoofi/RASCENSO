@@ -1,0 +1,34 @@
+name: Prueba de jugadas en navegador
+on:
+  push:
+    branches: [mejora-penales-controles]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Instalar Chromium y Playwright
+        run: |
+          npm install --no-save --no-package-lock playwright
+          npx playwright install --with-deps chromium
+      - name: Simular 20 jugadas
+        run: node tests/browser/scenes-node.mjs
+      - name: Comprobar escenas en Chromium
+        run: |
+          mkdir -p /tmp/rascenso-capturas
+          python3 -m http.server 8765 >/tmp/rascenso-http.log 2>&1 &
+          SHOTS=/tmp/rascenso-capturas node tests/browser/plays-e2e.cjs
+      - name: Guardar capturas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: capturas-minijuegos
+          path: /tmp/rascenso-capturas
+          if-no-files-found: ignore
