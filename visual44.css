@@ -386,3 +386,17 @@
  .history .history-mini-cup{width:16px;height:20px}
  .history .history-mini-cup img{max-width:15px;max-height:19px}
 }
+
+
+/* FM26 privado: solo interfaz, datos nunca publicados. */
+.fm26-roster{grid-column:1/-1;display:grid;gap:9px}
+.fm26-roster>header{display:flex;align-items:center;justify-content:space-between}
+.fm26-roster-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;max-height:250px;overflow:auto}
+.fm26-player{display:grid;grid-template-columns:32px minmax(0,1fr) 27px 40px;align-items:center;gap:7px;background:#122d42;border:1px solid #3b5f78;border-radius:6px;padding:6px 8px;color:#d5e6f4}
+.fm26-player>span{font-size:9px;font-weight:900;color:#edb27d}
+.fm26-player>b{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fm26-player>strong{text-align:right;color:#ffd0a0;font:900 15px 'Barlow Condensed',sans-serif}
+.fm26-player>small{text-align:right;font-size:9px;color:#bad0e0}
+.fm26-roster>small{font-size:10px;color:#8db4c8;line-height:1.5}
+@media(max-width:940px){.fm26-roster-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.fm26-roster-grid{grid-template-columns:minmax(0,1fr)}}
