@@ -332,7 +332,7 @@ const rondo={
    moveToward(p,target.x,target.y,p.speed*(.68+m.ai.d*.12),dt);
   });
    for(const p of m.press)if(dist(p,m.ball)<.6&&!m.result){setBanner(m,p.x,p.y);return m.finish(false,'interceptado',.2);}
-   if(dist(m.target,m.ball)<.82+m.stats.pass*.28){m.ball.owner=m.target;m.holdT=0;m.done++;m.hint=`${m.done}/${m.need} pases`;if(m.done>=m.need&&!m.result){setBanner(m,m.target.x,m.target.y);return m.finish(true,'posesión',.6+m.stats.pass*.3);}}}
+   if(dist(m.target,m.ball)<.80+m.stats.pass*.11){m.ball.owner=m.target;m.holdT=0;m.done++;m.hint=`${m.done}/${m.need} pases`;if(m.done>=m.need&&!m.result){setBanner(m,m.target.x,m.target.y);return m.finish(true,'posesión',.6+m.stats.pass*.3);}}}
   if(timeUp(m)){setBanner(m,m.c.x,m.c.y);return m.finish(true,'posesión',.5);}
  },
  down(m){if(!m.ball.owner)return;const tx=m.pointer.wx,ty=m.pointer.wy;const t=m.spots.filter(p=>p!==m.ball.owner).sort((a,b)=>Math.hypot(a.x-tx,a.y-ty)-Math.hypot(b.x-tx,b.y-ty))[0];if(Math.hypot(t.x-tx,t.y-ty)>3)return;
