@@ -17,11 +17,12 @@ jobs:
       - name: Instalar Chromium y Playwright
         run: |
           npm install --no-save --no-package-lock playwright
-          npx playwright install --with-deps chromium
+          npx playwright install --with-deps chromium firefox webkit
       - name: Validar motor y simular 20 jugadas
         run: |
           node --test tests/*.test.mjs
           node tests/browser/balance40.mjs
+          node tests/career-sim40.mjs
       - name: Comprobar escenas en Chromium
         run: |
           mkdir -p /tmp/rascenso-capturas
@@ -29,6 +30,8 @@ jobs:
           SHOTS=/tmp/rascenso-capturas node tests/browser/plays-e2e.cjs
           node tests/browser/controls-e2e.cjs
           node tests/browser/e2e.cjs
+          node tests/browser/e2e.cjs http://localhost:8765/index.html firefox
+          node tests/browser/e2e.cjs http://localhost:8765/index.html webkit
           node tests/browser/viewport40.cjs
       - name: Guardar capturas
         if: always()

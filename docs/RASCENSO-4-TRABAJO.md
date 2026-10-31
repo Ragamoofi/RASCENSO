@@ -13,6 +13,7 @@ Rama de trabajo: `rascenso-4-integral`. Base: `bb85f188cf63e016ba8429b8d24b44d53
 - Arquero frontal: silueta articulada con camiseta, pantalón, guantes y botas; falta inspección visual de esta versión.
 - Penal: remate potente o colocado, con diferencias en precisión y velocidad; desvío animado de las atajadas con indicación de guantes o cuerpo. Pruebas unitarias iniciales.
 - Selección: la división actual prevalece tras ascensos o descensos; la evaluación incluye minutos, titularidad, forma previa y experiencia internacional.
+- Carreras completas simuladas: CL/DC 21 temporadas, AR/DFC 21, FR/MC 22 y JP/POR 22, todas hasta el retiro; se comprobó lectura del guardado y continuidad básica.
 - Titularidad: el rendimiento previo en el mismo club influye moderadamente en la competencia por el puesto.
 - Vestuario: una amistad con el competidor aporta moral mientras compartan club y abre una escena contextual con elecciones persistentes.
 - Interfaz: nueva jerarquía visual, foco visible y ajustes de movimiento reducido. Pendiente de validación visual en navegador.
