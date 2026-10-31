@@ -11,13 +11,22 @@ export function retirementData(s){
  },null);
  const trophies=[...a.titles].reverse(),unique=new Map();
  for(const t of trophies){const k=String(t.name||'').trim();if(!k)continue;const v=unique.get(k)||{...t,years:[],count:0};v.count++;if(t.year!=null)v.years.push(t.year);unique.set(k,v);}
- const highlights=(s.careerMoments||[]).filter(x=>x.text&&['on-field','award','story'].includes(x.kind)).slice(-7).reverse();
+ const highlights=(s.careerMoments||[]).filter(x=>x.text&&(
+ x.kind==='award'||x.kind==='on-field'&&/¡gol!|asistencia de gol|evitaste el gol rival/i.test(x.text)||
+ x.kind==='story'&&/Ganaste|cumplid|consagraste|récord/i.test(x.text)
+ )).slice(-7).reverse();
+ const rivals=new Map();
+ for(const y of history)for(const p of y.plays||[]){
+  if(!p?.rival)continue;const name=String(p.rival),v=rivals.get(name)||{name,duels:0,successes:0,years:new Set()};
+  v.duels++;v.successes+=p.success?1:0;v.years.add(y.year);rivals.set(name,v);
+ }
+ const rivalries=[...rivals.values()].sort((x,y)=>y.duels-x.duels||y.successes-x.successes).slice(0,4);
  const awards=(s.awards||[]).slice(-6).reverse();
  const first=history[0],last=history.at(-1);
  const most=clubs[0],peak=Math.max(0,...history.map(x=>+x.ovrAfter||0));
  const stature=trophies.length>=10||a.goals>=300||a.caps>=65?'UNA LEYENDA':trophies.length>=4||a.goals>=100||a.caps>=20?'CARRERA MEMORABLE':'UNA VIDA EN EL FÚTBOL';
  const hero=[trophies.length?`${n(trophies.length)} títulos`:'',a.goals?`${n(a.goals)} goles`:'',a.caps?`${n(a.caps)} partidos internacionales`:''].filter(Boolean).slice(0,2).join(' · ');
- return {a,history,clubs,best,trophies,unique:[...unique.values()],highlights,awards,first,last,most,peak,stature,hero};
+ return {a,history,clubs,best,trophies,unique:[...unique.values()],highlights,rivalries,awards,first,last,most,peak,stature,hero};
 }
 function chart(h){
  const all=h.map(y=>+y.ovrAfter).filter(Number.isFinite);
@@ -36,6 +45,7 @@ export function retirementView(s,{badge,trophyImage,flag,dreamProgress,button}){
  const clubs=d.clubs.map((c,i)=>`<div class="farewell-club"><span class="farewell-numeral">${String(i+1).padStart(2,'0')}</span>${badge(c.id,'large')}<div><strong>${esc(c.name)}</strong><small>${year(Math.min(...c.years))}–${year(Math.max(...c.years))} · ${c.years.length} temporada${c.years.length===1?'':'s'}</small></div><b>${n(c.matches)} PJ</b></div>`).join('');
  const trophies=d.unique.slice(0,12).map(t=>`<div class="farewell-trophy"><img src="${esc(trophyImage({title:t.name,kind:t.kind}))}" alt="" loading="lazy"><strong>${esc(t.name)}</strong><small>${n(t.count)} veces · ${esc(t.years.reverse().slice(0,4).join(' / ')||'Año sin registro')}</small></div>`).join('');
  const memories=d.highlights.slice(0,6).map((m,i)=>`<div class="farewell-memory"><b>${String(i+1).padStart(2,'0')}</b><div><small>${esc(m.year||'—')}</small><p>${esc(m.text)}</p></div></div>`).join('');
+ const rivals=d.rivalries.map(r=>`<div class="farewell-rival"><strong>${esc(r.name)}</strong><span>${n(r.duels)} momentos decisivos · ${n(r.successes)} favorables</span><small>${n(r.years.size)} temporadas</small></div>`).join('');
  const awards=d.awards.map(m=>`<div class="farewell-award">✦ <strong>${esc(m.title||m.name||m.type||'Reconocimiento')}</strong> <span>${esc(m.year||'')}</span></div>`).join('');
  const dream=dreamProgress(s);
  const dreamHtml=dream?`<div class="farewell-dream"><span>${dream.done?'★':'◇'}</span><div><small>${dream.done?'SUEÑO CUMPLIDO':'SUEÑO PENDIENTE'}</small><b>${esc(dream.title)}</b></div></div>`:'';
@@ -56,6 +66,8 @@ export function retirementView(s,{badge,trophyImage,flag,dreamProgress,button}){
  ${d.best?`<div class="farewell-best"><span>★ TEMPORADA DESTACADA</span><b>${year(d.best.year)} · ${esc(d.best.club)}</b><small>${n(d.best.matches)} PJ · ${n(d.best.goals)} G · ${n(d.best.assists)} A · ${(d.best.titles||[]).length} títulos</small></div>`:''}</section></div>
  <div class="farewell-side"><section class="farewell-section"><div class="farewell-section-head"><span class="farewell-kicker">EL PALMARÉS</span><b>${n(d.trophies.length)} COPAS</b></div><h2>La sala de trofeos</h2><div class="farewell-trophies">${trophies||'<p>No ganaste títulos, pero tu carrera también tiene una historia que contar.</p>'}</div></section>
  <section class="farewell-section"><span class="farewell-kicker">LOS MOMENTOS QUE QUEDAN</span><h2>Recuerdos de cancha</h2><div class="farewell-memories">${memories||'<p>Las temporadas y resultados registran tu camino.</p>'}</div></section>
+ ${rivals?`<section class="farewell-section"><span class="farewell-kicker">ADVERSARIOS DE TU HISTORIA</span><h2>Rivales inolvidables</h2><div class="farewell-rivals">${rivals}</div></section>`:''}
+
  ${awards?`<section class="farewell-section"><span class="farewell-kicker">RECONOCIMIENTOS</span><h2>Premios individuales</h2><div class="farewell-awards">${awards}</div></section>`:''}
  </div></div>
  <section class="farewell-outro"><span class="farewell-kicker">FIN DEL CAMINO PROFESIONAL</span><h2>Las estadísticas terminan.<em>La historia permanece.</em></h2><p>De ${esc(d.first?.club||'tu primer equipo')} a ${esc(club)}. ${n(a.matches)} partidos que ya son parte de tu historia.</p>
