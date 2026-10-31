@@ -169,8 +169,6 @@
 .trophy-detail-facts>div{display:grid;gap:4px;background:#233d53;border:1px solid #567185;border-radius:8px;padding:10px 6px}
 .trophy-detail-facts small{font-size:9px;color:#e8b480;letter-spacing:.07em}
 .trophy-detail-facts strong{font-size:12px;color:#fff;overflow-wrap:anywhere}
-.trophy-detail-body p{font-size:11px;line-height:1.5;color:#bbcfdd;margin:4px 0 0}
-.trophy-detail-body a{font-size:11px;color:#f1cc9e;text-decoration:underline}
 .farewell-trophies{max-height:370px!important;overflow-y:auto}
 .farewell-trophy{box-sizing:border-box;min-height:127px;gap:3px!important;padding:8px 5px!important}
 .farewell-trophy-art{height:63px;width:100%;display:grid;place-items:center;background:radial-gradient(ellipse,#b68d5040,transparent 70%)}

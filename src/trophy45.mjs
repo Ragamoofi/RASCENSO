@@ -82,8 +82,7 @@ export function trophyDetail(record,getClub,getCountry){
  return '<div class="trophy-detail-body"><div class="trophy-detail-head"><span>RASCENSO · PALMARÉS</span><button type="button" data-action="trophy-close" class="trophy-detail-close" aria-label="Cerrar detalle">✕</button></div><div class="trophy-detail-art">'+trophyImgTag(record,club)+'</div>'+
  '<span class="trophy-detail-category">'+esc(info.category)+'</span><h2 id="trophy-modal-title">'+esc(info.title)+'</h2>'+
  '<div class="trophy-detail-facts"><div><small>TEMPORADA</small><strong>'+esc(record.year??'Sin registro')+'</strong></div><div><small>CONSEGUIDO CON</small><strong>'+esc(context)+'</strong></div></div>'+
- '<p>'+(info.source==='fm-pack'?'Trofeo del paquete gráfico proporcionado para RASCENSO. Su nombre se vinculó por identificador de competición o nombre inequívoco; la licencia de redistribución no está verificada.':'Imagen de referencia o ilustración original de RASCENSO; conserva el diseño anterior cuando no hay una equivalencia exacta.')+'</p>'+
- '<a href="./assets/MEDIA_CREDITS.html" target="_blank" rel="noopener">Ver créditos y licencias de imágenes</a></div>';
+ '</div>';
 }
 export function trophyRetirementGrid(groups,getClub){
  return groups.slice(0,12).map(g=>{

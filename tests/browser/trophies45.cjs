@@ -63,6 +63,8 @@ const {chromium}=require('playwright');
   if(!await dialog.getByText('Copa Libertadores').count())throw Error('Falta el nombre de la copa');
   if(!await dialog.getByText('2045').count())throw Error('No figura el año');
   if(!await dialog.locator('.trophy-detail-facts strong').last().innerText())throw Error('Falta el club');
+  if(await dialog.locator('.trophy-detail-body p,.trophy-detail-body a').count())throw Error('La ficha aún muestra texto técnico o enlaces de licencia');
+  if((await dialog.locator('.trophy-detail-body').innerText()).includes('redistribución'))throw Error('Sigue visible la advertencia técnica del ZIP');
   if(errors.length)throw Error(errors.join(' | '));
   if(process.env.SHOTS)await page.screenshot({path:process.env.SHOTS+'/trophies-'+width+'.png'});
   await page.keyboard.press('Escape');

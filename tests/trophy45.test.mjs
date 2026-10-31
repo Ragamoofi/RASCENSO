@@ -38,12 +38,13 @@ test('4.5 · títulos ordenados y nombres visibles sin recorte de la colección'
  assert.doesNotMatch(html,/>2048<\/small>/);
  assert.match(html,/Colo-Colo/);
 });
-test('4.5 · ficha táctil muestra nombre, año, club y atribución',()=>{
+test('4.7.1 · ficha de copa muestra solo trofeo, nombre, año y club',()=>{
  const html=trophyDetail(rec('Copa Chile',2035),club);
  assert.match(html,/Copa Chile/);
  assert.match(html,/2035/);
  assert.match(html,/Colo-Colo/);
- assert.match(html,/MEDIA_CREDITS.html/);
+ assert.doesNotMatch(html,/MEDIA_CREDITS.html|licencia de redistribución|paquete gráfico proporcionado|Imagen de referencia/);
+ assert.doesNotMatch(html,/<p>|<a href=/);
  assert.match(html,/data-action="trophy-close"/);
 });
 test('4.5 · nombre malicioso no inyecta HTML y los títulos históricos no se pierden',()=>{
