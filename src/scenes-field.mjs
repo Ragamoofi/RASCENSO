@@ -279,7 +279,7 @@ const pase_filtrado={
   if(m.receiver.x>last+.15){setBanner(m,m.receiver.x,m.receiver.y);m.say('¡BANDERA ARRIBA!',false);return m.finish(false,'fuera de juego',.1);}
   const lofted=button==='alt',err=st.passNoise*(lofted?.55:.45);const t={x:tx+m.aimNoise(err),y:ty+m.aimNoise(err)};m.passTarget=t;m.quality=clampN(1-err/2.5,0,1);
   if(lofted){const duration=clampN(dist(m.me,t)/(17+st.pass*8),.55,1.45);loft(m.ball,t.x,t.y,duration,2+st.pass*.9);m.hint='Pase bombeado: tarda más en caer';}
-  else{kick(m.ball,t.x,t.y,17+st.pass*12,0);m.hint='Pase raso: cuidado con los defensores';}},
+  else{kick(m.ball,t.x,t.y,22+st.pass*13,0);m.hint='Pase raso: cuidado con los defensores';}},
  draw(m,g){drawPitch(g);const last=Math.max(...m.defs.map(d=>d.x));drawLine(g,{x:last,y:1},{x:last,y:28},'rgba(232,165,116,.55)',{dash:[8,6],width:2});
   for(const d of m.defs)them(m,d);for(const s of m.strikers)mate(m,s,{ring:s.x>last+.15?'#f0a08c':null});keeper(m,m.k);us(m,m.me,{highlight:true});drawBall(g,m.ball);if(!m.passed)drawAim(g,m,m.me);}
 };

@@ -43,3 +43,10 @@ Rama de trabajo: `rascenso-4-integral`. Base: `bb85f188cf63e016ba8429b8d24b44d53
 - Auditoría de escudos y fuentes verificables.
 - Pruebas de carreras, tasas de éxito, controles, animaciones y diseño en navegador; comparación con la base.
 - Integrar y desplegar solo después de comprobar los criterios del encargo.
+
+## Continuación: ajuste de pase raso
+- Último commit anterior a este ajuste: e832bb2b7480e6c30a39ada3327493b9eb3eaa2a. Este documento y el ajuste se guardan juntos en el commit siguiente.
+- Se incrementó la velocidad del pase filtrado raso para reducir intercepciones inevitables. En 100 semillas por caso, el bot pasó de 19/2/26/9 a 31/11/55/13 éxitos (niveles 55 y 85, dificultades 0,25 y 0,85). El bot accede a información interna: falta validar con personas.
+- La matriz sigue mostrando extremos en recuperación, achique, salida aérea y reflejos; priorizar su calibración sin resultados arbitrarios. El pase filtrado sigue difícil con dificultad alta.
+- Pendientes: renovación individual y pruebas manuales de los 20 minijuegos, interfaz, mundo y narrativa; revisar los 48 escudos sin fuente y verificar externamente los demás. No fusionar ni desplegar hasta completar y validar.
+- Antes de este ajuste: 214 pruebas locales aprobadas, cuatro carreras simuladas completas; pruebas de navegador anteriores aprobadas, sin validar visualmente este ajuste.
