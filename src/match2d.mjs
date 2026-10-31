@@ -166,7 +166,7 @@ export function drawPlayer(g,p,{color=COLORS.us,dark=COLORS.usDark,ring=null,hig
  g.fillStyle=COLORS.shadow;g.beginPath();g.ellipse(x+3,y+4,r*1.05,r*.7,0,0,7);g.fill();
  if(highlight){g.strokeStyle=COLORS.copper;g.lineWidth=2.5;g.beginPath();g.arc(x,y,r+7+Math.sin(performance.now()/160)*1.5,0,7);g.stroke();}
  if(ring){g.strokeStyle=ring;g.lineWidth=2;g.setLineDash([4,4]);g.beginPath();g.arc(x,y,r+12,0,7);g.stroke();g.setLineDash([]);}
- const f=p.face||[1,0],moving=Math.hypot(p.vx||0,p.vy||0),stride=Math.sin(performance.now()/115+(p.num||0))*Math.min(1,moving/4);
+ const f=p.face||[1,0],moving=Math.hypot(p.vx||0,p.vy||0),stride=Math.sin(performance.now()/115+(Number(p.num)||0))*Math.min(1,moving/4);
  // Silueta cenital: cabeza, brazos, camiseta, pantalón y piernas orientadas al movimiento.
  g.save();g.translate(x,y);g.rotate(Math.atan2(f[1],f[0]));g.lineCap='round';
  g.strokeStyle=dark;g.lineWidth=r*.42;g.beginPath();g.moveTo(-r*.45,-r*.34);g.lineTo(-r*.95-stride*r*.25,-r*.42);g.moveTo(-r*.45,r*.34);g.lineTo(-r*.95+stride*r*.25,r*.42);g.stroke();
@@ -210,8 +210,8 @@ function drawHud(m,g){
 /** Lo que está en juego, en una frase: depende del marcador, del minuto y del tipo de jugada. */
 export function stakes(p){
  const d=p.before.gf-p.before.ga,min=p.minute;
- if(p.kind==='attack')return d===0?`Empate en el minuto ${min}: un gol vale la victoria.`:d===-1?`Pierden por uno: el empate está en tus pies.`:d<=-2?`Un gol para soñar con la remontada.`:`Ganan por ${d}: un gol más sentencia el partido.`;
- return d===0?`Empate en el minuto ${min}: si marcan ellos, se pierde todo.`:d===1?`Ganan por la mínima: este gol rival sería el empate.`:d>1?`Ventaja cómoda, pero un gol rival enciende el partido.`:`Si entra, la derrota se hace más grande.`;
+ if(p.kind==='attack')return d===0?`Con el partido empatado, un gol pone a tu equipo en ventaja.`:d===-1?`Pierden por uno: un gol iguala el marcador.`:d<=-2?`Un gol reduce la diferencia y mantiene viva la remontada.`:`Ya van arriba: un gol aumenta la ventaja.`;
+ return d===0?`El partido está empatado: evita que el rival tome ventaja.`:d===1?`Ganan por la mínima: evita el empate.`:d>1?`Defiende la ventaja y mantén al rival a distancia.`:`Evita que el rival aumente la diferencia.`;
 }
 function drawIntro(m,g){
  const brief=m.phase==='brief';
