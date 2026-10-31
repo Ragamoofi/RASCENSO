@@ -10,6 +10,7 @@ import { COUNTRIES } from './countries.mjs';
 import { VERIFIED_LEAGUES, getInauguralLeague } from './leagues2026.mjs';
 import { clubPrestige, livePrestige, CLUBS, marketClub, simLevel } from './market.mjs';
 import { rng, hash, clamp, yearOf, COACH_STYLES, POSITION_NAMES, positionGroup } from './career20.mjs';
+import {isRealClubReady,getFM26LoadedPlayers} from './fm26-real.mjs';
 
 /* ---------- Nombres ficticios por región ---------- */
 const POOLS={
@@ -104,7 +105,7 @@ export function initWorld(state){
  for(let i=0;i<28;i++){
   const ovr=Math.round(80+Math.pow(r(),1.6)*12),age=21+Math.floor(r()*12);
   const club=pickClubNear(S,Math.min(97,ovr+3),r,{minPrestige:80})||stars[i%stars.length];
-  world.players.push(makeNPC(state,`${seed}:star:${i}`,{age,ovr,pot:ovr+Math.max(0,Math.round((27-age)*.8)),kind:'star',clubId:club.id}));
+  if(!isRealClubReady(club.id))world.players.push(makeNPC(state,`${seed}:star:${i}`,{age,ovr,pot:ovr+Math.max(0,Math.round((27-age)*.8)),kind:'star',clubId:club.id}));
  }
  // Tu generación: 16 promesas de edad similar, en clubes de todo el mundo.
  for(let i=0;i<16;i++){
@@ -112,7 +113,7 @@ export function initWorld(state){
   const ovr=clamp(Math.round(50+r()*12+(pot-75)*.18),46,70);
   const cc=i<3?state.country:null;
   const club=pickClubNear(S,58+ovr*.25+r()*12,r)||ALL_CLUBS[i];
-  world.players.push(makeNPC(state,`${seed}:gen:${i}`,{age,ovr,pot,kind:'gen',cc:cc||undefined,clubId:club.id}));
+  if(!isRealClubReady(club.id))world.players.push(makeNPC(state,`${seed}:gen:${i}`,{age,ovr,pot,kind:'gen',cc:cc||undefined,clubId:club.id}));
  }
  // Rival generacional: misma zona del campo, mismo año y techo parecido al tuyo.
  const g=positionGroup(state.position);
@@ -277,6 +278,7 @@ export function advanceWorld(state,playedLeague,userSeason){
   const pot=Math.round(76+Math.pow(r(),1.4)*19),age=17+Math.floor(r()*2);
   const club=pickClubNear(S,62+r()*20,r);if(!club)continue;
   const p=makeNPC(state,`${world.seed}:prospect:${year}:${i}`,{age,ovr:clamp(Math.round(56+r()*10+(pot-80)*.2),50,72),pot,kind:'prospect',clubId:club.id});
+  if(isRealClubReady(club.id))continue;
   world.players.push(p);
   if(i===0)news(fresh,year,'prospect',`Un juvenil se incorpora a ${club.name}`,`${p.name}, ${age} años, ${POSITION_NAMES[p.pos].toLowerCase()}, inicia su carrera en ${club.name}.`,{playerId:p.id,clubId:club.id});
  }
@@ -285,12 +287,12 @@ export function advanceWorld(state,playedLeague,userSeason){
  for(let i=0;i<Math.max(0,24-elite)&&i<6;i++){
   const ovr=Math.round(83+Math.pow(r(),1.8)*8),age=21+Math.floor(r()*6);
   const club=pickClubNear(S,Math.min(97,ovr+4),r,{minPrestige:82});if(!club)continue;
-  world.players.push(makeNPC(state,`${world.seed}:emerging:${year}:${i}`,{age,ovr,pot:ovr+Math.max(0,Math.round((26-age)*.9)),kind:'star',clubId:club.id}));
+  if(!isRealClubReady(club.id))world.players.push(makeNPC(state,`${world.seed}:emerging:${year}:${i}`,{age,ovr,pot:ovr+Math.max(0,Math.round((26-age)*.9)),kind:'star',clubId:club.id}));
  }
  // Mantener la lista manejable: se conservan rival, estrellas activas y retirados recientes.
  const kept=world.players.filter(p=>p.status==='active'||p.rival||year-(p.retired||year)<=4);
- let drop=Math.max(0,kept.length-120);
- world.players=kept.filter(p=>{if(p.rival||drop<=0)return true;drop--;return false;});
+ let drop=Math.max(0,kept.filter(p=>p.origin!=='fm26').length-120);
+ world.players=kept.filter(p=>{if(p.origin==='fm26'||p.rival||drop<=0)return true;drop--;return false;});
  // Premios individuales.
  const awardsYear=worldAwards(S,world,year,userSeason,tables);
  world.awards=[...world.awards,awardsYear].slice(-30);
@@ -328,7 +330,8 @@ function userScore(state,season){
  return (state.ovr||60)*1.6+(rating-6.6)*5+Math.min(3,titles)*1.4+Math.min(40,(season.goals||0)+(season.assists||0))/8+(clubPrestige(club)-84)/5+(season.international?1:0);
 }
 export function worldAwards(S,world,year,season,tables){
- const list=[];const players=world.players.filter(p=>p.status==='active'||p.retired===year);
+ const list=[];const known=new Set(world.players.map(p=>p.id));
+ const players=[...world.players,...getFM26LoadedPlayers(S).filter(p=>!known.has(p.id))].filter(p=>p.status==='active'||p.retired===year);
  const last=p=>p.seasons?.at(-1)?.year===year?p.seasons.at(-1):null;
  const npcScore=p=>{const s=last(p);if(!s)return 0;const nr=rng(`${world.seed}:npcform:${p.id}:${year}`)();return p.ovr*1.6+(nr-.5)*4+Math.min(40,s.goals+s.assists)/8+(s.champion?1.4:0)+(clubPrestige(worldClub(p.clubId))-84)/5;};
  // Balón de Ascenso: el mejor del planeta.
@@ -371,8 +374,8 @@ export function worldAwards(S,world,year,season,tables){
 }
 
 /* ---------- Resúmenes para la interfaz ---------- */
-export function topPlayers(state,limit=12){return (state.world?.players||[]).filter(p=>p.status==='active').sort((a,b)=>b.ovr-a.ovr).slice(0,limit);}
-export function generationPlayers(state){const age=state.age;return (state.world?.players||[]).filter(p=>p.status==='active'&&Math.abs(p.age-age)<=2&&(p.kind==='gen'||p.kind==='prospect'||p.rival)).sort((a,b)=>b.ovr-a.ovr).slice(0,12);}
+export function topPlayers(state,limit=12){const all=[...(state.world?.players||[]),...getFM26LoadedPlayers(state)];const seen=new Set();return all.filter(p=>{if(p.status!=='active'||seen.has(p.id))return false;seen.add(p.id);return true}).sort((a,b)=>b.ovr-a.ovr).slice(0,limit);}
+export function generationPlayers(state){const age=state.age;return [...(state.world?.players||[]),...getFM26LoadedPlayers(state)].filter(p=>p.status==='active'&&Math.abs(p.age-age)<=2&&(p.kind==='gen'||p.kind==='prospect'||p.kind==='real'||p.rival)).sort((a,b)=>b.ovr-a.ovr).slice(0,12);}
 export function powerRanking(state,limit=12){
  // Se ordenan índices y solo se copian los clubes que entran al ranking.
  const pr=ALL_CLUBS.map(c=>livePrestige(state,c)),pw=ALL_CLUBS.map(c=>dynamicLevel(state,c));
