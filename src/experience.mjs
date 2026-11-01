@@ -1,6 +1,6 @@
 import { retirementView } from './retirement42.mjs';
 import {loadedFM26Clubs,advanceFM26Season} from './fm26-real.mjs';
-import {installWorldDatabase,getWorldDatabaseInfo,getWorldMappingInfo,activateWorldContext,activateWorldClub,searchWorldPlayers,searchWorldClubs,getWorldPlayer,forgetWorldDatabase} from './fm26-universe.mjs';
+import {installWorldDatabase,getWorldDatabaseInfo,getWorldMappingInfo,activateWorldContext,activateWorldClub,searchWorldPlayers,searchWorldClubs,getWorldPlayer,readWorldClub,forgetWorldDatabase} from './fm26-universe.mjs';
 import { academyOfferReason } from './engine.mjs';
 /* RASCENSO — Interfaz renovada. Motor y UI independientes. Sin dependencias de framework. */
 import { COUNTRIES } from './countries.mjs';
@@ -38,7 +38,7 @@ function worldPlayerSearchView(){
  '<form id="fm-world-search"><input name="player-search" aria-label="Buscar futbolista" value="'+h(worldSearchTerm)+'" placeholder="Buscar jugador de cualquier club o país…" autocomplete="off"><button class="action main" type="submit">Buscar</button></form>'+
  '<div class="fm-world-results">'+(worldSearchPending?'Buscando en la base mundial…':worldSearchRows.length?worldSearchRows.map(p=>'<button type="button" class="fm-world-person" data-action="fm-world-player" data-id="'+h(p.id)+'"><b>'+h(p.name)+'</b><small>'+h(p.position)+' · '+Number(p.age)+' años · '+h(p.clubName||'Agente libre')+'</small><strong>'+Number(p.ovr||0)+'</strong></button>').join(''):worldSearchTerm?'Sin coincidencias para esa búsqueda.':'Busca por nombre para explorar el mundo futbolístico.')+'</div>'+
  '<form id="fm-world-club-search"><input name="club-search" aria-label="Buscar equipo" placeholder="Buscar cualquiera de los 12.725 clubes…" value="'+h(worldClubTerm)+'" autocomplete="off"><button class="action secondary" type="submit">Clubes</button></form>'+
- '<div class="fm-world-results">'+worldClubRows.map(c=>'<div class="fm-world-person"><b>'+h(c.name)+'</b><small>'+h(c.players)+' futbolistas · '+h(c.firstTeam)+' primera plantilla</small><strong>'+h(c.countryId)+'</strong></div>').join('')+'</div>'+
+ '<div class="fm-world-results">'+worldClubRows.map(c=>'<button type="button" class="fm-world-person" data-action="fm-world-club" data-id="'+h(c.uid)+'"><b>'+h(c.name)+'</b><small>'+h(c.players)+' futbolistas · '+h(c.firstTeam)+' primera plantilla</small><strong>'+h(c.countryId)+'</strong></button>').join('')+'</div>'+
  '<small class="fm-world-footnote">Clubes encontrados: '+n(worldClubTotal)+'.</small>'+
  '<small class="fm-world-footnote">'+(worldSearchTerm?n(worldSearchTotal)+' coincidencias en el catálogo completo. ':'')+'Plantillas y nombres importados desde tu archivo local. No se envían a ningún servidor.</small></section>';
 }
@@ -359,6 +359,12 @@ ROOT.addEventListener('click',e=>{
  if(action==='export'){download();return;}
  if(action==='share-png'){shareCareerPNG().catch(err=>alert('No se pudo generar la imagen: '+err.message));return;}
  if(action==='import'){document.getElementById('import-file')?.click();return;}
+ if(action==='fm-world-club'){readWorldClub(a.dataset.id).then(club=>{
+ if(!club)return;
+ const modal=document.createElement('dialog');modal.className='trophy-spotlight fm-person-spotlight';
+ modal.innerHTML='<div class="trophy-detail-body"><b>PLANTILLA MUNDIAL</b><h2>'+h(club.name)+'</h2><p>'+club.players.length+' futbolistas registrados</p><div class="fm-world-results">'+club.players.slice(0,90).map(p=>'<div class="fm-world-person"><b>'+h(p.nombre)+'</b><small>'+h(p.posiciones?.[0]||'')+' · '+h(p.edad)+' años</small><strong>'+h(p.ca_fm??'—')+'</strong></div>').join('')+'</div><button type="button" class="action secondary" data-action="fm-person-close">Cerrar</button></div>';
+ ROOT.appendChild(modal);modal.addEventListener('close',()=>modal.remove(),{once:true});modal.showModal();
+ }).catch(err=>alert(err.message));return;}
  if(action==='fm-world-player'){const id=a.dataset.id;
  getWorldPlayer(id).then(player=>{if(!player)return;const modal=document.createElement('dialog');modal.className='trophy-spotlight fm-person-spotlight';
  modal.innerHTML='<div class="trophy-detail-body"><b>FUTBOLISTA DEL MUNDO</b><h2>'+h(player.nombre)+'</h2><p>'+h(player.edad)+' años · '+h((player.posiciones||[]).join(' / '))+'</p><div class="trophy-detail-facts"><div><small>MEDIA</small><strong>'+h(player.ca_fm??'—')+'</strong></div><div><small>POTENCIAL</small><strong>'+h(player.pa_fm??'—')+'</strong></div></div><button type="button" class="action secondary" data-action="fm-person-close">Cerrar</button></div>';
