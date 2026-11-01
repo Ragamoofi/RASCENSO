@@ -1,5 +1,5 @@
 import { retirementView } from './retirement42.mjs';
-import {loadedFM26Clubs,advanceFM26Season} from './fm26-real.mjs';
+import {loadedFM26Clubs,advanceFM26Season,fm26OVR} from './fm26-real.mjs';
 import {installWorldDatabase,getWorldDatabaseInfo,getWorldMappingInfo,activateWorldContext,activateWorldClub,searchWorldPlayers,searchWorldClubs,getWorldPlayer,readWorldClub,forgetWorldDatabase} from './fm26-universe.mjs';
 import { academyOfferReason } from './engine.mjs';
 /* RASCENSO — Interfaz renovada. Motor y UI independientes. Sin dependencias de framework. */
@@ -362,12 +362,12 @@ ROOT.addEventListener('click',e=>{
  if(action==='fm-world-club'){readWorldClub(a.dataset.id).then(club=>{
  if(!club)return;
  const modal=document.createElement('dialog');modal.className='trophy-spotlight fm-person-spotlight';
- modal.innerHTML='<div class="trophy-detail-body"><b>PLANTILLA MUNDIAL</b><h2>'+h(club.name)+'</h2><p>'+club.players.length+' futbolistas registrados</p><div class="fm-world-results">'+club.players.slice(0,90).map(p=>'<div class="fm-world-person"><b>'+h(p.nombre)+'</b><small>'+h(p.posiciones?.[0]||'')+' · '+h(p.edad)+' años</small><strong>'+h(p.ca_fm??'—')+'</strong></div>').join('')+'</div><button type="button" class="action secondary" data-action="fm-person-close">Cerrar</button></div>';
+ modal.innerHTML='<div class="trophy-detail-body"><b>PLANTILLA MUNDIAL</b><h2>'+h(club.name)+'</h2><p>'+club.players.length+' futbolistas registrados</p><div class="fm-world-results">'+club.players.slice(0,90).map(p=>'<div class="fm-world-person"><b>'+h(p.nombre)+'</b><small>'+h(p.posiciones?.[0]||'')+' · '+h(p.edad)+' años</small><strong>'+h(fm26OVR(p.ca_fm)??'—')+'</strong></div>').join('')+'</div><button type="button" class="action secondary" data-action="fm-person-close">Cerrar</button></div>';
  ROOT.appendChild(modal);modal.addEventListener('close',()=>modal.remove(),{once:true});modal.showModal();
  }).catch(err=>alert(err.message));return;}
  if(action==='fm-world-player'){const id=a.dataset.id;
  getWorldPlayer(id).then(player=>{if(!player)return;const modal=document.createElement('dialog');modal.className='trophy-spotlight fm-person-spotlight';
- modal.innerHTML='<div class="trophy-detail-body"><b>FUTBOLISTA DEL MUNDO</b><h2>'+h(player.nombre)+'</h2><p>'+h(player.edad)+' años · '+h((player.posiciones||[]).join(' / '))+'</p><div class="trophy-detail-facts"><div><small>MEDIA</small><strong>'+h(player.ca_fm??'—')+'</strong></div><div><small>POTENCIAL</small><strong>'+h(player.pa_fm??'—')+'</strong></div></div><button type="button" class="action secondary" data-action="fm-person-close">Cerrar</button></div>';
+ modal.innerHTML='<div class="trophy-detail-body"><b>FUTBOLISTA DEL MUNDO</b><h2>'+h(player.nombre)+'</h2><p>'+h(player.edad)+' años · '+h((player.posiciones||[]).join(' / '))+'</p><div class="trophy-detail-facts"><div><small>MEDIA</small><strong>'+h(fm26OVR(player.ca_fm)??'—')+'</strong></div><div><small>POTENCIAL</small><strong>'+h(fm26OVR(player.pa_fm)??'—')+'</strong></div></div><button type="button" class="action secondary" data-action="fm-person-close">Cerrar</button></div>';
  ROOT.appendChild(modal);modal.addEventListener('close',()=>modal.remove(),{once:true});modal.showModal();
  }).catch(err=>alert(err.message));return;}
  if(action==='fm-person-close'){a.closest('dialog')?.close();return;}
