@@ -1,0 +1,27 @@
+RASCENSO 4.9.3 — PARCHE DIRECTO, SIN INSTALADORES
+
+BASE: RASCENSO 4.9.2 de main, commit 7b3da5493.
+
+INSTALACIÓN (SIN .CMD, SIN .PS1, SIN CONSOLA):
+1. Abre GitHub Desktop y selecciona RASCENSO / main.
+2. Fetch origin y Pull origin si corresponde.
+3. Extrae TODO este ZIP directamente dentro de Documentos\GitHub\RASCENSO,
+   en la misma carpeta que index.html, y acepta reemplazar index.html.
+4. Se agregan nuevos módulos en src/, sin reemplazar los grandes archivos existentes.
+5. En GitHub Desktop haz Commit y Push origin.
+6. Revisa que la publicación termine correcta; abre el juego con Ctrl+F5.
+
+CORRECCIÓN:
+- TOP 10 de Las figuras del momento con la base global de 180.739 futbolistas.
+- Tu generación usa futbolistas del mundo con edades equivalentes.
+- Banderas por nacionalidad del jugador; nombres originales de clubes.
+- Mantiene jugadores ficticios como respaldo cuando no hay reales aplicables.
+- No incluye la base de 180.739 jugadores: YA está en la versión 4.9.2.
+- No modifica guardados ni datos existentes.
+
+NOTA TÉCNICA:
+Se utiliza un import map estándar del navegador para ampliar 2 módulos de la versión
+4.9.2 sin tocar sus archivos originales. Los nuevos .mjs forman parte del juego;
+NO son instaladores. Solo debes copiar/reemplazar como siempre.
+
+PENDIENTE INDEPENDIENTE: prueba de navegador de la vitrina de trofeos 4.5.
