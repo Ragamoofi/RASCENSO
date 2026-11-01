@@ -1,0 +1,23 @@
+RASCENSO 4.10.0 - HOTFIX DE PUBLICACIÓN
+======================================
+Base comprobada: commit 59c320a396cbb9ecb4c8d84868fa73fa62f3db1b.
+
+Qué pasó: GitHub Actions "Publicar RASCENSO" falló en 1 de 325
+pruebas porque tests/scroll-guard499.test.mjs exigía ?v=501,
+pero index.html (4.10.0) carga ?v=502 correctamente.
+
+Qué cambia: SOLO tests/scroll-guard499.test.mjs.
+La prueba reconoce números de versión válidos sin quedar anclada
+al número exacto, y sigue comprobando que el guardia de scroll
+se cargue antes que el juego y que la ficha conserve el foco.
+
+No cambia código del juego, base mundial, jugadores, fichajes,
+partidas guardadas ni index.html.
+
+INSTALACIÓN (ZIP DIRECTO; SIN INSTALADORES):
+Extraer el contenido de este ZIP en Documentos\GitHub\RASCENSO,
+reemplazando tests/scroll-guard499.test.mjs.
+En GitHub Desktop: Commit -> Push origin.
+Comprobar que "Publicar RASCENSO" quede en verde.
+El workflow independiente de pruebas de navegador puede seguir
+fallando por otro motivo; no impide la publicación.
