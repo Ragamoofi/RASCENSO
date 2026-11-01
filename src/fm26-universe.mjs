@@ -188,3 +188,12 @@ export async function forgetWorldDatabase(){
  tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});
  db.close();cachedIndex=null;cachedMapping=null;clearFM26Memory();
 }
+
+export async function searchWorldClubs(term,{limit=40,offset=0}={}){
+ const q=cleanup(term);
+ if(!q)return {total:0,results:[]};
+ const idx=await getWorldIndex();
+ const matches=Object.entries(idx).filter(([uid,c])=>cleanup(c.nombre).includes(q)).map(([uid,c])=>({uid,name:c.nombre,countryId:c.pais_id_fm,players:c.n_jugadores,firstTeam:c.n_primer_equipo}));
+ matches.sort((a,b)=>Number(b.players)-Number(a.players));
+ return {total:matches.length,results:matches.slice(offset,offset+limit)};
+}
