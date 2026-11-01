@@ -5,7 +5,8 @@ import {renderClub497} from '../src/club-ui495.mjs';
 import {resolveClub} from '../src/club-squads495.mjs';
 import {isFemaleClubRecord497,isFemalePlayerRecord497,filterWorldIndex497,filterWorldDirectory497,filterWorldShard497} from '../src/world-gender497.mjs';
 const player=(id,name,pos='MC')=>({id,name,age:23,ovr:83,cc:'CL',pos,source:'base'});
-const fixture={name:'Santiago Wanderers',club:{id:'cl-1',name:'Santiago Wanderers',country:'Chile',league:'Liga de Ascenso',level:71},players:[player('fm26:1','Jugador Prueba'),player('fm26:2','Otro Futbolista','GK')],hasWorld:true};
+// IDs del catálogo real: cl-extra-9 = Santiago Wanderers; cl-1 = Colo-Colo.
+const fixture={name:'Santiago Wanderers',club:{id:'cl-extra-9',name:'Santiago Wanderers',country:'Chile',league:'Liga de Ascenso',level:71},players:[player('fm26:1','Jugador Prueba'),player('fm26:2','Otro Futbolista','GK')],hasWorld:true};
 test('la ficha muestra únicamente club, plantilla y filtros de sus futbolistas',()=>{
  const html=renderClub497(fixture);
  assert.match(html,/Santiago Wanderers/);assert.match(html,/Jugador Prueba/);
@@ -24,12 +25,18 @@ test('si no hay enlace, no inventa jugadores ni propone clubes dentro de la fich
 });
 test('equivalencia por nombre exacto y país acepta clubes con n_primer_equipo = 0',()=>{
  const index={'17':{nombre:'Club de Deportes Santiago Wanderers',pais_id_fm:'190',n_jugadores:30,n_primer_equipo:0}};
- const mapped=resolveClub({kind:'game',id:'cl-1'},index,{mapping:{},countries:{CL:'190'}});
+ const mapped=resolveClub({kind:'game',id:'cl-extra-9'},index,{mapping:{},countries:{CL:'190'}});
  assert.equal(mapped.uid,'17');assert.equal(mapped.linkStatus,'nombre-pais');
+});
+test('no atribuye a Colo-Colo la plantilla de Santiago Wanderers',()=>{
+ const index={'17':{nombre:'Club de Deportes Santiago Wanderers',pais_id_fm:'190',n_jugadores:30,n_primer_equipo:0}};
+ const mapped=resolveClub({kind:'game',id:'cl-1'},index,{mapping:{},countries:{CL:'190'}});
+ assert.equal(mapped.uid,null);
+ assert.equal(mapped.linkStatus,'sin-enlace');
 });
 test('no identifica a un club por país o nombre parecidos si hay homónimos',()=>{
  const index={'17':{nombre:'Club de Deportes Santiago Wanderers',pais_id_fm:'190',n_jugadores:30,n_primer_equipo:0},'18':{nombre:'Santiago Wanderers',pais_id_fm:'190',n_jugadores:28,n_primer_equipo:0}};
- const mapped=resolveClub({kind:'game',id:'cl-1'},index,{mapping:{},countries:{CL:'190'}});
+ const mapped=resolveClub({kind:'game',id:'cl-extra-9'},index,{mapping:{},countries:{CL:'190'}});
  assert.equal(mapped.uid,null);
 });
 test('el filtro usa marcas explícitas de club/registro y no deduce sexo de nombres personales',()=>{
