@@ -56,7 +56,7 @@ export function loadedFM26Clubs(){return [...approved.values()].map(x=>({...x}))
 export function isRealClubReady(clubId){return baseClubs.has(clubId)}
 export function getRealBasePlayer(id){return byId.get(String(id))||null}
 export function ownFM26Delta(state){const z=state?.fm26;return z&&typeof z==='object'&&z.changes&&typeof z.changes==='object'?z.changes:{}}
-function applyDelta(base,state){
+export function applyFM26Delta(base,state){
  const d=ownFM26Delta(state)[base.id]||{};
  const target=Number(state?.fm26?.year||0);
  const last=Number(d.lastYear||2025);
@@ -70,15 +70,15 @@ function applyDelta(base,state){
    clubId:d.clubId===undefined?base.clubId:d.clubId,age,ovr,
    status:d.status|| (age>=43?'retired':base.status)};
 }
-export function getFM26PlayerById(id,state){const p=getRealBasePlayer(id);return p?applyDelta(p,state):null}
+export function getFM26PlayerById(id,state){const p=getRealBasePlayer(id);return p?applyFM26Delta(p,state):null}
 export function getFM26Squad(clubId,state,{includeReserves=false}={}){
  // Consulta sólo snapshots previamente cargados y aplica cambio de dueño del overlay.
  if(!clubId)return [];
  return [...byId.values()].filter(p=>p.clubId===clubId||ownFM26Delta(state)[p.id]?.clubId===clubId)
-  .map(p=>applyDelta(p,state)).filter(p=>p.clubId===clubId&&p.status==='active'&&(includeReserves||p.teamSlot===0))
+  .map(p=>applyFM26Delta(p,state)).filter(p=>p.clubId===clubId&&p.status==='active'&&(includeReserves||p.teamSlot===0))
   .sort((a,b)=>b.ovr-a.ovr||a.name.localeCompare(b.name));
 }
-export function getFM26LoadedPlayers(state){return [...byId.values()].map(p=>applyDelta(p,state))}
+export function getFM26LoadedPlayers(state){return [...byId.values()].map(p=>applyFM26Delta(p,state))}
 export function getFM26BestCompetitor(clubId,pos,state){
  const exact=getFM26Squad(clubId,state).filter(p=>p.pos===pos);
  return exact[0]||null;
@@ -102,7 +102,7 @@ export function advanceFM26Season(state,year){
   const wasTracked=changes[base.id]!=null;
   if(!wasTracked&&!context.has(base.clubId)&&tracked>=220)continue;
   if(!wasTracked)tracked++;
-  const prior=applyDelta(base,{fm26:{changes}});
+  const prior=applyFM26Delta(base,{fm26:{changes}});
   if(prior.status!=='active')continue;
   let p={...prior},fromYear=Number(changes[p.id]?.lastYear??2025);
   // Permite cargar un plantel nuevo años después y ponerlo al día sin reiniciarlo.

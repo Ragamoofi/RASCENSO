@@ -1,0 +1,14 @@
+RASCENSO 4.9.5 — CLUBES Y PLANTILLAS
+Base: Ragamoofi/RASCENSO main 14b3984ce412c76b5fe1b18787c00b694a5127e8.
+
+Incluye una ficha de club con plantilla, búsqueda, filtros y orden; consulta a demanda del índice y archivos de la base; aplicación de cambios de carrera; y enlaces desde escudos, nombres reconocibles y búsqueda mundial. Las plantillas no simuladas se identifican como originales. La ventana se cierra con Escape y vuelve a la pantalla anterior. Se conservaron los cambios de banderas, noticias y montos de la versión base.
+
+El filtro oculta 822 registros de 34 planteles femeninos identificados por ID, incluidas instituciones de la NWSL. También filtra noticias y premios guardados con identificadores conocidos. No elimina datos de la base ni modifica guardados. La cifra visible se ajusta para la versión de base 2026-10-31.
+
+Pruebas: 289 pruebas automáticas aprobadas, prueba de interfaz simulada y exportación de clubes; Chromium real con vista 1920x1080 y 390x844, tabla, búsqueda mundial, filtros, Escape, fichaje Barcelona-Liverpool y conservación del guardado. Una carrera automatizada avanzó nueve temporadas y recorrió las pestañas sin errores. El test de fichas se agregó al workflow de navegador.
+
+Limitaciones: El origen no contiene un campo de sexo fiable, por lo que pueden permanecer futbolistas no identificadas; no se clasifica por nombre. Las noticias históricas sin ID pueden permanecer. Se revisaron los flujos indicados, pero no todas las menciones y abreviaturas de clubes en cada pantalla ni todos los navegadores; los nombres ambiguos se tratan con cautela. Los clubes y futbolistas que la simulación no gestiona mantienen datos originales.
+
+Archivos: index.html, club495.css, src/experience.mjs, src/experience494.mjs, src/fm26-bundled.mjs, src/fm26-real.mjs, src/ui20-494.mjs, src/club-squads495.mjs, src/club-ui495.mjs, src/world-exclusions.mjs, tests/club-squads495.test.mjs, tests/filter-women.test.mjs, tests/browser/clubs495.cjs, .github/workflows/plays-browser.yml y este archivo.
+
+Identificación de clubes adicionales: NWSL, https://www.nwslsoccer.com/about-the-nwsl
