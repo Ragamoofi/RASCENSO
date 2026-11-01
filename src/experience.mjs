@@ -1,5 +1,4 @@
 import { retirementView } from './retirement42.mjs';
-import {importFM26Local,restoreFM26Private,forgetFM26Private} from './fm26-local.mjs';
 import {loadedFM26Clubs,advanceFM26Season} from './fm26-real.mjs';
 import {installWorldDatabase,getWorldDatabaseInfo,getWorldMappingInfo,activateWorldContext,activateWorldClub,searchWorldPlayers,forgetWorldDatabase} from './fm26-universe.mjs';
 import { academyOfferReason } from './engine.mjs';
@@ -349,4 +348,3 @@ document.addEventListener?.('keydown',e=>{
 ROOT.addEventListener('error',e=>{if(e.target.matches('img.badge-img'))e.target.remove();},true);
 render();
 getWorldDatabaseInfo().then(async info=>{worldDbInfo=info;if(info){await activateWorldContext(state||{clubId:''});if(state?.clubId){state=syncClub(state);save()}}render()}).catch(()=>{});
-restoreFM26Private().then(info=>{if(info.clubs&&state?.clubId&&!worldDbInfo){state=syncClub(state);save();render();}}).catch(()=>{});
