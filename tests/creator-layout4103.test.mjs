@@ -11,11 +11,11 @@ test('identidad mantiene edad y pierna en el bloque superior sin crear subpesta�
  assert.match(css,/\.creator4103 \.cr4103-ident-inline\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
 });
 
-test('la tarjeta lateral recibe un fondo más trabajado y actualizado a 4.10.3',()=>{
- assert.match(js,/RASCENSO 4\.10\.3 · IDENTIDAD ARMONIZADA/);
+test('identidad y tarjeta lateral conservan el estilo actual del creador',()=>{
+ assert.match(js,/RASCENSO 4\.10\.4 · FUTBOLISTA RENOVADO/);
  assert.match(css,/\.cr3:has\(\.creator4103\) \.cr-poster \.poster-kit-wrap\{/);
- assert.match(html,/creator-layout4103\.css\?v=506/);
- assert.match(html,/creator-layout4103\.mjs\?v=506/);
+ assert.match(html,/creator-layout4103\.css\?v=\d+/);
+ assert.match(html,/creator-layout4103\.mjs\?v=\d+/);
 });
 
 test('el buscador de Sueños sigue presente',()=>{

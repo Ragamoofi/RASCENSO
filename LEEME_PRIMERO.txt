@@ -1,32 +1,37 @@
-RASCENSO 4.10.3 — CREADOR DE FUTBOLISTA SIN SUBPESTAÑAS
-Base: main, commit 5ad27e450e9bc2afeab749adb4b2db93c73d4229
+RASCENSO 4.10.4 — FUTBOLISTA RENOVADO
 
-INSTALACION
-1. Extrae el contenido de este ZIP en Documentos\GitHub\RASCENSO.
-2. Acepta reemplazar index.html y tests/creator-layout4101.test.mjs.
-3. En GitHub Desktop, revisa cambios, Commit y Push origin.
-4. Comprueba el workflow 'Publicar RASCENSO' (verde) y recarga con Ctrl+F5.
+BASE COMPROBADA: main 63f1e95d3533147889ede0e8b0a36afb016c9775
+
+INSTALACIÓN: Extraer este ZIP en Documentos\GitHub\RASCENSO y aceptar
+reemplazar archivos. Hacer Commit y Push en GitHub Desktop.
+NO hay comandos, instaladores, scripts de instalación ni cambios en guardados.
 
 CAMBIOS
-- Se ELIMINAN las subpestañas del creador 4.10.1 (sus archivos anteriores se conservan en el repositorio sin cargarse).
-- Las 6 etapas originales siguen intactas: cada pantalla muestra TODAS sus categorías simultáneamente, en un tablero de dos columnas.
-- Las opciones dejan de ser tarjetas de gran tamaño y pasan a ser selectores lineales compactos de una fila, con una única zona de explicación y bonos por categoría.
-- Identidad: campo, cancha, edad, pierna y rol en la misma pantalla.
-- Raíces, Futbolista, Mentalidad, Sueños: bloques simultáneos, sin navegación secundaria.
-- Sueños: buscador de club favorito integrado en el propio bloque, conserva el selector original por país.
-- Resumen: informe compacto en filas.
-- Se conserva el formulario HTML/radios originales, su lógica de cambios, bonos, guardado de borrador y validación.
+- Futbolista: cabecera técnica horizontal con clase y 6 atributos ordenados.
+- Fortaleza, debilidad, estilo y desarrollo visibles juntos en una grilla 2x2
+  para pantallas anchas; cada grupo tiene alternativas compactas a la izquierda
+  y los bonos de la opción elegida a la derecha.
+- Jerarquía visual más clara, colores de apoyo, bordes y espacios uniformes.
+- Adaptación para pantallas medianas, pequeñas y móviles.
+- Identidad 4.10.3 y el buscador de clubes de Sueños conservados.
+- Corrige la prueba antigua que aún buscaba el archivo 4.10.2 y bloqueó
+  la publicación 4.10.3. Las pruebas de versión ahora verifican la carga
+  actual sin fijar valores de caché que impidan futuras actualizaciones.
 
 ARCHIVOS
 index.html
-src/creator-layout4102.mjs (nuevo)
-src/creator-layout4102.css (nuevo)
-tests/creator-layout4101.test.mjs (ajusta pruebas antiguas que exigían las subpestañas eliminadas)
-tests/creator-layout4102.test.mjs (nuevo)
+src/creator-layout4103.css
+src/creator-layout4103.mjs
+tests/creator-layout4101.test.mjs
+tests/creator-layout4103.test.mjs
+tests/creator-layout4104.test.mjs
 
-VERIFICACION
-- node --check de JavaScript: OK.
-- 8/8 pruebas específicas: OK.
-- No se modificó motor de carrera, plantillas, datos FM26 ni partidas.
-- No se pudo completar revisión visual con Chromium en este entorno; revisar tamaños y desplazamiento después de publicar.
-- GitHub Actions completo debe ejecutarse después de subir el ZIP.
+VERIFICACIONES
+- node --check: todos los JS modificados pasan.
+- 11 pruebas específicas de los archivos modificados: pasan.
+- CSS: estructura de llaves equilibrada.
+- Pendiente: pruebas completas de GitHub Actions y revisión visual real del
+  creador publicado (el navegador local del entorno bloqueó la vista).
+
+El motor de carrera, los datos mundiales, fichajes, guardados y bonos de elección
+no fueron modificados.

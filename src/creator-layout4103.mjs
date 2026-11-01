@@ -1,6 +1,6 @@
-/* RASCENSO 4.10.3 — Ajuste visual del creador.
- * Mantiene el tablero de decisiones, pero ordena mejor Identidad
- * y armoniza la tarjeta lateral provisional. */
+/* RASCENSO 4.10.4 — Identidad y Futbolista armonizados.
+ * Mantiene los controles de elección y su lógica original.
+ * Un solo tablero, sin subpestañas ni grandes tarjetas. */
 const normalize=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('es').trim();
 const element=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e};
 let savedClubSearch='';
@@ -66,9 +66,28 @@ function reorganize(main,step){
   split?.after(groupBoard);
   split?.classList.add('cr4102-roots-intro');
  }else if(step===2){
-  const groupBoard=board(groups,'cr4102-player-board');
+  // Estudio del futbolista: identidad de juego, prioridades y cuatro decisiones
+  // visibles en un solo tablero. Los controles originales siguen intactos.
+  split?.classList.add('cr4102-profile-intro','cr4104-profile-banner');
+  const profName=split?.querySelector('.cr-prof-class');
+  if(profName){
+   const heading=element('div','cr4104-role-eyebrow','◆  TU PAPEL EN EL EQUIPO');
+   profName.prepend(heading);
+  }
+  const groupBoard=board(groups,'cr4102-player-board cr4104-player-board');
+  const categoryNames=['FORTALEZA','DEBILIDAD','ESTILO','DESARROLLO'];
+  for(const [index,group] of [...groupBoard.children].entries()){
+   group.classList.add('cr4104-choice-section','cr4104-choice-'+index);
+   const heading=group.querySelector(':scope > header');
+   if(heading){
+    const marker=element('span','cr4104-section-index',String(index+1).padStart(2,'0'));
+    heading.prepend(marker);
+    heading.dataset.category=categoryNames[index]||'PERFIL';
+   }
+   const detail=group.querySelector(':scope > .cr4102-detail');
+   if(detail)detail.setAttribute('aria-live','polite');
+  }
   split?.after(groupBoard);
-  split?.classList.add('cr4102-profile-intro');
  }else if(step===3){
   main.querySelector(':scope > .cr-head')?.after(board(groups,'cr4102-mind-board'));
  }else if(step===4){
@@ -136,13 +155,13 @@ function setup(main){
  const steps=[...document.querySelectorAll('.cr3 .creation-step')];
  const step=steps.findIndex(x=>x.classList.contains('active'));
  if(step<0)return;
- main.dataset.creator4102='1';main.classList.add('creator4102','creator4103');main.dataset.step=String(step);
+ main.dataset.creator4102='1';main.classList.add('creator4102','creator4103','creator4104');main.dataset.step=String(step);
  reorganize(main,step);
 }
 let pending=false;
 function scan(){pending=false;const root=document.getElementById('app');
  const build=root?.querySelector('.site-head .build');
- if(build&&/RASCENSO\s+4\.10\.[0-2]/.test(build.textContent))build.textContent='RASCENSO 4.10.3 · IDENTIDAD ARMONIZADA';
+ if(build&&/RASCENSO\s+4\.10\.[0-3]/.test(build.textContent))build.textContent='RASCENSO 4.10.4 · FUTBOLISTA RENOVADO';
  const main=root?.querySelector('.cr3 .cr-main');if(main&&!main.dataset.creator4102)setup(main);
 }
 function schedule(){if(pending)return;pending=true;requestAnimationFrame(scan)}

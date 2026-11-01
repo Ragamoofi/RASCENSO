@@ -3,12 +3,12 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
 const html=read('index.html');
-const js=read('src/creator-layout4102.mjs');
-const css=read('src/creator-layout4102.css');
-test('creador 4.10.2 reemplaza las subpestañas de 4.10.1',()=>{
+const js=read('src/creator-layout4103.mjs');
+const css=read('src/creator-layout4103.css');
+test('creador activo reemplaza las subpestañas de 4.10.1',()=>{
  assert.match(html,/experience494\.mjs\?v=502/);
- assert.match(html,/creator-layout4102\.mjs\?v=504/);
- assert.match(html,/creator-layout4102\.css\?v=504/);
+ assert.match(html,/creator-layout4103\.mjs\?v=\d+/);
+ assert.match(html,/creator-layout4103\.css\?v=\d+/);
  assert.doesNotMatch(html,/creator-layout4101\.(?:css|mjs)/);
 });
 test('todas las decisiones siguen presentes, en un único tablero por etapa',()=>{
