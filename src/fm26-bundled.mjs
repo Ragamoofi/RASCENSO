@@ -12,7 +12,7 @@ export async function bundledWorldManifest(){
    const res=await fetch(new URL('manifest.json',ROOT),{cache:'force-cache'});
    if(!res.ok)return null;
    const m=await res.json();
-   if(m.schema!=='rascenso-bundled-world-v1'||m.total!==180739||m.shards!==311)throw Error('Catálogo mundial incompleto');
+   if(m.schema!=='rascenso-bundled-world-v1'||!Number.isInteger(m.total)||m.total<1||!Number.isInteger(m.shards)||m.shards<1)throw Error('Catálogo mundial incompleto');
    return m;
   }catch(e){if(String(e.message).includes('incompleto'))throw e;return null}
  })();
