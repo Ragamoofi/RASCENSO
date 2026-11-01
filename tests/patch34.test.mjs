@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {readFileSync,existsSync} from 'node:fs';
 import {keyboardDirection} from '../src/match2d.mjs';
 
 test('3.4: WASD y flechas permiten movimiento diagonal normalizado',()=>{
@@ -29,5 +29,18 @@ test('3.4: ajustes accesibles durante draft, contratos y carrera',()=>{
  assert.ok(css.length>130000&&css.includes('z-index:30000'));
  const cssVersion=html.match(/experience\.css\?v=(\d+)/)?.[1];
  assert.ok(cssVersion,'El HTML debe declarar versión de caché para CSS');
- assert.ok(html.includes('src/experience.mjs?v='+cssVersion),'CSS y módulo principal deben usar la misma versión');
+ const secondaryCssVersion=html.match(/visual44\.css\?v=(\d+)/)?.[1];
+ assert.equal(secondaryCssVersion,cssVersion,'Las hojas de estilo deben compartir versión de caché');
+ // La entrada puede ser experience.mjs o un módulo de arranque como experience494.mjs.
+ // Validamos el script REAL referenciado por HTML, sin asumir un nombre fijo antiguo.
+ const entry=html.match(/<script\s+type=["']module["']\s+src=["']\.\/src\/(experience\d*)\.mjs\?v=(\d+)["']/);
+ assert.ok(entry,'HTML debe cargar un módulo principal de RASCENSO versionado');
+ assert.equal(entry[2],cssVersion,'CSS y módulo principal deben usar la misma versión');
+ const entryUrl=new URL('../src/'+entry[1]+'.mjs',import.meta.url);
+ assert.ok(existsSync(entryUrl),'El módulo principal versionado debe existir');
+ if(entry[1]!=='experience'){
+  const wrapper=readFileSync(entryUrl,'utf8');
+  assert.match(wrapper,/import\(['"]\.\/experience\.mjs\?v=\d+['"]\)/,
+   'El módulo de arranque debe cargar el motor/interfaz original');
+ }
 });
