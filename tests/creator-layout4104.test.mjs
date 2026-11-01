@@ -35,7 +35,7 @@ test('se actualiza la versión sin depender de la caché previa ni modificar el 
  const module=html.match(/creator-layout4103\.mjs\?v=(\d+)/)?.[1];
  assert.ok(style,'estilo activo presente');
  assert.equal(module,style,'scripts y estilos deben compartir versión de caché');
- assert.match(html,/RASCENSO 4\.10\.4 · Futbolista renovado/);
+ assert.match(html,/RASCENSO 4\.10\.(?:[4-9]|[1-9]\d+) · /); // Nueva versión sin bloquear las siguientes
  assert.match(html,/experience494\.mjs\?v=502/);
  assert.doesNotMatch(js,/localStorage\.clear|window\.location\.reload/);
 });

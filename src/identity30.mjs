@@ -220,6 +220,81 @@ export const CHOICES={
   Izquierda:O('⬅',[['+2 % minutos en bandas izquierdas',1],['A pierna cambiada por derecha: +3 % goles',1],['A pierna cambiada: −1 % asistencias',0]],{})
  }
 };
+/** Equilibrio 4.10.6 — coste de oportunidad de cada elección.
+ * No se aplica directamente al guardado: choiceFx lo calcula desde la identidad.
+ * Los costes se guardan separados de los efectos preexistentes para evitar
+ * aplicar dos veces los rasgos ya resueltos por career08/league.
+ * En elecciones de fortaleza (mismo valor inicial y techo) y debilidad
+ * (todas son penalizaciones) la exclusividad ya funciona como coste.
+ */
+export const BALANCE_TRADEOFFS={
+ origin:{
+  barrio:{label:'−4 % crecimiento con muchos minutos: formación informal',fx:{growthRegular:.96}},
+  cantera:{label:'−4 % desarrollo si juegas pocos minutos',fx:{growthLow:.96}},
+ },
+ environment:{
+  sin_contactos:{label:'−4 % interés en el mercado: sin contactos',fx:{market:.96}},
+  familia_futbolera:{label:'+3 presión: expectativas del entorno',fx:{pressure:3}},
+  club_formativo:{label:'−4 % crecimiento con pocos minutos',fx:{growthLow:.96}},
+  autodidacta:{label:'−4 % crecimiento del Pase',fx:{growthAttr:{pass:.96}}},
+  migrante:{label:'−3 confianza inicial: adaptación al club',fx:{startTrust:-3}},
+  campesino:{label:'−6 % crecimiento del Pase',fx:{growthAttr:{pass:.94}}},
+  escuela:{label:'−4 % desarrollo juvenil: tiempo compartido',fx:{growthYoung:.96}},
+ },
+ developmentPath:{
+  mental:{label:'−6 % crecimiento del Físico y Ritmo',fx:{growthAttr:{pace:.94,physical:.94}}},
+  mixta:{label:'−1 techo Tiro y Defensa: sin picos de especialización',fx:{ceil:{shot:-1,defense:-1}}},
+  recuperacion:{label:'−8 % desarrollo general y −1,2 % minutos',fx:{growth:.92,minutes:-.012}},
+  tardio:{label:'−9 % desarrollo global y −1 % minutos: madurez tardía',fx:{growth:.91,minutes:-.01}},
+ },
+ personality:{
+  disciplinado:{label:'−5 % interés externo: perfil de continuidad',fx:{market:.95}},
+  ambicioso:{label:'+4 presión por expectativas altas',fx:{pressure:4}},
+  leal:{label:'−10 % interés externo por permanecer',fx:{market:.90}},
+  carismatico:{label:'+3 presión por visibilidad pública',fx:{pressure:3}},
+  sereno:{label:'−4 % crecimiento al priorizar estabilidad',fx:{growth:.96}},
+  lider:{label:'−3 % desarrollo por deberes de liderazgo',fx:{growth:.97}},
+  solidario:{label:'−5 % goles por priorizar pases',fx:{goals:.95}},
+ },
+ style:{
+  equilibrado:{label:'−3 % crecimiento de Tiro: sin especialización',fx:{growthAttr:{shot:.97}}},
+  goleador:{label:'−6 % asistencias: más remates propios',fx:{assists:.94}},
+  creador:{label:'−6 % goles: prioridad al pase',fx:{goals:.94}},
+  asociativo:{label:'−4 % goles: prefieres combinar',fx:{goals:.96}},
+  aereo:{label:'+3 % riesgo de lesión en duelos aéreos',fx:{}},
+ },
+ strength:{
+  tecnica:{label:'−2 % crecimiento Físico: énfasis técnico',fx:{growthAttr:{physical:.98}}},
+  explosividad:{label:'−2 % crecimiento Pase: énfasis en velocidad',fx:{growthAttr:{pass:.98}}},
+  definicion:{label:'−2 % crecimiento Defensa: énfasis rematador',fx:{growthAttr:{defense:.98}}},
+  resistencia:{label:'−2 % crecimiento Tiro: énfasis físico',fx:{growthAttr:{shot:.98}}},
+  lectura:{label:'−2 % crecimiento Ritmo: énfasis táctico',fx:{growthAttr:{pace:.98}}},
+ },
+ dream:{
+  seleccion:{label:'−2 % crecimiento general por fechas internacionales',fx:{growth:.98}},
+  idolo:{label:'−7 % interés externo: prioridad a un club',fx:{market:.93}},
+  titulos:{label:'+3 presión en partidos decisivos',fx:{pressure:3}},
+  cantera:{label:'−2 % goles: tiempo dedicado a enseñar',fx:{goals:.98}},
+  regresar:{label:'−6 % interés extranjero por volver a casa',fx:{market:.94}},
+  capitan:{label:'−2 % desarrollo individual por liderazgo',fx:{growth:.98}},
+  goleador:{label:'−3 % asistencias: más foco en definir',fx:{assists:.97}},
+  resistencia:{label:'−4 % desarrollo juvenil: cuidar la carga',fx:{growthYoung:.96}},
+ },
+ publicImage:{
+  referente:{label:'−4 % interés externo por compromiso con el club',fx:{market:.96}},
+  solidario:{label:'−2 % desarrollo por compromisos comunitarios',fx:{growth:.98}},
+  analitico:{label:'−3 % interés externo: perfil de sistema',fx:{market:.97}},
+  confiado:{label:'+2 presión: más exposición y responsabilidad',fx:{pressure:2}},
+ },
+};
+for(const [category,entries] of Object.entries(BALANCE_TRADEOFFS)){
+ for(const [id,cost] of Object.entries(entries)){
+  const c=CHOICES[category]?.[id];
+  if(!c)throw Error(`Balance: opción desconocida ${category}.${id}`);
+  // El creador suele mostrar sólo 2–3 etiquetas: el coste debe verse al elegir.
+  c.chips.splice(1,0,[cost.label,0]);
+ }
+}
 /** Tipo de personalidades con efecto ya implementado en otras partes (se anotan para el resumen). */
 export const AGE_FX={16:[['Más años para crecer (+1 año de carrera)',1],['Arranque más bajo',0]],17:[['Equilibrio entre margen y madurez',1]],18:[['+2 a los seis atributos al empezar',1]],19:[['+4 a los seis atributos al empezar',1],['Un año menos de desarrollo',0]]};
 export function startBoost(age){return Math.max(0,(clamp(Number(age)||17,16,19)-17)*2);} // 17:0, 18:+2, 19:+4
@@ -229,8 +304,11 @@ const NEUTRAL={minutes:0,goals:1,assists:1,injury:1,growth:1,growthYoung:1,growt
 /** Suma/multiplica los efectos de todas las elecciones del jugador y su ADN. Devuelve un objeto plano. */
 export function choiceFx(s){
  const out={...NEUTRAL,growthAttr:{},ceil:{},startAttr:{}};
- const take=(cat,id)=>{const f=CHOICES[cat]?.[id]?.fx;if(!f)return;
-  for(const [k,v] of Object.entries(f)){
+ const take=(cat,id)=>{
+  const base=CHOICES[cat]?.[id]?.fx;
+  const cost=BALANCE_TRADEOFFS[cat]?.[id]?.fx;
+  if(!base&&!cost)return;
+  for(const f of [base,cost])for(const [k,v] of Object.entries(f||{})){
    if(['growthAttr'].includes(k)){for(const [a,m] of Object.entries(v))out.growthAttr[a]=(out.growthAttr[a]||1)*m;}
    else if(['ceil','startAttr'].includes(k)){for(const [a,n] of Object.entries(v))out[k][a]=(out[k][a]||0)+n;}
    else if(['goals','assists','injury','growth','growthYoung','growthLow','growthRegular','market','passNoise','paceDecline'].includes(k))out[k]*=v;

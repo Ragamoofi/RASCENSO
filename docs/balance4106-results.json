@@ -1,0 +1,1078 @@
+{
+  "version": "4.10.6",
+  "mode": "motor real — carreras completas; semillas comunes por categoría",
+  "seedsPerOption": 16,
+  "positions": [
+    "DC",
+    "MC",
+    "DFC",
+    "POR",
+    "EI",
+    "MCD",
+    "LI"
+  ],
+  "runs": 1056,
+  "errors": [],
+  "results": [
+    {
+      "category": "developmentPath",
+      "option": "tecnica",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.44,
+        "peak": 72.56,
+        "minutes": 35409.25,
+        "goals": 103,
+        "assists": 75.31,
+        "injuryWeeks": 8.69,
+        "titles": 5.06,
+        "ovr": 60.44,
+        "retired": 1
+      }
+    },
+    {
+      "category": "developmentPath",
+      "option": "fisica",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.5,
+        "peak": 72.63,
+        "minutes": 34606.56,
+        "goals": 92.56,
+        "assists": 75.31,
+        "injuryWeeks": 5.69,
+        "titles": 5.13,
+        "ovr": 60,
+        "retired": 1
+      }
+    },
+    {
+      "category": "developmentPath",
+      "option": "tactica",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.38,
+        "peak": 72.38,
+        "minutes": 32144.56,
+        "goals": 81.5,
+        "assists": 69.06,
+        "injuryWeeks": 8.69,
+        "titles": 4.69,
+        "ovr": 60.25,
+        "retired": 1
+      }
+    },
+    {
+      "category": "developmentPath",
+      "option": "mental",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.31,
+        "peak": 72.69,
+        "minutes": 34859.19,
+        "goals": 91,
+        "assists": 72.44,
+        "injuryWeeks": 6.06,
+        "titles": 4.25,
+        "ovr": 60.31,
+        "retired": 1
+      }
+    },
+    {
+      "category": "developmentPath",
+      "option": "mixta",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.31,
+        "peak": 72.31,
+        "minutes": 33873,
+        "goals": 87,
+        "assists": 73.75,
+        "injuryWeeks": 6.19,
+        "titles": 4.75,
+        "ovr": 60.13,
+        "retired": 1
+      }
+    },
+    {
+      "category": "developmentPath",
+      "option": "recuperacion",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.94,
+        "peak": 71.75,
+        "minutes": 34847.63,
+        "goals": 88.38,
+        "assists": 79.06,
+        "injuryWeeks": 6.25,
+        "titles": 3.38,
+        "ovr": 61.94,
+        "retired": 1
+      }
+    },
+    {
+      "category": "developmentPath",
+      "option": "tardio",
+      "runs": 16,
+      "mean": {
+        "seasons": 21.5,
+        "peak": 73.69,
+        "minutes": 40558.81,
+        "goals": 112.56,
+        "assists": 77.94,
+        "injuryWeeks": 5.13,
+        "titles": 4.06,
+        "ovr": 67.63,
+        "retired": 1
+      }
+    },
+    {
+      "category": "environment",
+      "option": "sin_contactos",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.56,
+        "peak": 74.75,
+        "minutes": 37606.88,
+        "goals": 108.69,
+        "assists": 71.88,
+        "injuryWeeks": 7.06,
+        "titles": 4.38,
+        "ovr": 63,
+        "retired": 1
+      }
+    },
+    {
+      "category": "environment",
+      "option": "familia_futbolera",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.56,
+        "peak": 74.75,
+        "minutes": 38314.44,
+        "goals": 109.56,
+        "assists": 74.75,
+        "injuryWeeks": 6.44,
+        "titles": 4.25,
+        "ovr": 63.25,
+        "retired": 1
+      }
+    },
+    {
+      "category": "environment",
+      "option": "club_formativo",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.81,
+        "peak": 75.25,
+        "minutes": 39226.19,
+        "goals": 119,
+        "assists": 78.38,
+        "injuryWeeks": 7.06,
+        "titles": 3.88,
+        "ovr": 62.88,
+        "retired": 1
+      }
+    },
+    {
+      "category": "environment",
+      "option": "autodidacta",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.56,
+        "peak": 74.69,
+        "minutes": 37725.69,
+        "goals": 110.81,
+        "assists": 72.19,
+        "injuryWeeks": 6.94,
+        "titles": 4.63,
+        "ovr": 63.06,
+        "retired": 1
+      }
+    },
+    {
+      "category": "environment",
+      "option": "migrante",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.69,
+        "peak": 75.06,
+        "minutes": 37915.06,
+        "goals": 107.69,
+        "assists": 74.88,
+        "injuryWeeks": 10.38,
+        "titles": 5.06,
+        "ovr": 63.06,
+        "retired": 1
+      }
+    },
+    {
+      "category": "environment",
+      "option": "campesino",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.56,
+        "peak": 75.19,
+        "minutes": 39518.19,
+        "goals": 117.19,
+        "assists": 76.63,
+        "injuryWeeks": 9.06,
+        "titles": 4.81,
+        "ovr": 63.13,
+        "retired": 1
+      }
+    },
+    {
+      "category": "environment",
+      "option": "escuela",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.5,
+        "peak": 74.94,
+        "minutes": 39250.5,
+        "goals": 108.25,
+        "assists": 75.63,
+        "injuryWeeks": 8.94,
+        "titles": 4.31,
+        "ovr": 63.5,
+        "retired": 1
+      }
+    },
+    {
+      "category": "environment",
+      "option": "doble_turno",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.56,
+        "peak": 75,
+        "minutes": 38946.81,
+        "goals": 114.31,
+        "assists": 76.69,
+        "injuryWeeks": 8.81,
+        "titles": 4.63,
+        "ovr": 63.19,
+        "retired": 1
+      }
+    },
+    {
+      "category": "personality",
+      "option": "disciplinado",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.19,
+        "peak": 72.81,
+        "minutes": 30362.19,
+        "goals": 87.19,
+        "assists": 56.31,
+        "injuryWeeks": 4.19,
+        "titles": 4.94,
+        "ovr": 60.94,
+        "retired": 1
+      }
+    },
+    {
+      "category": "personality",
+      "option": "ambicioso",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.19,
+        "peak": 72.31,
+        "minutes": 31742.81,
+        "goals": 90.38,
+        "assists": 55.81,
+        "injuryWeeks": 2.94,
+        "titles": 5.06,
+        "ovr": 60.19,
+        "retired": 1
+      }
+    },
+    {
+      "category": "personality",
+      "option": "leal",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.13,
+        "peak": 72.31,
+        "minutes": 30492.81,
+        "goals": 90.75,
+        "assists": 53.88,
+        "injuryWeeks": 6.06,
+        "titles": 4.69,
+        "ovr": 60.69,
+        "retired": 1
+      }
+    },
+    {
+      "category": "personality",
+      "option": "carismatico",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.13,
+        "peak": 72.38,
+        "minutes": 32842,
+        "goals": 102.31,
+        "assists": 59.19,
+        "injuryWeeks": 1.63,
+        "titles": 4.56,
+        "ovr": 60.94,
+        "retired": 1
+      }
+    },
+    {
+      "category": "personality",
+      "option": "sereno",
+      "runs": 16,
+      "mean": {
+        "seasons": 19.94,
+        "peak": 72.06,
+        "minutes": 30857.31,
+        "goals": 92.94,
+        "assists": 55.69,
+        "injuryWeeks": 4.25,
+        "titles": 4.44,
+        "ovr": 60.81,
+        "retired": 1
+      }
+    },
+    {
+      "category": "personality",
+      "option": "rebelde",
+      "runs": 16,
+      "mean": {
+        "seasons": 19.94,
+        "peak": 72.06,
+        "minutes": 27488.25,
+        "goals": 75.31,
+        "assists": 49.38,
+        "injuryWeeks": 6.75,
+        "titles": 5.13,
+        "ovr": 61,
+        "retired": 1
+      }
+    },
+    {
+      "category": "personality",
+      "option": "lider",
+      "runs": 16,
+      "mean": {
+        "seasons": 19.88,
+        "peak": 72.25,
+        "minutes": 32098.5,
+        "goals": 93,
+        "assists": 58.44,
+        "injuryWeeks": 6.88,
+        "titles": 4.69,
+        "ovr": 60.94,
+        "retired": 1
+      }
+    },
+    {
+      "category": "personality",
+      "option": "obsesivo",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.13,
+        "peak": 72.56,
+        "minutes": 32358.44,
+        "goals": 98.63,
+        "assists": 61.69,
+        "injuryWeeks": 6.81,
+        "titles": 3.44,
+        "ovr": 60.75,
+        "retired": 1
+      }
+    },
+    {
+      "category": "personality",
+      "option": "solidario",
+      "runs": 16,
+      "mean": {
+        "seasons": 19.94,
+        "peak": 72.38,
+        "minutes": 30995.38,
+        "goals": 81.06,
+        "assists": 61,
+        "injuryWeeks": 3,
+        "titles": 4.75,
+        "ovr": 60.94,
+        "retired": 1
+      }
+    },
+    {
+      "category": "personality",
+      "option": "competitivo",
+      "runs": 16,
+      "mean": {
+        "seasons": 20,
+        "peak": 72.31,
+        "minutes": 32056.63,
+        "goals": 91.56,
+        "assists": 58.88,
+        "injuryWeeks": 3.88,
+        "titles": 4.75,
+        "ovr": 60.5,
+        "retired": 1
+      }
+    },
+    {
+      "category": "style",
+      "option": "equilibrado",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.63,
+        "peak": 73.06,
+        "minutes": 32810.94,
+        "goals": 107.63,
+        "assists": 71.31,
+        "injuryWeeks": 6.69,
+        "titles": 4.63,
+        "ovr": 62.13,
+        "retired": 1
+      }
+    },
+    {
+      "category": "style",
+      "option": "goleador",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.5,
+        "peak": 73.19,
+        "minutes": 32827.44,
+        "goals": 111.13,
+        "assists": 58.81,
+        "injuryWeeks": 7.19,
+        "titles": 3.81,
+        "ovr": 62.5,
+        "retired": 1
+      }
+    },
+    {
+      "category": "style",
+      "option": "creador",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.5,
+        "peak": 73.25,
+        "minutes": 35504.63,
+        "goals": 106.19,
+        "assists": 89.56,
+        "injuryWeeks": 7.19,
+        "titles": 4.06,
+        "ovr": 62.5,
+        "retired": 1
+      }
+    },
+    {
+      "category": "style",
+      "option": "intenso",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.69,
+        "peak": 73.13,
+        "minutes": 33782.56,
+        "goals": 105,
+        "assists": 71.81,
+        "injuryWeeks": 6.13,
+        "titles": 4.5,
+        "ovr": 61.5,
+        "retired": 1
+      }
+    },
+    {
+      "category": "style",
+      "option": "vertical",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.63,
+        "peak": 73.19,
+        "minutes": 32869,
+        "goals": 100.19,
+        "assists": 69.06,
+        "injuryWeeks": 7,
+        "titles": 3.31,
+        "ovr": 61.75,
+        "retired": 1
+      }
+    },
+    {
+      "category": "style",
+      "option": "asociativo",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.63,
+        "peak": 73,
+        "minutes": 32612.25,
+        "goals": 93.06,
+        "assists": 72.38,
+        "injuryWeeks": 6.44,
+        "titles": 4.25,
+        "ovr": 61.75,
+        "retired": 1
+      }
+    },
+    {
+      "category": "style",
+      "option": "aereo",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.56,
+        "peak": 73.13,
+        "minutes": 32863.94,
+        "goals": 102.44,
+        "assists": 63.81,
+        "injuryWeeks": 6.75,
+        "titles": 3.75,
+        "ovr": 61.38,
+        "retired": 1
+      }
+    },
+    {
+      "category": "style",
+      "option": "defensor",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.44,
+        "peak": 73.06,
+        "minutes": 35796.94,
+        "goals": 107.13,
+        "assists": 74,
+        "injuryWeeks": 4.06,
+        "titles": 4,
+        "ovr": 62.06,
+        "retired": 1
+      }
+    },
+    {
+      "category": "style",
+      "option": "regateador",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.5,
+        "peak": 72.88,
+        "minutes": 31351.75,
+        "goals": 99.56,
+        "assists": 63.56,
+        "injuryWeeks": 5.75,
+        "titles": 3.63,
+        "ovr": 61.81,
+        "retired": 1
+      }
+    },
+    {
+      "category": "dream",
+      "option": "seleccion",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.56,
+        "peak": 75.94,
+        "minutes": 39657.81,
+        "goals": 118.56,
+        "assists": 81.88,
+        "injuryWeeks": 3.31,
+        "titles": 3.44,
+        "ovr": 61.81,
+        "retired": 1
+      }
+    },
+    {
+      "category": "dream",
+      "option": "europa",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.56,
+        "peak": 76.19,
+        "minutes": 39460.13,
+        "goals": 119.19,
+        "assists": 79.25,
+        "injuryWeeks": 5.13,
+        "titles": 4.19,
+        "ovr": 62,
+        "retired": 1
+      }
+    },
+    {
+      "category": "dream",
+      "option": "idolo",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.56,
+        "peak": 76.19,
+        "minutes": 38709.5,
+        "goals": 117.75,
+        "assists": 76.63,
+        "injuryWeeks": 4.56,
+        "titles": 4.25,
+        "ovr": 61.81,
+        "retired": 1
+      }
+    },
+    {
+      "category": "dream",
+      "option": "titulos",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.5,
+        "peak": 76.06,
+        "minutes": 38980.56,
+        "goals": 118.19,
+        "assists": 78.63,
+        "injuryWeeks": 4.19,
+        "titles": 4.31,
+        "ovr": 62.56,
+        "retired": 1
+      }
+    },
+    {
+      "category": "dream",
+      "option": "cantera",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.69,
+        "peak": 75.94,
+        "minutes": 38021.38,
+        "goals": 108.44,
+        "assists": 71.88,
+        "injuryWeeks": 5.19,
+        "titles": 4.75,
+        "ovr": 61.75,
+        "retired": 1
+      }
+    },
+    {
+      "category": "dream",
+      "option": "regresar",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.5,
+        "peak": 76.13,
+        "minutes": 38168.44,
+        "goals": 116.75,
+        "assists": 76.75,
+        "injuryWeeks": 5.13,
+        "titles": 4.56,
+        "ovr": 62.31,
+        "retired": 1
+      }
+    },
+    {
+      "category": "dream",
+      "option": "capitan",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.5,
+        "peak": 76,
+        "minutes": 39464.75,
+        "goals": 120.75,
+        "assists": 76.75,
+        "injuryWeeks": 4.63,
+        "titles": 3.69,
+        "ovr": 62.13,
+        "retired": 1
+      }
+    },
+    {
+      "category": "dream",
+      "option": "goleador",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.44,
+        "peak": 75.81,
+        "minutes": 39733.44,
+        "goals": 125,
+        "assists": 72.81,
+        "injuryWeeks": 4.88,
+        "titles": 4.88,
+        "ovr": 62.31,
+        "retired": 1
+      }
+    },
+    {
+      "category": "dream",
+      "option": "resistencia",
+      "runs": 16,
+      "mean": {
+        "seasons": 21.38,
+        "peak": 75.69,
+        "minutes": 40580.25,
+        "goals": 126.31,
+        "assists": 84.63,
+        "injuryWeeks": 5.88,
+        "titles": 4.94,
+        "ovr": 64.75,
+        "retired": 1
+      }
+    },
+    {
+      "category": "origin",
+      "option": "barrio",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.75,
+        "peak": 73.5,
+        "minutes": 33523.63,
+        "goals": 111.25,
+        "assists": 71.13,
+        "injuryWeeks": 6.19,
+        "titles": 4.63,
+        "ovr": 62.13,
+        "retired": 1
+      }
+    },
+    {
+      "category": "origin",
+      "option": "cantera",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.63,
+        "peak": 73.31,
+        "minutes": 34254.75,
+        "goals": 112.25,
+        "assists": 74.56,
+        "injuryWeeks": 5.19,
+        "titles": 3.81,
+        "ovr": 62.13,
+        "retired": 1
+      }
+    },
+    {
+      "category": "origin",
+      "option": "amateur",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.63,
+        "peak": 73.13,
+        "minutes": 32829.19,
+        "goals": 108.06,
+        "assists": 68.38,
+        "injuryWeeks": 8.88,
+        "titles": 4.56,
+        "ovr": 61.75,
+        "retired": 1
+      }
+    },
+    {
+      "category": "origin",
+      "option": "academia",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.75,
+        "peak": 73.19,
+        "minutes": 35991.56,
+        "goals": 127.13,
+        "assists": 78.06,
+        "injuryWeeks": 4.19,
+        "titles": 3.94,
+        "ovr": 61.94,
+        "retired": 1
+      }
+    },
+    {
+      "category": "publicImage",
+      "option": "reservado",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.31,
+        "peak": 73.56,
+        "minutes": 34691.63,
+        "goals": 104.63,
+        "assists": 77.19,
+        "injuryWeeks": 9.69,
+        "titles": 3.63,
+        "ovr": 61.75,
+        "retired": 1
+      }
+    },
+    {
+      "category": "publicImage",
+      "option": "referente",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.44,
+        "peak": 73.94,
+        "minutes": 36367.56,
+        "goals": 115.13,
+        "assists": 74.44,
+        "injuryWeeks": 9.25,
+        "titles": 4.25,
+        "ovr": 61.56,
+        "retired": 1
+      }
+    },
+    {
+      "category": "publicImage",
+      "option": "mediatico",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.19,
+        "peak": 73.5,
+        "minutes": 33353.31,
+        "goals": 104.19,
+        "assists": 76,
+        "injuryWeeks": 8,
+        "titles": 3.13,
+        "ovr": 62.06,
+        "retired": 1
+      }
+    },
+    {
+      "category": "publicImage",
+      "option": "provocador",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.44,
+        "peak": 73.63,
+        "minutes": 36211.81,
+        "goals": 114.94,
+        "assists": 81.75,
+        "injuryWeeks": 8.25,
+        "titles": 4.25,
+        "ovr": 62,
+        "retired": 1
+      }
+    },
+    {
+      "category": "publicImage",
+      "option": "solidario",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.63,
+        "peak": 74,
+        "minutes": 38003,
+        "goals": 118.38,
+        "assists": 80,
+        "injuryWeeks": 11.19,
+        "titles": 3.69,
+        "ovr": 61.69,
+        "retired": 1
+      }
+    },
+    {
+      "category": "publicImage",
+      "option": "analitico",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.31,
+        "peak": 73.56,
+        "minutes": 34691.63,
+        "goals": 104.63,
+        "assists": 77.19,
+        "injuryWeeks": 9.69,
+        "titles": 3.63,
+        "ovr": 61.75,
+        "retired": 1
+      }
+    },
+    {
+      "category": "publicImage",
+      "option": "confiado",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.31,
+        "peak": 73.56,
+        "minutes": 34691.63,
+        "goals": 104.63,
+        "assists": 77.19,
+        "injuryWeeks": 9.69,
+        "titles": 3.63,
+        "ovr": 61.75,
+        "retired": 1
+      }
+    },
+    {
+      "category": "strength",
+      "option": "tecnica",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.44,
+        "peak": 73.25,
+        "minutes": 35431.44,
+        "goals": 103.19,
+        "assists": 74.06,
+        "injuryWeeks": 5.75,
+        "titles": 4.56,
+        "ovr": 62.06,
+        "retired": 1
+      }
+    },
+    {
+      "category": "strength",
+      "option": "explosividad",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.63,
+        "peak": 73.44,
+        "minutes": 36173.94,
+        "goals": 116.63,
+        "assists": 70.81,
+        "injuryWeeks": 10.5,
+        "titles": 4.25,
+        "ovr": 61.88,
+        "retired": 1
+      }
+    },
+    {
+      "category": "strength",
+      "option": "definicion",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.38,
+        "peak": 73.06,
+        "minutes": 34908.13,
+        "goals": 105.94,
+        "assists": 65,
+        "injuryWeeks": 9.13,
+        "titles": 3.19,
+        "ovr": 62.13,
+        "retired": 1
+      }
+    },
+    {
+      "category": "strength",
+      "option": "resistencia",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.44,
+        "peak": 73,
+        "minutes": 34400.69,
+        "goals": 98.81,
+        "assists": 67.88,
+        "injuryWeeks": 7.25,
+        "titles": 3.88,
+        "ovr": 61.81,
+        "retired": 1
+      }
+    },
+    {
+      "category": "strength",
+      "option": "lectura",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.31,
+        "peak": 72.81,
+        "minutes": 34695.13,
+        "goals": 95.81,
+        "assists": 68,
+        "injuryWeeks": 7.13,
+        "titles": 3.69,
+        "ovr": 62.25,
+        "retired": 1
+      }
+    },
+    {
+      "category": "riskProfile",
+      "option": "paciente",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.63,
+        "peak": 71.38,
+        "minutes": 34420.19,
+        "goals": 105.06,
+        "assists": 75.06,
+        "injuryWeeks": 5.13,
+        "titles": 3.69,
+        "ovr": 61.06,
+        "retired": 1
+      }
+    },
+    {
+      "category": "riskProfile",
+      "option": "audaz",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.69,
+        "peak": 71.44,
+        "minutes": 32540.13,
+        "goals": 98.13,
+        "assists": 66.44,
+        "injuryWeeks": 7.25,
+        "titles": 3.5,
+        "ovr": 61.06,
+        "retired": 1
+      }
+    },
+    {
+      "category": "riskProfile",
+      "option": "calculador",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.56,
+        "peak": 71.56,
+        "minutes": 35251.88,
+        "goals": 109.75,
+        "assists": 74.81,
+        "injuryWeeks": 2.94,
+        "titles": 3.13,
+        "ovr": 61.5,
+        "retired": 1
+      }
+    },
+    {
+      "category": "riskProfile",
+      "option": "economico",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.75,
+        "peak": 71.5,
+        "minutes": 35476.13,
+        "goals": 101.5,
+        "assists": 67.63,
+        "injuryWeeks": 5.81,
+        "titles": 2.88,
+        "ovr": 60.56,
+        "retired": 1
+      }
+    },
+    {
+      "category": "riskProfile",
+      "option": "hogareno",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.75,
+        "peak": 71.56,
+        "minutes": 33869,
+        "goals": 97.06,
+        "assists": 75.38,
+        "injuryWeeks": 5.13,
+        "titles": 3.56,
+        "ovr": 60.88,
+        "retired": 1
+      }
+    },
+    {
+      "category": "riskProfile",
+      "option": "aventurero",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.56,
+        "peak": 70.63,
+        "minutes": 28029.44,
+        "goals": 90.38,
+        "assists": 59.56,
+        "injuryWeeks": 6.75,
+        "titles": 3.56,
+        "ovr": 60.06,
+        "retired": 1
+      }
+    },
+    {
+      "category": "riskProfile",
+      "option": "leal",
+      "runs": 16,
+      "mean": {
+        "seasons": 20.56,
+        "peak": 71.56,
+        "minutes": 35251.88,
+        "goals": 109.75,
+        "assists": 74.81,
+        "injuryWeeks": 2.94,
+        "titles": 3.13,
+        "ovr": 61.5,
+        "retired": 1
+      }
+    }
+  ],
+  "retune": "Se repitieron las 112 carreras de developmentPath después del ajuste a Mixta y Maduración tardía.",
+  "totalExecuted": 1168,
+  "note": "Matriz final 66 opciones × 16 semillas = 1.056 carreras. Se ejecutaron además 112 carreras de calibración de Desarrollo. No equivale a todas las combinaciones cruzadas.",
+  "source": "Motor de carrera RASCENSO, modo offline, sin cargar toda la base mundial real durante la auditoría."
+}

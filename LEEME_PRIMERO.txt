@@ -1,28 +1,23 @@
-RASCENSO 4.10.5 — PIERNA HÁBIL EQUILIBRADA
-Base exacta comprobada: commit ff429a6a63fa54f1b6f7bfeff83c8ac63277fc48 (main, 2026-11-01).
+RASCENSO 4.10.6 — Balance de elecciones y auditoría reproducible
+Base de main: c56034d925a0170bf02ad15d86d7e24c3ca480e8 (2026-11-01)
 
-INSTALACIÓN
-1. Extrae este ZIP directamente en Documentos\GitHub\RASCENSO.
-2. Acepta reemplazar los archivos manteniendo las carpetas src y tests.
-3. Haz Commit y Push origin desde GitHub Desktop.
-4. Comprueba que el flujo «Publicar RASCENSO» termine en verde y actualiza la página (Ctrl+F5).
-No hay ejecutables ni scripts de instalación.
-
-CAMBIOS
-- Derecha: +2 % de minutos en banda derecha (ED, MD, LD).
-- Derecha a pierna cambiada por izquierda (EI, MI, LI): +3 % de goles, a cambio de -1 % de asistencias.
-- Izquierda: los mismos efectos, reflejados por la otra banda.
-- Los puestos centrales no obtienen ventaja de pie preferido.
-- Se elimina la antigua demanda extra de mercado por ser zurdo; ambas piernas tienen la misma demanda base.
-- Las tres etiquetas visibles de cada opción reflejan exactamente sus nuevos efectos.
-- Se fuerza la renovación de caché del módulo identity30.mjs mediante importmap, sin tocar el creador 4.10.4.
+INSTALACIÓN (NO HAY INSTALADORES)
+1. Extrae el ZIP en Documentos\GitHub\RASCENSO y acepta reemplazar archivos.
+2. Desde GitHub Desktop, revisa los cambios, haz Commit y Push origin.
+3. Comprueba en Actions que «Publicar RASCENSO» esté verde.
+4. Actualiza la página con Ctrl+F5.
 
 ARCHIVOS
-index.html
-src/identity30.mjs
-tests/foot-balance4105.test.mjs
+- src/identity30.mjs: ventajas con costes visibles y efectos reales de motor.
+- index.html: versión 4.10.6 y renovación del caché del módulo identidad.
+- tests/balance-choices4106.test.mjs: 13 pruebas de equilibrio e integración.
+- tests/creator-layout4104.test.mjs y tests/foot-balance4105.test.mjs:
+  versiones futuras no rompen pruebas antiguas del creador.
+- scripts/audit-balance4106.mjs: auditor de carreras completas con semillas reproducibles.
+- docs/RASCENSO-4.10.6-BALANCE.md: metodología, métricas, pruebas y límites.
+- docs/balance4106-results.json: reporte reproducible de las carreras ejecutadas.
 
-PRUEBAS
-6 de 6 pruebas funcionales aisladas aprobadas en Node 22; sintaxis del módulo verificada.
-La publicación y pruebas de GitHub Actions deben confirmarse tras subir el ZIP.
-No se tocaron datos de jugadores, partidos, partidas guardadas ni el motor visual del creador.
+NO modifica el sistema de guardado ni borra partidas. NO sustituye la base mundial.
+Los costes son elecciones de diseño y pueden revisarse con los datos de nuevas simulaciones.
+La auditoría NO cubre el producto cartesiano completo de todas las combinaciones;
+compara cada alternativa controlando los demás parámetros y la semilla.
