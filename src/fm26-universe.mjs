@@ -167,13 +167,14 @@ export async function activateWorldContext(state,{clubLimit=120}={}){
  return {active,players};
 }
 export async function searchWorldPlayers(term,{limit=70,offset=0,clubUID=null}={}){
- const q=cleanup(term),files=(await bundledWorldManifest())?[await bundledDirectory()]:await dbAll(DIR);
+ const bundled=!!(await bundledWorldManifest());
+ const q=cleanup(term),files=bundled?[await bundledDirectory()]:await dbAll(DIR);
  const found=[];
  for(const rows of files){
   for(const p of rows){
    if(clubUID!==null&&p[5]!==String(clubUID))continue;
    if(q&&!cleanup(p[1]).includes(q))continue;
-   found.push({id:p[0],name:p[1],age:p[2],position:p[3],ovr:p[4],fmClubUID:p[5],fmNationId:p[6]});
+   found.push({id:p[0],name:p[1],age:p[2],position:p[3],ovr:bundled?fm26OVR(p[4]):p[4],fmClubUID:p[5],fmNationId:p[6]});
   }
  }
  found.sort((a,b)=>b.ovr-a.ovr||a.name.localeCompare(b.name));
