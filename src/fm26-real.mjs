@@ -57,8 +57,17 @@ export function getRealBasePlayer(id){return byId.get(String(id))||null}
 export function ownFM26Delta(state){const z=state?.fm26;return z&&typeof z==='object'&&z.changes&&typeof z.changes==='object'?z.changes:{}}
 function applyDelta(base,state){
  const d=ownFM26Delta(state)[base.id]||{};
+ const target=Number(state?.fm26?.year||0);
+ const last=Number(d.lastYear||2025);
+ const elapsed=target>last?Math.min(80,target-last):0;
+ const oldAge=Number(d.age??base.age);
+ const oldOvr=Number(d.ovr??base.ovr);
+ const age=oldAge+elapsed;
+ const ovr=clamp(oldOvr+Math.round((Math.min(27,age)-Math.min(27,oldAge))*.28)
+   -Math.max(0,age-32)*.46+Math.max(0,oldAge-32)*.46,40,99);
  return {...base,...d,seasons:d.seasons||base.seasons,attributes:{...base.attributes,...(d.attributes||{})},
-   clubId:d.clubId===undefined?base.clubId:d.clubId};
+   clubId:d.clubId===undefined?base.clubId:d.clubId,age,ovr,
+   status:d.status|| (age>=43?'retired':base.status)};
 }
 export function getFM26PlayerById(id,state){const p=getRealBasePlayer(id);return p?applyDelta(p,state):null}
 export function getFM26Squad(clubId,state,{includeReserves=false}={}){
@@ -78,13 +87,20 @@ export function transferFM26(state,id,toClub,year){
  if(!p||p.status!=='active')throw Error('Jugador inexistente o retirado');
  if(toClub!==null&&!baseClubs.has(toClub))throw Error('Destino no cargado/verificado; transferencia bloqueada');
  const previous=ownFM26Delta(state)[id]||{};
- const change={...previous,clubId:toClub,joined:year,transferHistory:[...(previous.transferHistory||[]),{year,from:p.clubId,to:toClub}].slice(-20)};
+ const change={...previous,clubId:toClub,joined:year,lastYear:previous.lastYear??year-1,transferHistory:[...(previous.transferHistory||[]),{year,from:p.clubId,to:toClub}].slice(-20)};
  return {...state,fm26:{...(state.fm26||{}),schema:1,changes:{...ownFM26Delta(state),[id]:change}}};
 }
 export function advanceFM26Season(state,year){
  if(year<2026)return state;
  const changes={...ownFM26Delta(state)},events=[];
+ const context=new Set([state.clubId,state.fanClubId].filter(Boolean));
+ let tracked=0;
  for(const base of byId.values()){
+  // Solo una burbuja pequeña mantiene un historial detallado. Los demás envejecen
+  // automáticamente al consultarlos, sin serializar centenares de miles de fichas.
+  const wasTracked=changes[base.id]!=null;
+  if(!wasTracked&&!context.has(base.clubId)&&tracked>=220)continue;
+  if(!wasTracked)tracked++;
   const prior=applyDelta(base,{fm26:{changes}});
   if(prior.status!=='active')continue;
   let p={...prior},fromYear=Number(changes[p.id]?.lastYear??2025);
@@ -113,5 +129,5 @@ export function advanceFM26Season(state,year){
   const {id,name,pos,attributes,kind,origin,teamSlot,cc,fmNationId,...evolved}=p;
   changes[p.id]={...changes[p.id],...evolved,lastYear:year};
  }
- return {...state,fm26:{schema:1,changes},fm26Events:events.slice(-20)};
+ return {...state,fm26:{schema:1,year,changes},fm26Events:events.slice(-20)};
 }
