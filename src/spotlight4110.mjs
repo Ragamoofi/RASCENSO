@@ -63,12 +63,12 @@ export function traitSignals4110(state,play,playerStats){
    if(!Number.isFinite(current[key])||!Number.isFinite(baseline[key]))continue;
    const difference=(current[key]-baseline[key])*sign;
    if(difference<=.001)continue;
-   const score=unit==='pp'?Math.round(difference*10)*10:fmt(difference);
+   const score=fmt(difference);
    if(score<=0)continue;
    if(!impact||difference>impact.weight)impact={label,unit,value:score,weight:difference};
   }
   if(impact){
-   const value=impact.unit==='pp'?`+${fmt(impact.weight*100)} puntos porcentuales`:`+${fmt(impact.weight)} ${impact.unit}`;
+   const value=impact.unit==='pp'?`+${fmt(impact.weight)} puntos porcentuales`:`+${fmt(impact.weight)} ${impact.unit}`;
    out.push({id:`${field}:${id}`,title:labels[id]||id.replace(/_/g,' '),text:`Tu ${labels[id]||cat.toLowerCase()} aporta ${value} de ${impact.label} en esta jugada.`,weight:impact.weight});
   }
  }

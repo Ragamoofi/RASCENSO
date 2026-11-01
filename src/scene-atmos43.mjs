@@ -1,3 +1,4 @@
+const editorialMotion=typeof matchMedia==='function'?matchMedia('(prefers-reduced-motion: reduce)'):null;
 /* RASCENSO 4.3 — realización televisiva Canvas para todas las jugadas. Sin recursos externos. */
 const W=960,H=540;
 import {tuningFor} from './play-tuning43.mjs';
@@ -18,12 +19,12 @@ export function drawBroadcast43(m,g){
  const name=String(tuningFor(play.type).tag||'Momento decisivo').toUpperCase();
  g.fillStyle='rgba(5,23,38,.75)';panel(g,18,H-76,252,30);
  g.strokeStyle='rgba(215,163,111,.75)';g.lineWidth=1.3;g.beginPath();g.moveTo(30,H-61);g.lineTo(46,H-61);g.stroke();
- g.textAlign='left';g.textBaseline='middle';g.font='800 12px "DM Sans",Arial';g.fillStyle=S.pale;g.fillText(name.slice(0,28),55,H-61,204);
+ g.textAlign='left';g.textBaseline='middle';g.font='800 12px Inter,Arial';g.fillStyle=S.pale;g.fillText(name.slice(0,28),55,H-61,204);
  if(play.classic||play.decisive){
-  const pulse=.78+Math.sin(t*3)*.08;
+  const pulse=editorialMotion?.matches?1:.78+Math.sin(t*3)*.08;
   g.globalAlpha=pulse;
   g.fillStyle='rgba(10,28,45,.82)';panel(g,W-220,H-76,200,30);
-  g.fillStyle=S.copper;g.textAlign='center';g.font='900 11px "DM Sans",Arial';
+  g.fillStyle=S.copper;g.textAlign='center';g.font='900 11px Inter,Arial';
   g.fillText(play.classic?'⚡ CLÁSICO EN JUEGO':'★ MOMENTO CLAVE',W-120,H-61,188);
   g.globalAlpha=1;
  }

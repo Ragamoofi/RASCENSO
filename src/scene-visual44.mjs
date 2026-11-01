@@ -1,3 +1,4 @@
+const editorialMotion=typeof matchMedia==='function'?matchMedia('(prefers-reduced-motion: reduce)'):null;
 /* RASCENSO 4.4 — dirección artística de jugadas, sin tocar input, física ni aleatoriedad. */
 const W=960,H=540;
 const GROUPS={
@@ -41,17 +42,17 @@ export function drawSceneFilm44(m,g){
  // Tablero de transmisión secundario, no tapa el marcador existente.
  g.fillStyle='rgba(4,18,30,.8)';g.fillRect(14,64,189,23);
  g.fillStyle=style.accent;g.fillRect(14,64,3,23);
- g.textBaseline='middle';g.textAlign='left';g.font='900 10px "DM Sans",Arial';
+ g.textBaseline='middle';g.textAlign='left';g.font='900 10px Inter,Arial';
  g.fillStyle='#e9f4f3';g.fillText(style.label,24,76,170);
  g.fillStyle='rgba(5,22,35,.65)';g.fillRect(W-176,64,163,23);
  g.fillStyle=style.accent;g.fillRect(W-176,64,3,23);
- g.fillStyle='#d5e9ed';g.font='800 10px "DM Sans",Arial';g.textAlign='center';
+ g.fillStyle='#d5e9ed';g.font='800 10px Inter,Arial';g.textAlign='center';
  g.fillText((m?.play?.kind==='defend'?'DEFENSA':'ATAQUE')+' · RASCENSO',W-92,76);
  // Pulso lineal de presión: decoración temporal sin alterar resultados.
  if(m?.phase==='play'){
   g.fillStyle='rgba(255,255,255,.07)';g.fillRect(15,91,130,3);
   g.fillStyle=style.accent;g.fillRect(15,91,130*clamp((Number(m?.play?.pressure)||40)/100,.05,1),3);
-  const flick=.35+.65*Math.abs(Math.sin(t*1.1));
+  const flick=editorialMotion?.matches?1:.35+.65*Math.abs(Math.sin(t*1.1));
   g.globalAlpha=flick*.65;ring(g,W-42,107,6,style.accent);g.globalAlpha=1;
  }
  g.restore();
@@ -66,11 +67,11 @@ export function drawBriefFilm44(m,g){
  g.beginPath();g.arc(W/2,H/2,196,-Math.PI*.72,Math.PI*.12);g.stroke();
  g.beginPath();g.arc(W/2,H/2,196,Math.PI*.28,Math.PI*.78);g.stroke();
  g.globalAlpha=1;g.fillStyle=style.accent;g.textBaseline='middle';g.textAlign='center';
- g.font='900 10px "DM Sans",Arial';g.fillText('RASCENSO / '+style.label,W/2,m?.phase==='brief'?42:H/2-146);
+ g.font='900 10px Inter,Arial';g.fillText('RASCENSO / '+style.label,W/2,m?.phase==='brief'?42:H/2-146);
  g.restore();
 }
 export function drawResultFilm44(m,g){
- if(!m?.result||m.phase!=='outro')return;
+ if(!m?.result||m.phase!=='outro'||editorialMotion?.matches)return;
  const style=sceneVisualStyle44(m.play?.type),progress=clamp((2.1-(m.outT||0))/2.1,0,1);
  const good=!!m.result.success,color=good?style.accent:'#f2a4a0';
  g.save();

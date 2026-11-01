@@ -273,3 +273,22 @@ dialog.club-modal495.club-modal497{border:1px solid var(--ed-line);border-radius
 .cr-poster .kit-halo{display:none}.cr-poster .kit-country-seal{background:var(--ed-bg-alt)!important;box-shadow:none!important;border-color:var(--ed-line)!important}.cr-poster .kit-country-seal strong{font:700 28px var(--ed-display)!important}.cr-poster .kit-country-seal small{letter-spacing:.06em}
 .cr-eff{background:none!important;border:0!important;border-bottom:1px solid var(--ed-line)!important;border-radius:0!important;padding:16px 12px!important}.cr-eff>div{min-width:0}.cr-eff strong{font-size:14px!important;line-height:1.5}.cr-eff .cr-ico{background:transparent!important;border:0!important;box-shadow:none!important;color:var(--ed-muted)!important}.cr-eff small{color:var(--ed-muted)!important}.cr-effects>header{padding:16px 12px!important;gap:8px;flex-wrap:wrap;font-size:12px!important;background:var(--ed-surface)}
 .cr-sum{padding:16px!important;border:1px solid var(--ed-line)!important;border-radius:10px;background:var(--ed-surface)!important}.cr-sum>header{gap:12px;align-items:start}.cr-sum header strong{font-size:15px!important;line-height:1.5}.cr-edit{min-height:44px!important;min-width:44px;font-size:13px!important;background:var(--ed-bg-alt)!important;border:1px solid var(--ed-line)!important;color:var(--ed-muted);padding:8px!important}.cr-oneliner,.cr-next{font-size:15px!important;line-height:1.7;background:var(--ed-bg-alt)!important;border-color:var(--ed-line)!important;padding:20px!important}.cr-next strong{font-size:18px!important}.cr-next p{font-size:14px!important;line-height:1.7}
+/* Player identity remains matte across every existing rarity tier. */
+.app-shell .profile-card[class*="player-tier-"]{background:linear-gradient(145deg,var(--ed-raised),var(--ed-bg-alt) 75%)!important;border-color:var(--ed-line)!important;box-shadow:var(--ed-shadow)!important}
+.app-shell .profile-card[class*="player-tier-"]::before,.app-shell .profile-card[class*="player-tier-"]::after{opacity:.08!important}
+@media(max-width:767px){
+ .playing-layout>.left-rail{display:contents!important}
+ .playing-layout>.center-rail{order:1}.playing-layout>.right-rail{order:3}
+ .left-rail>.profile-card{order:0;width:100%;grid-template-columns:60px minmax(0,1fr);padding:16px;gap:8px 12px}
+ .left-rail>.rail-panel{order:2;width:100%}
+ .profile-card .player-economy{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important;padding:12px 0!important}
+ .profile-card .player-economy>div{display:flex;flex-direction:column;align-items:start;justify-content:start;gap:6px;min-width:0}
+ .profile-card .player-economy strong{font-size:13px!important;line-height:1.5;overflow-wrap:anywhere}
+ .profile-card .player-economy small{font-size:12px!important}
+ .profile-card .dna-badge{grid-column:1/-1;justify-self:start;margin:0!important}
+ .profile-card .player-club{display:flex;gap:12px;background:var(--ed-bg)!important}
+}
+.ed-icon{flex:none;vertical-align:middle}.main-nav .navtab{display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.ed-table-hint{display:none;font-size:12px!important;line-height:1.6;color:var(--ed-muted);margin:8px 0 12px}
+.hero-emblem{pointer-events:auto!important}.hero-emblem:hover,.hero-emblem:focus-within{opacity:.7!important}
+@media(max-width:767px){.ed-table-hint{display:block}.main-nav .navtab{flex-direction:column;gap:6px;padding:8px 6px;font-size:13px;min-height:64px}.site-head{min-height:140px}.main-nav .navtab .ed-icon{width:20px;height:20px}}
