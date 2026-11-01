@@ -20,6 +20,7 @@ jobs:
           mkdir -p _site
           cp index.html experience.css visual44.css favicon.svg favicon.png .nojekyll _site/
           cp -R src assets _site/
+          node scripts/export-clubs.mjs
           python scripts/build_crests.py _site/assets/crests
           python scripts/build_trophy_gallery.py _site
           python scripts/build_fm_trophy_pack.py _site
