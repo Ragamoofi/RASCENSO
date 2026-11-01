@@ -1,27 +1,24 @@
-RASCENSO 4.9.3 — PARCHE DIRECTO, SIN INSTALADORES
+RASCENSO 4.9.4 — BANDERAS DEL BALÓN DE ASCENSO + NOTICIAS + TASACIÓN DE FICHAJES
 
-BASE: RASCENSO 4.9.2 de main, commit 7b3da5493.
+BASE REQUERIDA: RASCENSO 4.9.3 ya instalado en main (commit de referencia 0e069da4df).
+PAQUETE DIRECTO: SIN instalador .cmd, SIN .ps1, SIN consola, SIN modificar la base de 180.739 futbolistas.
 
-INSTALACIÓN (SIN .CMD, SIN .PS1, SIN CONSOLA):
-1. Abre GitHub Desktop y selecciona RASCENSO / main.
-2. Fetch origin y Pull origin si corresponde.
-3. Extrae TODO este ZIP directamente dentro de Documentos\GitHub\RASCENSO,
-   en la misma carpeta que index.html, y acepta reemplazar index.html.
-4. Se agregan nuevos módulos en src/, sin reemplazar los grandes archivos existentes.
-5. En GitHub Desktop haz Commit y Push origin.
-6. Revisa que la publicación termine correcta; abre el juego con Ctrl+F5.
+INSTALACIÓN:
+1. En GitHub Desktop: RASCENSO, rama main. Fetch origin / Pull origin si corresponde.
+2. Abre el ZIP y extrae TODO en Documentos\GitHub\RASCENSO (carpeta donde está index.html).
+3. Acepta REEMPLAZAR index.html y conserva las carpetas src, tests y docs.
+4. En GitHub Desktop revisa los cambios. Commit: RASCENSO 4.9.4 - Banderas, noticias y fichajes.
+5. Haz Push origin. Cuando GitHub Pages publique, abre el juego y usa Ctrl + F5.
 
-CORRECCIÓN:
-- TOP 10 de Las figuras del momento con la base global de 180.739 futbolistas.
-- Tu generación usa futbolistas del mundo con edades equivalentes.
-- Banderas por nacionalidad del jugador; nombres originales de clubes.
-- Mantiene jugadores ficticios como respaldo cuando no hay reales aplicables.
-- No incluye la base de 180.739 jugadores: YA está en la versión 4.9.2.
-- No modifica guardados ni datos existentes.
+CORRECCIONES:
+- Balón de Ascenso: las banderas de rankings antiguos se recuperan por UID real de la base mundial.
+- La nacionalidad NUNCA se toma del club. Registros sin país comprobable muestran globo neutral.
+- Noticias: los IDs internos de los clubes se convierten a nombres deportivos legibles.
+- Fichajes: el destino se muestra también en el titular cuando antes decía «otro club».
+- Se muestra importe de traspaso ESTIMADO en euros; toma como base la valoración de RASCENSO
+  y pondera edad, nivel, potencial disponible y capacidad deportiva de clubes.
+- El monto es estimativo del simulador, NO una cifra histórica/real ni un cargo contable al club.
+- Se mantienen los 180.739 registros, las jugadas, los guardados y las temporadas.
 
-NOTA TÉCNICA:
-Se utiliza un import map estándar del navegador para ampliar 2 módulos de la versión
-4.9.2 sin tocar sus archivos originales. Los nuevos .mjs forman parte del juego;
-NO son instaladores. Solo debes copiar/reemplazar como siempre.
-
-PENDIENTE INDEPENDIENTE: prueba de navegador de la vitrina de trofeos 4.5.
+PRUEBAS: node --test tests/world-news494.test.mjs (6 casos).
+LIMITACIÓN: el fallo previo de pruebas de la vitrina de trofeos es independiente y no se modifica en este parche.
