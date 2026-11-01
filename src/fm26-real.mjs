@@ -26,8 +26,9 @@ export function convertFM26(fm,clubId,year=2026){
 }
 /* La aprobación sólo acepta una evidencia EXTERNA real, no una etiqueta del paquete. */
 export function verifyFM26Mapping(mapping,expectedClubId=null){
- return !!(mapping&&mapping.status==='verified'&&mapping.genderVerified===true&&mapping.countryVerified===true&&
-  typeof mapping.evidence==='string'&&mapping.evidence.trim().length>=12&&
+ return !!(mapping&&((mapping.status==='verified'&&mapping.genderVerified===true&&mapping.countryVerified===true)||
+  (mapping.status==='local-matched'&&mapping.localOnly===true&&['pilot-id-country','unique-name-country'].includes(mapping.matchMethod)))&&
+  (mapping.status==='local-matched'||(typeof mapping.evidence==='string'&&mapping.evidence.trim().length>=12))&&
   /^\d+$/.test(String(mapping.fmUID))&& /^\d+$/.test(String(mapping.fmCountryId))&&
   String(mapping.isoCountry||'')===String(mapping.clubId||'').slice(0,2).toUpperCase()&&
   (!expectedClubId||mapping.clubId===expectedClubId)&&/^[a-z]{2}-\d+$/.test(String(mapping.clubId)));
