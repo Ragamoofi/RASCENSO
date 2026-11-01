@@ -197,3 +197,12 @@ export async function searchWorldClubs(term,{limit=40,offset=0}={}){
  matches.sort((a,b)=>Number(b.players)-Number(a.players));
  return {total:matches.length,results:matches.slice(offset,offset+limit)};
 }
+
+export async function readWorldClub(fmUID){
+ const index=await getWorldIndex(),entry=index[String(fmUID)];
+ if(!entry)return null;
+ const shard=await getShard(entry.archivo);
+ const club=shard.clubes.find(x=>String(x.club_uid)===String(fmUID)&&String(x.pais_id_fm)===String(entry.pais_id_fm));
+ if(!club)return null;
+ return {uid:String(fmUID),name:club.nombre,players:[...club.jugadores].sort((a,b)=>Number(a.equipo_slot)-Number(b.equipo_slot)||Number(b.ca_fm)-Number(a.ca_fm))};
+}
