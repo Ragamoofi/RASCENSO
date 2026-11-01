@@ -1,0 +1,170 @@
+/* RASCENSO 4.10.2 — Un tablero por etapa. Sin subpestañas ni tarjetas de elección. */
+.cr3 .cr-main.creator4102{padding:12px 18px 18px!important;scrollbar-gutter:stable;scrollbar-width:thin}
+.creator4102>.cr-head{margin:0 0 10px;padding:0 0 9px;border-bottom:1px solid #36516c66}
+.creator4102>.cr-head .section-label{font-size:9px;letter-spacing:.12em;color:#dfaa81}
+.creator4102>.cr-head h1{font-size:27px;line-height:1.04;margin:2px 0 3px}
+.creator4102>.cr-head p{font-size:11.2px;line-height:1.35;margin:0;color:#a9bfd6;max-width:100%}
+/* Un tablero continuo de decisiones, en vez de tarjetas independientes. */
+.creator4102 .cr4102-board{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:start;margin:9px 0 0}
+.creator4102 .cr4102-decision,.creator4102 .cr4102-fan-panel{min-width:0;margin:0;padding:10px 12px 12px;background:linear-gradient(150deg,#152c43,#0d2236);border:1px solid #36546c;border-radius:11px;box-shadow:inset 0 1px 0 #ffffff09}
+.creator4102 .cr4102-decision>header{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:0 0 8px;padding-bottom:7px;border-bottom:1px solid #284761}
+.creator4102 .cr4102-decision>header h3{display:flex;align-items:center;gap:7px;font-size:11px;letter-spacing:.09em;color:#f0b580;margin:0;font-weight:900}
+.creator4102 .cr4102-decision>header small{font-size:10px;line-height:1.3;color:#92acc5}
+.creator4102 .cr4102-accent{display:inline-block;width:3px;height:13px;border-radius:3px;background:#ebae78}
+/* Selector estilo marcador/planilla: no son los cuadros anteriores. */
+.creator4102 .cr4102-options,.creator4102 .cr-grid.cr4102-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px 6px;margin:0}
+.creator4102 .cr4102-options[data-count="2"]{grid-template-columns:repeat(2,minmax(0,1fr))}
+.creator4102 .cr4102-options[data-count="3"],.creator4102 .cr4102-options[data-count="4"]{grid-template-columns:repeat(2,minmax(0,1fr))}
+.creator4102 .cr4102-choice{position:relative;display:flex;align-items:center;min-width:0;min-height:32px;padding:6px 8px 6px 15px;color:#acc8df;border-bottom:1px solid #35547270;border-radius:5px;cursor:pointer;transition:background .12s,color .12s}
+.creator4102 .cr4102-choice:before{content:'';position:absolute;left:5px;top:50%;transform:translateY(-50%);width:5px;height:5px;border:1px solid #6483a5;border-radius:50%;background:transparent}
+.creator4102 .cr4102-choice:hover{background:#224560;color:#fff}
+.creator4102 .cr4102-choice.on{background:#28405a;color:#fff;border-bottom-color:#ce986d;box-shadow:inset 0 -2px 0 #e6ac78}
+.creator4102 .cr4102-choice.on:before{background:#eeb783;border-color:#eeb783;box-shadow:0 0 0 2px #eeb78322}
+.creator4102 .cr4102-choice:focus-within{outline:2px solid #efba88;outline-offset:1px}
+.creator4102 .cr4102-choice input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;margin:0}
+.creator4102 .cr4102-choice .cr-ico,.creator4102 .cr4102-choice .cr-chips,.creator4102 .cr4102-choice .cr-body>small{display:none!important}
+.creator4102 .cr4102-choice .cr-body{display:block;min-width:0;width:100%}
+.creator4102 .cr4102-choice .cr-body strong{display:block;font-size:10.6px;font-weight:750;line-height:1.24;white-space:normal;padding:0;color:inherit;overflow-wrap:anywhere}
+.creator4102 .cr4102-choice .cr-rec{display:none}
+/* Una única ficha contextual por categoría: muestra los efectos de lo elegido. */
+.creator4102 .cr4102-detail{margin-top:8px;padding:8px 10px;background:#0b1d2e;border-radius:7px;border-left:2px solid #dc9e6d;min-height:53px}
+.creator4102 .cr4102-detail-title{display:flex;align-items:center;gap:7px;font-size:11.5px;color:#ffe0c6;font-weight:900;line-height:1.2}
+.creator4102 .cr4102-check{display:grid;place-items:center;width:15px;height:15px;border-radius:50%;background:#dca26f;color:#122132;font-size:10px;font-weight:900;flex:none}
+.creator4102 .cr4102-detail p{font-size:10.3px;color:#aac3d5;line-height:1.27;margin:4px 0}
+.creator4102 .cr4102-detail .cr-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.creator4102 .cr4102-detail .cr-chips i{font-size:9.3px;line-height:1.2;padding:2px 6px;white-space:normal}
+/* Identidad: cancha y campos arriba, todas las elecciones inmediatamente abajo. */
+.creator4102 .cr4102-ident-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.92fr);gap:13px;margin:0}
+.creator4102 .cr4102-ident-layout>.cr-left,.creator4102 .cr4102-ident-layout>.cr-right{min-width:0}
+.creator4102 .cr4102-ident-layout .cr-fields{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) 83px;gap:7px}
+.creator4102 .cr4102-ident-layout .field{gap:5px;font-size:10px}
+.creator4102 .cr4102-ident-layout .field input,.creator4102 .cr4102-ident-layout .field select{height:36px;padding:0 8px;font-size:11px}
+.creator4102 .cr4102-ident-layout .cr-sugg{gap:4px;margin:4px 0 0}
+.creator4102 .cr4102-ident-layout .cr-pill{height:23px;min-width:27px;padding:0 6px;font-size:10px}
+.creator4102 .cr4102-ident-layout .cr-pitch{height:225px;min-height:0}
+.creator4102 .cr4102-ident-layout .pitch-dot b{width:30px;height:30px;font-size:9px}
+.creator4102 .cr4102-ident-layout .pitch-dot em{font-size:8px;top:34px}
+.creator4102 .cr4102-ident-layout .cr-selected{margin:5px 0 0;padding:6px 9px}
+.creator4102 .cr4102-ident-board{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.creator4102 .cr4102-ident-board>.cr4102-decision:last-child:nth-child(odd){grid-column:1/-1}
+.creator4102 .cr4102-ident-board>.cr4102-decision:last-child:nth-child(odd) .cr4102-options{grid-template-columns:repeat(3,minmax(0,1fr))}
+.creator4102 .cr4102-presets{margin-top:8px;border:1px solid #33536b;border-radius:8px;padding:6px 10px;background:#10263b;font-size:10px;color:#b4cadc}
+.creator4102 .cr4102-presets summary{cursor:pointer;color:#d7b087;font-weight:850}
+.creator4102 .cr4102-presets .cr-presets{margin:8px 0 2px}
+/* Raíces / Futbolista / Sueños: información contextual sin bloques gigantes. */
+.creator4102 .cr4102-roots-intro{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0}
+.creator4102 .cr4102-roots-intro .field{gap:5px;font-size:10.5px}
+.creator4102 .cr4102-roots-intro input{height:36px}
+.creator4102 .cr4102-roots-intro textarea{min-height:52px;height:52px;resize:vertical;padding:8px}
+.creator4102 .cr4102-profile-intro{display:grid;grid-template-columns:minmax(0,.45fr) minmax(0,1fr);gap:10px;margin:0}
+.creator4102 .cr4102-profile-intro .cr-selected{margin:4px 0;padding:7px 10px}
+.creator4102 .cr4102-profile-intro .cr-profile{padding:7px 11px}
+.creator4102 .cr4102-profile-intro .cr-bar{margin:2px 0;font-size:10px}
+.creator4102 .cr4102-dream-board>.cr4102-decision:first-child{grid-column:1/-1}
+.creator4102 .cr4102-dream-board>.cr4102-decision:first-child .cr4102-options{grid-template-columns:repeat(5,minmax(0,1fr))}
+.creator4102 .cr4102-dream-board .cr-dream{margin-top:8px;padding:8px 12px;grid-template-columns:30px 1fr 1.2fr;gap:9px}
+.creator4102 .cr4102-dream-board .cr-dream .cr-ico{height:30px;width:30px;font-size:16px}
+.creator4102 .cr4102-fan-panel .cr-fan{padding:0}
+.creator4102 .cr4102-fan-panel .cr-fanrow{gap:8px;margin:4px 0}
+.creator4102 .cr4102-fan-panel .cr-fanrow .field{display:none}
+.creator4102 .cr4102-fan-panel .cr-fanrow .team-badge{max-height:35px;max-width:35px}
+.creator4102 .cr4102-fan-panel .cr-fan>small{font-size:10px}
+.creator4102 .cr4102-fan-search{min-width:0}
+.creator4102 .cr4102-search-label{display:block;font-size:9px;font-weight:900;letter-spacing:.09em;color:#edb887;margin-top:8px}
+.creator4102 .cr4102-club-input{display:block;width:100%;margin-top:4px;height:35px;border:1px solid #4e7692;border-radius:7px;background:#081c2e;color:#fff;padding:0 10px;font-size:11.5px;outline:0}
+.creator4102 .cr4102-club-input:focus{border-color:#ecad77;box-shadow:0 0 0 2px #e4a56b24}
+.creator4102 .cr4102-selected-club{font-size:10.5px;color:#8ee0bf;margin:7px 0 2px;font-weight:800}
+.creator4102 .cr4102-search-status{display:block;font-size:9.8px;color:#8ca8c1;margin:4px 0}
+.creator4102 .cr4102-club-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px 6px;max-height:120px;overflow-y:auto}
+.creator4102 .cr4102-club-result{display:flex;align-items:center;justify-content:space-between;gap:5px;background:#11283e;color:#c8dbea;border:0;border-bottom:1px solid #35546b;text-align:left;min-height:30px;padding:5px 6px;border-radius:4px}
+.creator4102 .cr4102-club-result:hover,.creator4102 .cr4102-club-result.selected{background:#29425b;color:#ffe3ca}
+.creator4102 .cr4102-club-result b{font-size:10.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.creator4102 .cr4102-club-result small{font-size:9px;color:#8daabe;flex:none}
+.creator4102 .cr4102-no-club{color:#a9bed1;font-size:10px}
+.creator4102 .cr4102-fan-manual{margin-top:7px;font-size:10px;color:#a9c1d7}
+.creator4102 .cr4102-fan-manual summary{cursor:pointer;color:#b9d4e9}
+.creator4102 .cr4102-fan-manual .field{display:flex;margin:6px 0}
+.creator4102 .cr4102-fan-manual select{height:36px;font-size:11px}
+.creator4102 .cr4102-report{margin-top:7px;border-top:1px solid #37536a;padding:5px;font-size:10px;color:#a8bbcf}
+.creator4102 .cr4102-report summary{cursor:pointer;font-weight:800}
+.creator4102 .cr4102-report .cr-report{margin:6px 0 0;font-size:10.5px}
+/* Resumen como una ficha de información, en filas y sin tarjetas por todas partes. */
+.creator4102.cr4102-summary .cr-oneliner{padding:8px 12px;font-size:12px;margin:0 0 9px}
+.creator4102.cr4102-summary .cr-sumgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px;background:#112940;border:1px solid #31516c;border-radius:9px;overflow:hidden}
+.creator4102.cr4102-summary .cr-sum{border:0;border-radius:0;background:none;border-bottom:1px solid #304a6370;min-height:50px;padding:7px 10px}
+.creator4102.cr4102-summary .cr-sum header{margin:0 0 3px;gap:8px;grid-template-columns:24px 1fr auto}
+.creator4102.cr4102-summary .cr-sum .cr-ico{width:24px;height:24px;font-size:12px}
+.creator4102.cr4102-summary .cr-sum strong{font-size:11.7px}
+.creator4102.cr4102-summary .cr-sum small{font-size:9px}
+.creator4102.cr4102-summary .cr-sum .cr-chips i{font-size:9px;padding:1px 5px}
+.creator4102.cr4102-summary .cr-edit{font-size:10px;padding:3px 7px}
+.creator4102.cr4102-summary .cr-next{padding:9px 12px;margin-top:8px}
+/* Mejor uso del espacio de la columna derecha */
+.cr3:has(.creator4102) .cr-poster .poster-kit-wrap{height:150px;margin:4px 0}
+.cr3:has(.creator4102) .cr-poster{padding:9px 14px}
+.cr3:has(.creator4102) .cr-effects{padding:9px 12px}
+@media(max-width:1350px){
+ .creator4102 .cr4102-options,.creator4102 .cr-grid.cr4102-options{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .creator4102 .cr4102-dream-board>.cr4102-decision:first-child .cr4102-options{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:880px){
+ .cr3 .cr-main.creator4102{padding:10px!important}
+ .creator4102 .cr4102-board,.creator4102 .cr4102-ident-layout,.creator4102 .cr4102-roots-intro,.creator4102 .cr4102-profile-intro{grid-template-columns:1fr}
+ .creator4102 .cr4102-ident-layout .cr-pitch{height:255px}
+ .creator4102 .cr4102-dream-board>.cr4102-decision:first-child .cr4102-options{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .creator4102 .cr4102-ident-board>.cr4102-decision:last-child:nth-child(odd){grid-column:auto}
+}
+@media(max-width:500px){
+ .creator4102 .cr4102-options,.creator4102 .cr-grid.cr4102-options,.creator4102 .cr4102-dream-board>.cr4102-decision:first-child .cr4102-options{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .creator4102 .cr4102-ident-layout .cr-fields{grid-template-columns:1fr 1fr}
+ .creator4102 .cr4102-ident-layout .cr-fields .field:first-child{grid-column:1/-1}
+ .creator4102 .cr4102-club-results{grid-template-columns:1fr}
+ .creator4102.cr4102-summary .cr-sumgrid{grid-template-columns:1fr}
+}
+
+/* RASCENSO 4.10.3 — armonía visual extra para Identidad y la tarjeta lateral */
+.creator4103 .cr4103-ident-layout{grid-template-columns:minmax(0,1.12fr) minmax(350px,.88fr);align-items:start;gap:14px}
+.creator4103 .cr4103-ident-layout>.cr-left{display:grid;gap:10px;align-content:start}
+.creator4103 .cr4103-ident-layout>.cr-right{display:flex;flex-direction:column;gap:8px;align-content:start}
+.creator4103 .cr4103-ident-layout .cr-fields{margin:0}
+.creator4103 .cr4103-ident-inline{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:0}
+.creator4103 .cr4103-ident-inline .cr4102-decision{padding:9px 10px 10px}
+.creator4103 .cr4103-ident-inline .cr4102-options{grid-template-columns:repeat(2,minmax(0,1fr))}
+.creator4103 .cr4103-ident-inline .cr4102-options[data-count="2"]{grid-template-columns:repeat(2,minmax(0,1fr))}
+.creator4103 .cr4103-ident-inline .cr4102-options[data-count="4"]{grid-template-columns:repeat(2,minmax(0,1fr))}
+.creator4103 .cr4103-ident-inline .cr4102-detail{min-height:0;padding:7px 9px}
+.creator4103 .cr4103-ident-inline .cr4102-choice{min-height:30px;padding:5px 8px 5px 15px}
+.creator4103 .cr4103-ident-inline .cr4102-choice .cr-body strong{font-size:10.2px}
+.creator4103 .cr4103-ident-layout .cr-label{margin-bottom:4px}
+.creator4103 .cr4103-ident-layout .cr-pitch{height:230px}
+.creator4103 .cr4103-ident-layout .cr-selected{margin:0;padding:8px 10px;border-radius:10px;background:linear-gradient(180deg,#11283f,#0c2032);border:1px solid #30516b}
+.creator4103 .cr4102-ident-board{margin-top:10px}
+.creator4103 .cr4102-ident-board .cr4102-decision{max-width:none}
+.creator4103 .cr4102-presets{margin-top:10px}
+
+/* Tarjeta lateral provisional con fondo más trabajado y menos vacío visual */
+.cr3:has(.creator4103) .creation-aside.cr-aside{background:linear-gradient(160deg,#1a3959,#0a1f33 72%)}
+.cr3:has(.creator4103) .cr-poster{padding:11px 14px 10px;background:linear-gradient(180deg,#1a3553,#132b44 60%,transparent)}
+.cr3:has(.creator4103) .cr-poster .poster-top{margin-bottom:6px}
+.cr3:has(.creator4103) .cr-poster .poster-kit-wrap{position:relative;height:156px;margin:5px 0 9px;border:1px solid #355775;border-radius:24px;background:radial-gradient(circle at 50% 8%,#8fb6ff18 0,transparent 36%),radial-gradient(circle at 18% 85%,#7eb6cf14 0,transparent 25%),linear-gradient(155deg,#294a6f,#16314c 64%,#10243a);box-shadow:inset 0 1px 0 #ffffff12,inset 0 -24px 50px #050d171f,0 10px 24px #07112028;overflow:hidden;isolation:isolate}
+.cr3:has(.creator4103) .cr-poster .poster-kit-wrap:before{content:'';position:absolute;inset:0;background:linear-gradient(130deg,transparent 0 58%,#ffffff05 58% 61%,transparent 61%),repeating-linear-gradient(115deg,transparent 0 19px,#ffffff04 19px 20px);pointer-events:none}
+.cr3:has(.creator4103) .cr-poster .kit-halo{width:190px;height:190px;border-color:#aac7ee24;background:radial-gradient(circle,#b6d0ee18 0,transparent 70%);box-shadow:0 0 40px #6d93bf21}
+.cr3:has(.creator4103) .cr-poster .kit-country-seal{width:156px;height:156px;gap:6px;border-radius:50%;background:radial-gradient(circle at 50% 32%,#5479a8,#244366 68%,#18304b);border:1px solid #9cc0e14a;box-shadow:0 14px 36px #07132665,inset 0 0 32px #c1d7f212}
+.cr3:has(.creator4103) .cr-poster .kit-country-seal>span{font-size:48px;line-height:1.05;filter:drop-shadow(0 6px 10px #07132680)}
+.cr3:has(.creator4103) .cr-poster .kit-country-seal strong{font-size:18px;line-height:1.05}
+.cr3:has(.creator4103) .cr-poster .kit-country-seal small{font-size:8px;letter-spacing:.16em}
+.cr3:has(.creator4103) .cr-poster .kit-badge{bottom:9px;padding:5px 10px;font-size:9px;letter-spacing:.08em;background:#0f253be6}
+.cr3:has(.creator4103) .cr-who{margin-top:5px;align-items:flex-start;gap:10px}
+.cr3:has(.creator4103) .cr-num{font-size:31px}
+.cr3:has(.creator4103) .cr-who strong{font-size:27px;line-height:1}
+.cr3:has(.creator4103) .cr-who small{font-size:11px;line-height:1.32}
+.cr3:has(.creator4103) .cr-effects{padding:10px 12px 13px}
+
+@media(max-width:1180px){
+ .creator4103 .cr4103-ident-layout{grid-template-columns:1fr}
+ .creator4103 .cr4103-ident-inline{grid-template-columns:1fr}
+ .creator4103 .cr4103-ident-layout .cr-pitch{height:245px}
+}
+@media(max-width:880px){
+ .creator4103 .cr4103-ident-inline{grid-template-columns:1fr}
+}
