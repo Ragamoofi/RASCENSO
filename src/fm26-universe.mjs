@@ -66,7 +66,7 @@ function proposeMappings(index){
    const pilot=expected6[club.id];
    let candidates=pilot?(index[pilot.uid]&&String(index[pilot.uid].pais_id_fm)===pilot.pais?[{uid:pilot.uid,...index[pilot.uid]}]:[]):(byLabel.get(cleanup(club.name))||[]).filter(x=>String(x.pais_id_fm)===fmCountry);
    if(candidates.length!==1||used.has(candidates[0].uid))continue;
-   const entry=candidates[0];if(Number(entry.n_primer_equipo)<9)continue;
+   const entry=candidates[0];if(Number(entry.n_primer_equipo)<11)continue;
    mapping[club.id]={clubId:club.id,fmUID:String(entry.uid),fmCountryId:String(fmCountry),isoCountry:country.code,
     matchMethod:pilot?'pilot-id-country':'unique-name-country',status:'local-matched',localOnly:true,
     candidate:true,coverage:Number(entry.n_primer_equipo),fmName:entry.nombre};
@@ -88,9 +88,10 @@ export async function installWorldDatabase(file,{onProgress=()=>{}}={}){
  const idxName=matchEnd(entries,'/runtime/indice_clubes.json');if(!idxName)throw Error('El ZIP no contiene el índice mundial de clubes.');
  const index=json(await unpackZIPEntry(bytes,entries.get(idxName)));
  const related=[...entries].filter(([name])=>startsWithFM(name)&&/\/runtime\/(por_pais|libres)\//.test(name));
- const batches=[],dirBatches=[];let nPlayers=0,nFree=0,processed=0;
+ const batches=[],dirBatches=[];let nPlayers=0,nFree=0,processed=0,freeFiles=[];
  for(const [name,entry] of related){
   const key=name.slice(name.indexOf('/runtime/')+9),free=key.startsWith('libres/');
+  if(free)freeFiles.push(key);
   const blob=bytes.slice(entry.local+30+new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength).getUint16(entry.local+26,true)+new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength).getUint16(entry.local+28,true),
    entry.local+30+new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength).getUint16(entry.local+26,true)+new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength).getUint16(entry.local+28,true)+entry.compressed);
   batches.push([key,{data:blob,method:entry.method,size:entry.size,free}]);
@@ -105,7 +106,7 @@ export async function installWorldDatabase(file,{onProgress=()=>{}}={}){
  if(dirBatches.length)await dbPutMany(DIR,dirBatches);
  const map=proposeMappings(index);
  const info={schema:2,installedAt:Date.now(),players:nPlayers,freePlayers:nFree,total:nPlayers+nFree,shards:related.length,
-  clubs:Object.keys(index).length,mapped:map.mapped};
+  clubs:Object.keys(index).length,mapped:map.mapped,freeFiles};
  await dbPutMany(META,[['index',index],['mapping',map],['info',info]]);
  cachedIndex=index;cachedMapping=map;clearFM26Memory();
  onProgress({processed,total:related.length,players:info.total,done:true,mapped:info.mapped});
