@@ -19,25 +19,43 @@ export function installClubUI(root,getState){
  getWorldIndex().then(index=>{for(const [uid,c] of Object.entries(index||{})){const k=String(c.nombre||'').trim().toLocaleLowerCase('es');if(!k)continue;worldNames.set(k,worldNames.has(k)?null:{kind:'world',id:uid});}annotate()}).catch(()=>{});
  function close(){if(dialog?.open)dialog.close();}
  async function open(ref){
-  const token=++seq;previousFocus=document.activeElement;
+  const token=++seq;if(!dialog)previousFocus=document.activeElement;
   if(dialog){dialog.close();dialog.remove()}
   dialog=document.createElement('dialog');dialog.className='club-modal495';dialog.setAttribute('aria-labelledby','club495-title');
   dialog.innerHTML='<div class="club495-loading">Cargando plantilla… <button type="button" data-close aria-label="Cerrar">×</button></div>';
   document.body.append(dialog);let active=dialog;
   active.addEventListener('close',()=>{active.remove();if(dialog===active){dialog=null;previousFocus?.focus?.()}});
-  active.addEventListener('click',e=>{if(e.target===active||e.target.closest('[data-close]'))close()});
+  active.addEventListener('click',e=>{
+   const pick=e.target.closest('[data-world-uid]');
+   if(pick){e.preventDefault();open({kind:'world',id:pick.dataset.worldUid});return;}
+   if(e.target===active||e.target.closest('[data-close]'))close();
+  });
   active.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close()}},true);
   active.showModal();
   try{const data=await loadClubSquad(ref,getState()||{});if(token!==seq||active!==dialog||!active.open)return;
    const actual=data.players.filter(p=>p.ovr!=null&&Number.isFinite(Number(p.ovr)));
    const avg=actual.length?(actual.reduce((sum,p)=>sum+Number(p.ovr),0)/actual.length).toFixed(1):'—';
    const info=data.club, country=info?.country||fmNationName(data.entry?.pais_id_fm)||'País sin identificar';
-   active.innerHTML=`<div class="club495-shell"><header class="club495-head">${info?badge(info,'large'):'<div class="club495-icon">⚽</div>'}<div><small>RASCENSO · FICHA DE CLUB</small><h2 id="club495-title">${esc(data.name)}</h2><p>${esc(country)}${info?.league?' · '+esc(info.league):''}</p></div><button type="button" data-close aria-label="Cerrar ficha">×</button></header><div class="club495-stats"><div><b>${data.players.length}</b><span>FUTBOLISTAS</span></div><div><b>${avg}</b><span>MEDIA DEL PLANTEL</span></div>${info?.prestige!=null?`<div><b>${esc(info.prestige)}</b><span>PRESTIGIO</span></div>`:''}${info?.level!=null?`<div><b>${esc(info.level)}</b><span>NIVEL</span></div>`:''}</div><p class="club495-note">${data.hasWorld?(data.simulationMapped?'Plantilla original con cambios registrados en tu carrera. Los jugadores sin seguimiento conservan sus datos de origen.':'Datos originales de la base mundial. La simulación aún no gestiona este club completo.'):'No hay plantilla mundial vinculada de forma segura a este club; se muestran únicamente futbolistas registrados por la simulación.'}</p><div class="club495-controls"><label><span>Buscar jugador</span><input type="search" data-search placeholder="Nombre o posición" autocomplete="off"></label><label><span>Posición</span><select data-group><option value=''>Todas</option>${groups.map(g=>`<option value="${g}">${g}</option>`).join('')}</select></label><label><span>Ordenar por</span><select data-sort><option value="ovr">Media</option><option value="name">Nombre</option><option value="age">Edad</option><option value="pos">Posición</option></select></label></div><div class="club495-list" tabindex="0"></div></div>`;
+   const needsLink=!data.hasWorld&&ref.kind==='game';
+   const suggestionList=data.candidates||[];
+   const suggestionPanel=needsLink?`<section class="club495-recovery"><h3>Buscar plantilla original</h3><p>Este club del juego aún no tiene una equivalencia confirmada. Puedes consultar sus jugadores en la base mundial sin alterar tu partida.</p><label>Buscar nombre original del equipo<input type="search" data-world-find placeholder="Nombre del club" autocomplete="off"></label><div class="club495-suggestions" data-world-results></div></section>`:'';
+   active.innerHTML=`<div class="club495-shell"><header class="club495-head">${info?badge(info,'large'):'<div class="club495-icon">⚽</div>'}<div><small>RASCENSO · FICHA DE CLUB</small><h2 id="club495-title">${esc(data.name)}</h2><p>${esc(country)}${info?.league?' · '+esc(info.league):''}</p></div><button type="button" data-close aria-label="Cerrar ficha">×</button></header><div class="club495-stats"><div><b>${data.players.length}</b><span>FUTBOLISTAS</span></div><div><b>${avg}</b><span>MEDIA DEL PLANTEL</span></div>${info?.prestige!=null?`<div><b>${esc(info.prestige)}</b><span>PRESTIGIO</span></div>`:''}${info?.level!=null?`<div><b>${esc(info.level)}</b><span>NIVEL</span></div>`:''}</div><p class="club495-note">${data.hasWorld?(data.simulationMapped?'Plantilla original con cambios registrados en tu carrera. Los jugadores sin seguimiento conservan sus datos de origen.':'Datos originales de la base mundial. La simulación aún no gestiona este club completo.'):'No hay plantilla mundial vinculada de forma segura a este club; se muestran únicamente futbolistas registrados por la simulación.'}</p>${suggestionPanel}<div class="club495-controls"><label><span>Buscar jugador</span><input type="search" data-search placeholder="Nombre o posición" autocomplete="off"></label><label><span>Posición</span><select data-group><option value=''>Todas</option>${groups.map(g=>`<option value="${g}">${g}</option>`).join('')}</select></label><label><span>Ordenar por</span><select data-sort><option value="ovr">Media</option><option value="name">Nombre</option><option value="age">Edad</option><option value="pos">Posición</option></select></label></div><div class="club495-list" tabindex="0"></div></div>`;
    const list=active.querySelector('.club495-list'),search=active.querySelector('[data-search]'),sort=active.querySelector('[data-sort]'),group=active.querySelector('[data-group]');
    function paint(){const q=search.value.trim().toLocaleLowerCase('es');const rows=data.players.filter(p=>(!group.value||category(p.pos)===group.value)&&(p.name+' '+p.pos).toLocaleLowerCase('es').includes(q));
     const cmp=(a,b)=>sort.value==='name'?String(a.name).localeCompare(String(b.name),'es'):sort.value==='age'?(Number(b.age)||0)-(Number(a.age)||0):sort.value==='pos'?String(a.pos).localeCompare(String(b.pos),'es'): (Number(b.ovr)||0)-(Number(a.ovr)||0);
     list.innerHTML=groups.map(g=>{let matches=rows.filter(p=>category(p.pos)===g).sort((a,b)=>cmp(a,b)||String(a.name).localeCompare(String(b.name),'es'));if(!matches.length)return '';
       return `<section><h3>${g} <span>${matches.length}</span></h3>${matches.map(p=>`<div class="club495-row"><b class="club495-ovr">${esc(p.ovr??'—')}</b><div class="club495-name"><strong>${flag(p.cc)} ${esc(p.name)}</strong><small>${esc(p.fmNationId!=null?fmNationName(p.fmNationId):(p.cc||'Nacionalidad sin identificar'))} · ${esc(p.source==='base'?'Base original':p.source==='tu carrera'?'Tu futbolista':'Carrera simulada')}</small></div><span>${esc(p.pos||'—')}</span><span>${p.age==null?'—':esc(p.age)+' años'}</span><span>${p.ovr!=null&&p.age!=null?esc(money(marketValueEUR({ovr:p.ovr,age:p.age,potential:p.pot},info))):'—'}</span></div>`).join('')}</section>`}).join('')||'<p class="club495-empty">No hay futbolistas disponibles para esta búsqueda.</p>';}
+   if(needsLink){
+    const field=active.querySelector('[data-world-find]'),results=active.querySelector('[data-world-results]');
+    const all=await getWorldIndex();if(token!==seq||active!==dialog||!active.open)return;
+    const rows=Object.entries(all||{}).map(([uid,c])=>({uid,name:String(c.nombre||''),count:Number(c.n_jugadores)||0,country:c.pais_id_fm}));
+    const show=term=>{
+     const query=String(term||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+     const available=query?rows.filter(x=>x.name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().includes(query)).slice(0,12):suggestionList;
+     results.innerHTML=available.map(x=>`<button type="button" data-world-uid="${esc(x.uid)}"><strong>${esc(x.name)}</strong><small>${esc(x.count??x.players)} futbolistas · País ${esc(x.country??x.countryId??'—')} · plantilla original</small></button>`).join('')||'<small>Sin coincidencias. Prueba otro nombre.</small>';
+    };
+    show('');field.addEventListener('input',()=>show(field.value));
+   }
    search.addEventListener('input',paint);sort.addEventListener('change',paint);group.addEventListener('change',paint);paint();active.querySelector('[data-close]').focus();
   }catch(err){if(active===dialog&&active.open)active.innerHTML=`<div class="club495-loading"><h2 id="club495-title">No se pudo cargar el club</h2><p>${esc(err.message)}</p><button type="button" data-close>Cerrar</button></div>`;}
  }
