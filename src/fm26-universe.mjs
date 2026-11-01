@@ -5,6 +5,7 @@
 import {COUNTRIES} from './countries.mjs';
 import {fm26OVR,registerFM26Club,clearFM26Memory,isRealClubReady,getFM26Squad,getFM26PlayerById,loadedFM26Clubs} from './fm26-real.mjs';
 import {zipEntries,unpackZIPEntry} from './fm26-local.mjs';
+import {bundledWorldManifest,bundledClubIndex,bundledDirectory,bundledShard} from './fm26-bundled.mjs';
 const DB='rascenso-fm26-world-v2',VERSION=1;
 const CLUBS='shards',META='meta',DIR='directory',FREE='free';
 const cleanup=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/&/g,' and ').replace(/\b(futbol club|football club|club deportivo|club de futbol|club social y deportivo)\b/g,' ').replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ');
@@ -112,9 +113,21 @@ export async function installWorldDatabase(file,{onProgress=()=>{}}={}){
  onProgress({processed,total:related.length,players:info.total,done:true,mapped:info.mapped});
  return info;
 }
-export async function getWorldDatabaseInfo(){return await dbGet(META,'info')||null}
-export async function getWorldMappingInfo(){return cachedMapping||await dbGet(META,'mapping')||null}
-export async function getWorldIndex(){return cachedIndex||(cachedIndex=await dbGet(META,'index'))||{}}
+export async function getWorldDatabaseInfo(){
+ const bundled=await bundledWorldManifest();
+ if(bundled){const mappings=await getWorldMappingInfo();return {...bundled,mapped:mappings?.mapped||0,installedAt:0,bundled:true,ready:true}}
+ return await dbGet(META,'info')||null;
+}
+export async function getWorldMappingInfo(){
+ if(cachedMapping)return cachedMapping;
+ if(await bundledWorldManifest())return cachedMapping=proposeMappings(await getWorldIndex());
+ return await dbGet(META,'mapping')||null;
+}
+export async function getWorldIndex(){
+ if(cachedIndex)return cachedIndex;
+ const bundled=await bundledWorldManifest();
+ return cachedIndex=bundled?(await bundledClubIndex()):(await dbGet(META,'index'))||{};
+}
 async function inflateStored(r){
  if(!r)throw Error('El archivo del club no existe en la base local');
  if(r.method===0)return b2u(r.data);
@@ -126,6 +139,7 @@ async function inflateStored(r){
 }
 async function getShard(file){
  const key=String(file).replace(/^runtime\//,'');
+ if(await bundledWorldManifest())return bundledShard(key);
  return json(await inflateStored(await dbGet(CLUBS,key)));
 }
 export async function activateWorldClub(clubId,{year=2026}={}){
@@ -153,7 +167,7 @@ export async function activateWorldContext(state,{clubLimit=120}={}){
  return {active,players};
 }
 export async function searchWorldPlayers(term,{limit=70,offset=0,clubUID=null}={}){
- const q=cleanup(term),files=await dbAll(DIR);
+ const q=cleanup(term),files=(await bundledWorldManifest())?[await bundledDirectory()]:await dbAll(DIR);
  const found=[];
  for(const rows of files){
   for(const p of rows){
@@ -167,6 +181,13 @@ export async function searchWorldPlayers(term,{limit=70,offset=0,clubUID=null}={
  return {total:found.length,results:found.slice(offset,offset+limit).map(p=>({...p,clubName:index[p.fmClubUID]?.nombre||'Agente libre'}))};
 }
 export async function getWorldPlayer(id){
+ if(await bundledWorldManifest()){
+  const dir=await bundledDirectory(),entry=dir.find(row=>row[0]===id);
+  if(!entry)return null;
+  const data=await getShard(entry[7]);
+  if(entry[5])return data.clubes.find(c=>String(c.club_uid)===String(entry[5]))?.jugadores.find(p=>p.id===id)||null;
+  return data.jugadores?.find(p=>p.id===id)||null;
+ }
  const all=await dbAll(DIR);
  for(const shard of all){
   const match=shard.find(p=>p[0]===id);
