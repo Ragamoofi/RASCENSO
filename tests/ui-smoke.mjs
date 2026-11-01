@@ -34,4 +34,4 @@ assert.match(root.innerHTML,/CENTRO DE PARTIDO/);
 assert.doesNotMatch(root.innerHTML,/clutch-pick/);
 assert.doesNotMatch(root.innerHTML,/director-dock|Copiar contexto y abrir ChatGPT/);
 assert.doesNotMatch(root.innerHTML,/preseason-bar/);
-console.log('Interfaz RASCENSO 4.9.2 correcta; bandera y mundo no alterados. Tamaño:',root.innerHTML.length);
+console.log('Interfaz editorial RASCENSO correcta; bandera y mundo no alterados. Tamaño:',root.innerHTML.length);
