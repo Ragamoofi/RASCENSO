@@ -1,6 +1,6 @@
 import { retirementView } from './retirement42.mjs';
 import {loadedFM26Clubs,advanceFM26Season} from './fm26-real.mjs';
-import {installWorldDatabase,getWorldDatabaseInfo,getWorldMappingInfo,activateWorldContext,activateWorldClub,searchWorldPlayers,forgetWorldDatabase} from './fm26-universe.mjs';
+import {installWorldDatabase,getWorldDatabaseInfo,getWorldMappingInfo,activateWorldContext,activateWorldClub,searchWorldPlayers,searchWorldClubs,getWorldPlayer,forgetWorldDatabase} from './fm26-universe.mjs';
 import { academyOfferReason } from './engine.mjs';
 /* RASCENSO — Interfaz renovada. Motor y UI independientes. Sin dependencias de framework. */
 import { COUNTRIES } from './countries.mjs';
@@ -31,12 +31,22 @@ import { cardExtras, projectionLine, attributeBar, seasonPanels, optionConsequen
 const ROOT=document.getElementById('app');
 const STORE='rascenso-save-v2',OLD='carrera-mundial-demo-v1';
 let worldDbInfo=null,worldImportStatus='',worldSearchTerm='',worldSearchRows=[],worldSearchTotal=0,worldSearchPending=false;
+let worldClubTerm='',worldClubRows=[],worldClubTotal=0;
 function worldPlayerSearchView(){
  if(!worldDbInfo)return '<div class="fm-world-empty">Instala una vez la base mundial desde ⚙ Opciones para consultar futbolistas reales de todos los países y clubes.</div>';
  return '<section class="fm-world-search"><div class="fm-world-summary"><b>BASE MUNDIAL INSTALADA</b><strong>'+n(worldDbInfo.total)+' futbolistas</strong><small>'+n(worldDbInfo.clubs)+' clubes de origen · '+n(worldDbInfo.freePlayers)+' agentes libres · '+n(worldDbInfo.mapped)+' clubes enlazados a RASCENSO</small></div>'+
  '<form id="fm-world-search"><input name="player-search" aria-label="Buscar futbolista" value="'+h(worldSearchTerm)+'" placeholder="Buscar jugador de cualquier club o país…" autocomplete="off"><button class="action main" type="submit">Buscar</button></form>'+
- '<div class="fm-world-results">'+(worldSearchPending?'Buscando en la base mundial…':worldSearchRows.length?worldSearchRows.map(p=>'<div class="fm-world-person"><b>'+h(p.name)+'</b><small>'+h(p.position)+' · '+Number(p.age)+' años · '+h(p.fmClubUID||'Agente libre')+'</small><strong>'+Number(p.ovr||0)+'</strong></div>').join(''):worldSearchTerm?'Sin coincidencias para esa búsqueda.':'Busca por nombre para explorar el mundo futbolístico.')+'</div>'+
+ '<div class="fm-world-results">'+(worldSearchPending?'Buscando en la base mundial…':worldSearchRows.length?worldSearchRows.map(p=>'<button type="button" class="fm-world-person" data-action="fm-world-player" data-id="'+h(p.id)+'"><b>'+h(p.name)+'</b><small>'+h(p.position)+' · '+Number(p.age)+' años · '+h(p.clubName||'Agente libre')+'</small><strong>'+Number(p.ovr||0)+'</strong></button>').join(''):worldSearchTerm?'Sin coincidencias para esa búsqueda.':'Busca por nombre para explorar el mundo futbolístico.')+'</div>'+
+ '<form id="fm-world-club-search"><input name="club-search" aria-label="Buscar equipo" placeholder="Buscar cualquiera de los 12.725 clubes…" value="'+h(worldClubTerm)+'" autocomplete="off"><button class="action secondary" type="submit">Clubes</button></form>'+
+ '<div class="fm-world-results">'+worldClubRows.map(c=>'<div class="fm-world-person"><b>'+h(c.name)+'</b><small>'+h(c.players)+' futbolistas · '+h(c.firstTeam)+' primera plantilla</small><strong>'+h(c.countryId)+'</strong></div>').join('')+'</div>'+
+ '<small class="fm-world-footnote">Clubes encontrados: '+n(worldClubTotal)+'.</small>'+
  '<small class="fm-world-footnote">'+(worldSearchTerm?n(worldSearchTotal)+' coincidencias en el catálogo completo. ':'')+'Plantillas y nombres importados desde tu archivo local. No se envían a ningún servidor.</small></section>';
+}
+async function runWorldClubSearch(term){
+ worldClubTerm=String(term||'').trim().slice(0,70);
+ try{const data=await searchWorldClubs(worldClubTerm,{limit:40});worldClubRows=data.results;worldClubTotal=data.total}
+ catch(err){worldClubRows=[];worldClubTotal=0;worldImportStatus='Error: '+err.message}
+ if(tab==='mundo')render();
 }
 async function runWorldSearch(term){
  worldSearchTerm=String(term||'').trim().slice(0,70);worldSearchPending=true;
@@ -266,7 +276,7 @@ ROOT.addEventListener('change',e=>{if(e.target.closest('#creation-form')){gather
  }).catch(err=>{worldImportStatus='No se pudo importar: '+err.message;render();alert(worldImportStatus)});return;
  }if(e.target.id==='import-file'){const file=e.target.files?.[0];if(!file)return;file.text().then(x=>{let data=migrateCareer(JSON.parse(x));if(!data)throw Error('Archivo incompatible');if(!confirm('¿Reemplazar la partida actual por este guardado?'))return;showNew=false;mutate(data);}).catch(err=>alert(`Error al importar: ${err.message}`));}});
 ROOT.addEventListener('input',e=>{if(e.target.closest('#creation-form')&&e.target.name){draft[e.target.name]=e.target.value;saveDraft();if(e.target.name==='story'){const c=document.getElementById('story-count');if(c)c.textContent=`${e.target.value.length}/180`;}if(e.target.name==='name'||e.target.name==='number'){const aside=document.querySelector('.cr-who');if(aside){const strong=aside.querySelector('strong');if(strong&&e.target.name==='name')strong.textContent=e.target.value||'TU NOMBRE';const num=aside.querySelector('.cr-num');if(num&&e.target.name==='number')num.textContent='#'+(e.target.value||'9');}}}});
-ROOT.addEventListener('submit',e=>{if(e.target.id==='fm-world-search'){e.preventDefault();runWorldSearch(new FormData(e.target).get('player-search'));return;}if(e.target.id==='creation-form'){e.preventDefault();wizard===5?begin():((gather(),wizard++,render()));}});
+ROOT.addEventListener('submit',e=>{if(e.target.id==='fm-world-search'){e.preventDefault();runWorldSearch(new FormData(e.target).get('player-search'));return;}if(e.target.id==='fm-world-club-search'){e.preventDefault();runWorldClubSearch(new FormData(e.target).get('club-search'));return;}if(e.target.id==='creation-form'){e.preventDefault();wizard===5?begin():((gather(),wizard++,render()));}});
 ROOT.addEventListener('click',e=>{
  const a=e.target.closest('[data-action]');if(!a||a.disabled)return;
  const action=a.dataset.action;
@@ -335,6 +345,12 @@ ROOT.addEventListener('click',e=>{
  if(action==='export'){download();return;}
  if(action==='share-png'){shareCareerPNG().catch(err=>alert('No se pudo generar la imagen: '+err.message));return;}
  if(action==='import'){document.getElementById('import-file')?.click();return;}
+ if(action==='fm-world-player'){const id=a.dataset.id;
+ getWorldPlayer(id).then(player=>{if(!player)return;const modal=document.createElement('dialog');modal.className='trophy-spotlight fm-person-spotlight';
+ modal.innerHTML='<div class="trophy-detail-body"><b>FUTBOLISTA DEL MUNDO</b><h2>'+h(player.nombre)+'</h2><p>'+h(player.edad)+' años · '+h((player.posiciones||[]).join(' / '))+'</p><div class="trophy-detail-facts"><div><small>MEDIA</small><strong>'+h(player.ca_fm??'—')+'</strong></div><div><small>POTENCIAL</small><strong>'+h(player.pa_fm??'—')+'</strong></div></div><button type="button" class="action secondary" data-action="fm-person-close">Cerrar</button></div>';
+ ROOT.appendChild(modal);modal.addEventListener('close',()=>modal.remove(),{once:true});modal.showModal();
+ }).catch(err=>alert(err.message));return;}
+ if(action==='fm-person-close'){a.closest('dialog')?.close();return;}
  if(action==='fm-world-import'){document.getElementById('fm-world-file')?.click();return;}
  if(action==='fm-world-clear'){if(!confirm('¿Borrar la base mundial instalada en este navegador? La partida seguirá guardada.'))return;forgetWorldDatabase().then(()=>{worldDbInfo=null;worldSearchRows=[];render()}).catch(e=>alert(e.message));return;}
  if(action==='reset'){if(!confirm('¿Crear una nueva carrera? Exporta la actual antes de reemplazarla.'))return;localStorage.removeItem(STORE);state=null;showNew=false;wizard=0;render();return;}
