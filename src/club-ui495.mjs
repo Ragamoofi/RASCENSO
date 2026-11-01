@@ -50,21 +50,30 @@ export function renderClub497(data,{query='',group='',sort='ovr'}={}){
 
 export function installClubUI(root,getState){
  if(!root||typeof MutationObserver!=='function'||typeof document.createTreeWalker!=='function')return;
- let dialog=null,previousFocus=null,serial=0,worldIndex=null;
+ let dialog=null,previousFocus=null,serial=0,worldIndex=null,openScroll=null;
  const worldNames=new Map();
  getWorldIndex().then(index=>{worldIndex=index||{};for(const [uid,c] of Object.entries(worldIndex)){if(isFemaleClubRecord497(uid,c))continue;const k=normalize(c.nombre);if(!k)continue;worldNames.set(k,worldNames.has(k)?null:{kind:'world',id:uid});}schedule()}).catch(()=>{});
  const close=()=>{if(dialog?.open)dialog.close()};
+ const saveScroll=()=>({top:window.scrollY,left:window.scrollX,panes:[...root.querySelectorAll('*')]
+  .filter(el=>el.scrollHeight>el.clientHeight+15&&el.scrollTop>0)
+  .map(el=>({el,top:el.scrollTop,left:el.scrollLeft}))});
+ const restoreScroll=snap=>{
+  if(!snap)return;
+  for(const p of snap.panes)if(p.el.isConnected){p.el.scrollTop=p.top;p.el.scrollLeft=p.left;}
+  window.scrollTo({top:snap.top,left:snap.left,behavior:'instant'});
+ };
+
  async function open(ref){
   if(!ref)return;
   const token=++serial;
-  if(!dialog)previousFocus=document.activeElement;
+  if(!dialog){previousFocus=document.activeElement;openScroll=saveScroll();}
   if(dialog){dialog.close();dialog.remove()}
   dialog=document.createElement('dialog');dialog.className='club-modal495 club-modal497';dialog.setAttribute('aria-labelledby','club495-title');
   document.body.append(dialog);const active=dialog;
   active.innerHTML='<div class="club497-loading" role="status"><span class="club497-spinner"></span>Cargando plantilla…<button type="button" data-close aria-label="Cerrar">✕</button></div>';
-  active.addEventListener('close',()=>{active.remove();if(dialog===active){dialog=null;previousFocus?.focus?.()}},{once:true});
+  active.addEventListener('close',()=>{active.remove();if(dialog===active){dialog=null;previousFocus?.focus?.({preventScroll:true});restoreScroll(openScroll);requestAnimationFrame(()=>restoreScroll(openScroll));openScroll=null;}},{once:true});
   active.addEventListener('click',e=>{if(e.target===active||e.target.closest('[data-close]'))close()});
-  active.showModal();
+  active.showModal();restoreScroll(openScroll);
   try{
    const data=await loadClubSquad(ref,getState()||{});
    if(serial!==token||dialog!==active||!active.open)return;
@@ -77,7 +86,7 @@ export function installClubUI(root,getState){
    paint();
    active.addEventListener('input',e=>{if(e.target.matches('[data-search]')){filters.query=e.target.value;paint(true)}});
    active.addEventListener('change',e=>{if(e.target.matches('[data-group]'))filters.group=e.target.value;else if(e.target.matches('[data-sort]'))filters.sort=e.target.value;else return;paint(true)});
-   active.querySelector('[data-close]')?.focus();
+   active.querySelector('[data-close]')?.focus({preventScroll:true});restoreScroll(openScroll);
   }catch(err){if(serial===token&&dialog===active&&active.open)active.innerHTML=`<div class="club497-error"><h2 id="club495-title">No se pudo cargar la plantilla</h2><p>${esc(err.message)}</p><button type="button" data-close>Cerrar</button></div>`;}
  }
 
@@ -88,7 +97,7 @@ export function installClubUI(root,getState){
   panel.innerHTML=`<div class="club497-finder-banner"><div class="club497-finder-icon">⌕</div><div class="club497-finder-copy"><small>EXPLORADOR MUNDIAL</small><h3>Encuentra cualquier club</h3><p>Busca equipos y consulta su plantilla original o actualizada.</p></div><button type="button" class="club497-finder-toggle" data-toggle-club-finder aria-expanded="false">Explorar clubes <span>⌄</span></button></div><div class="club497-finder-body" hidden><label class="club497-world-label">Buscar club del mundo<input type="search" data-club-global-search placeholder="Ej. Santiago Wanderers, Real Madrid, Liverpool…" autocomplete="off" aria-label="Buscar cualquier club"></label><div class="club497-results" data-club-global-results aria-live="polite"><p>Escribe al menos dos letras para encontrar clubes de todo el mundo.</p></div></div>`;
   const target=area.querySelector('.fm-world-search');if(target)target.before(panel);else area.prepend(panel);
   const toggle=panel.querySelector('[data-toggle-club-finder]');
-  toggle.addEventListener('click',()=>{const body=panel.querySelector('.club497-finder-body'),show=body.hidden;body.hidden=!show;toggle.setAttribute('aria-expanded',String(show));if(show)panel.querySelector('[data-club-global-search]').focus()});
+  toggle.addEventListener('click',()=>{const body=panel.querySelector('.club497-finder-body'),show=body.hidden;body.hidden=!show;toggle.setAttribute('aria-expanded',String(show));if(show)panel.querySelector('[data-club-global-search]').focus({preventScroll:true})});
   let timer=null,job=0;
   panel.querySelector('[data-club-global-search]').addEventListener('input',e=>{
    clearTimeout(timer);const q=normalize(e.target.value),out=panel.querySelector('[data-club-global-results]');const myJob=++job;

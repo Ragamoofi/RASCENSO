@@ -1,0 +1,37 @@
+RASCENSO 4.9.9 — CORRECCIÓN DE PLANTILLAS ENLAZADAS Y SCROLL
+Base: main del repositorio Ragamoofi/RASCENSO, commit 4f1f26ea14f6413678755b5ee07872e8a2f090ed.
+
+INSTALACIÓN
+1. Extraer este ZIP directamente en Documentos\GitHub\RASCENSO.
+2. Aceptar reemplazar archivos, conservando carpetas src/ y tests/.
+3. Commit y Push origin desde GitHub Desktop.
+4. Verificar "Publicar RASCENSO" (no confundir con la prueba independiente de navegador).
+5. Recargar página con Ctrl+F5.
+
+CAMBIOS
+- Mejor correspondencia entre los IDs jugables y los UID de clubes de la base mundial.
+- Normalización de razones sociales (Club Deportivo, Club de Deportes, SADP, etc.).
+- Coincidencia por país + identidad única del club. No confundir homónimos.
+- Resolución explícita por nombre oficial para Universidad Católica, Deportes Iquique y Santiago Wanderers.
+- Resuelve también desde el nombre original de la base mundial hacia el club jugable cuando es inequívoco.
+- Conserva fichajes, plantilla profesional real (máximo 30), exclusión de registros femeninos identificados y generación tardía de canteranos.
+- Corrige saltos de scroll al abrir/cerrar fichas y tras acciones que reconstruyen la pantalla. Devuelve foco sin desplazar el documento.
+- Ajustes de versión caché 501.
+
+ARCHIVOS
+index.html
+src/club-squads495.mjs
+src/club-ui495.mjs
+src/experience494.mjs
+src/scroll-guard499.mjs
+ tests/club-ux497.test.mjs
+ tests/scroll-guard499.test.mjs
+
+PRUEBAS Y LIMITACIONES
+- 28 pruebas aisladas de clubes/plantillas aprobadas con mocks de dependencias.
+- Las pruebas del scroll verifican la instalación y los mecanismos por lectura de código; no sustituyen una prueba real de navegador.
+- Sintaxis JavaScript y estructura del ZIP verificadas.
+- No se modificó la base mundial ni se escribió ningún guardado.
+- No se pudo ensayar automáticamente todo el índice original comprimido desde este entorno: no prometemos enlazar todos los 874 clubes.
+- Cuando exista ambigüedad real, el juego debe mantener "sin enlace" antes de mezclar plantillas de equipos diferentes.
+- Las X de "Prueba de jugadas en navegador" pueden corresponder a pruebas antiguas de otras áreas; la publicación GitHub Pages es independiente.

@@ -2,6 +2,7 @@ import {getWorldMappingInfo,getWorldIndex,readWorldClub,getWorldPlayer} from './
 import {fm26OVR,fm26Position,applyFM26Delta} from './fm26-real.mjs';
 import {fmNationToCode} from './fm26-nations.mjs';
 import {getClub} from './engine.mjs';
+import {COUNTRIES} from './countries.mjs';
 import {isExcludedPlayer} from './world-exclusions.mjs';
 import {isFemaleClubRecord497,isFemalePlayerRecord497} from './world-gender497.mjs';
 
@@ -12,67 +13,101 @@ function explicitMatch(id,index){const x=explicit[id],entry=x&&index[x.uid];retu
 // RASCENSO y la base mundial usan IDs de club diferentes. No confundir
 // «no enlazado» con «sin jugadores»: buscar una equivalencia segura por
 // país FM y nombre normalizado, sin fusionar homónimos por intuición.
+/**
+ * RASCENSO 4.9.9 — Resolver por identidad del CLUB, nunca por similitud aislada.
+ * La base mundial incluye razones sociales (Club Deportivo, SADP, etc.) y
+ * el catálogo jugable suele mostrar un nombre corto. Enlace automático sólo
+ * si el país FM está confirmado y existe un candidato inequívoco.
+ */
 const normalizeClubName=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'')
- .toLocaleLowerCase('es').replace(/&/g,' y ').replace(/[^a-z0-9]+/g,' ')
- .replace(/\b(?:s a d p|s a d|s a|sadp|sociedad anonima deportiva profesional|sociedad anonima deportiva|s a d|club|clube|atletico|deportivo|deportiva|deportes|desportivo|futbol|futebol|football|sociedad|social|asociacion|associacao|regatas|fc|cf|ac|sc|sd|de|del|da|do|la|el)\b/g,' ')
- .replace(/\s+/g,' ').trim();
-const tokenSet=value=>new Set(normalizeClubName(value).split(' ').filter(Boolean));
-let lastIndex=null,lastRows=null;
+ .toLowerCase().replace(/&/g,' y ').replace(/\b(s\.?\s*a\.?\s*d\.?\s*p?\.?)\b/g,' ')
+ .replace(/\b(?:sociedad anonima deportiva profesional|sociedad anonima deportiva|club|clube|deportivo|deportiva|deportes|desportivo|futbol|futebol|football|sociedad|social|asociacion|associacao|regatas|fc|cf|ac|sc|sd|de|del|da|do|la|el)\b/g,' ')
+ .replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();
+const normTokens=value=>new Set(normalizeClubName(value).split(' ').filter(Boolean));
+const normBare=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ');
+const isYouthOrReserve=(name)=>/\b(?:women|womens|female|femenin[ao]|feminino|feminina|fem|ladies|sub\s*\d+|u\s*\d+|reserva(?:s)?|juvenil(?:es)?|filial|academy|academia|b team|ii|iii)\b/i.test(normBare(name));
+const ratio=(a,b)=>{if(!a.size||!b.size)return 0;let hits=0;for(const t of a)if(b.has(t))hits++;return hits/Math.max(a.size,b.size)};
+let memoIndex=null,memoRows=null,memoAlias=null,memoCountry=null;
 function clubRows(index){
- if(index===lastIndex&&lastRows)return lastRows;
- lastIndex=index;lastRows=Object.entries(index||{}).filter(([uid,x])=>x&&x.nombre&&!Number.isNaN(Number(x.n_jugadores??1))&&Number(x.n_jugadores??1)>0)
-  .map(([uid,x])=>({uid,entry:x,key:normalizeClubName(x.nombre),words:tokenSet(x.nombre)}));
- return lastRows;
+ if(index===memoIndex&&memoRows)return memoRows;
+ memoIndex=index;memoCountry=new Map();memoAlias=new Map();
+ memoRows=Object.entries(index||{}).filter(([uid,x])=>x&&x.nombre&&Number(x.n_jugadores)>0&&!isFemaleClubRecord497(uid,x))
+ .map(([uid,entry])=>({uid,entry,key:normalizeClubName(entry.nombre),bare:normBare(entry.nombre),words:normTokens(entry.nombre),
+  firstTeam:Number(entry.n_primer_equipo)||0,players:Number(entry.n_jugadores)||0,
+  country:String(entry.pais_id_fm||'')})).filter(r=>!!r.key&&!isYouthOrReserve(r.entry.nombre));
+ for(const row of memoRows){const k=row.key;const list=memoAlias.get(k)||[];list.push(row);memoAlias.set(k,list)}
+ return memoRows;
 }
-const overlap=(a,b)=>{if(!a.size||!b.size)return 0;let count=0;for(const t of a)if(b.has(t))count++;
- return count/Math.max(a.size,b.size);
-};
+/** Países inferidos con varias coincidencias INDEPENDIENTES de clubes del catálogo.
+ * Nunca usar fmNationToCode(pais_id_fm): los IDs de naciones de futbolistas
+ * son otra tabla distinta a los países de clubes FM. */
+function countryFor(club,index,mappings){
+ const code=String(club?.countryCode||'').toUpperCase();
+ const fromMapping=mappings?.countries?.[code];
+ if(fromMapping!=null)return String(fromMapping);
+ const fromKnown=memoCountry?.get(code);if(fromKnown!==undefined)return fromKnown;
+ const countryClubs=COUNTRIES.find(c=>c.code===code)?.clubs||null;
+ if(!countryClubs){memoCountry?.set(code,null);return null}
+ const tally=new Map();
+ for(const game of countryClubs){
+  const options=(memoAlias?.get(normalizeClubName(game.name))||[]);
+  if(options.length!==1)continue;
+  tally.set(options[0].country,(tally.get(options[0].country)||0)+1);
+ }
+ const ordered=[...tally].sort((a,b)=>b[1]-a[1]);
+ const result=ordered[0]?.[1]>=3&&ordered[0][1]>=2*(ordered[1]?.[1]||0)?ordered[0][0]:null;
+ memoCountry?.set(code,result);return result;
+}
+const officialAliases=Object.freeze({
+ 'cl-3':['club deportivo universidad catolica'],
+ 'cl-extra-3':['club de deportes iquique'],
+ 'cl-extra-9':['club de deportes santiago wanderers']
+});
+function bestCandidate(club,rows){
+ const wanted=normalizeClubName(club.name),bare=normBare(club.name),tokens=normTokens(club.name);
+ const options=[];const official=officialAliases[club.id]||[];
+ for(const row of rows){
+  const exact=!!wanted&&row.key===wanted;
+  const words=ratio(tokens,row.words);
+  // Una razón social puede extender el nombre, pero no mezclar clubes que
+  // comparten sólo una palabra («Universidad», «Atlético», «City», etc.).
+  const containment=wanted.length>=7&&(row.key.startsWith(wanted+' ')||row.key.endsWith(' '+wanted));
+  const score=official.includes(row.bare)?140:row.bare===bare?120:exact?110:containment&&words>=.76?93:words>=.87&&tokens.size>=2?82:0;
+  if(score<82)continue;
+  options.push({...row,score,exact});
+ }
+ options.sort((a,b)=>b.score-a.score||b.firstTeam-a.firstTeam||b.players-a.players||a.uid.localeCompare(b.uid));
+ const top=options[0];if(!top)return {match:null,candidates:[]};
+ // Varios registros con la misma identidad exacta: distinguir la plantilla
+ // profesional de un duplicado con cero titulares; nunca adivinar si ambos
+ // parecen clubes principales.
+ let match=null;
+ const peers=options.filter(x=>x.score===top.score);
+ if(peers.length===1)match=top.uid;
+ else {
+  const professional=peers.filter(x=>x.firstTeam>=11);
+  if(professional.length===1&&peers.every(x=>x===professional[0]||x.firstTeam<11))match=professional[0].uid;
+ }
+ // Evitar aceptar un alias parcial si otro nombre tiene puntuación cercana.
+ if(options[1]&&options[1].score>=top.score-10&&options[1].key!==top.key)match=null;
+ return {match,candidates:options.slice(0,8).map(x=>({uid:x.uid,name:x.entry.nombre,
+  countryId:x.country,players:x.players,firstTeam:x.firstTeam,score:x.score,exact:x.exact}))};
+}
 function candidatesForGame(club,index,mappings){
  if(!club)return {match:null,candidates:[],countryVerified:false};
- const name=normalizeClubName(club.name),tokens=tokenSet(club.name);
- const countryCode=String(club.countryCode||'').toUpperCase();
- const countryId=mappings?.countries?.[countryCode];
- // Además de los países inferidos del catálogo, ya existe una equivalencia
- // numérica FM→nacionalidad verificada en fm26-nations.mjs. Aprovecharla
- // permite abrir muchos clubes antes omitidos sin adivinar países.
- const knownRows=clubRows(index).filter(row=>countryId!=null
-  ?String(row.entry.pais_id_fm)===String(countryId)
-  :fmNationToCode(row.entry.pais_id_fm)===countryCode);
- const countryVerified=knownRows.length>0;
- const results=[];
- for(const row of (countryVerified?knownRows:clubRows(index))){
-  // Con país desconocido sugerir, nunca enlazar automáticamente.
-  const exact=!!name&&name===row.key;
-  const ratio=overlap(tokens,row.words);
-  // Para candidatos sugeridos permitimos nombres abreviados, nunca para
-  // establecer un enlace automático con sólo parecido parcial.
-  if(!exact&&ratio<.5)continue;
-  const score=exact?1:ratio;
-  results.push({uid:row.uid,name:row.entry.nombre,countryId:row.entry.pais_id_fm,
-   players:Number(row.entry.n_jugadores)||0,firstTeam:Number(row.entry.n_primer_equipo)||0,
-   score,exact});
- }
- results.sort((a,b)=>b.score-a.score||b.firstTeam-a.firstTeam||a.name.localeCompare(b.name,'es'));
- // Un club puede tener jugadores incluso cuando el índice no marca titulares (n_primer_equipo=0).
- // El único enlace automático permitido sigue exigiendo nombre+país inequívocos.
- const exacts=results.filter(x=>x.exact&&x.players>0);
- let match=countryVerified&&exacts.length===1?exacts[0].uid:null;
- // Deportes Iquique figura con distintas razones sociales en los datos FM.
- // Sólo aceptar un registro masculino del país comprobado, con el núcleo
- // «Deportes Iquique» completo y SIN sufijos de filiales/sub-21/reservas.
- if(!match&&club.id==='cl-extra-3'&&countryVerified&&String(countryId)==='190'){
-  const alias=knownRows.filter(row=>/\bdeportes?\s+iquique\b/i.test(row.entry.nombre)
-   &&!/\b(?:women|femenin[ao]|sub[- ]?\d+|u[- ]?\d+|reserva|filial|juvenil|ii|iii|b)\b/i.test(row.entry.nombre)
-   &&Number(row.entry.n_jugadores)>0);
-  if(alias.length===1)match=alias[0].uid;
- }
- return {match,candidates:results.slice(0,10),countryVerified};
+ const rows=clubRows(index);const country=countryFor(club,index,mappings);
+ // No asignar automáticamente un club de país incierto; la lista mundial
+ // sigue disponible desde Mundo para consultar la plantilla original.
+ if(!country)return {match:null,candidates:[],countryVerified:false};
+ const correctCountry=rows.filter(x=>x.country===country);
+ const answer=bestCandidate(club,correctCountry);
+ return {...answer,countryVerified:correctCountry.length>0};
 }
 export function resolveClub(ref,index,mappings){
  const mapping=mappings?.mapping||{};
  if(ref.kind==='game'){
   const club=getClub(ref.id),known=mapping[ref.id];
-  const verified=known&&index[String(known.fmUID)]?String(known.fmUID):null;
+  const verified=known&&index[String(known.fmUID)]&&!isFemaleClubRecord497(known.fmUID,index[String(known.fmUID)])?String(known.fmUID):null;
   const explicitUid=verified?null:explicitMatch(ref.id,index);
   const fallback=verified||explicitUid?null:candidatesForGame(club,index,mappings);
   const uid=verified||explicitUid||fallback?.match||null;
@@ -83,7 +118,23 @@ export function resolveClub(ref,index,mappings){
  const uid=String(ref.id),entry=index[uid];
  const matches=Object.entries(mapping).filter(([,v])=>String(v.fmUID)===uid);
  const explicitIds=Object.keys(explicit).filter(id=>explicitMatch(id,index)===uid);
- const gameId=matches.length===1?matches[0][0]:matches.length===0&&explicitIds.length===1?explicitIds[0]:null;
+ let gameId=matches.length===1?matches[0][0]:matches.length===0&&explicitIds.length===1?explicitIds[0]:null;
+ // La ficha original también puede reconocer el equipo jugable que comparte
+ // UID confirmado: así conserva escudo, competición y valores de mercado.
+ // Siempre comprobar ida y vuelta; no fusionar clubes homónimos.
+ if(!gameId&&entry){
+  const isoCountry=String(entry.pais_id_fm);
+  const normalized=normalizeClubName(entry.nombre);
+  const possible=[];
+  for(const country of COUNTRIES){
+   if(String(mappings?.countries?.[country.code])!==isoCountry)continue;
+   for(const c of country.clubs||[]){
+    if(c.inactive||normalizeClubName(c.name)!==normalized)continue;
+    if(resolveClub({kind:'game',id:c.id},index,mappings).uid===uid)possible.push(c.id);
+   }
+  }
+  if(possible.length===1)gameId=possible[0];
+ }
  return {uid,entry,gameId,club:gameId?getClub(gameId):null,
   simulationMapped:matches.length===1,candidates:[],linkStatus:'original'};
 }
