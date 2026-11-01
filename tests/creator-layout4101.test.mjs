@@ -1,31 +1,32 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
-const html=read('index.html'),js=read('src/creator-layout4101.mjs'),css=read('src/creator-layout4101.css');
-test('el nuevo creador carga después del motor existente sin romper la entrada',()=>{
+const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
+const html=read('index.html');
+const js=read('src/creator-layout4102.mjs');
+const css=read('src/creator-layout4102.css');
+test('creador 4.10.2 reemplaza las subpestañas de 4.10.1',()=>{
  assert.match(html,/experience494\.mjs\?v=502/);
- assert.match(html,/src\/creator-layout4101\.mjs\?v=503/);
- assert.match(html,/src\/creator-layout4101\.css\?v=503/);
- assert.ok(html.indexOf('experience494.mjs')<html.indexOf('creator-layout4101.mjs'));
+ assert.match(html,/creator-layout4102\.mjs\?v=504/);
+ assert.match(html,/creator-layout4102\.css\?v=504/);
+ assert.doesNotMatch(html,/creator-layout4101\.(?:css|mjs)/);
 });
-test('las seis etapas permanecen presentes, y cinco incluyen navegación por categorías',()=>{
- for(const i of [0,1,2,3,4])assert.match(js,new RegExp(' '+i+':\\['));
- assert.match(js,/step===5/);
- assert.match(js,/role="tabpanel"|setAttribute\('role','tabpanel'\)/);
- assert.match(js,/preferred\.set\(step,cur\)/);
+test('todas las decisiones siguen presentes, en un único tablero por etapa',()=>{
+ for(const i of [0,1,2,3,4,5])assert.match(js,new RegExp('step==='+i+'[){]'));
+ assert.match(js,/cr4102-board/);
+ assert.doesNotMatch(js,/role','tabpanel'|creator4101-nav|aria-selected.*cur/);
  assert.match(js,/MutationObserver\(schedule\)/);
 });
-test('buscador de clubes conserva el select original y el evento de cambio de RASCENSO',()=>{
+test('el selector de clubes conserva su valor y emite cambio al creador original',()=>{
  assert.match(js,/select\[name="fanClubId"\]/);
- assert.match(js,/select\.value=id/);
+ assert.match(js,/select\.value=b\.dataset\.clubChoice/);
  assert.match(js,/new Event\('change',\{bubbles:true\}\)/);
- assert.match(js,/options\.filter\(o=>normalize\(o\.name\)/);
  assert.match(js,/type='search'/);
 });
-test('el modo compacto conserva tarjetas y sus decisiones sin tocar los módulos del motor',()=>{
- assert.match(css,/\.creator4101-pane \.cr-grid\.c5/);
- assert.match(css,/\.creator4101-summary \.cr-sumgrid/);
- assert.match(css,/@media\(max-width:560px\)/);
+test('opciones tipo planilla y detalle único conservan controles originales',()=>{
+ assert.match(css,/\.cr4102-choice/);
+ assert.match(css,/\.cr4102-detail/);
+ assert.match(js,/classList\.remove\('cr-card','compact'\)/);
+ assert.match(js,/chips\.cloneNode\(true\)/);
  assert.doesNotMatch(js,/localStorage\.clear|removeItem\(|window\.location\.reload/);
 });

@@ -1,38 +1,32 @@
-RASCENSO 4.10.1 — CREADOR RENOVADO (PARCHE DIRECTO)
-=====================================================
-Base inspeccionada: main, commit 6224c7588e8705c13a9f59e467fb2c0ae20e0b87.
+RASCENSO 4.10.2 — CREADOR DE FUTBOLISTA SIN SUBPESTAÑAS
+Base: main, commit 5ad27e450e9bc2afeab749adb4b2db93c73d4229
 
-INSTALACIÓN:
-1. Extrae este ZIP directamente en Documentos\GitHub\RASCENSO.
-2. Acepta reemplazar index.html y conservar las carpetas src y tests.
-3. En GitHub Desktop haz Commit -> Push origin.
-4. Espera el resultado verde de 'Publicar RASCENSO' y actualiza la página con Ctrl+F5.
+INSTALACION
+1. Extrae el contenido de este ZIP en Documentos\GitHub\RASCENSO.
+2. Acepta reemplazar index.html y tests/creator-layout4101.test.mjs.
+3. En GitHub Desktop, revisa cambios, Commit y Push origin.
+4. Comprueba el workflow 'Publicar RASCENSO' (verde) y recarga con Ctrl+F5.
 
-CAMBIOS:
-- Seis pasos del creador con tarjetas más compactas y consistentes.
-- Navegación por subsecciones dentro de cada paso, sin apilar todas las decisiones.
-- Identidad: separa datos/cancha, edad/pierna y tipo de jugador.
-- Raíces: historia, formación y entorno.
-- Futbolista: clase, fortaleza, debilidad, estilo y desarrollo.
-- Mentalidad: carácter, imagen pública y decisiones.
-- Sueños: meta, club favorito y modo del draft.
-- Buscador por nombre para seleccionar el club favorito entre los equipos jugables.
-- Resumen más compacto en 4 columnas (pantallas amplias).
-- Adaptación a resoluciones medianas y móviles.
+CAMBIOS
+- Se ELIMINAN las subpestañas del creador 4.10.1 (sus archivos anteriores se conservan en el repositorio sin cargarse).
+- Las 6 etapas originales siguen intactas: cada pantalla muestra TODAS sus categorías simultáneamente, en un tablero de dos columnas.
+- Las opciones dejan de ser tarjetas de gran tamaño y pasan a ser selectores lineales compactos de una fila, con una única zona de explicación y bonos por categoría.
+- Identidad: campo, cancha, edad, pierna y rol en la misma pantalla.
+- Raíces, Futbolista, Mentalidad, Sueños: bloques simultáneos, sin navegación secundaria.
+- Sueños: buscador de club favorito integrado en el propio bloque, conserva el selector original por país.
+- Resumen: informe compacto en filas.
+- Se conserva el formulario HTML/radios originales, su lógica de cambios, bonos, guardado de borrador y validación.
 
-RESPETO DE DATOS:
-No se modifica el motor, el archivo creator30.mjs, la simulación ni las partidas.
-Los controles originales se mantienen en el formulario; el buscador cambia el select
-que ya usa RASCENSO y dispara su evento de guardado. El listado largo sigue disponible
-por país como alternativa.
-
-ARCHIVOS:
+ARCHIVOS
 index.html
-src/creator-layout4101.css (nuevo)
-src/creator-layout4101.mjs (nuevo)
-tests/creator-layout4101.test.mjs (nuevo)
+src/creator-layout4102.mjs (nuevo)
+src/creator-layout4102.css (nuevo)
+tests/creator-layout4101.test.mjs (ajusta pruebas antiguas que exigían las subpestañas eliminadas)
+tests/creator-layout4102.test.mjs (nuevo)
 
-VALIDACIÓN:
-Sintaxis JS y pruebas específicas incluidas. Prueba visual completa en navegador
-no realizada: el entorno impidió acceder al servidor y al archivo local en Chromium.
-No debe confundirse con una verificación completa de publicación en GitHub Actions.
+VERIFICACION
+- node --check de JavaScript: OK.
+- 8/8 pruebas específicas: OK.
+- No se modificó motor de carrera, plantillas, datos FM26 ni partidas.
+- No se pudo completar revisión visual con Chromium en este entorno; revisar tamaños y desplazamiento después de publicar.
+- GitHub Actions completo debe ejecutarse después de subir el ZIP.
