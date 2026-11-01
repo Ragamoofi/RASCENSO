@@ -1,0 +1,34 @@
+RASCENSO 4.9 - PARCHE WEB (NO ES UN INSTALADOR DEL JUEGO)
+========================================================
+OBJETIVO: Que TODOS entren a https://ragamoofi.github.io/RASCENSO/
+y los 180.739 jugadores vengan INCLUIDOS sin importar archivos.
+
+ESTE ZIP CONTIENE SOLAMENTE LOS ARCHIVOS PARA PUBLICAR EN GITHUB.
+Tu juego se sigue abriendo en la pagina, sin descargar nada.
+
+UNA SOLA VEZ EN GITHUB DESKTOP:
+1) Abre tu repositorio Ragamoofi/RASCENSO en GitHub Desktop.
+2) Selecciona la rama main y haz Fetch origin para tener los cambios actuales.
+3) Extrae el contenido de ESTE ZIP dentro de la carpeta RAIZ del repositorio.
+   Deben quedar: repo/index.html, repo/src/fm26-bundled.mjs,
+   repo/assets/world-data/manifest.json, etc. Elige reemplazar archivos.
+4) GitHub Desktop mostrara alrededor de 319 archivos nuevos/modificados.
+   Escribe en Summary: feat: integrar base mundial por defecto en la web
+   Haz Commit to main y Push origin.
+5) Espera la ejecucion 'Publicar RASCENSO' en GitHub Actions.
+6) Entra a la pagina habitual. El juego ya cargara sus datos automaticamente.
+
+NO TE PIDE IMPORTAR NI INSTALAR LA BASE AL JUGAR.
+Solo es una publicacion de la base al servidor de GitHub Pages.
+
+ATENCION: GitHub Pages es publico. Los datos que se suban al
+repositorio publico y a su pagina podran ser descargados por terceros.
+
+VALIDACIONES HECHAS:
+- 180.739 jugadores unicos
+- 12.725 clubes de origen
+- 30.944 agentes libres
+- 311 fragmentos gzip por pais o libres
+- 124 equivalencias automatizadas con clubes jugables
+
+RASCENSO 4.9 - Compilado para GitHub Desktop.
