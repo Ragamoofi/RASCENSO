@@ -3,6 +3,7 @@ import {fm26OVR,fm26Position,applyFM26Delta} from './fm26-real.mjs';
 import {fmNationToCode} from './fm26-nations.mjs';
 import {getClub} from './engine.mjs';
 import {isExcludedPlayer} from './world-exclusions.mjs';
+import {isFemaleClubRecord497,isFemalePlayerRecord497} from './world-gender497.mjs';
 
 // Correspondencias contrastadas con el nombre completo, país y plantel del índice mundial.
 const explicit={'cl-extra-15':{uid:'130779',country:'190',name:'Club de Deportes Santiago Morning'},'cl-extra-14':{uid:'130788',country:'190',name:'Club Social de Deportes Rangers de Talca'},'en-2':{uid:'676',country:'139',name:'Liverpool'}};
@@ -52,7 +53,9 @@ function candidatesForGame(club,index,mappings){
    score,exact});
  }
  results.sort((a,b)=>b.score-a.score||b.firstTeam-a.firstTeam||a.name.localeCompare(b.name,'es'));
- const exacts=results.filter(x=>x.exact&&x.firstTeam>0);
+ // Un club puede tener jugadores incluso cuando el índice no marca titulares (n_primer_equipo=0).
+ // El único enlace automático permitido sigue exigiendo nombre+país inequívocos.
+ const exacts=results.filter(x=>x.exact&&x.players>0);
  const match=countryVerified&&exacts.length===1?exacts[0].uid:null;
  return {match,candidates:results.slice(0,10),countryVerified};
 }
@@ -86,9 +89,11 @@ export function snapshotPlayer(raw,gameId,state,simulationMapped=true){
 }
 export async function loadClubSquad(ref,state={},api={getWorldMappingInfo,getWorldIndex,readWorldClub,getWorldPlayer}){
  const [mappings,index]=await Promise.all([api.getWorldMappingInfo(),api.getWorldIndex()]);
- const info=resolveClub(ref,index||{},mappings),world=info.uid?await api.readWorldClub(info.uid):null;
+ const info=resolveClub(ref,index||{},mappings);
+ // Nunca leer un club confirmado como femenino en la consulta masculina.
+ const world=info.uid&&!isFemaleClubRecord497(info.uid,info.entry)?await api.readWorldClub(info.uid):null;
  const changes=state?.fm26?.changes||{},seen=new Set(),players=[];
- const add=(raw,originId)=>{if(!raw?.id||isExcludedPlayer(raw.id)||seen.has(raw.id))return;const p=snapshotPlayer(raw,originId,state,info.simulationMapped);
+ const add=(raw,originId)=>{if(!raw?.id||isExcludedPlayer(raw.id)||isFemalePlayerRecord497(raw)||seen.has(raw.id))return;const p=snapshotPlayer(raw,originId,state,info.simulationMapped);
   if(p.status==='retired'||p.clubId!==info.gameId&&info.gameId!==null)return;
   if(info.gameId===null&&changes[p.id]?.clubId!==undefined)return;
   seen.add(p.id);players.push({...p,source:changes[p.id]?'simulado':'base'});
@@ -97,7 +102,7 @@ export async function loadClubSquad(ref,state={},api={getWorldMappingInfo,getWor
  // La ficha original del futbolista transferido puede estar en otro shard aún no cargado.
  if(info.gameId){const inbound=Object.entries(changes).filter(([id,d])=>d.clubId===info.gameId&&!seen.has(id)&&d.status!=='retired');
   for(const [id] of inbound){const raw=await api.getWorldPlayer(id);if(raw)add(raw,info.gameId);}
-  for(const p of state.world?.players||[]){if(p.clubId!==info.gameId||p.status==='retired'||isExcludedPlayer(p.id)||seen.has(p.id))continue;
+  for(const p of state.world?.players||[]){if(p.clubId!==info.gameId||p.status==='retired'||isExcludedPlayer(p.id)||isFemalePlayerRecord497(p)||seen.has(p.id))continue;
    // Cuando hay datos reales, no presentar veteranos ficticios como sustitutos.
    if(world&&p.kind!=='gen'&&p.kind!=='prospect')continue;
    seen.add(p.id);players.push({...p,source:'simulado'});

@@ -1,4 +1,4 @@
-import {isExcludedClub,isExcludedPlayer} from './world-exclusions.mjs';
+import {filterWorldIndex497,filterWorldDirectory497,filterWorldShard497} from './world-gender497.mjs';
 /* RASCENSO 4.9 — Mundo mundial preinstalado. 
  * Si el paquete de datos forma parte del sitio, se consulta directamente;
  * nunca exige seleccionar ZIP, importar en IndexedDB ni copiarlo al guardado.
@@ -27,11 +27,11 @@ async function gzipJSON(file){
  return new Response(res.body.pipeThrough(new DecompressionStream('gzip'))).json();
 }
 export async function bundledClubIndex(){
- if(!indexPromise)indexPromise=(async()=>{const m=await bundledWorldManifest();if(!m)return null;const idx=await gzipJSON(m.clubIndex);return Object.fromEntries(Object.entries(idx).filter(([uid])=>!isExcludedClub(uid)))})();
+ if(!indexPromise)indexPromise=(async()=>{const m=await bundledWorldManifest();if(!m)return null;const idx=await gzipJSON(m.clubIndex);return filterWorldIndex497(idx)})();
  return indexPromise;
 }
 export async function bundledDirectory(){
- if(!directoryPromise)directoryPromise=(async()=>{const m=await bundledWorldManifest();if(!m)return null;const rows=await gzipJSON(m.directory);return rows.filter(p=>!isExcludedClub(p?.[5])&&!isExcludedPlayer(p?.[0]))})();
+ if(!directoryPromise)directoryPromise=(async()=>{const m=await bundledWorldManifest();if(!m)return null;const [rows,index]=await Promise.all([gzipJSON(m.directory),bundledClubIndex()]);return filterWorldDirectory497(rows,index)})();
  return directoryPromise;
 }
 export async function bundledShard(path){
@@ -39,7 +39,7 @@ export async function bundledShard(path){
  const key=String(path||'').replace(/^runtime\//,'').replace(/^\/+/, '');
  if(!/^(por_pais\/nacion_[0-9]+_parte_[0-9]+|libres\/libres_[0-9]+)\.json$/.test(key))throw Error('Shard mundial inválido: '+key);
  if(shardCache.has(key))return shardCache.get(key);
- const promise=gzipJSON(key+'.gz').then(data=>{if(Array.isArray(data.clubes))data={...data,clubes:data.clubes.filter(c=>!isExcludedClub(c.club_uid)).map(c=>({...c,jugadores:(c.jugadores||[]).filter(p=>!isExcludedPlayer(p.id))}))};if(Array.isArray(data.jugadores))data={...data,jugadores:data.jugadores.filter(p=>!isExcludedPlayer(p.id))};return data}).catch(err=>{shardCache.delete(key);throw err});
+ const promise=gzipJSON(key+'.gz').then(filterWorldShard497).catch(err=>{shardCache.delete(key);throw err});
  shardCache.set(key,promise);
  // No mantener decenas de miles de fichas detalladas en RAM durante toda la carrera.
  if(shardCache.size>6)shardCache.delete(shardCache.keys().next().value);
