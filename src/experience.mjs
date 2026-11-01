@@ -106,7 +106,21 @@ function save(){
   return true;
  }catch{message='No fue posible guardar la partida. Exporta una copia desde el menú.';return false;}
 }
-function mutate(s){if(!s||s===state)return;const previous=state;state=s;const saved=save();if(!saved)state=previous;agentFocusOpen=false;tab='carrera';render();return saved;}
+function mutate(s){
+ if(!s||s===state)return;
+ const previous=state,clubChanged=previous?.clubId!==s.clubId;
+ state=s;const saved=save();if(!saved)state=previous;
+ agentFocusOpen=false;tab='carrera';render();
+ if(saved&&worldDbInfo&&clubChanged&&state?.clubId){
+  const target=state.clubId;
+  activateWorldClub(target).then(result=>{
+   if(result.active&&state?.clubId===target){
+    state=syncClub(state);save();render();
+   }
+  }).catch(()=>{});
+ }
+ return saved;
+}
 function button(label,action,cls='main',more=''){return `<button type="button" class="action ${cls}" data-action="${action}" ${more}>${label}</button>`;}
 const opt=(value,label,active)=>`<option value="${h(value)}" ${active===value?'selected':''}>${h(label)}</option>`;
 function select(label,name,items,value){return `<label class="field"><span>${label}</span><select name="${name}">${items.map(([v,l])=>opt(String(v),l,String(value))).join('')}</select></label>`;}
