@@ -163,7 +163,8 @@ export async function searchWorldPlayers(term,{limit=70,offset=0,clubUID=null}={
   }
  }
  found.sort((a,b)=>b.ovr-a.ovr||a.name.localeCompare(b.name));
- return {total:found.length,results:found.slice(offset,offset+limit)};
+ const index=await getWorldIndex();
+ return {total:found.length,results:found.slice(offset,offset+limit).map(p=>({...p,clubName:index[p.fmClubUID]?.nombre||'Agente libre'}))};
 }
 export async function getWorldPlayer(id){
  const all=await dbAll(DIR);
