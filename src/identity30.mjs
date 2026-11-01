@@ -214,8 +214,10 @@ export const CHOICES={
   'Purista':O('◌',[['Valores ocultos: eliges por instinto',0],['+1 techo en todo (premio por arriesgar)',1]],{ceilAll:1})
  },
  foot:{
-  Derecha:O('➜',[['Pie natural: sin bonificaciones',1]],{}),
-  Izquierda:O('⬅',[['Rareza: +1 de demanda en el mercado',1],['+2 % minutos en bandas izquierdas',1],['Extremo derecho = perfil invertido (+3 % goles)',1]],{})
+  // Las dos piernas otorgan las mismas oportunidades en su banda natural
+  // o a pierna cambiada: elegir el pie no aumenta atributos ni mercado.
+  Derecha:O('➜',[['+2 % minutos en bandas derechas',1],['A pierna cambiada por izquierda: +3 % goles',1],['A pierna cambiada: −1 % asistencias',0]],{}),
+  Izquierda:O('⬅',[['+2 % minutos en bandas izquierdas',1],['A pierna cambiada por derecha: +3 % goles',1],['A pierna cambiada: −1 % asistencias',0]],{})
  }
 };
 /** Tipo de personalidades con efecto ya implementado en otras partes (se anotan para el resumen). */
@@ -234,8 +236,15 @@ export function choiceFx(s){
    else if(['goals','assists','injury','growth','growthYoung','growthLow','growthRegular','market','passNoise','paceDecline'].includes(k))out[k]*=v;
    else out[k]=(out[k]||0)+v;}};
  for(const cat of ['origin','environment','developmentPath','personality','style','strength','weakness','dream','publicImage','riskProfile','mode'])take(cat,s[cat]);
- // Pierna hábil
- if(s.foot==='Izquierda'){if(['EI','MI','LI'].includes(s.position))out.minutes+=.02;if(['ED','MD','LD'].includes(s.position)){out.goals*=1.03;out.assists*=.99;}}
+ // Pierna hábil: bonificación espejo, según banda natural o a pierna cambiada.
+ // No se aplican ventajas para posiciones centrales (DC, MC, POR, etc.).
+ const bandaDerecha=['ED','MD','LD'].includes(s.position);
+ const bandaIzquierda=['EI','MI','LI'].includes(s.position);
+ if((s.foot==='Derecha'&&bandaDerecha)||(s.foot==='Izquierda'&&bandaIzquierda))out.minutes+=.02;
+ if((s.foot==='Derecha'&&bandaIzquierda)||(s.foot==='Izquierda'&&bandaDerecha)){
+  out.goals*=1.03;
+  out.assists*=.99;
+ }
  // ADN heredado de los legados
  if(s.dna){const d=dnaFx(s.dna);out.goals*=d.goals;out.assists*=d.assists;out.injury*=d.injury;out.minutes+=d.minutes;out.feint+=d.feint;out.tackle+=d.tackle;out.reflex+=d.reflex;out.sprint+=d.sprint;out.passNoise*=d.passNoise;out.paceDecline*=d.paceDecline;}
  return out;
@@ -243,8 +252,8 @@ export function choiceFx(s){
 /** Techos y valores iniciales extra derivados de las elecciones (se aplican una vez, al cerrar el draft). */
 export function creatorCeilings(s){const f=choiceFx(s);const out={...f.ceil};for(const k of KEYS)out[k]=(out[k]||0)+f.ceilAll;const d=dnaCeilBonus(s.dna);for(const [k,v] of Object.entries(d))out[k]=(out[k]||0)+v;return out;}
 export function startAttrDelta(s){const f=choiceFx(s);const out={...f.startAttr};const b=startBoost(s.startAge||s.age);if(b)for(const k of KEYS)out[k]=(out[k]||0)+b;return out;}
-/** Pierna hábil izquierda: la demanda de mercado sube un punto (rareza). */
-export const marketRarity=s=>s.foot==='Izquierda'?1:0;
+/** La demanda depende del rendimiento y perfil, no del pie preferido. */
+export const marketRarity=()=>0;
 
 /* ====================================================================== */
 /* 3 · Sueños: metas medibles                                              */

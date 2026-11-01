@@ -1,37 +1,28 @@
-RASCENSO 4.10.4 — FUTBOLISTA RENOVADO
+RASCENSO 4.10.5 — PIERNA HÁBIL EQUILIBRADA
+Base exacta comprobada: commit ff429a6a63fa54f1b6f7bfeff83c8ac63277fc48 (main, 2026-11-01).
 
-BASE COMPROBADA: main 63f1e95d3533147889ede0e8b0a36afb016c9775
-
-INSTALACIÓN: Extraer este ZIP en Documentos\GitHub\RASCENSO y aceptar
-reemplazar archivos. Hacer Commit y Push en GitHub Desktop.
-NO hay comandos, instaladores, scripts de instalación ni cambios en guardados.
+INSTALACIÓN
+1. Extrae este ZIP directamente en Documentos\GitHub\RASCENSO.
+2. Acepta reemplazar los archivos manteniendo las carpetas src y tests.
+3. Haz Commit y Push origin desde GitHub Desktop.
+4. Comprueba que el flujo «Publicar RASCENSO» termine en verde y actualiza la página (Ctrl+F5).
+No hay ejecutables ni scripts de instalación.
 
 CAMBIOS
-- Futbolista: cabecera técnica horizontal con clase y 6 atributos ordenados.
-- Fortaleza, debilidad, estilo y desarrollo visibles juntos en una grilla 2x2
-  para pantallas anchas; cada grupo tiene alternativas compactas a la izquierda
-  y los bonos de la opción elegida a la derecha.
-- Jerarquía visual más clara, colores de apoyo, bordes y espacios uniformes.
-- Adaptación para pantallas medianas, pequeñas y móviles.
-- Identidad 4.10.3 y el buscador de clubes de Sueños conservados.
-- Corrige la prueba antigua que aún buscaba el archivo 4.10.2 y bloqueó
-  la publicación 4.10.3. Las pruebas de versión ahora verifican la carga
-  actual sin fijar valores de caché que impidan futuras actualizaciones.
+- Derecha: +2 % de minutos en banda derecha (ED, MD, LD).
+- Derecha a pierna cambiada por izquierda (EI, MI, LI): +3 % de goles, a cambio de -1 % de asistencias.
+- Izquierda: los mismos efectos, reflejados por la otra banda.
+- Los puestos centrales no obtienen ventaja de pie preferido.
+- Se elimina la antigua demanda extra de mercado por ser zurdo; ambas piernas tienen la misma demanda base.
+- Las tres etiquetas visibles de cada opción reflejan exactamente sus nuevos efectos.
+- Se fuerza la renovación de caché del módulo identity30.mjs mediante importmap, sin tocar el creador 4.10.4.
 
 ARCHIVOS
 index.html
-src/creator-layout4103.css
-src/creator-layout4103.mjs
-tests/creator-layout4101.test.mjs
-tests/creator-layout4103.test.mjs
-tests/creator-layout4104.test.mjs
+src/identity30.mjs
+tests/foot-balance4105.test.mjs
 
-VERIFICACIONES
-- node --check: todos los JS modificados pasan.
-- 11 pruebas específicas de los archivos modificados: pasan.
-- CSS: estructura de llaves equilibrada.
-- Pendiente: pruebas completas de GitHub Actions y revisión visual real del
-  creador publicado (el navegador local del entorno bloqueó la vista).
-
-El motor de carrera, los datos mundiales, fichajes, guardados y bonos de elección
-no fueron modificados.
+PRUEBAS
+6 de 6 pruebas funcionales aisladas aprobadas en Node 22; sintaxis del módulo verificada.
+La publicación y pruebas de GitHub Actions deben confirmarse tras subir el ZIP.
+No se tocaron datos de jugadores, partidos, partidas guardadas ni el motor visual del creador.
