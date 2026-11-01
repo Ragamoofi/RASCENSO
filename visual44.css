@@ -400,3 +400,23 @@
 .fm26-roster>small{font-size:10px;color:#8db4c8;line-height:1.5}
 @media(max-width:940px){.fm26-roster-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){.fm26-roster-grid{grid-template-columns:minmax(0,1fr)}}
+
+
+/* Base mundial real 4.x · búsqueda de todos los clubes importados */
+.fm-world-empty{margin:10px 0;padding:12px;border:1px dashed #66839e;border-radius:9px;background:#18324b;font-size:12px;color:#bed6e9}
+.fm-world-search{display:grid;gap:10px;margin:10px 0 18px;padding:13px;background:linear-gradient(120deg,#12304a,#172d43);border:1px solid #54728a;border-radius:10px}
+.fm-world-summary{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.fm-world-summary>b{font-size:10px;letter-spacing:1px;color:#f3b782}
+.fm-world-summary>strong{font:900 23px 'Barlow Condensed',sans-serif;color:#fff}
+.fm-world-summary>small{font-size:10px;color:#9abdd3}
+#fm-world-search{display:flex;gap:7px;min-width:0}
+#fm-world-search input{flex:1;min-width:0;height:35px;padding:0 10px;color:#fff;background:#10263e;border:1px solid #56728a;border-radius:6px}
+#fm-world-search button{min-width:72px;white-space:nowrap}
+.fm-world-results{max-height:210px;overflow-y:auto;display:grid;gap:3px;font-size:12px;color:#b8d0e1}
+.fm-world-person{display:grid;grid-template-columns:minmax(0,1fr) minmax(105px,.8fr) 30px;gap:8px;align-items:center;padding:7px 9px;border-radius:5px;background:#1f3b55}
+.fm-world-person>b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#f2f7fc}
+.fm-world-person small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px}
+.fm-world-person strong{font:900 18px 'Barlow Condensed',sans-serif;color:#efb983;text-align:right}
+.fm-world-footnote{font-size:10px;color:#9ebcd0}
+.fm-world-status{display:block;font-size:11px;color:#f4bf8d;margin:8px 0;line-height:1.5}
+@media(max-width:680px){.fm-world-summary{display:grid}.fm-world-person{grid-template-columns:minmax(0,1fr) 50px}.fm-world-person small{display:none}}
