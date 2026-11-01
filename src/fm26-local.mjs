@@ -44,7 +44,7 @@ export function zipEntries(bytes){
  }
  return entries;
 }
-async function decompressZip(bytes,entry){
+export async function unpackZIPEntry(bytes,entry){
  const a=bytes instanceof Uint8Array?bytes:new Uint8Array(bytes),v=new DataView(a.buffer,a.byteOffset,a.byteLength),at=entry.local;
  if(u32(v,at)!==0x04034b50)throw Error('Cabecera ZIP inválida');
  const start=at+30+u16(v,at+26)+u16(v,at+28),chunk=a.slice(start,start+entry.compressed);
@@ -56,7 +56,7 @@ async function decompressZip(bytes,entry){
  if(out.length!==entry.size)throw Error('Archivo ZIP truncado');
  return out;
 }
-async function jsonEntry(buffer,entry){return JSON.parse(new TextDecoder().decode(await decompressZip(buffer,entry)))}
+async function jsonEntry(buffer,entry){return JSON.parse(new TextDecoder().decode(await unpackZIPEntry(buffer,entry)))}
 const find=(files,end)=>[...files.keys()].find(k=>k.endsWith(end));
 export async function importFM26Local(files,opts={}){
  const list=Array.from(files||[]),archive=list.find(f=>/\.zip$/i.test(f.name));
