@@ -1,0 +1,38 @@
+name: Preparar paquete RASCENSO 4.9 completo
+on:
+  push:
+    branches: [rascenso-4-9-universo-integrado]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: bundle49-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construir recursos visuales para RASCENSO
+        run: |
+          python -m pip install -q pillow cairosvg
+          mkdir -p _site
+          cp index.html experience.css visual44.css favicon.svg favicon.png .nojekyll _site/
+          cp -R src assets _site/
+          node scripts/export-clubs.mjs
+          python scripts/build_crests.py _site/assets/crests
+          python scripts/build_trophy_gallery.py _site
+          python scripts/build_fm_trophy_pack.py _site
+          python scripts/build_media12.py _site
+          python scripts/restore_portraits.py _site
+          python scripts/build_kits18.py _site/assets/kits
+          test -s _site/index.html
+          test -s _site/src/fm26-bundled.mjs
+          test -s _site/assets/trophies/fm/102415.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rascenso-49-sitio-base
+          path: _site
+          compression-level: 6
+          retention-days: 7

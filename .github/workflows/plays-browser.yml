@@ -1,7 +1,7 @@
 name: Prueba de jugadas en navegador
 on:
   push:
-    branches: [main, mejora-penales-controles, carrera-mundo35, jugadas36, duelos37, rascenso-4-integral, rascenso-4-1-centro-partidos, rascenso-4-2-legado-final, rascenso-4-3-gran-parche, rascenso-4-4-renovacion-visual, rascenso-4-5-vitrina-trofeos, rascenso-4-6-historial-legado-seleccion, rascenso-4-7-trofeos-fm, fm26-mundo-real-privado]
+    branches: [main, mejora-penales-controles, carrera-mundo35, jugadas36, duelos37, rascenso-4-integral, rascenso-4-1-centro-partidos, rascenso-4-2-legado-final, rascenso-4-3-gran-parche, rascenso-4-4-renovacion-visual, rascenso-4-5-vitrina-trofeos, rascenso-4-6-historial-legado-seleccion, rascenso-4-7-trofeos-fm, fm26-mundo-real-privado, rascenso-4-9-universo-integrado]
   workflow_dispatch:
 permissions:
   contents: read
@@ -43,6 +43,7 @@ jobs:
           mkdir -p /tmp/rascenso-capturas
           python3 -m http.server 8765 >/tmp/rascenso-http.log 2>&1 &
           node tests/browser/fm26-universe.cjs
+          node tests/browser/world-bundled49.cjs
           SHOTS=/tmp/rascenso-capturas node tests/browser/plays-e2e.cjs
           node tests/browser/controls-e2e.cjs
           node tests/browser/e2e.cjs
