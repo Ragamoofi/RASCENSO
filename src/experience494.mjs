@@ -4,7 +4,7 @@ import './scroll-guard499.mjs';
 import {primeWorldHighlights493} from './world-highlights493.mjs';
 import {primeWorldMetadata494} from './world-metadata494.mjs';
 const globalData=Promise.allSettled([primeWorldHighlights493(),primeWorldMetadata494()]);
-await import('./experience.mjs?v=502');
+await import('./experience.mjs?v=513');
 const root=document.getElementById('app');
 function version(){
  const el=root?.querySelector('.site-head .build');

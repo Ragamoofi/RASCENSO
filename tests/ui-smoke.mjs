@@ -1,8 +1,16 @@
+import {autoSummerCareer} from '../src/summer-career4111.mjs';
 import assert from 'node:assert/strict';
 import {newCareer,acceptDraft,signAcademy,academyOffers,autoResolveEvent,chooseTransfer,advanceSeason} from '../src/engine.mjs';
 let s=newCareer({name:'Prueba RASCENSO',country:'CL',position:'DC',seed:'prueba-ui',age:17});
 while(s.phase==='draft')s=acceptDraft(s,0);
-s=signAcademy(s,academyOffers(s)[0].id);s=autoResolveEvent(s);s=advanceSeason(s);for(let i=0;i<3&&s.phase==='event';i++)s=autoResolveEvent(s);if(s.phase==='transfer')s=chooseTransfer(s,null);
+s=signAcademy(s,academyOffers(s)[0].id);s=autoResolveEvent(s);s=advanceSeason(s);
+for(let guard=0;guard<30&&s.phase!=='season';guard++){
+ if(s.phase==='event')s=autoResolveEvent(s);
+ else if(s.phase==='summer')s=autoSummerCareer(s);
+ else if(s.phase==='transfer')s=chooseTransfer(s,s.market?.canStay===false?s.offers[0]?.id:null);
+ else throw new Error('Fase no contemplada en smoke: '+s.phase);
+}
+assert.equal(s.phase,'season','La prueba debe renderizar una temporada real después del verano');
 const root={innerHTML:'',addEventListener(){}};
 globalThis.document={getElementById:id=>id==='app'?root:null};
 globalThis.localStorage={getItem(k){return k==='rascenso-save-v2'?JSON.stringify(s):null},setItem(){}};
@@ -10,7 +18,7 @@ await import('../src/experience.mjs');
 assert.match(root.innerHTML,/playing-layout/);
 assert.match(root.innerHTML,/right-tabs/);
 assert.match(root.innerHTML,/standing-row/);
-assert.match(root.innerHTML,/RASCENSO 4\.9\.2/);
+assert.match(root.innerHTML,/RASCENSO 4\.11/);
 assert.match(root.innerHTML,/v2-season-grid/);
 assert.match(root.innerHTML,/OBJETIVOS/);
 assert.match(root.innerHTML,/LUCHA POR EL PUESTO/);
@@ -26,4 +34,4 @@ assert.match(root.innerHTML,/CENTRO DE PARTIDO/);
 assert.doesNotMatch(root.innerHTML,/clutch-pick/);
 assert.doesNotMatch(root.innerHTML,/director-dock|Copiar contexto y abrir ChatGPT/);
 assert.doesNotMatch(root.innerHTML,/preseason-bar/);
-console.log('Interfaz RASCENSO 4.9.2 correcta; bandera y mundo no alterados. Tamaño:',root.innerHTML.length);
+console.log('Interfaz editorial RASCENSO correcta; bandera y mundo no alterados. Tamaño:',root.innerHTML.length);

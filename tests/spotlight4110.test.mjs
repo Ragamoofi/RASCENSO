@@ -82,3 +82,11 @@ test('HTML carga módulos de versión 511 y UI incluye tarjeta de hitos',()=>{
  assert.match(ui,/recapPending|focus-card\.story\.recap/);
  assert.match(ui,/spotlight4110-dialog/);assert.match(ui,/spotlight4110-history/);
 });
+
+// Regression: metric sign already converts fractions into percentage points.
+test('un rasgo de +4 % informa 4 puntos porcentuales, sin multiplicar dos veces',()=>{
+ const stats=s=>({composure:s.environment ? .04 : 0});
+ const rows=traitSignals4110({environment:'sin_contactos'},{type:'cabezazo'},stats);
+ assert.match(rows[0].text,/\+4 puntos porcentuales/);
+ assert.doesNotMatch(rows[0].text,/400/);
+});

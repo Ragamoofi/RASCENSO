@@ -1,3 +1,4 @@
+import {autoSummerCareer} from '../src/summer-career4111.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { newCareer, acceptDraft, academyOffers, signAcademy, autoResolveEvent, advanceSeason, simulateToRetirement, migrateCareer, eventInfo, resolveEvent, finishEvent, currentObjectives, negotiateOffer, openAgentMarket, retireNow, canRetire, syncClub, draftChoices, SAVE_VERSION } from '../src/engine.mjs';
@@ -12,6 +13,7 @@ function seasons(s,n){
  while(s.history.length<n&&k++<80&&s.phase!=='retired'){
   if(s.phase==='season')s=advanceSeason(s);
   else if(s.phase==='event')s=autoResolveEvent(s);
+  else if(s.phase==='summer')s=autoSummerCareer(s);
   else if(s.phase==='transfer')s=s.market?.canStay===false?(s.offers[0]?chooseTransfer(s,s.offers[0].id):retireFromMarket({...s,age:Math.max(31,s.age)})):chooseTransfer(s);
  }
  return s;
@@ -82,12 +84,12 @@ test('2.0 · todas las escenas del mundo se construyen y resuelven sin errores',
  for(const id of WORLD_SCENE_IDS){
   const s={...base,phase:'event',sceneBeat:0,pendingEvent:id,sceneData:{clubId:club,position:'MCO',newOvr:base.ovr+2,award:'Balón de Ascenso',youth:'Juan Pérez',youthAge:17,called:id==='w_national'},lastSeason:{...base.lastSeason,objectives:base.lastSeason.objectives,injuryWeeks:10}};
   const e=eventInfo(s);assert.ok(e.title&&e.options.length>=2,id);
-  for(let i=0;i<e.options.length;i++){const r=resolveEvent(s,i);assert.equal(r.sceneBeat,1,id);const f=finishEvent(r);assert.ok(['season','event','transfer','retired'].includes(f.phase),id);}
+  for(let i=0;i<e.options.length;i++){const r=resolveEvent(s,i);assert.equal(r.sceneBeat,1,id);const f=finishEvent(r);assert.ok(['season','event','transfer','summer','retired'].includes(f.phase),id);}
  }
 });
 
 test('2.0 · negociación determinista: acepta, mantiene o retira la oferta',()=>{
- let s=seasons(start('nego20'),2);while(s.phase!=='season'){s=s.phase==='event'?autoResolveEvent(s):s.phase==='transfer'?chooseTransfer(s):s;}
+ let s=seasons(start('nego20'),2);while(s.phase!=='season'){s=s.phase==='event'?autoResolveEvent(s):s.phase==='transfer'?chooseTransfer(s):s.phase==='summer'?autoSummerCareer(s):s;}
  s=openAgentMarket(s);assert.equal(s.phase,'transfer');
  const offer=s.offers[0];if(!offer)return;
  const a=negotiateOffer(s,offer.id,'salary'),b=negotiateOffer(s,offer.id,'salary');

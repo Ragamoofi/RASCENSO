@@ -1,0 +1,50 @@
+[
+  {
+    "foreground": "Texto",
+    "background": "Fondo",
+    "contrast": 17.07,
+    "AA_normal": true
+  },
+  {
+    "foreground": "Secundario",
+    "background": "Panel",
+    "contrast": 8.48,
+    "AA_normal": true
+  },
+  {
+    "foreground": "Fondo",
+    "background": "Cobre",
+    "contrast": 5.74,
+    "AA_normal": true
+  },
+  {
+    "foreground": "Cobre claro",
+    "background": "Panel",
+    "contrast": 7.06,
+    "AA_normal": true
+  },
+  {
+    "foreground": "Éxito",
+    "background": "Panel",
+    "contrast": 6.95,
+    "AA_normal": true
+  },
+  {
+    "foreground": "Aviso",
+    "background": "Panel",
+    "contrast": 8.05,
+    "AA_normal": true
+  },
+  {
+    "foreground": "Error",
+    "background": "Panel",
+    "contrast": 4.76,
+    "AA_normal": true
+  },
+  {
+    "foreground": "Información",
+    "background": "Panel",
+    "contrast": 6.03,
+    "AA_normal": true
+  }
+]
