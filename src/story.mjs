@@ -330,13 +330,15 @@ function storyWeight(id,s){
 export function chooseScene(s,roll){
  if(s.fanClubId && s.clubId===s.fanClubId && !s.storyFlags?.playedForFan) return 'fan_home';
  const log=s.storyLog||[];
+ const past=new Set([...log.map(x=>x.id),...Object.keys(s.sceneSeen4110||{})]);
  const recentIds=new Set(log.slice(-12).map(x=>x.id));
  const recentTags=new Set(log.slice(-3).map(x=>x.tag));
  const excluded=new Set(['arrival','fan_home','fan_departure','family']);
  const eligible=STORY_IDS.filter(id=>!excluded.has(id)&&catalog[id]&&(!catalog[id].eligible||catalog[id].eligible(s)));
  if(!eligible.length)return 'coach';
  // Solo permitir reciclaje de una escena cuando todas las opciones se agotaron.
- const fresh=eligible.filter(id=>!recentIds.has(id));
+ const unseen=eligible.filter(id=>!past.has(id));
+ const fresh=unseen.length?unseen:eligible.filter(id=>!recentIds.has(id));
  const pool=fresh.length?fresh:eligible.filter(id=>id!==log.at(-1)?.id);
  const candidates=pool.length?pool:eligible;
  const weights=candidates.map(id=>Math.max(.01,storyWeight(id,s)*(recentTags.has(catalog[id].tag)?.24:1)));
@@ -359,6 +361,7 @@ export function resultOfScene(s,scene,index,playerText=''){
    morale:x((s.morale??70)+(effect.morale||0),0,100),reputation:x((s.reputation??0)+(effect.reputation||0),0,100),
    sceneBeat:1,sceneChoice:index,scenePlayerText:String(playerText||'').trim().slice(0,240),
    decisions:[...s.decisions,{age:s.age,text:`${scene.title}: ${o.title}`}],
+   sceneSeen4110:{...(s.sceneSeen4110||{}),[scene.id]:{count:((s.sceneSeen4110||{})[scene.id]?.count||0)+1,year:(s.startYear||2026)+(s.age-(s.startAge||16))}},
    storyLog:[...(s.storyLog||[]),{year:(s.startYear||2026)+(s.age-(s.startAge||16)),id:scene.id,title:scene.title,tag:scene.tag,actor:scene.speaker.name,choice:o.title,words:String(playerText||'').trim().slice(0,240),result:o.impact,club:clubName(s.clubId)}].slice(-100)};
  const shifted=modern&&effect.ovr?adjustOvr(newState,x(s.ovr+effect.ovr,40,s.potential)-s.ovr):newState;
  // Efectos extendidos (hinchada, directiva, compromisos, posición…) valen para cualquier escena.

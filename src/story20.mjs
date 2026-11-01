@@ -297,7 +297,11 @@ export function pickWorldScene(s,roll,{urgentOnly=false}={}){
  const u=urgent.find(x=>!done.has(x.id));
  if(u)return u;
  if(urgentOnly)return null;
- const pool=list.filter(x=>x.weight<25&&!done.has(x.id));if(!pool.length)return null;
+ const pool0=list.filter(x=>x.weight<25&&!done.has(x.id));
+ const history=new Set([...Object.keys(s.sceneSeen4110||{}),...(s.storyLog||[]).map(x=>x.id)]);
+ const unused=pool0.filter(x=>!history.has(x.id));
+ const pool=unused.length?unused:pool0.filter(x=>{const last=s.sceneSeen4110?.[x.id]?.year;return last==null||yearOf(s)-last>=3});
+ if(!pool.length)return null;
  const total=pool.reduce((a,x)=>a+x.weight,0);let v=roll()*total;
  for(const x of pool)if((v-=x.weight)<=0)return x;return pool.at(-1);
 }

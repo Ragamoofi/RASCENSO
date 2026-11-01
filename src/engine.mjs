@@ -5,6 +5,7 @@ import { upcomingMoment, solveMoment } from './moments15.mjs';
 import { identityTraits, identitySeasonEffects, preparationEffects, PREPARATIONS, archetypeFor } from './career08.mjs';
 import { DRAFT_REFERENTS, DRAFT_TIERS, draftPotentialAdjustment } from './draft09.mjs';
 import { chooseSeasonAgenda, seasonAgendaEffects } from './agenda09.mjs';
+import {seasonMilestones4110} from './spotlight4110.mjs';
 import {seasonMatchImpact,matchImpactHeadline} from './play-impact43.mjs';
 export { chooseSeasonAgenda } from './agenda09.mjs';
 
@@ -86,7 +87,7 @@ export function newCareer({name,number=9,foot='Derecha',country='CL',position='D
   const start=choiceFx({origin:originId,environment,developmentPath,personality:personalityId,style,strength,weakness,dream,foot:foot==='Izquierda'?'Izquierda':'Derecha',position});
   const startTrust=clamp(50+start.startTrust,0,100);
   relationships.coach.trust=startTrust;relationships.family.trust=clamp((relationships.family.trust||75)+start.startFamily,0,100);
-  return {version:SAVE_VERSION,attrModel:2,attrCeil:{},world:null,squad:null,threads:[],awards:[],...normalizeProfile({position,roleClass,strength,weakness}),clutchMoment:null,...identityTraits({environment,publicImage,riskProfile,developmentPath}),preparation:null,careerMoments:[],annualScenes:0,market:null,agent:{searches:0,year:null,focus:'balanced'},careerEarnings:0,developmentProfile:developmentPath==='tardio'?'tardio':['temprano','normal','normal','normal','tardio'][Math.floor(rng(String(seed)+':dev')()*5)],injuryProfile:rng(String(seed)+':injury')()<.18?'fragil':'resistente',seasonPlan:'equilibrio',contract:null,seed:String(seed),phase:'draft',name:safeName,number:clamp(Number(number)||9,1,99),foot:foot==='Izquierda'?'Izquierda':'Derecha', country,position,mode:mode==='Purista'?'Purista':'Clásico',
+  return {version:SAVE_VERSION,attrModel:2,attrCeil:{},world:null,squad:null,threads:[],awards:[],...normalizeProfile({position,roleClass,strength,weakness}),clutchMoment:null,...identityTraits({environment,publicImage,riskProfile,developmentPath}),preparation:null,careerMoments:[],milestones4110:[],sceneSeen4110:{},annualScenes:0,market:null,agent:{searches:0,year:null,focus:'balanced'},careerEarnings:0,developmentProfile:developmentPath==='tardio'?'tardio':['temprano','normal','normal','normal','tardio'][Math.floor(rng(String(seed)+':dev')()*5)],injuryProfile:rng(String(seed)+':injury')()<.18?'fragil':'resistente',seasonPlan:'equilibrio',contract:null,seed:String(seed),phase:'draft',name:safeName,number:clamp(Number(number)||9,1,99),foot:foot==='Izquierda'?'Izquierda':'Derecha', country,position,mode:mode==='Purista'?'Purista':'Clásico',
     age:firstAge,startAge:firstAge,startYear:START_YEAR,city:String(city||'').trim().slice(0,40),origin:originId,personality:personalityId,
     style:validSelection(style,STYLES,'equilibrado'),dream:validSelection(dream,DREAMS,'seleccion'),story:String(story||'').trim().slice(0,180),
     fanClubId:getClub(fanClubId)?fanClubId:null,storyFlags:{playedForFan:false},storyLog:[],relationships,sceneBeat:0,sceneChoice:null,scenePlayerText:'',
@@ -103,7 +104,7 @@ export function migrateCareer(s){
   const safeRel={...rel,coach:{...rel.coach,trust:v1.coachTrust??rel.coach?.trust??50}};
   const backfilledTrophies=(v1.history||[]).flatMap(x=>(x.titles||[]).map(title=>({title,year:x.year??null,clubId:x.clubId??null,leagueId:x.leagueId||'',kind:'league'})));
   if(backfilledTrophies.length<(v1.trophies||[]).length){for(const title of (v1.trophies||[]).slice(backfilledTrophies.length))backfilledTrophies.push({title:String(title),year:null,clubId:null,kind:'league'});}
-  const migrated={...v1,...normalizeProfile(v1),version:SAVE_VERSION,threads:Array.isArray(v1.threads)?v1.threads:[],awards:Array.isArray(v1.awards)?v1.awards:[],world:v1.world&&v1.world.v?v1.world:null,squad:v1.squad||null,clutchMoment:v1.clutchMoment||null,trophyRecords:Array.isArray(v1.trophyRecords)?v1.trophyRecords:backfilledTrophies,...identityTraits(v1),preparation:v1.preparation||null,careerMoments:Array.isArray(v1.careerMoments)?v1.careerMoments:[],annualScenes:v1.annualScenes||0,market:v1.market||null,agent:v1.agent||{searches:0,year:null,focus:'balanced'},careerEarnings:v1.careerEarnings??(v1.history||[]).reduce((n,x)=>n+(x.salaryEarned||0),0),developmentProfile:v1.developmentProfile||'normal',injuryProfile:v1.injuryProfile||'resistente',seasonPlan:v1.seasonPlan||'equilibrio',contract:v1.contract||null,fanClubId:getClub(v1.fanClubId)?v1.fanClubId:null,
+  const migrated={...v1,...normalizeProfile(v1),version:SAVE_VERSION,threads:Array.isArray(v1.threads)?v1.threads:[],awards:Array.isArray(v1.awards)?v1.awards:[],world:v1.world&&v1.world.v?v1.world:null,squad:v1.squad||null,clutchMoment:v1.clutchMoment||null,trophyRecords:Array.isArray(v1.trophyRecords)?v1.trophyRecords:backfilledTrophies,...identityTraits(v1),preparation:v1.preparation||null,careerMoments:Array.isArray(v1.careerMoments)?v1.careerMoments:[],milestones4110:Array.isArray(v1.milestones4110)?v1.milestones4110:[],sceneSeen4110:v1.sceneSeen4110||{},annualScenes:v1.annualScenes||0,market:v1.market||null,agent:v1.agent||{searches:0,year:null,focus:'balanced'},careerEarnings:v1.careerEarnings??(v1.history||[]).reduce((n,x)=>n+(x.salaryEarned||0),0),developmentProfile:v1.developmentProfile||'normal',injuryProfile:v1.injuryProfile||'resistente',seasonPlan:v1.seasonPlan||'equilibrio',contract:v1.contract||null,fanClubId:getClub(v1.fanClubId)?v1.fanClubId:null,
     storyFlags:v1.storyFlags||{playedForFan:!!(v1.fanClubId&&v1.history?.some(h=>h.clubId===v1.fanClubId))},
     storyLog:Array.isArray(v1.storyLog)?v1.storyLog:[],recapPending:!!v1.recapPending,relationships:safeRel,
     sceneBeat:v1.sceneBeat||0,sceneChoice:v1.sceneChoice??null,scenePlayerText:v1.scenePlayerText||''};
@@ -442,10 +443,12 @@ export function advanceSeason(input){
  for(const a of myAwards)moments.push({year,kind:'award',text:`${a.name}${a.league?` · ${a.league}`:''}`});
  const trophyRecords=[...(s.trophyRecords||[]),...titles.filter(title=>title===league.league).map(title=>({title,year,clubId:club.id,leagueId:league.leagueId||'',kind:'league'})),...global.trophyRecords];
  const morale=clamp(Math.round((s.morale??70)+playFx.morale+cfx.moraleYear+(s.dream==='titulos'?titles.length:0)-((s.morale??70)-68)*.18+prep.morale+identity.morale+coachFx.morale+threadFx.morale+social.morale+(objScore>=2?3:objScore<1?-4:0)+(myAwards.length?4:0)),0,100);
+ const milestoneAdd=seasonMilestones4110(s,seasonal);
+ const milestones4110=[...(s.milestones4110||[]),...milestoneAdd].slice(-35);
  const flags={...(s.storyFlags||{})};if(s.fanClubId&&s.clubId===s.fanClubId)flags.playedForFan=true;
  // Las promesas de esta temporada vencen; quedan registradas para escenas posteriores.
  const next={...s,age:s.age+1,ovr,potential:dev.potential,attributes,attrCeil:dev.attrCeil,reputation,trophyRecords,annualScenes:0,morale,careerEarnings:(s.careerEarnings||0)+wage,leagueRosters,coachTrust,relationships,history:[...s.history,seasonal],trophies:[...s.trophies,...titles],lastSeason:seasonal,recapPending:true,storyFlags:flags,
-  world,fm26:fmProgress.fm26,squad,threads,awards:[...(s.awards||[]),...myAwards],careerMoments:moments.slice(-120),
+  world,fm26:fmProgress.fm26,squad,threads,milestones4110,awards:[...(s.awards||[]),...myAwards],careerMoments:moments.slice(-120),
   sceneBeat:0,sceneChoice:null,scenePlayerText:'',clutchMoment:null,plays30:null,phase:'event'};
  let synced=syncClub(next);
  // Sueño cumplido: recompensa única (reputación, moral, afición, directiva) y premio de carrera.

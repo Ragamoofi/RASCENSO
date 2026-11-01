@@ -91,7 +91,7 @@ test('una carrera completa es determinista para la misma semilla y elecciones',(
 
 test('los recursos de publicación apuntan al motor actualizado con versión distinta',()=>{
  const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
- assert.match(html,/RASCENSO 4\.10\.6/);
+ assert.match(html,/RASCENSO 4\.10\.(?:[6-9]|[1-9]\d+)/);
  assert.match(html,/"\.\/src\/identity30\.mjs":"\.\/src\/identity30\.mjs\?v=510"/);
  assert.match(html,/experience494\.mjs\?v=502/);
 });

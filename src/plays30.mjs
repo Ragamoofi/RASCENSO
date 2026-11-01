@@ -10,6 +10,7 @@ import { rng, hash, clamp, yearOf, positionGroup } from './career20.mjs';
 import { fixtureContext } from './career15.mjs';
 import { choiceFx } from './identity30.mjs';
 import {tuningFor,tunedAI,tunedChance} from './play-tuning43.mjs';
+import {contextVariation4110} from './spotlight4110.mjs';
 
 export const PLAYS={
  mano_a_mano:{name:'Mano a mano',kind:'attack',credit:'goal',view:'field',attr:['shot','dribble','pace'],brief:'Encara al arquero: muévete, amaga y define antes de que llegue el defensor.',controls:'Ratón o WASD/flechas para conducir · clic izquierdo potente o derecho colocado'},
@@ -135,10 +136,12 @@ export function buildSeasonPlays(s,league,getClub,{role,rivalLevel=()=>60,clubLe
   const pressure=clamp(Math.round(38+(decisive?24:0)+(ctx.classic?14:0)+(Math.abs(before.gf-before.ga)<=1?8:0)+(minute>=85?8:0)+(tier===1?4:0)+(prestige-70)*.25+choiceFx(s).pressure),20,99);
   const fatigue=clamp(minute/95*(1.05-((s.attributes?.physical||60)/150)),0,.85);
   const difficulty=clamp(.34+(rl-(s.ovr||60))*.022+(prestige-65)*.006+(tier===1?.05:0)+pressure*.0016+(s.history?.length||0)*.004,.12,.95);
-  out.push({id:`${year}:${pick.m.round}:${type}`,year,round:pick.m.round,home:pick.m.home,away:pick.m.away,type,kind:info.kind,credit:info.credit,
+  const playEntry={id:`${year}:${pick.m.round}:${type}`,year,round:pick.m.round,home:pick.m.home,away:pick.m.away,type,kind:info.kind,credit:info.credit,
    rivalId,rival:ctx.rival,homeName:ctx.home,awayName:ctx.away,classic:!!ctx.classic,decisive,tag:decisive?DECISIVE_LABEL[hash(seed)%DECISIVE_LABEL.length]:ctx.tag||'Partido de liga',
    minute,before,pressure,fatigue:Math.round(fatigue*100)/100,difficulty:Math.round(difficulty*100)/100,rivalLevel:rl,seed,
-   isHome:pick.m.home===s.clubId});
+   isHome:pick.m.home===s.clubId,lastRound:pick.m.round===Math.max(...league.playerMatches.map(m=>m.round)),isFinal:/^final(?:\s+de\s+copa)?$/i.test(String(pick.m.stage||pick.m.phase||''))};
+  playEntry.variation=contextVariation4110(s,playEntry);
+  out.push(playEntry);
  }
  return out.sort((a,b)=>a.round-b.round);
 }

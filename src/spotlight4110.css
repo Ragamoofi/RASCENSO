@@ -1,0 +1,36 @@
+/* RASCENSO 4.10.7 — cobre y azul marino; sin librerías externas. */
+.spotlight4110-effects{margin:8px 0;display:grid;gap:5px}
+.spotlight4110-live{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:6px;padding:7px 12px 9px;background:linear-gradient(120deg,#112c43,#1a344c);border-top:1px solid #bd87595c}
+.spotlight4110-live>span{grid-column:1/-1;color:#e9b788;font-size:9px;letter-spacing:.14em;font-weight:900}
+.spotlight4110-effect{min-width:0;border:1px solid #9c75465e;background:#12283d;border-radius:8px;padding:6px 9px;display:flex;flex-direction:column;gap:3px}
+.spotlight4110-effect b{font-size:11px;color:#f1c195}
+.spotlight4110-effect small{font-size:10px;color:#c8d9ed;line-height:1.4}
+.spotlight4110-season{margin:10px 0;padding:14px;border-radius:12px;border:1px solid #836140;background:linear-gradient(135deg,#20314a,#16283c)}
+.spotlight4110-eyebrow{font-size:10px;letter-spacing:.13em;font-weight:900;color:#edb98a}
+.spotlight4110-season>p{margin:5px 0 10px;color:#aebfd1;font-size:11px}
+.spotlight4110-season-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.spotlight4110-season-grid>div{display:flex;flex-direction:column;gap:4px;padding:9px;border:1px solid #36536b;border-radius:8px;background:#0c2136}
+.spotlight4110-season-grid strong{color:#ffdfba;font-size:11px}
+.spotlight4110-season-grid span{color:#c7d7e8;font-size:11px;line-height:1.4}
+.spotlight4110-dialog{position:fixed;max-width:min(560px,calc(100vw - 30px));width:100%;padding:0;border:1px solid #b78858;border-radius:18px;overflow:hidden;color:#fff;background:#0c2137;box-shadow:0 24px 110px #000b}
+.spotlight4110-dialog::backdrop{background:rgba(2,9,19,.87);backdrop-filter:blur(6px)}
+.spotlight4110-hero{position:relative;isolation:isolate;overflow:hidden;text-align:center;display:flex;flex-direction:column;align-items:center;padding:26px 34px 28px;background:radial-gradient(circle at 50% 33%,#a7773e30,transparent 45%),linear-gradient(160deg,#203e5b,#0a1c2e)}
+.spotlight4110-glow{position:absolute;inset:20px 15%;z-index:-1;border:1px solid #d4a16a3d;border-radius:50%;transform:scale(1.1);box-shadow:0 0 80px #ffb87316}
+.spotlight4110-label{font-size:10px;letter-spacing:.18em;color:#efc19c;font-weight:900}
+.spotlight4110-symbol{display:grid;place-items:center;font-size:75px;width:142px;height:142px;margin:20px 0 12px;border-radius:50%;background:radial-gradient(circle,#42668c,#17314d 70%);border:1px solid #dba66f7d;box-shadow:0 14px 40px #030c19a1, inset 0 0 30px #93b6de22}
+.spotlight4110-overline{margin:0;color:#b6cee5;font-weight:800;font-size:10px;letter-spacing:.14em}
+.spotlight4110-dialog h2{font:900 clamp(30px,4vw,46px)/1.05 'Barlow Condensed',sans-serif;margin:7px 0 12px;color:#fff}
+.spotlight4110-description{font-size:14px;color:#d0dfef;line-height:1.55;max-width:430px;margin:0}
+.spotlight4110-rule{height:1px;background:linear-gradient(90deg,transparent,#b68759,transparent);width:85%;margin:22px 0 11px}
+.spotlight4110-footnote{font-size:10px;color:#a9c0d8}
+.spotlight4110-next{background:#bd8658;color:#061c30;border:1px solid #ffd0a1;border-radius:9px;padding:12px 24px;font-weight:900;margin-top:20px;cursor:pointer}
+.spotlight4110-next:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.spotlight4110-history{padding:12px 0;margin:14px 0}
+.spotlight4110-gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:8px;margin-top:10px}
+.spotlight4110-gallery article{display:flex;gap:10px;padding:12px;border:1px solid #9d7b5e70;border-radius:10px;background:#183149}
+.spotlight4110-gallery article>span{font-size:27px}
+.spotlight4110-gallery small{color:#eab381;font-size:10px}
+.spotlight4110-gallery strong{display:block;font-size:12px}
+.spotlight4110-gallery p{font-size:10px;color:#b4c8d8;line-height:1.4;margin:4px 0 0}
+@media(max-width:650px){.spotlight4110-season-grid{grid-template-columns:1fr}.spotlight4110-hero{padding:20px 17px 24px}.spotlight4110-live{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.spotlight4110-dialog,.spotlight4110-hero{animation:none!important}}
