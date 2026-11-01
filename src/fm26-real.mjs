@@ -1,6 +1,7 @@
 /* FM26 PRIVADO · datos sólo en memoria local, nunca incluidos en el repositorio ni en el guardado.
  * Un club queda activo ÚNICAMENTE con FM UID, verificación de país/género y evidencia.
  * Se guardan IDs + cambios de trayectoria, no 180.739 fichas estáticas. */
+import {fmNationToCode} from './fm26-nations.mjs';
 const baseClubs=new Map(),approved=new Map(),byId=new Map();
 export const POS_FM={GK:'POR',DC:'DFC',DL:'LI',DR:'LD',DM:'MCD',MC:'MC',ML:'MI',MR:'MD',AMC:'MCO',AML:'EI',AMR:'ED',STC:'DC',WBL:'LI',WBR:'LD'};
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
@@ -21,7 +22,7 @@ export function convertFM26(fm,clubId,year=2026){
  const ovr=fm26OVR(fm.ca_fm)??60,pot=Math.max(ovr,fm26OVR(fm.pa_fm)??ovr);
  return {id:fm.id,name:String(fm.nombre||'').trim(),pos,age,ovr,pot,clubId,kind:'real',origin:'fm26',
   teamSlot:Number(fm.equipo_slot)||0,attributes:fm26Attributes(fm.stats),status:'active',apps:0,goals:0,assists:0,
-  titles:0,awards:[],peak:ovr,seasons:[],joined:year,cc:null,fmNationId:fm.nacion_fm??null,
+  titles:0,awards:[],peak:ovr,seasons:[],joined:year,cc:fmNationToCode(fm.nacion_fm),fmNationId:fm.nacion_fm??null,
   loan:fm.cedido?{parentFM:String(fm.club_origen_cesion_uid||'')}:null};
 }
 /* La aprobación sólo acepta una evidencia EXTERNA real, no una etiqueta del paquete. */

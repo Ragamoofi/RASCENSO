@@ -3,6 +3,7 @@
  * Nombres/UID no equivalen a una certificación de género; nunca se infiere el sexo del jugador.
  */
 import {COUNTRIES} from './countries.mjs';
+import {fmNationToCode} from './fm26-nations.mjs';
 import {fm26OVR,registerFM26Club,clearFM26Memory,isRealClubReady,getFM26Squad,getFM26PlayerById,loadedFM26Clubs} from './fm26-real.mjs';
 import {zipEntries,unpackZIPEntry} from './fm26-local.mjs';
 import {bundledWorldManifest,bundledClubIndex,bundledDirectory,bundledShard} from './fm26-bundled.mjs';
@@ -174,7 +175,7 @@ export async function searchWorldPlayers(term,{limit=70,offset=0,clubUID=null}={
   for(const p of rows){
    if(clubUID!==null&&p[5]!==String(clubUID))continue;
    if(q&&!cleanup(p[1]).includes(q))continue;
-   found.push({id:p[0],name:p[1],age:p[2],position:p[3],ovr:bundled?fm26OVR(p[4]):p[4],fmClubUID:p[5],fmNationId:p[6]});
+   found.push({id:p[0],name:p[1],age:p[2],position:p[3],ovr:bundled?fm26OVR(p[4]):p[4],fmClubUID:p[5],fmNationId:p[6],cc:fmNationToCode(p[6])});
   }
  }
  found.sort((a,b)=>b.ovr-a.ovr||a.name.localeCompare(b.name));

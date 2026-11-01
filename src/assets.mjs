@@ -28,9 +28,12 @@ if(typeof document!=='undefined'&&typeof fetch==='function'){
 function letters(name){return String(name||'FC').split(/\s+/).filter(w=>!['de','da','do','del','la','el','fc','club','ac'].includes(w.toLowerCase())).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'FC';}
 function hue(str){let value=7;for(const c of String(str))value=(value*31+c.charCodeAt(0))%360;return value;}
 export function flag(code,cls='flag'){
- const iso={EN:'gb-eng',SC:'gb-sct' }[code]||String(code||'CL').toLowerCase();
- const fallback=''; // Sin emoji de letras superpuesto: la bandera verdadera viene en PNG.
- return `<span class="${cls}" title="${code}"><span>${fallback}</span><img src="https://flagcdn.com/w80/${iso}.png" loading="lazy" alt="" decoding="async" onload="this.previousElementSibling.style.display='none'" onerror="this.remove()"></span>`;
+ // Un valor indefinido nunca se interpreta como Chile.
+ const value=typeof code==='string'?code.trim().toUpperCase():'';
+ const iso={EN:'gb-eng',SC:'gb-sct',WA:'gb-wls',NIR:'gb-nir',SYC:'sc',NIC:'ni'}[value]||value.toLowerCase();
+ const safe=/^[A-Z]{2}$/.test(value)||['NIR','SYC','NIC'].includes(value);
+ if(!safe)return `<span class="${cls}" title="Nacionalidad sin identificar"><span>🌐</span></span>`;
+ return `<span class="${cls}" title="${value}"><span>🌐</span><img src="https://flagcdn.com/w80/${iso}.png" loading="lazy" alt="" decoding="async" onload="this.previousElementSibling.style.display='none'" onerror="this.remove()"></span>`;
 }
 export function badge(club, size=''){
  const c=typeof club==='string'?COUNTRIES.flatMap(x=>x.clubs).find(x=>x.id===club):club;
