@@ -292,3 +292,12 @@ dialog.club-modal495.club-modal497{border:1px solid var(--ed-line);border-radius
 .ed-table-hint{display:none;font-size:12px!important;line-height:1.6;color:var(--ed-muted);margin:8px 0 12px}
 .hero-emblem{pointer-events:auto!important}.hero-emblem:hover,.hero-emblem:focus-within{opacity:.7!important}
 @media(max-width:767px){.ed-table-hint{display:block}.main-nav .navtab{flex-direction:column;gap:6px;padding:8px 6px;font-size:13px;min-height:64px}.site-head{min-height:140px}.main-nav .navtab .ed-icon{width:20px;height:20px}}
+/* Stack mode keeps the next match ahead of secondary season analysis. The
+   original nodes and all their controls remain in the same functional flow. */
+@media(max-width:1679px){
+ .v2-season-cols>.v2-col-main,.v2-season-cols>.v2-col-side{display:contents!important}
+ .v2-col-main>*{order:5}.v2-col-side>*{order:8}
+ .v2-col-main>.v2-kicker{order:0}.v2-col-main>h2{order:1;margin:0!important}.v2-col-main>p{order:2;margin:0!important}
+ .v2-col-side>.matchday-center{order:3}.v2-col-main>.season-action-row{order:4;margin:0!important}
+ .v2-col-main>.match-rhythm{order:6;margin:0!important}.v2-col-main>.agent-focus-picker{order:7}.v2-col-main>.last-match{order:7}
+}
