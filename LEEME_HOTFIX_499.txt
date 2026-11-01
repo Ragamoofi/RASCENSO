@@ -1,0 +1,24 @@
+RASCENSO 4.9.9 — HOTFIX DE PUBLICACION (2026-11-01)
+Base: commit 5248ffbad7af01a32a1511f2985ba125c227bd3f (RASCENSO 4.9.9)
+
+Este ZIP NO es un instalador. Extrae su contenido en:
+Documentos\GitHub\RASCENSO
+Acepta reemplazar src\club-squads495.mjs, luego Commit y Push origin en GitHub Desktop.
+
+Correcciones en el modulo de correspondencia de clubes:
+- Reconoce la razon social 'Club Atletico ...' manteniendo distintos
+  los equipos cuyo nombre empieza naturalmente con Atletico.
+- Recupera los paises previamente contrastados CL=190, AR=187, ES=170
+  cuando no se aportan anclas, sin adivinar la identidad de otros paises.
+- Si la procedencia de pais no coincide, solo ofrece candidatos internos
+  sin asignar una plantilla de otro pais (la ficha publica sigue limpia).
+
+Sin modificaciones de partidas guardadas, plantilla profesional, estilos ni scroll.
+
+Validacion: node --check del modulo correcto; 38/38 pruebas aisladas
+con adaptadores de dependencias, incluyendo los 7 casos que fallaron
+previamente en GitHub Actions. NO equivale a una ejecucion integral del
+workflow remoto; verifica 'Publicar RASCENSO' en Actions tras subir.
+La prueba independiente 'Prueba de jugadas en navegador' puede seguir
+con X por un test antiguo que espera 180739 registros visibles mientras
+el filtro masculino muestra 179917; esa X NO bloquea GitHub Pages.

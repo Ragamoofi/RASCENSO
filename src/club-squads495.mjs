@@ -20,7 +20,8 @@ function explicitMatch(id,index){const x=explicit[id],entry=x&&index[x.uid];retu
  * si el país FM está confirmado y existe un candidato inequívoco.
  */
 const normalizeClubName=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'')
- .toLowerCase().replace(/&/g,' y ').replace(/\b(s\.?\s*a\.?\s*d\.?\s*p?\.?)\b/g,' ')
+ .toLowerCase().replace(/^\s*club\s+atletico\s+/,' ')
+ .replace(/&/g,' y ').replace(/\b(s\.?\s*a\.?\s*d\.?\s*p?\.?)\b/g,' ')
  .replace(/\b(?:sociedad anonima deportiva profesional|sociedad anonima deportiva|club|clube|deportivo|deportiva|deportes|desportivo|futbol|futebol|football|sociedad|social|asociacion|associacao|regatas|fc|cf|ac|sc|sd|de|del|da|do|la|el)\b/g,' ')
  .replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();
 const normTokens=value=>new Set(normalizeClubName(value).split(' ').filter(Boolean));
@@ -45,6 +46,10 @@ function countryFor(club,index,mappings){
  const code=String(club?.countryCode||'').toUpperCase();
  const fromMapping=mappings?.countries?.[code];
  if(fromMapping!=null)return String(fromMapping);
+ // Anclas de país verificadas en la base mundial. Evitar inferir desde la
+ // nacionalidad individual de jugadores, que no garantiza país del club.
+ const verifiedOrigins={AR:'187',CL:'190',ES:'170'};
+ if(verifiedOrigins[code])return verifiedOrigins[code];
  const fromKnown=memoCountry?.get(code);if(fromKnown!==undefined)return fromKnown;
  const countryClubs=COUNTRIES.find(c=>c.code===code)?.clubs||null;
  if(!countryClubs){memoCountry?.set(code,null);return null}
@@ -98,10 +103,18 @@ function candidatesForGame(club,index,mappings){
  const rows=clubRows(index);const country=countryFor(club,index,mappings);
  // No asignar automáticamente un club de país incierto; la lista mundial
  // sigue disponible desde Mundo para consultar la plantilla original.
- if(!country)return {match:null,candidates:[],countryVerified:false};
+ if(!country){
+  const possible=bestCandidate(club,rows);
+  return {match:null,candidates:possible.candidates,countryVerified:false};
+ }
  const correctCountry=rows.filter(x=>x.country===country);
+ if(!correctCountry.length){
+  // Informar posibles coincidencias sin asignar un plantel extranjero.
+  const possible=bestCandidate(club,rows);
+  return {match:null,candidates:possible.candidates,countryVerified:false};
+ }
  const answer=bestCandidate(club,correctCountry);
- return {...answer,countryVerified:correctCountry.length>0};
+ return {...answer,countryVerified:true};
 }
 export function resolveClub(ref,index,mappings){
  const mapping=mappings?.mapping||{};
