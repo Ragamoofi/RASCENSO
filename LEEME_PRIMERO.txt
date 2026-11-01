@@ -1,0 +1,38 @@
+RASCENSO 4.10.1 — CREADOR RENOVADO (PARCHE DIRECTO)
+=====================================================
+Base inspeccionada: main, commit 6224c7588e8705c13a9f59e467fb2c0ae20e0b87.
+
+INSTALACIÓN:
+1. Extrae este ZIP directamente en Documentos\GitHub\RASCENSO.
+2. Acepta reemplazar index.html y conservar las carpetas src y tests.
+3. En GitHub Desktop haz Commit -> Push origin.
+4. Espera el resultado verde de 'Publicar RASCENSO' y actualiza la página con Ctrl+F5.
+
+CAMBIOS:
+- Seis pasos del creador con tarjetas más compactas y consistentes.
+- Navegación por subsecciones dentro de cada paso, sin apilar todas las decisiones.
+- Identidad: separa datos/cancha, edad/pierna y tipo de jugador.
+- Raíces: historia, formación y entorno.
+- Futbolista: clase, fortaleza, debilidad, estilo y desarrollo.
+- Mentalidad: carácter, imagen pública y decisiones.
+- Sueños: meta, club favorito y modo del draft.
+- Buscador por nombre para seleccionar el club favorito entre los equipos jugables.
+- Resumen más compacto en 4 columnas (pantallas amplias).
+- Adaptación a resoluciones medianas y móviles.
+
+RESPETO DE DATOS:
+No se modifica el motor, el archivo creator30.mjs, la simulación ni las partidas.
+Los controles originales se mantienen en el formulario; el buscador cambia el select
+que ya usa RASCENSO y dispara su evento de guardado. El listado largo sigue disponible
+por país como alternativa.
+
+ARCHIVOS:
+index.html
+src/creator-layout4101.css (nuevo)
+src/creator-layout4101.mjs (nuevo)
+tests/creator-layout4101.test.mjs (nuevo)
+
+VALIDACIÓN:
+Sintaxis JS y pruebas específicas incluidas. Prueba visual completa en navegador
+no realizada: el entorno impidió acceder al servidor y al archivo local en Chromium.
+No debe confundirse con una verificación completa de publicación en GitHub Actions.
