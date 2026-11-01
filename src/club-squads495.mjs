@@ -14,7 +14,7 @@ function explicitMatch(id,index){const x=explicit[id],entry=x&&index[x.uid];retu
 // país FM y nombre normalizado, sin fusionar homónimos por intuición.
 const normalizeClubName=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'')
  .toLocaleLowerCase('es').replace(/&/g,' y ').replace(/[^a-z0-9]+/g,' ')
- .replace(/\b(?:club|clube|atletico|deportivo|deportiva|deportes|desportivo|futbol|futebol|football|sociedad|social|asociacion|associacao|regatas|fc|cf|ac|sc|sd|de|del|da|do|la|el)\b/g,' ')
+ .replace(/\b(?:s a d p|s a d|s a|sadp|sociedad anonima deportiva profesional|sociedad anonima deportiva|s a d|club|clube|atletico|deportivo|deportiva|deportes|desportivo|futbol|futebol|football|sociedad|social|asociacion|associacao|regatas|fc|cf|ac|sc|sd|de|del|da|do|la|el)\b/g,' ')
  .replace(/\s+/g,' ').trim();
 const tokenSet=value=>new Set(normalizeClubName(value).split(' ').filter(Boolean));
 let lastIndex=null,lastRows=null;
@@ -56,7 +56,16 @@ function candidatesForGame(club,index,mappings){
  // Un club puede tener jugadores incluso cuando el índice no marca titulares (n_primer_equipo=0).
  // El único enlace automático permitido sigue exigiendo nombre+país inequívocos.
  const exacts=results.filter(x=>x.exact&&x.players>0);
- const match=countryVerified&&exacts.length===1?exacts[0].uid:null;
+ let match=countryVerified&&exacts.length===1?exacts[0].uid:null;
+ // Deportes Iquique figura con distintas razones sociales en los datos FM.
+ // Sólo aceptar un registro masculino del país comprobado, con el núcleo
+ // «Deportes Iquique» completo y SIN sufijos de filiales/sub-21/reservas.
+ if(!match&&club.id==='cl-extra-3'&&countryVerified&&String(countryId)==='190'){
+  const alias=knownRows.filter(row=>/\bdeportes?\s+iquique\b/i.test(row.entry.nombre)
+   &&!/\b(?:women|femenin[ao]|sub[- ]?\d+|u[- ]?\d+|reserva|filial|juvenil|ii|iii|b)\b/i.test(row.entry.nombre)
+   &&Number(row.entry.n_jugadores)>0);
+  if(alias.length===1)match=alias[0].uid;
+ }
  return {match,candidates:results.slice(0,10),countryVerified};
 }
 export function resolveClub(ref,index,mappings){
@@ -78,6 +87,48 @@ export function resolveClub(ref,index,mappings){
  return {uid,entry,gameId,club:gameId?getClub(gameId):null,
   simulationMapped:matches.length===1,candidates:[],linkStatus:'original'};
 }
+/** Plantel profesional: no confundir una plantilla con los 80-100 registros de
+ * primer equipo + juveniles + reservas de la exportación de 2026.
+ * El identificador equipo_slot=0 señala primera plantilla en esta base.
+ * Si faltan titulares marcados, completar sólo con futbolistas reales del
+ * archivo, ordenados por calidad; JAMÁS inventar jugadores en esta función.
+ */
+export function selectOriginalSquad498(raw=[],maxPlayers=30){
+ const eligible=(raw||[]).filter(p=>p?.id&&!isExcludedPlayer(p.id)&&!isFemalePlayerRecord497(p));
+ const quality=(a,b)=>(Number(b.ca_fm)||0)-(Number(a.ca_fm)||0)
+   ||(Number(a.edad)||99)-(Number(b.edad)||99)||String(a.id).localeCompare(String(b.id));
+ const first=eligible.filter(p=>Number(p.equipo_slot)===0).sort(quality);
+ const reserves=eligible.filter(p=>Number(p.equipo_slot)!==0).sort(quality);
+ const cap=Math.max(1,Math.min(35,Math.floor(Number(maxPlayers)||30)));
+ const choose=(rows,max)=>{
+  const out=[];let keepers=0;
+  for(const p of rows){
+   if(out.length>=max)break;
+   const keeper=fm26Position(p.posiciones)==='POR';
+   if(keeper&&keepers>=4)continue;
+   if(keeper)keepers++;
+   out.push(p);
+  }
+  return out;
+ };
+ if(first.length>=11){
+  const regular=choose(first,cap);
+  return regular.length>=11?regular:choose([...first,...reserves],cap);
+ }
+ // Sin marca de titularidad suficiente: completar con el mejor talento
+ // REAL del archivo; máximo 30 y nunca más de 4 porteros.
+ const fallbackSize=first.length?Math.min(cap,Math.max(18,first.length)):Math.min(cap,30);
+ return choose([...first,...reserves],fallbackSize);
+}
+
+/** Evitar canteranos sintéticos durante las primeras temporadas; recién
+ * aparecen cuando quedan huecos reales por retiros o transferencias.
+ */
+export function shouldFillWithGenerated498(state,realCount){
+ const year=Math.max(Number(state?.world?.year)||0,Number(state?.fm26?.year)||0,2026);
+ return year>=2029&&realCount<18;
+}
+
 export function snapshotPlayer(raw,gameId,state,simulationMapped=true){
  const base={id:raw.id,name:raw.nombre||'',age:raw.edad!=null&&raw.edad!==''&&Number.isFinite(Number(raw.edad))?Number(raw.edad):null,
   pos:fm26Position(raw.posiciones)||raw.posiciones?.[0]||'',ovr:fm26OVR(raw.ca_fm),
@@ -96,18 +147,40 @@ export async function loadClubSquad(ref,state={},api={getWorldMappingInfo,getWor
  const add=(raw,originId)=>{if(!raw?.id||isExcludedPlayer(raw.id)||isFemalePlayerRecord497(raw)||seen.has(raw.id))return;const p=snapshotPlayer(raw,originId,state,info.simulationMapped);
   if(p.status==='retired'||p.clubId!==info.gameId&&info.gameId!==null)return;
   if(info.gameId===null&&changes[p.id]?.clubId!==undefined)return;
-  seen.add(p.id);players.push({...p,source:changes[p.id]?'simulado':'base'});
+  seen.add(p.id);players.push({...p,source:changes[p.id]?'real actualizado':'real base'});
  };
- for(const raw of world?.players||[])add(raw,info.gameId);
- // La ficha original del futbolista transferido puede estar en otro shard aún no cargado.
- if(info.gameId){const inbound=Object.entries(changes).filter(([id,d])=>d.clubId===info.gameId&&!seen.has(id)&&d.status!=='retired');
+ // El visor muestra profesionales, no todas las categorías del archivo.
+ // El motor sigue conservando TODA la base real y los suplentes intactos.
+ const selected=selectOriginalSquad498(world?.players||[]);
+ for(const raw of selected)add(raw,info.gameId);
+ // Traslados históricos: retirar quien se fue, incluir jugadores reales que llegaron.
+ if(info.gameId){
+  const inbound=Object.entries(changes).filter(([id,d])=>d.clubId===info.gameId&&!seen.has(id)&&d.status!=='retired');
   for(const [id] of inbound){const raw=await api.getWorldPlayer(id);if(raw)add(raw,info.gameId);}
-  for(const p of state.world?.players||[]){if(p.clubId!==info.gameId||p.status==='retired'||isExcludedPlayer(p.id)||isFemalePlayerRecord497(p)||seen.has(p.id))continue;
-   // Cuando hay datos reales, no presentar veteranos ficticios como sustitutos.
-   if(world&&p.kind!=='gen'&&p.kind!=='prospect')continue;
-   seen.add(p.id);players.push({...p,source:'simulado'});
+  // Jugadores reales ya incorporados por el motor, sin duplicar fichas.
+  for(const p of state.world?.players||[]){
+   if(p.clubId!==info.gameId||p.status==='retired'||isExcludedPlayer(p.id)||isFemalePlayerRecord497(p)||seen.has(p.id))continue;
+   if(p.origin!=='fm26'&&!String(p.id||'').startsWith('fm26:'))continue;
+   seen.add(p.id);players.push({...p,source:'real'});
   }
-  if(state.clubId===info.gameId&&state.name){players.push({id:'career-player',name:state.name,age:state.age,pos:state.position,ovr:state.ovr,cc:state.country,source:'tu carrera'});}
+  // No añadir figuras, rivales ni juveniles inventados al plantel inicial.
+  // Sólo reponer bajas reales desde 2029, y hasta una base de 18 futbolistas.
+  const realCount=players.length;
+  if(shouldFillWithGenerated498(state,realCount)){
+   const shortage=18-realCount;
+   const eligible=(state.world?.players||[]).filter(p=>p?.clubId===info.gameId
+    &&p.status==='active'&&(p.kind==='gen'||p.kind==='prospect')
+    &&p.origin!=='fm26'&&!seen.has(p.id)&&!isExcludedPlayer(p.id)&&!isFemalePlayerRecord497(p));
+   for(const p of eligible.slice(0,shortage)){
+    seen.add(p.id);players.push({...p,source:'generado'});
+   }
+  }
+  if(state.clubId===info.gameId&&state.name&&!seen.has('career-player')){
+   players.push({id:'career-player',name:state.name,age:state.age,pos:state.position,ovr:state.ovr,cc:state.country,source:'tu carrera'});
+  }
  }
- return {...info,name:info.club?.name||world?.name||info.entry?.nombre||'Club',players,hasWorld:!!world};
+ const generatedCount=players.filter(p=>p.source==='generado').length;
+ return {...info,name:info.club?.name||world?.name||info.entry?.nombre||'Club',players,
+  hasWorld:!!world,rawTotal:world?.players?.length||0,selectedOriginal: selected.length,
+  generatedCount};
 }

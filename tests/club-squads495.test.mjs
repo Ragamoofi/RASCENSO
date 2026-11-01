@@ -1,4 +1,5 @@
-import {test} from 'node:test';import assert from 'node:assert/strict';
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
 import {loadClubSquad,resolveClub} from '../src/club-squads495.mjs';
 const raw=(id,n)=>({id,nombre:n,edad:25,posiciones:['MC'],ca_fm:100,nacion_fm:190,equipo_slot:0});
 const index={'11':{nombre:'Origen',pais_id_fm:190},'22':{nombre:'Destino',pais_id_fm:190},'33':{nombre:'Sin enlace',pais_id_fm:190}};
@@ -10,5 +11,12 @@ test('fichaje entrante se recupera desde otro archivo y no queda en origen',asyn
 test('un club mundial no enlazado conserva datos originales',async()=>{let r=await loadClubSquad({kind:'world',id:'33'},state,api);assert.equal(r.gameId,null);assert.equal(r.players[0].age,25)});
 test('club sin datos ni inventos',async()=>{let r=await loadClubSquad({kind:'game',id:'cl-3'},{},api);assert.deepEqual(r.players,[]);assert.equal(r.hasWorld,false)});
 test('ambigüedad de UID no se vincula por su nombre',()=>{let x=resolveClub({kind:'world',id:'11'},index,{mapping:{'cl-1':{fmUID:'11'},'cl-2':{fmUID:'11'}}});assert.equal(x.gameId,null)});
-test('se muestran todos los registros sin límite de 90',async()=>{let more={...api,readWorldClub:async()=>({name:'Muchos',players:Array.from({length:130},(_,i)=>raw(`fm26:${i+100}`,'Jugador '+i))})};let r=await loadClubSquad({kind:'world',id:'33'},{},more);assert.equal(r.players.length,130)});
-test('jugadoras identificadas en partidas guardadas no se muestran en plantillas',async()=>{const state={world:{players:[{id:'fm26:2000101297',name:'Registro excluido',clubId:'cl-1',status:'active',kind:'gen'},{id:'sim:42',name:'Canterano',clubId:'cl-1',status:'active',kind:'gen'}]}};const r=await loadClubSquad({kind:'game',id:'cl-1'},state,api);assert.equal(r.players.some(p=>p.id==='fm26:2000101297'),false);assert.equal(r.players.some(p=>p.id==='sim:42'),true)});
+test('130 fichas reales de varias categorías no son 130 profesionales',async()=>{let more={...api,readWorldClub:async()=>({name:'Muchos',players:Array.from({length:130},(_,i)=>raw(`fm26:${i+100}`,'Jugador '+i))})};let r=await loadClubSquad({kind:'world',id:'33'},{},more);assert.equal(r.players.length,30);assert.equal(r.rawTotal,130);assert.equal(r.generatedCount,0)});
+test('jugadoras identificadas se excluyen; un canterano generado solo cubre bajas después de 2029',async()=>{
+ const worldPlayers=[{id:'fm26:2000101297',name:'Registro excluido',clubId:'cl-1',status:'active',kind:'gen'},{id:'sim:42',name:'Canterano',clubId:'cl-1',status:'active',kind:'gen'}];
+ const early=await loadClubSquad({kind:'game',id:'cl-1'},{world:{year:2027,players:worldPlayers}},api);
+ assert.equal(early.players.some(p=>p.id==='sim:42'),false);
+ const late=await loadClubSquad({kind:'game',id:'cl-1'},{world:{year:2032,players:worldPlayers}},api);
+ assert.equal(late.players.some(p=>p.id==='fm26:2000101297'),false);
+ assert.equal(late.players.some(p=>p.id==='sim:42'),true);
+});

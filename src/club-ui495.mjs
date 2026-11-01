@@ -25,7 +25,9 @@ export function renderClub497(data,{query='',group='',sort='ovr'}={}){
  const total=players.filter(p=>Number.isFinite(Number(p.ovr))&&p.ovr!=null);
  const avg=total.length?(total.reduce((x,p)=>x+Number(p.ovr),0)/total.length).toFixed(1):'—';
  const club=data.club||{},country=club.country||fmNationName(data.entry?.pais_id_fm)||'País por confirmar';
- const note=data.hasWorld?(data.simulationMapped?'Plantilla de origen con los movimientos conocidos de tu carrera.':'Plantilla original de la base mundial; la simulación no sigue todos sus movimientos.'):'Este club aún no tiene una plantilla mundial enlazada con seguridad. No asignaremos jugadores de otro equipo.';
+ const baseNote=data.hasWorld?(data.simulationMapped?'Plantilla profesional de origen con los movimientos conocidos de tu carrera.':'Plantilla profesional de la base mundial; la simulación no sigue todos sus movimientos.'):'Este club aún no tiene una plantilla mundial enlazada con seguridad. No asignaremos jugadores de otro equipo.';
+ const extra=Number(data.rawTotal||0)>Number(data.selectedOriginal||0)?` · Se muestran los futbolistas profesionales seleccionados; ${data.rawTotal} registros originales incluyen reservas y categorías inferiores.`:'';
+ const note=baseNote+extra+(data.generatedCount>0?` · ${data.generatedCount} juveniles generados para cubrir bajas en temporadas futuras.`:'');
  const lower=normalize(query);
  const visible=players.filter(p=>(!group||groupOf(p.pos)===group)&&(!lower||normalize(p.name+' '+p.pos).includes(lower)));
  const compare=(a,b)=>sort==='name'?String(a.name).localeCompare(String(b.name),'es'):sort==='age'?(Number(a.age)||0)-(Number(b.age)||0):sort==='pos'?String(a.pos).localeCompare(String(b.pos),'es'):(Number(b.ovr)||0)-(Number(a.ovr)||0);

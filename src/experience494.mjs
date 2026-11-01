@@ -3,11 +3,11 @@
 import {primeWorldHighlights493} from './world-highlights493.mjs';
 import {primeWorldMetadata494} from './world-metadata494.mjs';
 const globalData=Promise.allSettled([primeWorldHighlights493(),primeWorldMetadata494()]);
-await import('./experience.mjs?v=499');
+await import('./experience.mjs?v=500');
 const root=document.getElementById('app');
 function version(){
  const el=root?.querySelector('.site-head .build');
- if(el&&el.textContent.includes('4.9.2'))el.textContent='RASCENSO 4.9.7 · PLANTILLAS RENOVADAS';
+ if(el&&el.textContent.includes('4.9.2'))el.textContent='RASCENSO 4.9.8 · PLANTILLAS REALES';
 }
 version();
 if(root&&typeof MutationObserver!=='undefined'){

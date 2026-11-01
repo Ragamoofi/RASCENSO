@@ -1,0 +1,52 @@
+RASCENSO 4.9.8 — PRIMER EQUIPO REAL Y GENERACIÓN PROGRESIVA
+Base: main 78ae8e7224ca22cb8ec4331b283f7c877d0fafe3 (2026-11-01).
+
+APLICACIÓN: extraer este ZIP en Documentos\GitHub\RASCENSO,
+reemplazar archivos existentes, abrir GitHub Desktop, Commit y Push.
+NO hay instaladores, archivos .cmd, PowerShell ni modificaciones en el guardado.
+
+CAMBIOS
+1. Visor: solo primera plantilla cuando equipo_slot=0 está disponible;
+   máximo de 30 profesionales y 4 porteros. Reservas/juveniles de la
+   exportación permanecen en el archivo original para la simulación.
+2. Clubes sin marcador de primer equipo: seleccionar hasta 30 futbolistas
+   reales de ese club por calidad, sin asignar jugadores de otros clubes.
+3. Deportes Iquique: normalización de sufijos societarios (SADP) y enlace
+   adicional único por país + nombre institucional; sin enlazar homónimos.
+4. No mostrar jugadores sintéticos en la ficha durante 2026–2028.
+   Desde 2029 se incluyen solo canteranos generados ya existentes en la
+   partida cuando quedan menos de 18 jugadores reales disponibles, con
+   un máximo de 18 totales; nunca reemplazan a jugadores reales.
+5. Fichajes reales, retirados, filtros de jugadoras verificadas y el
+   futbolista del usuario continúan respetándose.
+6. La ficha explica que la base de un club puede traer más registros
+   (reservas, categorías inferiores) que su primer plantel profesional.
+7. Pruebas de 4.9.5 y 4.9.7 actualizadas: no deben exigir mostrar 130
+   registros ni canteranos ficticios desde la primera temporada.
+
+ARCHIVOS
+index.html
+src/club-squads495.mjs
+src/club-ui495.mjs
+src/experience494.mjs
+tests/club-squads495.test.mjs
+tests/club-squads498.test.mjs
+tests/club-ux497.test.mjs
+
+VALIDACIÓN
+- 14/14 pruebas aisladas aprobadas con dependencias simuladas.
+- node --check aprobado para todos los JS del ZIP.
+- No se ejecutó la prueba completa en Chromium con los 180.739 registros.
+- GitHub Actions deberá volver a ejecutar la validación completa al publicar.
+
+LÍMITES
+- El número 92 no demuestra que fueran NPC: podía incluir reservas y
+  juveniles de la base de datos de origen. El parche solo cambia el visor,
+  no elimina esos jugadores del mundo.
+- La generación de narrativas y NPC del MOTOR mundial no se reescribe aquí;
+  se corrige su inclusión prematura en las FICHAS de club. Una reforma
+  profunda de la simulación mundial sería un trabajo aparte.
+- Si un club carece de correspondencia segura y sigue vacío, hay que
+  confirmar su UID con el índice original (no asignar plantillas por nombre
+  parcial o solo por parecido).
+- La base de origen no contiene verificación exhaustiva de sexo.

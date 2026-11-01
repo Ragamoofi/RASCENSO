@@ -56,6 +56,6 @@ test('índice, directorio y shards excluyen clubes femeninos identificados',()=>
 });
 test('los estilos de la ficha se publican dentro de src, no se pierden en GitHub Pages',()=>{
  const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
- assert.match(html,/src\/club497\.css\?v=499/);
+ assert.match(html,/src\/club497\.css\?v=500/);
  assert.doesNotMatch(html,/href="\.\/club495\.css/);
 });
