@@ -124,7 +124,15 @@ export function initWorld(state){
  world.players.push(rival);
  return world;
 }
-export function ensureWorld(state){return state.world?.v?state:{...state,world:initWorld(state)};}
+export function ensureWorld(state){
+ if(!state.world?.v)return {...state,world:initWorld(state)};
+ // Si se instaló una base real después de comenzar la partida, no mantener
+ // futbolistas ficticios en clubes que ahora tienen plantilla identificada.
+ const current=state.world.players||[];
+ const players=current.filter(p=>p.origin==='fm26'||!isRealClubReady(p.clubId));
+ if(players.length===current.length)return state;
+ return {...state,world:{...state.world,players}};
+}
 export function worldRival(state){return state.world?.players?.find(p=>p.rival)||null;}
 
 /* ---------- Simulación rápida de las ligas del mundo ---------- */
