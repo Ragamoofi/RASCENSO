@@ -1,0 +1,32 @@
+RASCENSO 4.10.0 — ENLACES REALES DE CLUBES
+==========================================
+BASE: commit c2c8e0389666a661830ad488bc6188e313e421fa (main).
+
+INSTALACIÓN (sin instaladores):
+Extraer este ZIP en Documentos\GitHub\RASCENSO y reemplazar los archivos.
+Hacer Commit y Push origin desde GitHub Desktop.
+Comprobar que el workflow "Publicar RASCENSO" esté verde y recargar la web con Ctrl+F5.
+
+ARCHIVOS:
+- index.html: versión de caché 502, título 4.10.0.
+- src/experience494.mjs: arranque/versionado actualizado.
+- src/club-links4100.mjs: 583 equivalencias gameID → FM UID, país y nombre del registro, contrastadas con el índice original de 12.725 clubes.
+- src/club-squads495.mjs: prioriza esos IDs al abrir fichas jugables y reconoce la identidad desde la búsqueda mundial, con validación de país/nombre e índice antes de utilizarla.
+- tests/club-links4100.test.mjs: comprueba todos los enlaces y carga jugadores reales de Católica, Iquique y Wanderers desde los shards comprimidos originales.
+- tests/club-ux497.test.mjs: actualiza el test del versionado de estilos.
+
+DIAGNÓSTICO:
+La base original contiene múltiples clubes con mismo nombre y país, a menudo con distintos UIDs. En el código anterior muchos enlaces se rechazaban por duplicidad aunque hubiera un equipo principal de la base. Esta versión prioriza un UID del catálogo original contrastado en vez de seleccionar por parecido.
+
+VALIDACIÓN REALIZADA:
+- 583 IDs contrastados con el índice original.
+- Católica cl-3→401; Iquique cl-extra-3→130787; Santiago Wanderers cl-extra-9→120784.
+- 31 pruebas aisladas del visor/plantillas/enlaces pasaron con las dependencias de prueba.
+- JavaScript y estructura del ZIP verificados.
+
+LIMITACIONES:
+- 583 de 874 clubes tienen equivalencia directa; los restantes usan la lógica existente. No se puede asegurar que los 874 tengan plantilla hasta revisar los casos pendientes.
+- Algunos equipos del catálogo jugable son nombres alternativos del mismo club. No se cambian las competiciones ni la estructura del mundo en este parche.
+- Se mantiene el filtro femenino por registros identificados, sin suponer el género de personas sin evidencia.
+- No se ejecutó un navegador completo publicado en este entorno: la prueba final de GitHub Actions y la comprobación visual quedan pendientes.
+- La X de "Prueba de jugadas en navegador" es un workflow independiente y no determina por sí sola si Pages se publicó.

@@ -3,12 +3,24 @@ import {fm26OVR,fm26Position,applyFM26Delta} from './fm26-real.mjs';
 import {fmNationToCode} from './fm26-nations.mjs';
 import {getClub} from './engine.mjs';
 import {COUNTRIES} from './countries.mjs';
+import {CLUB_LINKS4100} from './club-links4100.mjs';
 import {isExcludedPlayer} from './world-exclusions.mjs';
 import {isFemaleClubRecord497,isFemalePlayerRecord497} from './world-gender497.mjs';
 
 // Correspondencias contrastadas con el nombre completo, país y plantel del índice mundial.
 const explicit={'cl-extra-15':{uid:'130779',country:'190',name:'Club de Deportes Santiago Morning'},'cl-extra-14':{uid:'130788',country:'190',name:'Club Social de Deportes Rangers de Talca'},'en-2':{uid:'676',country:'139',name:'Liverpool'}};
 function explicitMatch(id,index){const x=explicit[id],entry=x&&index[x.uid];return entry&&String(entry.pais_id_fm)===x.country&&entry.nombre===x.name?x.uid:null}
+// Vinculaciones de la base mundial original, por ID, país y nombre completo.
+// Si el índice cambia en una actualización, descartamos el enlace obsoleto.
+export function originalClubLink4100(id,index){
+ const link=CLUB_LINKS4100[id];if(!link)return null;
+ const [uid,country,worldName,gameName]=link,record=index?.[uid],club=getClub(id);
+ if(!record||!club||club.name!==gameName||record.nombre!==worldName||
+  String(record.pais_id_fm)!==String(country)||Number(record.n_jugadores)<=0||
+  isFemaleClubRecord497(uid,record))return null;
+ return String(uid);
+}
+
 
 // RASCENSO y la base mundial usan IDs de club diferentes. No confundir
 // «no enlazado» con «sin jugadores»: buscar una equivalencia segura por
@@ -121,17 +133,23 @@ export function resolveClub(ref,index,mappings){
  if(ref.kind==='game'){
   const club=getClub(ref.id),known=mapping[ref.id];
   const verified=known&&index[String(known.fmUID)]&&!isFemaleClubRecord497(known.fmUID,index[String(known.fmUID)])?String(known.fmUID):null;
-  const explicitUid=verified?null:explicitMatch(ref.id,index);
-  const fallback=verified||explicitUid?null:candidatesForGame(club,index,mappings);
-  const uid=verified||explicitUid||fallback?.match||null;
+  const linked=originalClubLink4100(ref.id,index);
+  const explicitUid=linked||verified?null:explicitMatch(ref.id,index);
+  const fallback=linked||verified||explicitUid?null:candidatesForGame(club,index,mappings);
+  // La exportación contiene a veces un club masculino y otro femenino con
+  // EXACTAMENTE la misma denominación. Priorizar el UID contrastado evita
+  // abrir una ficha vacía por ambigüedad o cruzar las dos plantillas.
+  const uid=linked||verified||explicitUid||fallback?.match||null;
+  const simulationMapped=!!verified&&verified===uid;
   return {gameId:ref.id,uid,club,entry:uid?index[uid]:null,
-   simulationMapped:!!verified,candidates:uid?[]:fallback?.candidates||[],
-   linkStatus:verified?'simulado':explicitUid?'verificado':uid?'nombre-pais':'sin-enlace'};
+   simulationMapped,candidates:uid?[]:fallback?.candidates||[],
+   linkStatus:linked?'indice-original':simulationMapped?'simulado':explicitUid?'verificado':uid?'nombre-pais':'sin-enlace'};
  }
  const uid=String(ref.id),entry=index[uid];
  const matches=Object.entries(mapping).filter(([,v])=>String(v.fmUID)===uid);
  const explicitIds=Object.keys(explicit).filter(id=>explicitMatch(id,index)===uid);
- let gameId=matches.length===1?matches[0][0]:matches.length===0&&explicitIds.length===1?explicitIds[0]:null;
+ const curatedIds=Object.keys(CLUB_LINKS4100).filter(id=>originalClubLink4100(id,index)===uid);
+ let gameId=curatedIds.length===1?curatedIds[0]:matches.length===1?matches[0][0]:matches.length===0&&explicitIds.length===1?explicitIds[0]:null;
  // La ficha original también puede reconocer el equipo jugable que comparte
  // UID confirmado: así conserva escudo, competición y valores de mercado.
  // Siempre comprobar ida y vuelta; no fusionar clubes homónimos.
@@ -149,7 +167,7 @@ export function resolveClub(ref,index,mappings){
   if(possible.length===1)gameId=possible[0];
  }
  return {uid,entry,gameId,club:gameId?getClub(gameId):null,
-  simulationMapped:matches.length===1,candidates:[],linkStatus:'original'};
+  simulationMapped:matches.length===1&&matches[0][0]===gameId,candidates:[],linkStatus:'original'};
 }
 /** Plantel profesional: no confundir una plantilla con los 80-100 registros de
  * primer equipo + juveniles + reservas de la exportación de 2026.
