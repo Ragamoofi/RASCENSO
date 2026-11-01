@@ -117,9 +117,9 @@ export function installClubUI(root,getState){
  }
 
  function annotate(){
-  root.querySelectorAll('.team-badge[data-team-id]').forEach(el=>{if(!el.dataset.teamId||el.closest('select,option'))return;el.tabIndex=0;el.setAttribute('role','button');el.setAttribute('aria-label','Ver plantilla de '+(el.title||'club'));el.classList.add('club495-link')});
+  root.querySelectorAll('.team-badge[data-team-id]').forEach(el=>{if(!el.dataset.teamId||el.closest('select,option,button,label'))return;el.tabIndex=0;el.setAttribute('role','button');el.setAttribute('aria-label','Ver plantilla de '+(el.title||'club'));el.classList.add('club495-link')});
   const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
-  for(const node of nodes){const parent=node.parentElement;if(!parent||parent.closest('select,option,input,textarea,script,style,.club495-name-link,.team-badge,.club497-finder'))continue;
+  for(const node of nodes){const parent=node.parentElement;if(!parent||parent.closest('select,option,input,textarea,script,style,button,label,.cr-effects,.kit-country-seal,.club495-name-link,.team-badge,.club497-finder'))continue;
    const text=node.nodeValue,trimmed=text.trim();if(trimmed.length<4)continue;
    const ids=nameIndex.get(normalize(trimmed)),world=worldNames.get(normalize(trimmed));
    const matches=ids?.length===1||world?[{index:text.indexOf(trimmed),0:trimmed}]:[...text.matchAll(embedded)];if(!matches.length)continue;

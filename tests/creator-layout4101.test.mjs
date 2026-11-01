@@ -6,7 +6,7 @@ const html=read('index.html');
 const js=read('src/creator-layout4103.mjs');
 const css=read('src/creator-layout4103.css');
 test('creador activo reemplaza las subpestañas de 4.10.1',()=>{
- assert.match(html,/experience494\.mjs\?v=502/);
+ assert.match(html,/experience494\.mjs\?v=\d+/);
  assert.match(html,/creator-layout4103\.mjs\?v=\d+/);
  assert.match(html,/creator-layout4103\.css\?v=\d+/);
  assert.doesNotMatch(html,/creator-layout4101\.(?:css|mjs)/);

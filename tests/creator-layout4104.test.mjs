@@ -36,6 +36,6 @@ test('se actualiza la versión sin depender de la caché previa ni modificar el 
  assert.ok(style,'estilo activo presente');
  assert.equal(module,style,'scripts y estilos deben compartir versión de caché');
  assert.match(html,/RASCENSO 4\.(?:10\.(?:[4-9]|[1-9]\d+)|11\.\d+) · /); // Nueva versión sin bloquear las siguientes
- assert.match(html,/experience494\.mjs\?v=502/);
+ assert.match(html,/experience494\.mjs\?v=\d+/);
  assert.doesNotMatch(js,/localStorage\.clear|window\.location\.reload/);
 });

@@ -32,7 +32,13 @@ Azul marino mate, cobre para prioridad/selección, Barlow Condensed 600/700 para
 | Global | Navegación, submenús, estados, foco, notificaciones y ventanas | Inventariada |
 
 ## Cambios implementados
-- Inventario de rutas reales y evaluación de estilos acumulados.
+- `src/editorial.css`: tokens y composición por familia de pantalla; responsive 360–1920, tablas con scroll local, tipografía legible, foco y movimiento reducido.
+- Barlow Condensed 600/700 e Inter 400–700 locales, WOFF comprimido (sin petición de Google Fonts), licencias OFL incluidas.
+- Creador con cabecera editorial, pasos semánticos y consecuencias originales; marca y arranque oficiales.
+- `editorial-ui.mjs`: foco de destino, enlace para saltar al contenido, ajustes con foco contenido/restaurado, fondo inert, cierre superior y por fondo.
+- Corrección comprobada en navegador: clic en un resultado del club favorito ya no es capturado por el sistema universal de fichas. Se excluyen controles/etiquetas y términos del informe del formador.
+- Versionado de recursos modificados actualizado; semántica de navegación actual/paso/selección.
+- Pruebas heredadas adaptadas a cache versionada y ciclo de verano real: un bucle antiguo de `world20.test.mjs` quedaba infinito al llegar a verano.
 
 ## Validación
 - Checkout limpio de main antes de crear la rama.
@@ -46,8 +52,8 @@ Azul marino mate, cobre para prioridad/selección, Barlow Condensed 600/700 para
 - Estilos previos usan fuentes remotas, muchos textos de 8–11 px, brillos, altura rígida y overflow oculto.
 
 ## Pendientes prioritarios
-1. Implementar sistema editorial y adaptar todas las áreas del inventario.
-2. Mejorar semántica/foco de navegación y ventanas sin alterar lógica.
+1. Terminar revisión real de resoluciones y flujos restantes.
+2. Corregir hallazgos visuales de la revisión.
 3. Recorrer flujo completo y variantes reales; comprobar resoluciones y tablas.
 4. Ejecutar suite, revisar consola/recursos/guardado y corregir hallazgos.
 5. Documentar evidencia, commits y limitaciones; subir rama final.
