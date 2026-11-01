@@ -1,28 +1,28 @@
-RASCENSO 4.10.7 — RASGOS VIVOS, VARIANTES Y GRANDES HITOS
-Base: main 683865afe19f2e352375728ebdd13d0d9b005489 (4.10.6).
+RASCENSO 4.11.0 — GRAN PARCHE DE VERANO
 
-INSTALACIÓN DIRECTA (SIN CMD, POWERSHELL NI INSTALADORES)
-1. Extrae todo este ZIP en Documentos\GitHub\RASCENSO.
-2. Acepta reemplazar los archivos existentes.
-3. Haz commit y Push origin con GitHub Desktop.
-4. Comprueba que 'Publicar RASCENSO' termine en verde en GitHub Actions.
-5. Recarga con Ctrl+F5.
+BASE: main 0bcffa15204a5a5f2e0b0dfee9d72c555a245cc0 (2026-11-01)
 
-CONTENIDO
-- src/spotlight4110.mjs: lógica pura de hitos, variantes, rasgos visibles.
-- src/spotlight-ui4110.mjs y .css: tarjeta de celebración al cerrar la temporada, recordatorio en Historial y explicación de rasgos.
-- src/engine.mjs: registra hitos y memoria de escenas en el estado, migrando partidas existentes.
-- src/plays30.mjs, src/plays-ui.mjs: contexto y mensajes reales dentro de Jugadas Vivas.
-- src/story.mjs, src/story20.mjs: prioriza escenas no vistas, conserva un contador persistente y evita repetir contextuales en los tres años siguientes cuando sea posible.
-- index.html: activa recursos de versión nueva para evitar caché vieja.
-- tests/spotlight4110.test.mjs: pruebas de hitos, atributos, variantes, integración de motor y escena.
-- tests/balance-choices4106.test.mjs: evita que una prueba antigua bloqueé una nueva versión por el título fijo.
-- docs/RASCENSO-4.10.7.md: alcance y límites.
+INSTALACION:
+1. Extrae el contenido de este ZIP directamente en Documentos\GitHub\RASCENSO.
+2. Acepta reemplazar. No ejecutes instaladores (no hay ninguno).
+3. Abre GitHub Desktop y haz Commit + Push origin.
+4. Revisa GitHub Actions «Publicar RASCENSO» y abre el juego con Ctrl+F5.
 
-IMPORTANTE
-No se sustituyen las 20 jugadas existentes ni se altera su probabilidad de éxito.
-Las variantes actuales cambian el contexto y la presentación; las finales de copa solo se etiquetan si el calendario entrega una fase real 'Final'.
-El primer gol y el debut se celebran al cierre de la temporada registrada: no se inventa la fecha exacta del partido.
-No se elimina información de partidas anteriores; los hitos previos a instalar el parche no se inventan ni se marcan retroactivamente.
-La celebración se marca como vista en una preferencia local separada del guardado.
-Pruebas aisladas: 34/34; cinco carreras completas hasta el retiro (19-23 temporadas); sin comprobación visual en navegador real.
+CONTENIDO:
+39 actividades entre temporadas con 6 semanas, tres ofertas semanales, modos,
+riesgo visual, rasgos del creador, economia real en EUR, servicios pagados cada año,
+memoria narrativa y 6 historias diferidas, historial y PNG adicional de veranos.
+Boton «Resumir el resto del verano» y descanso semanal.
+
+SIN CAMBIOS en identidad del jugador, bases FM26, fisica de minijuegos ni balance
+preexistente de elecciones del creador.
+
+ATENCION:
+- Los jugadores en partidas anteriores mantienen sus datos y continúan normalmente.
+- El patrimonio nuevo empieza en cero en partidas anteriores, sin inventar ahorros
+  retroactivos; se acumula el sueldo de cada nueva temporada.
+- Al terminar cada verano, el juego recarga una vez para sincronizar el motor y continuar.
+- La exportacion PNG de los veranos es independiente del PNG general de carrera.
+- El resultado de las simulaciones se explica en docs/RASCENSO-4.11.0-VERANO.md.
+
+El parche no se ha publicado automaticamente en GitHub; requiere tu Commit y Push.

@@ -1,4 +1,5 @@
 import { profileMatchEffects } from './archetypes17.mjs';
+import {summerSeasonMods} from './summer-career4111.mjs';
 /* Motor de liga ORIGINAL de RASCENSO. Cada punto nace de un partido simulado.
  * No utiliza ni reproduce el código de Copero.
  */
@@ -96,7 +97,7 @@ export function playLeague(state){
  const plan=state.seasonPlan||'equilibrio';
  const trust=bound(state.coachTrust??50,0,100);
 // Elecciones del creador y ADN heredado: minutos, goles, asistencias y lesiones de toda la carrera.
- const cf=choiceFx(state);
+ const cf=choiceFx(state);const sm=summerSeasonMods(state);cf.minutes+=(sm.minutos||0);cf.injury*=1+(sm.lesiones||0);
  const prep=preparationEffects(state),traits=identitySeasonEffects(state),persona=creatorIdentityEffects(state),agenda=seasonAgendaEffects(state),profile=profileMatchEffects(state);
  const own=teams[state.clubId];
  const coach=state.world&&!state.neutralLeague?coachFor(state,state.clubId):null;
@@ -116,7 +117,7 @@ export function playLeague(state){
    })()
   :calendar(selected);
  const injuryRoll=r();const prone=(state.injuryProfile==='fragil'?.085:state.injuryProfile==='resistente'?.025:.05)*prep.injury*traits.injury*(agenda.injury||1)*profile.injury*persona.injury*cf.injury*tfx.injury*social.injury;
- const injuryWeeks=injuryRoll<prone+Math.max(0,state.age-29)*.008?(2+Math.floor(r()*11)):0;
+ const injuryWeeks=Math.min(24,(Math.max(0,Number(state.summerInjuryWeeks)||0))+(injuryRoll<prone+Math.max(0,state.age-29)*.008?(2+Math.floor(r()*11)):0));
  const absence=injuryAbsenceSlots(fixtureList,state.clubId,injuryWeeks,r);
  const rows=Object.fromEntries(selected.map(t=>[t.id,{id:t.id,name:t.name,level:t.level,played:0,wins:0,draws:0,losses:0,for:0,against:0,gd:0,points:0}]));
  const skillGroup=groups[state.position]||'middle';

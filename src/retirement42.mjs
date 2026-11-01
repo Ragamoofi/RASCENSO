@@ -63,6 +63,9 @@ export function retirementView(s,{badge,trophyImage,flag,dreamProgress,button,ge
  const awards=d.awards.map(m=>`<div class="farewell-award">✦ <strong>${esc(m.title||m.name||m.type||'Reconocimiento')}</strong> <span>${esc(m.year||'')}</span></div>`).join('');
  const dream=dreamProgress(s);
  const dreamHtml=dream?`<div class="farewell-dream"><span>${dream.done?'★':'◇'}</span><div><small>${dream.done?'SUEÑO CUMPLIDO':'SUEÑO PENDIENTE'}</small><b>${esc(dream.title)}</b></div></div>`:'';
+ const summerRecords=Array.isArray(s.summerHistory)?s.summerHistory:[];
+ const summerFinance=s.summerFinance||{};
+ const summerLegacy=summerRecords.length?`<section class="farewell-section summer-retirement-legacy"><span class="farewell-kicker">LA VIDA FUERA DEL CAMPO</span><h2>Los veranos que te formaron</h2><div class="farewell-stats"><div class="farewell-stat"><b>${n(summerRecords.length)}</b><small>VERANOS</small></div><div class="farewell-stat"><b>${n(summerFinance.impactSocial||0)}</b><small>IMPACTO SOCIAL</small></div><div class="farewell-stat"><b>${n(summerFinance.escandalos||0)}</b><small>ESCÁNDALOS</small></div><div class="farewell-stat"><b>${n(summerFinance.cashEUR||0)}</b><small>PATRIMONIO EN EUROS</small></div></div><div class="farewell-memories">${summerRecords.slice(-5).reverse().map(y=>`<div class="farewell-memory"><b>${esc(y.year)}</b><div><small>FUERA DE LA CANCHA</small><p>${esc((y.headlines||[]).join(' · ')||(y.log||[]).map(x=>x.text).slice(0,2).join(' · '))}</p></div></div>`).join('')}</div>${(summerFinance.quotes||[]).length?`<p>Frases célebres: ${(summerFinance.quotes||[]).slice(-4).map(esc).join(' · ')}</p>`:''}</section>`:'';
  const summary=`${esc(s.name)} se retiró tras ${n(d.history.length)} temporadas y ${n(a.matches)} partidos profesionales.${d.most?' Su etapa más extensa fue en '+esc(d.most.name)+', donde disputó '+n(d.most.matches)+' encuentros.':''} ${d.hero?esc(d.hero)+'. ':''}Su último club fue ${esc(club)}.`;
  return `<div class="farewell-page">
  <section class="farewell-hero" aria-label="Homenaje de carrera"><div class="farewell-hero-top"><span>RASCENSO · DEL BARRIO A LA HISTORIA</span><span>${flag(s.country)} · ${esc(s.position)} · #${n(s.number)}</span></div>
@@ -72,6 +75,7 @@ export function retirementView(s,{badge,trophyImage,flag,dreamProgress,button,ge
  </div><div class="farewell-medallion"><span>✦</span><strong>${n(d.history.length)}</strong><small>TEMPORADAS<br>DE HISTORIA</small></div></div>
  <div class="farewell-hero-foot"><span>ÚLTIMA CAMISETA</span><b>${esc(club)}</b>${d.last?.clubId?badge(d.last.clubId,'large'):''}</div></section>
  ${renderCareerActs(s)}
+ ${summerLegacy}
  <section class="farewell-numbers"><div><span class="farewell-kicker">LOS NÚMEROS DE TU HISTORIA</span><h2>La huella que dejaste</h2></div>
  <div class="farewell-stats">${stats.map(([value,label])=>stat(value,label)).join('')}</div></section>
  <div class="farewell-content"><div class="farewell-main">

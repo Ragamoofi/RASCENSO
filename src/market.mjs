@@ -3,6 +3,7 @@
 import { COUNTRIES } from './countries.mjs';
 import { getInauguralLeague, VERIFIED_LEAGUES } from './leagues2026.mjs';
 import { choiceFx, marketRarity } from './identity30.mjs';
+import {summerSeasonMods} from './summer-career4111.mjs';
 import { socialEffects, activeThreads } from './career20.mjs';
 import {getFM26BestCompetitor,isRealClubReady} from './fm26-real.mjs';
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -108,6 +109,7 @@ function weightClub(state,c,focus,competitor=null){
  // Sueños y ambición: europa/ambicioso miran a los grandes; regresar premia a los clubes de tu país en la veteranía.
  const cf=choiceFx(state);
  if(cf.market>1&&prestige>=80)w*=cf.market;
+ if(prestige>=80)w*=Math.max(.6,1+(summerSeasonMods(state).mercadoGrandes||0));
  if(state.dream==='regresar'&&state.age>=30&&c.countryCode===state.country)w*=1.25;
  if(c.id===state.fanClubId)w*=1.0; // El equipo favorito no tiene fichaje garantizado.
  return w;

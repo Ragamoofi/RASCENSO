@@ -49,7 +49,7 @@ test('ambas opciones enseñan tres efectos equivalentes sin promesas de mercado'
 
 test('el HTML usa la nueva versión del motor sin cambiar la entrada de RASCENSO',()=>{
  const html=readFileSync(new URL('../index.html', import.meta.url),'utf8');
- assert.match(html,/RASCENSO 4\.10\.(?:[5-9]|[1-9]\d+)/);
+ assert.match(html,/RASCENSO 4\.(?:10\.(?:[5-9]|[1-9]\d+)|11\.\d+)/);
  assert.match(html,/"\.\/src\/identity30\.mjs":"\.\/src\/identity30\.mjs\?v=\d+"/);
  assert.match(html,/src\/experience494\.mjs\?v=502/);
  assert.match(html,/src\/creator-layout4103\.mjs\?v=507/);

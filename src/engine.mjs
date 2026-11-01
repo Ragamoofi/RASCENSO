@@ -6,6 +6,7 @@ import { identityTraits, identitySeasonEffects, preparationEffects, PREPARATIONS
 import { DRAFT_REFERENTS, DRAFT_TIERS, draftPotentialAdjustment } from './draft09.mjs';
 import { chooseSeasonAgenda, seasonAgendaEffects } from './agenda09.mjs';
 import {seasonMilestones4110} from './spotlight4110.mjs';
+import {normalizeSummerState,summerSalaryClose,summerSeasonMods,enterSummerCareer,autoSummerCareer} from './summer-career4111.mjs';
 import {seasonMatchImpact,matchImpactHeadline} from './play-impact43.mjs';
 export { chooseSeasonAgenda } from './agenda09.mjs';
 
@@ -97,7 +98,7 @@ export function newCareer({name,number=9,foot='Derecha',country='CL',position='D
     history:[],decisions:[],trophies:[],offers:[],pendingEvent:null,lastSeason:null};
 }
 export function migrateCareer(s){
-  if(!s||typeof s!=='object'||!['draft','academy','season','event','transfer','retired'].includes(s.phase)||!getCountry(s.country))return null;
+  if(!s||typeof s!=='object'||!['draft','academy','season','event','transfer','summer','retired'].includes(s.phase)||!getCountry(s.country))return null;
   if(![1,2,3,4,5,6,7,8,9].includes(s.version))return null;
   const v1=s.version===1?{...s,startAge:16,startYear:START_YEAR,city:'',origin:'barrio',personality:'disciplinado',style:'equilibrado',dream:'seleccion',story:'',coachTrust:50}:s;
   const rel=v1.relationships||initialRelationships(v1.country);
@@ -121,8 +122,8 @@ export function migrateCareer(s){
   if(migrated.phase!=='draft')Object.assign(migrated,migrateAttributes(migrated));
   else if(!migrated.attrCeil)migrated.attrCeil={};
   // 2.0: el mundo vivo y el vestuario se crean al cargar, no recién al simular.
-  if(['season','event','transfer'].includes(migrated.phase)&&migrated.clubId&&getClub(migrated.clubId))return syncClub(migrated);
-  return migrated;
+  if(['season','event','transfer','summer'].includes(migrated.phase)&&migrated.clubId&&getClub(migrated.clubId))return normalizeSummerState(syncClub(migrated));
+  return normalizeSummerState(migrated);
 }
 export const careerYear=yearOf;
 // Tres propuestas por ronda: leyendas, atributos y caminos de desarrollo diferentes.
@@ -372,7 +373,7 @@ export function advanceSeason(input){
  // «Irregularidad»: rachas buenas y malas → la nota de cada temporada oscila más (determinista por semilla).
  if(rating!=null&&s.weakness==='inconstante')rating=Math.round(clamp(rating+(rng(`${s.seed}:variance:${year}`)()-.5)*.5,5.6,8.6)*100)/100;
  // Desarrollo por atributos: edad, minutos, nota, entrenador, pretemporada, promesas y lesiones.
- const cfx=choiceFx(s);const social=socialEffects(s);
+ const cfx=choiceFx(s);const summerFx=summerSeasonMods(s);cfx.growth*=1+summerFx.desarrollo;cfx.calm+=(summerFx.serenidad||0);const social=socialEffects(s);
  const dev=developSeason(s,{share,rating:rating??6.2,injuryWeeks,coachFx,threadFx,careerFx:cfx,focus:preparationFocus(prep.id)});
  const ovr=dev.ovr,attributes=dev.attributes,attributeChanges=dev.changes,attributesBefore={...(s.attributes||{})};
  const international=global.international;
@@ -447,9 +448,9 @@ export function advanceSeason(input){
  const milestones4110=[...(s.milestones4110||[]),...milestoneAdd].slice(-35);
  const flags={...(s.storyFlags||{})};if(s.fanClubId&&s.clubId===s.fanClubId)flags.playedForFan=true;
  // Las promesas de esta temporada vencen; quedan registradas para escenas posteriores.
- const next={...s,age:s.age+1,ovr,potential:dev.potential,attributes,attrCeil:dev.attrCeil,reputation,trophyRecords,annualScenes:0,morale,careerEarnings:(s.careerEarnings||0)+wage,leagueRosters,coachTrust,relationships,history:[...s.history,seasonal],trophies:[...s.trophies,...titles],lastSeason:seasonal,recapPending:true,storyFlags:flags,
+ const next=summerSalaryClose({...s,age:s.age+1,ovr,potential:dev.potential,attributes,attrCeil:dev.attrCeil,reputation,trophyRecords,annualScenes:0,morale,careerEarnings:(s.careerEarnings||0)+wage,leagueRosters,coachTrust,relationships,history:[...s.history,seasonal],trophies:[...s.trophies,...titles],lastSeason:seasonal,recapPending:true,storyFlags:flags,summerDueYear:year+1,
   world,fm26:fmProgress.fm26,squad,threads,milestones4110,awards:[...(s.awards||[]),...myAwards],careerMoments:moments.slice(-120),
-  sceneBeat:0,sceneChoice:null,scenePlayerText:'',clutchMoment:null,plays30:null,phase:'event'};
+  sceneBeat:0,sceneChoice:null,scenePlayerText:'',clutchMoment:null,plays30:null,phase:'event'},wage);
  let synced=syncClub(next);
  // Sueño cumplido: recompensa única (reputación, moral, afición, directiva) y premio de carrera.
  const dream=dreamProgress(synced);
@@ -511,7 +512,7 @@ export function finishEvent(s){
  const outgrown=Math.max(0,(next.ovr||60)-prestige-2)*.05;
  const pressure=Math.min(.85,.16+(next.reputation||0)/260+outgrown+((next.lastSeason?.rating||6.4)>=7.1?.12:0));
  const shouldOpen=mandatory||requested||!!interest||policy.reason==='renewal'||next.age>=39&&!!next.contract&&next.contract.ends<=careerYear(next)+1||rng(`${next.seed}:transfer7:${next.age}`)()<pressure;
- if(!shouldOpen)return {...next,market:null,offers:[]};
+ if(!shouldOpen)return enterSummerCareer({...next,market:null,offers:[]});
  let offers=buildTransferOffers(next,{attempt:0,forced:mandatory||requested});
  if(policy.reason==='loan-request')offers=offers.map((o,i)=>i<2?{...o,kind:'loan',role:'Cesión',years:1,salary:annualSalary(o,next.ovr,'Cesión')}:o);
  if(requested)next={...next,threads:resolveThread(next,'transfer_request','mercado abierto')};
@@ -594,7 +595,7 @@ export function chooseTransfer(s,id=null){
   if(offer.promise)next={...next,threads:addThread(next,'promise_minutes',{clubId:offer.id},1)};
   next={...next,world:pushNews(next.world,{year:careerYear(s),kind:'you',title:`${s.name} ${offer.kind==='loan'?'llega cedido a':'ficha por'} ${offer.name}`,text:`${offer.kind==='loan'?'Préstamo por una temporada':`Contrato por ${offer.years||3} año(s)`} desde ${getClub(s.clubId)?.name||'su club'}.`,clubId:offer.id,mine:true})};
  }
- return next;
+ return next.phase==='season'?enterSummerCareer(next):next;
 }
 export function retireFromMarket(s){
  if(s.phase!=='transfer'||s.market?.canStay||s.age<31)return s;
@@ -612,6 +613,7 @@ export function simulateToRetirement(state){
       else s=advanceSeason(s);
     }
     else if(s.phase==='event')s=autoResolveEvent(s);
+    else if(s.phase==='summer')s=autoSummerCareer(s);
     else if(s.phase==='transfer'){
       const currentPrestige=dynamicPrestige(s,worldClub(s.clubId));
       const best=[...(s.offers||[])].sort((a,b)=>b.prestige-a.prestige)[0];

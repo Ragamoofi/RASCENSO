@@ -78,7 +78,7 @@ test('HTML carga módulos de versión 511 y UI incluye tarjeta de hitos',()=>{
  const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
  const ui=readFileSync(new URL('../src/spotlight-ui4110.mjs',import.meta.url),'utf8');
  assert.match(html,/spotlight-ui4110\.mjs\?v=511/);assert.match(html,/spotlight4110\.css\?v=511/);
- assert.match(html,/"\.\/src\/engine\.mjs":"\.\/src\/engine\.mjs\?v=511"/);
+ assert.match(html,/"\.\/src\/engine\.mjs":"\.\/src\/engine\.mjs\?v=\d+"/);
  assert.match(ui,/recapPending|focus-card\.story\.recap/);
  assert.match(ui,/spotlight4110-dialog/);assert.match(ui,/spotlight4110-history/);
 });

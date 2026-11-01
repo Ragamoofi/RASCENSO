@@ -9,6 +9,7 @@
 import { rng, hash, clamp, yearOf, positionGroup } from './career20.mjs';
 import { fixtureContext } from './career15.mjs';
 import { choiceFx } from './identity30.mjs';
+import {summerSeasonMods} from './summer-career4111.mjs';
 import {tuningFor,tunedAI,tunedChance} from './play-tuning43.mjs';
 import {contextVariation4110} from './spotlight4110.mjs';
 
@@ -64,7 +65,7 @@ export function composure(s){
  let c=.45+((s.morale??70)-60)/160+((s.reputation||0)/400);
  if(s.personality==='sereno')c+=.18;if(s.personality==='rebelde')c-=.05;
  if(s.weakness==='presion')c-=.15;if(s.strength==='mentalidad'||s.strength==='liderazgo')c+=.08;
- c+=choiceFx(s).calm;
+ c+=choiceFx(s).calm+(summerSeasonMods(s).serenidad||0);
  return clamp(c,.1,.95);
 }
 export function playerStats(s,play){

@@ -1,0 +1,83 @@
+/* RASCENSO 4.11 · Verano — azul marino, cobre, 1920×1080 y móvil. */
+.view.summer-view{overflow-y:auto;padding:18px 22px 20px;scrollbar-color:#476783 #0b2133}
+.summer-wrap{max-width:1700px;margin:0 auto;display:flex;flex-direction:column;gap:14px;color:#eef5ff}
+.summer-hero{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:20px 24px;border:1px solid #476783;border-radius:17px;background:radial-gradient(ellipse at 20% 0,#40638755,transparent 68%),linear-gradient(130deg,#173450,#0a2036)}
+.summer-tag{font-size:10px;font-weight:900;letter-spacing:.14em;color:#e9b388;text-transform:uppercase}
+.summer-hero h1{font:900 clamp(32px,3vw,52px)/1 'Barlow Condensed',sans-serif;letter-spacing:.04em;margin:6px 0}
+.summer-hero h1 em{font-style:normal;color:#efb67e}
+.summer-hero p{font-size:12px;line-height:1.45;color:#bcd0e2;margin:5px 0 0}
+.summer-finances{display:flex;flex-direction:column;gap:5px;min-width:250px;text-align:right}
+.summer-finances small{color:#a9c2db;font-weight:850;letter-spacing:.1em;font-size:10px}
+.summer-finances strong{font:900 clamp(25px,2.8vw,38px)/1 'Barlow Condensed',sans-serif;color:#f9dfc8}
+.summer-finances span{font-size:11px;color:#b1c9de}
+.summer-week-track{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px}
+.summer-week{display:flex;align-items:center;justify-content:space-between;gap:9px;min-height:49px;padding:9px 15px;border-radius:9px;border:1px solid #35516b;background:#0e273d}
+.summer-week b{font:900 24px 'Barlow Condensed',sans-serif;color:#9caec4}
+.summer-week small{font-size:9px;font-weight:900;color:#7792a9;letter-spacing:.08em}
+.summer-week.done{border-color:#aa7951;background:linear-gradient(125deg,#3a3028,#193146)}
+.summer-week.done b,.summer-week.done small{color:#f0c091}
+.summer-main-layout{display:grid;grid-template-columns:minmax(0,1fr) 305px;gap:14px;align-items:start}
+.summer-main{min-width:0}
+.summer-side{display:flex;flex-direction:column;gap:12px;min-width:0}
+.summer-offer-head{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:5px 0 12px}
+.summer-offer-head h2,.summer-summary h2{font:900 28px/1 'Barlow Condensed',sans-serif;margin:4px 0 0}
+.summer-offer-head>p{margin:0;max-width:300px;line-height:1.4;font-size:11px;color:#aec4db}
+.summer-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.summer-card{display:flex;flex-direction:column;min-width:0;min-height:310px;padding:14px;border:1px solid #3d5f7d;border-radius:13px;background:linear-gradient(160deg,#1b3855,#10263c 67%,#0b1e30)}
+.summer-card-top{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-bottom:12px}
+.summer-cat{font-size:9px;letter-spacing:.1em;font-weight:900;color:#f0b37b}
+.summer-duration{font-size:10px;color:#abc5d9}
+.summer-card h3{font:900 21px/1.1 'Barlow Condensed',sans-serif;margin:0 0 6px}
+.summer-card p{font-size:11px;color:#adc5d9;line-height:1.45;margin:0 0 15px}
+.summer-modes{display:flex;flex-direction:column;gap:6px;margin-top:auto}
+.summer-mode{display:flex;flex-direction:column;gap:6px;text-align:left;padding:10px 11px;border:1px solid #41627c;border-radius:8px;background:#122f48;color:#edf5ff;cursor:pointer;transition:background .15s,border-color .15s,transform .15s}
+.summer-mode:hover:not(:disabled){border-color:#e2a776;background:#25425b;transform:translateY(-1px)}
+.summer-mode:focus-visible,.summer-btn:focus-visible{outline:2px solid #f1bc8e;outline-offset:3px}
+.summer-mode:disabled{opacity:.44;cursor:not-allowed}
+.summer-mode-label{font-size:11px;font-weight:800}
+.summer-mode-meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;color:#b8d2e6;font-size:10px}
+.summer-mode small{font-size:9px;color:#f0af9b}
+.summer-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:15px}
+.summer-btn{border:1px solid #5e83a4;border-radius:9px;min-height:38px;background:#1b3954;color:#f8fbff;padding:8px 14px;font-weight:850;font-size:11px;cursor:pointer}
+.summer-btn.primary{background:#ca9169;color:#101f30;border-color:#e3b18a}
+.summer-btn.subtle{background:#163149}
+.summer-btn.ghost{background:transparent;border-color:#3e5b70;color:#afc7d8}
+.summer-btn:hover:not(:disabled){filter:brightness(1.13)}
+.summer-services,.summer-aside-box{padding:14px;border:1px solid #365470;border-radius:13px;background:linear-gradient(150deg,#142d47,#0a2033)}
+.summer-services h3,.summer-aside-box h3{font-size:15px;margin:0 0 12px;color:#f3d5b8}
+.summer-service{padding:10px 0;border-top:1px solid #36516a;display:flex;gap:10px;justify-content:space-between;align-items:flex-start}
+.summer-service b{font-size:11px;display:block}
+.summer-service small{display:block;font-size:9px;color:#aec3d5;margin:4px 0}
+.summer-service .summer-btn{min-height:27px;padding:4px 7px;font-size:9px}
+.summer-aside-box>div{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid #36516a;font-size:10px;color:#aac6dc}
+.summer-aside-box>div b{color:#f0e2d5;text-align:right}
+.summer-aside-box>.summer-btn{margin-top:13px;width:100%}
+.summer-moment,.summer-summary{padding:26px;min-height:330px;border:1px solid #8d6a4d;border-radius:14px;background:radial-gradient(circle at 95% 0%,#c08b5533,transparent 38%),linear-gradient(140deg,#24415d,#10283f 65%,#0d2335)}
+.summer-moment h2{font:900 clamp(29px,3vw,43px)/1.05 'Barlow Condensed',sans-serif;margin:18px 0 13px}
+.summer-moment>p,.summer-summary>p{font-size:14px;line-height:1.6;color:#d1deeb;max-width:760px}
+.summer-trait{padding:11px 13px;border-left:3px solid #ecc18d;background:#463c3455;border-radius:7px;font-size:12px;color:#ffdebd;margin:15px 0}
+.summer-chips{display:flex;flex-wrap:wrap;gap:5px;margin:12px 0}
+.summer-chip{border:1px solid #49627a;border-radius:15px;font-size:9px;font-weight:800;padding:5px 8px;white-space:normal}
+.summer-chip.positive{border-color:#477a70;color:#97e1c4;background:#163e3c66}
+.summer-chip.negative{border-color:#915d65;color:#f1aeb5;background:#452c3966}
+.summer-neutral{font-size:10px;color:#a8c0d3}
+.summer-log{display:grid;gap:6px;max-height:290px;overflow:auto;margin-top:20px}
+.summer-log>div{display:flex;flex-direction:column;gap:3px;padding:9px 11px;border:1px solid #355772;border-radius:7px;background:#112b42}
+.summer-log strong{font-size:12px}
+.summer-log small{font-size:10px;color:#b8cede}
+.summer-muted{font-size:11px;line-height:1.45;color:#aac0d6}
+.summer-warning{padding:12px;background:#512f39;border:1px solid #c58f86;border-radius:8px;font-size:11px;color:#ffd6ca}
+.summer-legacy{margin-top:15px;padding:18px;border:1px solid #7d654d;border-radius:13px;background:linear-gradient(120deg,#173c59,#10243b)}
+.summer-legacy h2{font-size:25px;margin:8px 0 12px}
+.summer-legacy-totals{display:flex;gap:18px;flex-wrap:wrap;font-size:11px;color:#b8d0e2;margin-bottom:14px}
+.summer-legacy-totals b{color:#f0bd92}
+.summer-legacy summary{cursor:pointer;font-size:12px;color:#ecd0b7;font-weight:800}
+.summer-legacy-row{display:flex;gap:13px;padding:9px;border-bottom:1px solid #37546f;font-size:11px;color:#c1d2e1}
+.summer-legacy-row b{color:#f0bd92}
+.summer-legacy p{font-size:11px;margin:14px 0;color:#c2d5e5}
+@media(max-width:1280px){.summer-main-layout{grid-template-columns:1fr}.summer-side{display:grid;grid-template-columns:1fr 1fr}.summer-card-grid{gap:9px}}
+@media(max-width:940px){.summer-card-grid{grid-template-columns:1fr 1fr}.summer-hero{align-items:start}.summer-offer-head{flex-direction:column;align-items:start}.summer-offer-head>p{max-width:100%}}
+@media(max-width:620px){.view.summer-view{padding:9px}.summer-hero{flex-direction:column;padding:17px}.summer-finances{text-align:left}.summer-week-track{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.summer-week{padding:8px}.summer-card-grid,.summer-side{grid-template-columns:1fr}.summer-moment,.summer-summary{padding:18px;min-height:250px}}
+@media(prefers-reduced-motion:reduce){.summer-mode{transition:none}}
+
+.summer-boost{font-size:9.5px!important;color:#efc89b!important;border-left:2px solid #efbd86;padding-left:8px;margin-top:-7px!important}.summer-effect-row{font-size:11px;color:#d6c2a9;margin:12px 0;line-height:1.5}.summer-effect-row b{color:#f3dbbd}
