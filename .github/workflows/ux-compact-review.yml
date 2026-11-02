@@ -1,0 +1,163 @@
+name: Verificar rediseño UX compacto
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ux-compacto-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  engine:
+    name: Motor, guardados y navegación
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verificar sintaxis
+        run: |
+          for file in src/*.mjs tests/*.mjs; do node --check "$file"; done
+          node --check tests/browser/e2e.cjs
+          node --check tests/browser/ux-compact-review.cjs
+          node --check tests/browser/ux-compact-secondary.cjs
+          node --check tests/browser/ux-compact-panorama.cjs
+      - name: Pruebas de motor, creador y verano
+        run: node --test --test-timeout=60000 tests/*.test.mjs
+      - name: Interfaz inicial y carreras completas
+        run: |
+          node tests/ui-smoke.mjs
+          node tests/career-sim40.mjs
+  visual:
+    name: Chromium y métricas de desplazamiento
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Instalar Playwright y Chromium
+        run: |
+          npm install --no-save --no-package-lock playwright
+          npx playwright install --with-deps chromium
+      - name: Probar pantallas con resoluciones reales
+        run: |
+          python3 -m http.server 8765 >/tmp/rascenso-ux-http.log 2>&1 &
+          node tests/browser/ux-compact-review.cjs
+          node tests/browser/ux-compact-secondary.cjs
+          node tests/browser/ux-compact-panorama.cjs
+      - name: Preparar miniaturas para revisión visual
+        if: success()
+        run: |
+          python3 -m pip install -q pillow
+          python3 - <<'PY'
+          from PIL import Image
+          from pathlib import Path
+          import io,base64
+          root=Path('/tmp/rascenso-ux-review')
+          candidates=[
+             'identidad-1366x768-top.png','futbolista-1366x768-top.png',
+             'carrera-1366x768-top.png','verano-1366x768-top.png',
+             'identidad-390x844-top.png','futbolista-390x844-top.png',
+             'carrera-390x844-top.png','verano-390x844-top.png',
+             'carrera-1366x768-full.png','verano-390x844-full.png',
+             'legado-1366x768-panorama.png','contratos-1366x768-panorama.png',
+             'narrativa-1366x768-panorama.png','mercado-1366x768-panorama.png',
+             'mundo-1366x768-panorama.png','retiro-1366x768-panorama.png',
+             'legado-390x844-panorama.png','mercado-390x844-panorama.png',
+             'mundo-390x844-panorama.png','club-390x844-panorama.png']
+          for name in candidates:
+           f=root/name
+           if not f.exists(): continue
+           im=Image.open(f).convert('RGB')
+           scale=min(1,940/im.width)
+           if scale<1:im.resize((round(im.width*scale),round(im.height*scale)),Image.Resampling.LANCZOS)
+           if scale<1:im=im.resize((round(im.width*scale),round(im.height*scale)),Image.Resampling.LANCZOS)
+           buf=io.BytesIO();im.save(buf,format='JPEG',quality=56,optimize=True)
+           print('VISUAL_CAPTURE:'+name+':'+base64.b64encode(buf.getvalue()).decode('ascii'),flush=True)
+          PY
+      - name: Adjuntar capturas y mediciones
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ux-compacto-revision-chromium
+          path: /tmp/rascenso-ux-review
+          if-no-files-found: ignore
+
+  package-zip:
+    name: Entregar ZIP completo y parche GitHub Desktop
+    needs: [engine, visual]
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Generar los ZIP desde el commit verificado
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile, ZIP_DEFLATED
+          import subprocess, hashlib, json
+          out=Path('/tmp/rascenso-entrega');out.mkdir(parents=True,exist_ok=True)
+          def git(*a):return subprocess.check_output(['git',*a])
+          head=git('rev-parse','HEAD').decode().strip()
+          base=git('merge-base','origin/main','HEAD').decode().strip()
+          all_files=[p.decode() for p in git('ls-files','-z').split(b'\0') if p]
+          changed=[p.decode() for p in git('diff','--name-only','--diff-filter=ACMR','-z',base,'HEAD').split(b'\0') if p]
+          removed=[p.decode() for p in git('diff','--name-only','--diff-filter=D','-z',base,'HEAD').split(b'\0') if p]
+          patch=out/'RASCENSO_PARCHE_UX_PREMIUM_PR8_DESKTOP.zip'
+          complete=out/'RASCENSO_COMPLETO_UX_PREMIUM_PR8.zip'
+          base_info=f'PR: https://github.com/Ragamoofi/RASCENSO/pull/8\nRama: ux/premium-compacto\nCommit: {head}\nBase main: {base}\n'
+          manual=(
+            'RASCENSO — PARCHE UX PREMIUM COMPACTO / GITHUB DESKTOP\n\n'+base_info+
+            '\nINSTALACION CON GITHUB DESKTOP\n'
+            '1. Abre GitHub Desktop y selecciona el repositorio RASCENSO.\n'
+            '2. En Repository > Show in Explorer abre la carpeta local del juego.\n'
+            '3. Haz una copia de seguridad o confirma que no tienes cambios locales sin guardar.\n'
+            '4. Extrae este ZIP EN LA RAIZ DEL REPOSITORIO (donde esta index.html).\n'
+            '5. Conserva la estructura de carpetas y acepta reemplazar archivos. NO borres .git.\n'
+            '6. Vuelve a GitHub Desktop: revisa el diff, haz commit y Push origin.\n'
+            '7. Publicar la web implica actualizar main o su rama configurada; no se hace automaticamente.\n'
+            '\nIMPORTANTE: estos archivos son el contenido FINAL de la rama del PR #8.\n'
+            'Si ya integraste el PR #8, NO los apliques otra vez.\n'
+            'No son capturas ni un ZIP con un proyecto alternativo.\n'
+            'Si GitHub Desktop indica conflictos, no sobreescribas a ciegas.\n'
+          )
+          def build(path,files,readme):
+            with ZipFile(path,'w',ZIP_DEFLATED,compresslevel=6,allowZip64=True) as z:
+              z.writestr('LEEME_GITHUB_DESKTOP.txt',readme)
+              for f in files:
+                p=Path(f)
+                if not p.is_file():raise RuntimeError(f'Archivo faltante: {f}')
+                z.write(p,f)
+          build(patch,changed,manual+'\nARCHIVOS REEMPLAZADOS: '+str(len(changed))+'\n'+'\n'.join(changed)+
+                 ('\n\nARCHIVOS ELIMINADOS EN EL PR (borrar manualmente):\n'+'\n'.join(removed) if removed else ''))
+          build(complete,all_files,
+                'RASCENSO — PROYECTO COMPLETO ACTUALIZADO\n\n'+base_info+
+                '\nEs un snapshot completo del juego en ese commit (sin carpeta .git).\n'
+                'Para mantener el historial de GitHub Desktop, extraelo sobre la raiz de tu repositorio local existente.\n'
+                'Revisa los cambios antes de commit y Push. No elimina archivos ajenos al snapshot.\n')
+          for file in (patch,complete):
+            with ZipFile(file) as z:
+              bad=z.testzip()
+              assert bad is None,(file,bad)
+              print(f'ZIP VALIDADO: {file.name} | {file.stat().st_size} bytes | {len(z.namelist())} entradas | sha256 {hashlib.sha256(file.read_bytes()).hexdigest()}')
+          assert len(changed)>20,(len(changed),changed)
+          assert len(all_files)>len(changed)
+          (out/'MANIFIESTO.json').write_text(json.dumps({'head':head,'base':base,'modified_files':changed,'deleted_files':removed,'total_tracked_files':len(all_files)},indent=2),encoding='utf-8')
+          PY
+      - name: Adjuntar los ZIP de integración
+        uses: actions/upload-artifact@v4
+        with:
+          name: RASCENSO-PR8-ENTREGA-DESKTOP
+          path: /tmp/rascenso-entrega/
+          if-no-files-found: error
+          retention-days: 90

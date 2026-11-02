@@ -55,7 +55,7 @@ function aside(draft,step){
   <div class="cr-who"><b class="cr-num">#${h(draft.number||'9')}</b><div><strong>${h(draft.name||'TU NOMBRE')}</strong><small>${flag(draft.country)} ${h(POSITION_NAMES[draft.position]||'')} · ${h(cls.name)} · ${h(draft.age)} años · ${draft.foot==='Izquierda'?'zurdo':'diestro'}</small></div></div>
   ${club?`<div class="poster-fan">${badge(club)} <span>Hincha de <b>${h(club.name)}</b></span></div>`:''}</div>
   ${step===5?projection(draft):''}
-  <div class="cr-effects ${step===5?'hidden':''}"><header><span>EFECTOS REALES DE TUS ELECCIONES</span><small>${cons.length} decisiones</small></header><div class="cr-effects-list">${cons.map(c=>`<div class="cr-eff ${c.cat===STEP_FOCUS[step]?'focus':''}"><span class="cr-ico sm">${c.icon}</span><div><small>${h(c.label)}</small><strong>${h(c.name)}</strong><div class="cr-chips">${c.chips.slice(0,2).map(([t,g])=>`<i class="${g?'up':'down'}">${h(t)}</i>`).join('')}</div></div></div>`).join('')}</div></div>`;
+  <div class="cr-effects ${step===5?'hidden':''}"><header><span>TUS DECISIONES</span><small>${cons.length} elecciones · Editar ↗</small></header><div class="cr-effects-list">${cons.map(c=>`<button type="button" class="cr-decision-link" data-action="cr-goto" data-step="${({origin:1,environment:1,developmentPath:2,personality:3,style:2,strength:2,weakness:2,publicImage:3,riskProfile:3,dream:4,mode:4,foot:0,age:0})[c.cat]??0}" aria-label="Editar ${h(c.label)}: ${h(c.name)}"><small>${h(c.label)}</small><strong>${h(c.name)}</strong><span aria-hidden="true">↗</span></button>`).join('')}</div><p class="cr-effects-note">Consulta los bonos de cada elección en su categoría y el balance completo en Resumen.</p></div>`;
 }
 const STEP_FOCUS=[null,'origin','style','personality','dream',null];
 const pctTxt=v=>{const x=Math.round((v-1)*100);return x?`${x>0?'+':''}${x} %`:null;};
@@ -183,7 +183,7 @@ export function draftView(state,choices){
   <aside class="lg-side"><section class="lg-panel"><header><span>TU JUGADOR HOY</span><small>${filled.length}/8 atributos</small></header>${radar(KEYS.map(k=>state.attributes[k]??null),{ghost:KEYS.map(k=>state.attrCeil?.[k]??null),size:230})}<div class="lg-legend"><i class="a"></i>Valor inicial<i class="b"></i>Techo</div></section>
    <section class="lg-panel"><header><span>ADN EN CONSTRUCCIÓN</span><small>${lean.label}</small></header>${lean.bars}</section>
    <section class="lg-panel picks"><header><span>TUS INFLUENCIAS</span></header>${picks?`<ol>${picks}</ol>`:'<p class="muted">Aún no has elegido ninguna.</p>'}</section>
-   <section class="lg-panel fam"><header><span>LAS FAMILIAS DE JUEGO</span><small>Tu ADN será una de ellas</small></header>${Object.entries(DNA_TAGS).map(([k,t])=>`<div class="lg-fam"><b>${t.icon}</b><div><strong>${h(t.name)}</strong><small>${h(TAG_EFFECT_TEXT[k])}</small></div></div>`).join('')}</section></aside></div>`;
+  </aside><section class="lg-panel fam"><header><span>LAS FAMILIAS DE JUEGO</span><small>Tu ADN será una de ellas</small></header>${Object.entries(DNA_TAGS).map(([k,t])=>`<div class="lg-fam"><b>${t.icon}</b><div><strong>${h(t.name)}</strong><small>${h(TAG_EFFECT_TEXT[k])}</small></div></div>`).join('')}</section></div>`;
 }
 const tagFor=p=>tagOf(p.legend);
 function leaning(state){

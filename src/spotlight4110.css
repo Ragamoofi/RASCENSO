@@ -1,3 +1,5 @@
+/* Historical component structure; editorial.css owns current presentation. */
+@layer legacy {
 /* RASCENSO 4.10.7 — cobre y azul marino; sin librerías externas. */
 .spotlight4110-effects{margin:8px 0;display:grid;gap:5px}
 .spotlight4110-live{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:6px;padding:7px 12px 9px;background:linear-gradient(120deg,#112c43,#1a344c);border-top:1px solid #bd87595c}
@@ -33,4 +35,6 @@
 .spotlight4110-gallery strong{display:block;font-size:12px}
 .spotlight4110-gallery p{font-size:10px;color:#b4c8d8;line-height:1.4;margin:4px 0 0}
 @media(max-width:650px){.spotlight4110-season-grid{grid-template-columns:1fr}.spotlight4110-hero{padding:20px 17px 24px}.spotlight4110-live{grid-template-columns:1fr}}
-@media(prefers-reduced-motion:reduce){.spotlight4110-dialog,.spotlight4110-hero{animation:none!important}}
+@media(prefers-reduced-motion:reduce){.spotlight4110-dialog,.spotlight4110-hero{animation:none}}
+
+}
