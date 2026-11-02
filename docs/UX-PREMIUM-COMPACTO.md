@@ -1,6 +1,6 @@
 # RASCENSO — Premium compacto
 
-Estado: implementación de composición realizada; validación visual y funcional en curso.
+Estado: implementación completada, CI independiente aprobada; PR disponible para revisión humana antes de fusionar.
 
 - Base comprobada con `git fetch origin main`: `af565af8a36252c085ed7d9744823a06c5d5f57c`.
 - Rama: `ux/premium-compacto`. No fusionar automáticamente.
@@ -63,3 +63,40 @@ Pendiente prioritario: terminar comparación responsive de mercado/verano/mundo/
 - 16/20 jugadas comprobadas individualmente: inicio HTML visible, ayuda oculta al empezar, proporción 16:9 y cierre. Faltan las cuatro de portería y completar el recorrido integral.
 - Segunda suite completa: 380/380; simulación de cuatro carreras hasta retiro aprobada.
 - Pendientes inmediatos: cuatro jugadas, revalidar Mundo y retiro/1280, creador móvil, JSON/PNG, filtros y navegación; guardar evidencias comparativas y abrir PR.
+
+
+## Cierre de recuperación tras interrupción de Terra — 2 de noviembre de 2026
+
+La rama `ux/premium-compacto` se recuperó con los commits `ce0c489`, `22b35d4` y `a76d3c3`, sin pérdida de cambios ni divergencias de `main`. Se abrió el [PR #8](https://github.com/Ragamoofi/RASCENSO/pull/8), sin fusionarlo ni publicar cambios.
+
+### Comprobación independiente de GitHub Actions
+
+- [Workflow de revisión UX #41408634807](https://github.com/Ragamoofi/RASCENSO/actions/runs/41408634807) — **dos jobs aprobados**.
+- `node --test --test-timeout=60000 tests/*.test.mjs`: **380 aprobadas, 0 fallidas**.
+- `node tests/ui-smoke.mjs` y `node tests/career-sim40.mjs`: aprobados.
+- Chromium: **28 combinaciones** (Identidad, Futbolista, Carrera y Verano por siete resoluciones) sin errores JavaScript ni overflow horizontal.
+- Capturas superiores, capturas completas a 1366 y 390, y `metricas.json` adjuntos como artefacto `ux-compacto-revision-chromium` del workflow. Estas imágenes permiten la revisión visual humana final; un resultado automatizado no equivale a certificación exhaustiva de diseño.
+
+### Comparación cuantitativa de desplazamiento vertical
+
+Documentos de la auditoría inicial (`docs/ux-compacto/antes.json`) frente al recorrido Chromium final en el mismo tamaño CSS. `Altura` corresponde a `document.documentElement.scrollHeight`.
+
+| Vista | Resolución | Antes | Después | Reducción |
+|---|---|---:|---:|---:|
+| Identidad | 1366×768 | 2704 px | 1159 px | 57,1 % |
+| Futbolista | 1366×768 | 2704 px | 1178 px | 56,4 % |
+| Carrera | 1366×768 | 2731 px | 1585 px | 42,0 % |
+| Verano | 1366×768 | 1074 px | 768 px | 28,5 % |
+| Identidad | 390×844 | 5271 px | 3016 px | 42,8 % |
+| Futbolista | 390×844 | 5684 px | 3388 px | 40,4 % |
+| Carrera | 390×844 | 6007 px | 4596 px | 23,5 % |
+| Verano | 390×844 | 2722 px | 1904 px | 30,1 % |
+
+A 1366×768 el botón Continuar de Identidad pasó de posición vertical inicial 1767 px a aproximadamente 716 px, dentro del primer viewport al conservar su barra de acción. En Carrera la acción prioritaria pasó de 1418 px a aproximadamente 161 px. No se ocultan los apartados que ahora pueden consultarse más abajo.
+
+### Alcance y limitaciones
+
+- El cierre de la rama quedó verificado mediante CI y capturas; **falta la aceptación visual y de jugabilidad por parte del usuario antes de integrar a `main`**.
+- La comprobación automatizada nueva cubre cuatro pantallas clave en siete viewports; Terra también dejó constancia de revisar el resto de pantallas y los veinte minijuegos, pero la nueva CI no repite exhaustivamente todos esos recorridos interactivos.
+- No se probó el guardado personal del usuario, ni Firefox, Safari o dispositivos físicos.
+- Ningún fichero de la rama se ha fusionado, desplegado ni usado para reemplazar `main` desde esta recuperación.
