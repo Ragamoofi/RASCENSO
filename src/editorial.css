@@ -450,3 +450,13 @@ html body [hidden],html body .hidden,.play-window .play-mobile-brief[hidden]{dis
  )>.left-rail>.profile-card{order:2}
  .profile-card h2{font-size:clamp(19px,5.1vw,25px)}
 }
+
+/* The pre-editorial OVR badge carried width:86px into a 46px CSS grid track.
+   Fix its intrinsic size instead of hiding the overlap or weakening QA. */
+.profile-card .player-overall{
+ width:100%;max-width:100%;min-width:0;box-sizing:border-box;
+ left:auto;right:auto;justify-self:stretch
+}
+@media(min-width:768px){
+ .profile-card .player-overall strong{font-size:36px}
+}
