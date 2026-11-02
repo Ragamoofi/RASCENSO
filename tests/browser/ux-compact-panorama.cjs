@@ -81,11 +81,12 @@ fs.mkdirSync(OUT,{recursive:true});
        documentHeight:doc.scrollHeight,documentWidth:doc.scrollWidth,
        overflows:doc.scrollWidth>innerWidth+2,
        viewport:innerWidth+'x'+innerHeight,primary:bound(el),modal:bound(modal),profile:bound(document.querySelector('.profile-card')),center:bound(document.querySelector('.center-rail')),name:bound(document.querySelector('.profile-card h2')),overall:bound(document.querySelector('.profile-card .player-overall')),
-       visibleControls:interact.length,firstActions:interact.slice(0,10).map(x=>({text:(x.textContent||x.getAttribute('aria-label')||'').trim().slice(0,50),top:Math.round(x.getBoundingClientRect().top)})),
+       salary:(()=>{const b=document.querySelector('.offer-name>small b');return b?{text:b.textContent,whiteSpace:getComputedStyle(b).whiteSpace,box:bound(b)}:null})(),visibleControls:interact.length,firstActions:interact.slice(0,10).map(x=>({text:(x.textContent||x.getAttribute('aria-label')||'').trim().slice(0,50),top:Math.round(x.getBoundingClientRect().top)})),
        blank:!!document.querySelector('.boot'),mainHeight:document.querySelector('main.view')?.scrollHeight||null
       };
     },task.selector);
     if(metric.overflows)problems.push(task.screen+' '+width+': overflow horizontal');
+    if(task.screen==='mercado'&&width===390&&metric.salary?.whiteSpace!=='nowrap')problems.push('mercado móvil: el importe anual se parte por carácter');
     if(metric.name&&metric.overall&&metric.name.left<metric.overall.right-1&&metric.name.top<metric.overall.bottom&&metric.name.bottom>metric.overall.top)
       problems.push(task.screen+' '+width+': media se superpone al nombre del jugador');
     if(width===390&&['narrativa','balance','mercado','vestuario','historial','mundo'].includes(task.screen)
