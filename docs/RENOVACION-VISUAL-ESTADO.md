@@ -1,3 +1,11 @@
+# Premium compacto — trabajo en curso
+
+Base actual: `af565af8a36252c085ed7d9744823a06c5d5f57c` (main, PR #7 y Verano 4.11). Rama: `ux/premium-compacto`.
+
+La renovación editorial anterior está integrada; la nueva reestructuración UX todavía no está terminada. Ver [auditoría y continuidad](UX-PREMIUM-COMPACTO.md).
+
+---
+
 # RASCENSO — Renovación visual integral
 
 **Estado: implementación y revisión completadas.** 1 de noviembre de 2026.
