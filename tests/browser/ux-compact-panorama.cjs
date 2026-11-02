@@ -28,6 +28,7 @@ fs.mkdirSync(OUT,{recursive:true});
  assert.equal(retired.phase,'retired');
  const market={...recap,phase:'transfer',market:{...(recap.market||{}),reason:'normal',canStay:true,searches:0},offers:e.transferOffers(recap)};
  const tasks=[
+  {screen:'carrera',save:season,tab:'carrera',selector:'.season-command'},
   {screen:'legado',save:original,selector:'.lg-card'},
   {screen:'adn',save:dna,selector:'.dna-review-actions'},
   {screen:'contratos',save:{...dna,dnaReviewed:true},selector:'.academy-card'},
@@ -72,6 +73,37 @@ fs.mkdirSync(OUT,{recursive:true});
     }
     await pg.locator(task.selector).first().waitFor({timeout:30000});
     await pg.waitForTimeout(180);
+    // Regression UX: los detalles conservan accesibilidad y no bloquean las acciones.
+    if(task.screen==='carrera'){
+     const details=pg.locator('.profile-finances');
+     await details.waitFor();
+     assert.equal(await details.evaluate(el=>el.open),width>767,'Economía abierta en escritorio y cerrada inicialmente en móvil');
+     if(width<=767){
+      const initialHeight=await pg.locator('.profile-card').evaluate(el=>Math.round(el.getBoundingClientRect().height));
+      assert.ok(initialHeight<290,'La tarjeta inicial móvil debe ser compacta: '+initialHeight);
+      await details.locator('summary').click();
+      assert.equal(await pg.locator('.profile-finances-content .player-economy').isVisible(),true,'Salario y contrato accesibles');
+      await details.locator('summary').click();
+      assert.equal(await details.evaluate(el=>el.open),false,'El detalle móvil se puede volver a plegar');
+     }
+    }
+    if(task.screen==='mundo'){
+     const advanced=pg.locator('.fm-world-club-tools');
+     await advanced.waitFor({timeout:30000});
+     assert.equal(await advanced.evaluate(el=>el.open),false,'La búsqueda secundaria no debe duplicar el explorador');
+     await advanced.locator('summary').click();
+     assert.equal(await pg.locator('#fm-world-club-search input').isVisible(),true,'La búsqueda completa de clubes sigue accesible');
+     await advanced.locator('summary').click();
+    }
+    if(task.screen==='legado'){
+     const footer=await pg.evaluate(()=>{
+      const f=document.querySelector('.lg-foot'),cards=[...document.querySelectorAll('.lg-card')];
+      return {position:getComputedStyle(f).position,gap:f.getBoundingClientRect().top-Math.max(...cards.map(c=>c.getBoundingClientRect().bottom))};
+     });
+     assert.equal(footer.position,'static','Los controles de Legado nunca tapan cartas');
+     assert.ok(footer.gap>=12,'Separación entre cartas y acciones: '+footer.gap);
+    }
+    await pg.evaluate(()=>window.scrollTo(0,0));
     const metric=await pg.evaluate(selector=>{
       const modal=document.querySelector('dialog[open],.tool-panel');
       const doc=document.documentElement,el=document.querySelector(selector);
