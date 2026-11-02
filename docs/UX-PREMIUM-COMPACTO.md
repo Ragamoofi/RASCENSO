@@ -100,3 +100,44 @@ A 1366×768 el botón Continuar de Identidad pasó de posición vertical inicial
 - La comprobación automatizada nueva cubre cuatro pantallas clave en siete viewports; Terra también dejó constancia de revisar el resto de pantallas y los veinte minijuegos, pero la nueva CI no repite exhaustivamente todos esos recorridos interactivos.
 - No se probó el guardado personal del usuario, ni Firefox, Safari o dispositivos físicos.
 - Ningún fichero de la rama se ha fusionado, desplegado ni usado para reemplazar `main` desde esta recuperación.
+
+## Revisión visual final asistida — 2 de noviembre de 2026
+
+### Evidencia visual y funcional
+Se revisaron las **capturas renderizadas por Chromium**, no solo las hojas CSS ni sus métricas. Las imágenes proceden del workflow de la rama de trabajo.
+
+- [CI de revisión extendida](https://github.com/Ragamoofi/RASCENSO/actions/runs/41411224700): dos jobs verdes.
+- **380/380** pruebas del motor, más UI smoke y carreras completas.
+- **28/28** combinaciones visuales principales (Identidad, Futbolista, Carrera, Verano × 7 resoluciones).
+- **33/33** recorridos de interacción adicionales en 1366×768, 390×844 y 360×800: las seis etapas del creador, navegación entre Carrera/Vestuario/Historial/Mundo y elección de un modo de actividad en Verano. Cero excepciones JS y cero desbordamientos horizontales en esos recorridos.
+- Capturas visibles de las cuatro pantallas principales en escritorio y móvil, y capturas de página completa para Carrera (1366) y Verano (390). Evidencia descargable desde el artefacto `ux-compacto-revision-chromium` del workflow.
+
+### Hallazgos y últimos ajustes
+1. **Creador móvil:** la introducción editorial duplicaba el texto explicativo de cada capítulo y consumía el primer viewport. Se conservó para lectores de pantalla, pero se retiró de la presentación visual bajo 768 px; sigue visible el título principal y la descripción propia de cada etapa. Las seis etapas permanecen a la vista, sin subpestañas.
+2. **Tarjeta del jugador en móvil:** ajustes finos de separación económica y club para mantener visible Jugar próximo partido sin necesidad de grandes desplazamientos iniciales.
+3. **Verano móvil:** las acciones de descanso y resumen persisten mientras se consulta la lista. Se añadió margen de desplazamiento al interactuar con los modos para reducir el riesgo de que una opción enfocada quede bajo los botones persistentes. Un clic real en un modo pasó el test de Chromium.
+4. **Pantallas de escritorio:** el próximo partido y las decisiones comparten el área principal, los tres modos de actividad de Verano se muestran juntos y los beneficios del creador son consultables sin bloquear el avance. No se detectaron espacios vacíos grandes por alturas mínimas artificiales en las capturas revisadas.
+5. **Cascada CSS:** esta revisión final no añade nuevas reglas `!important`; los ajustes responden a errores visuales concretos observados en Chromium.
+
+### Métricas actualizadas
+La primera auditoría de Terra quedó en `docs/ux-compacto/antes.json`. El test final registra lo siguiente:
+
+| Pantalla | Resolución | Antes | Revisión final | Reducción |
+|---|---|---:|---:|---:|
+| Identidad | 1366×768 | 2704 px | 1159 px | 57,1 % |
+| Futbolista | 1366×768 | 2704 px | 1178 px | 56,4 % |
+| Carrera | 1366×768 | 2731 px | 1585 px | 42,0 % |
+| Verano | 1366×768 | 1074 px | 768 px | 28,5 % |
+| Identidad | 390×844 | 5271 px | 2939 px | 44,2 % |
+| Futbolista | 390×844 | 5684 px | 3311 px | 41,7 % |
+| Carrera | 390×844 | 6007 px | 4588 px | 23,6 % |
+| Verano | 390×844 | 2722 px | 1904 px | 30,1 % |
+
+Las pantallas de móvil siguen siendo verticalmente largas cuando contienen muchas alternativas; la barra de avance y las acciones principales quedan accesibles. Reducción de altura no significa necesariamente que todo el contenido quepa en el viewport.
+
+### Resultado y límites
+**Revisión final de composición y recorridos clave: aprobada para revisión del usuario.** Las pruebas del motor y navegador no evidencian regresiones en los flujos comprobados.
+
+No se han repetido exhaustivamente todas las secuencias de los 20 minijuegos ni se ha realizado una auditoría completa de accesibilidad; Terra documentó el recorrido inicial, y la nueva revisión automática volvió a comprobar las pantallas principales y su navegación. No se verificaron Firefox, Safari, dispositivos reales ni guardados personales. La revisión definitiva de preferencia visual queda para el usuario.
+
+**No fusionar desde la herramienta:** esta rama permanece separada de `main`, conservando el sitio público y las partidas de usuario.
