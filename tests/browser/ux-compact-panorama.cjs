@@ -75,17 +75,23 @@ fs.mkdirSync(OUT,{recursive:true});
     const metric=await pg.evaluate(selector=>{
       const modal=document.querySelector('dialog[open],.tool-panel');
       const doc=document.documentElement,el=document.querySelector(selector);
-      const bound=(e)=>{if(!e)return null;const r=e.getBoundingClientRect();return {top:Math.round(r.top),bottom:Math.round(r.bottom),height:Math.round(r.height),width:Math.round(r.width)}};
+      const bound=(e)=>{if(!e)return null;const r=e.getBoundingClientRect();return {top:Math.round(r.top),bottom:Math.round(r.bottom),left:Math.round(r.left),right:Math.round(r.right),height:Math.round(r.height),width:Math.round(r.width)}};
       const interact=[...document.querySelectorAll('button:not([disabled]),input:not([disabled]),a[href]')].filter(e=>{const b=e.getBoundingClientRect();return b.width>0&&b.height>0});
       return {
        documentHeight:doc.scrollHeight,documentWidth:doc.scrollWidth,
        overflows:doc.scrollWidth>innerWidth+2,
-       viewport:innerWidth+'x'+innerHeight,primary:bound(el),modal:bound(modal),
+       viewport:innerWidth+'x'+innerHeight,primary:bound(el),modal:bound(modal),profile:bound(document.querySelector('.profile-card')),center:bound(document.querySelector('.center-rail')),name:bound(document.querySelector('.profile-card h2')),overall:bound(document.querySelector('.profile-card .player-overall')),
        visibleControls:interact.length,firstActions:interact.slice(0,10).map(x=>({text:(x.textContent||x.getAttribute('aria-label')||'').trim().slice(0,50),top:Math.round(x.getBoundingClientRect().top)})),
        blank:!!document.querySelector('.boot'),mainHeight:document.querySelector('main.view')?.scrollHeight||null
       };
     },task.selector);
     if(metric.overflows)problems.push(task.screen+' '+width+': overflow horizontal');
+    if(metric.name&&metric.overall&&metric.name.left<metric.overall.right-1&&metric.name.top<metric.overall.bottom&&metric.name.bottom>metric.overall.top)
+      problems.push(task.screen+' '+width+': media se superpone al nombre del jugador');
+    if(width===390&&['narrativa','balance','mercado','vestuario','historial','mundo'].includes(task.screen)
+       &&metric.profile&&metric.center&&metric.profile.top<=metric.center.top)
+      problems.push(task.screen+' '+width+': información secundaria antes del contenido solicitado');
+
     if(errors.length)problems.push(task.screen+' '+width+': JS '+errors.join(' | '));
     const key=task.screen+'-'+width+'x'+height;
     await pg.screenshot({path:path.join(OUT,key+'-panorama.png'),fullPage:false});
