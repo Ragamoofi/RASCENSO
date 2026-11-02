@@ -460,3 +460,12 @@ html body [hidden],html body .hidden,.play-window .play-mobile-brief[hidden]{dis
 @media(min-width:768px){
  .profile-card .player-overall strong{font-size:36px}
 }
+
+/* Offer summaries are prose, not flex rows: the old anonymous flex items
+   split EUR amounts into arbitrary fragments on narrow screens. */
+.offer-name>small{display:block;line-height:1.45;overflow-wrap:normal;word-break:normal}
+.offer-name>small b{display:inline-block;white-space:nowrap}
+@media(max-width:767px){
+ .offer-name>small{font-size:12px}
+ .offer-name>small b{font-size:12px}
+}
