@@ -422,3 +422,10 @@ html body [hidden],html body .hidden,.play-window .play-mobile-brief[hidden]{dis
  .summer-mode,.summer-service .summer-btn{scroll-margin-block-end:120px}
  .summer-actions{box-shadow:0 -8px 18px #081321dd}
 }
+
+/* Mobile creator uses the chapter heading as its unique page title; the
+   editorial slogan repeats on all six stages and needlessly pushes choices. */
+@media(max-width:767px){
+ .view:not(.playing)>.ed-page-intro{display:none}
+ .view:not(.playing)>.creation-layout.cr3{margin-top:0}
+}
