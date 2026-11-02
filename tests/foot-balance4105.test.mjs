@@ -52,5 +52,5 @@ test('el HTML usa la nueva versión del motor sin cambiar la entrada de RASCENSO
  assert.match(html,/RASCENSO 4\.(?:10\.(?:[5-9]|[1-9]\d+)|11\.\d+)/);
  assert.match(html,/"\.\/src\/identity30\.mjs":"\.\/src\/identity30\.mjs\?v=\d+"/);
  assert.match(html,/src\/experience494\.mjs\?v=\d+/);
- assert.match(html,/src\/creator-layout4103\.mjs\?v=514/);
+ assert.match(html,/src\/creator-layout4103\.mjs\?v=516/);
 });

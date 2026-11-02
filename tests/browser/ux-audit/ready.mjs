@@ -19,7 +19,7 @@ if(kind){
  if(kind.startsWith('jugada')){
   const rows=Object.values(await fetch('../qa-plays.json').then(r=>r.json()));
   const {state,play}=rows[Number(kind.slice(6))];
-  const {openPlay}=await import('./src/plays-ui.mjs?v=511');
+  const {openPlay}=await import(new URL(location.pathname.includes('/current/')?'./src/plays-ui.mjs?v=515':'./src/plays-ui.mjs?v=511',location.href).href);
   openPlay({state,play,clubName:'Tu club',onDone:()=>{},onCancel:()=>{}});
  }
  await document.fonts.ready;

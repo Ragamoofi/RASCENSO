@@ -10,7 +10,7 @@ export async function session(tab,output,folder='/home/oai/share/ux-captures'){
   await tab.getAXState({emit:false});
  };
  const ready=async(screen)=>{
-  for(let i=0;i<40;i++){
+  for(let i=0;i<100;i++){
    await tab.getAXState({emit:false});
    const value=await tab.playwright.locator('#metrics').textContent();
    if(value&&JSON.parse(value).ready===screen)return;

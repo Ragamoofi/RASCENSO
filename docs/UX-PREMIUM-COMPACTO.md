@@ -53,3 +53,13 @@ El contenedor de la herramienta Chromium tuvo un límite de uso durante la prime
 Pruebas al checkpoint: `node --test --test-timeout=60000 tests/*.test.mjs`: **380/380**. `node tests/ui-smoke.mjs`: aprobado. Versionado actualizado en pruebas de carga; ninguna regla del motor modificada.
 
 Pendiente prioritario: terminar comparación responsive de mercado/verano/mundo/historial/vestuario/retiro/club/ajustes; verificar las 20 jugadas, filtros y flujo completo; comprobar JSON/PNG y restauración; consolidar reglas editoriales repetidas y emitir PR.
+
+### Segundo checkpoint de implementación
+
+- Se retiran 9 KB de declaraciones editoriales sustituidas, manteniendo el orden de cascada. Cero reglas `!important` en las siete hojas activas.
+- Buscador de clubes abierto por defecto en el nuevo dock de Mundo; no se altera el explorador cuando se usa fuera de él.
+- Canvas ajustado a las alturas reales de cabecera, ayuda, rasgos y pie mediante `ResizeObserver`, sin modificar resolución, física o entrada. Observador y listener se desconectan al cerrar.
+- Ocultar ayuda redimensiona en el mismo evento para mantener estable el cierre; estados `[hidden]` prevalecen sobre layouts responsive.
+- 16/20 jugadas comprobadas individualmente: inicio HTML visible, ayuda oculta al empezar, proporción 16:9 y cierre. Faltan las cuatro de portería y completar el recorrido integral.
+- Segunda suite completa: 380/380; simulación de cuatro carreras hasta retiro aprobada.
+- Pendientes inmediatos: cuatro jugadas, revalidar Mundo y retiro/1280, creador móvil, JSON/PNG, filtros y navegación; guardar evidencias comparativas y abrir PR.

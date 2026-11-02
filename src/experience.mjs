@@ -28,7 +28,7 @@ import { seasonMoment, playCareerMoment, POSITIONS, ATTRS, ORIGINS, PERSONALITIE
 import { seasonPlays, resolveSeasonPlay, autoResolveSeasonPlay, chooseMatchRhythm } from './engine.mjs';
 import { matchdayPanel, rivalLedger } from './matchday41.mjs';
 import { playsPanel, openPlay } from './plays-ui.mjs';
-import { creatorView, STEPS, draftView, dnaCard } from './creator30.mjs?v=514';
+import { creatorView, STEPS, draftView, dnaCard } from './creator30.mjs?v=516';
 import { PRESETS, randomFields } from './identity30.mjs';
 import { cardExtras, projectionLine, attributeBar, seasonPanels, optionConsequences, recapExtras, vestuarioView, worldView, historyExtras, offerExtras, negotiationBanner, renewalExtras, legacyVerdict, h, n, tierOf, dnaBadge } from './ui20.mjs';
 const ROOT=document.getElementById('app');
