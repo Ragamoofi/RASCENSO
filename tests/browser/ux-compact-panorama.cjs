@@ -59,7 +59,7 @@ fs.mkdirSync(OUT,{recursive:true});
     },task.save);
     await pg.goto(URL,{waitUntil:'domcontentloaded',timeout:45000});
     if(task.tab){
-     const nav=pg.locator('[data-action="nav"][data-tab="'+task.tab+'"]');
+     const nav=pg.locator('.main-nav [data-action="nav"][data-tab="'+task.tab+'"]').first();
      await nav.waitFor({timeout:25000});
      await nav.click();
     }
