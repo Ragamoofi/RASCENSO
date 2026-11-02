@@ -115,7 +115,7 @@ test('3.1 · el borrador del creador se dibuja completo en cada paso y con cualq
  const draft={name:'Pruebas',country:'AR',age:'18',position:'DC',number:'10',foot:'Izquierda',city:'La Boca',story:'Pateaba contra la pared.',origin:'barrio',personality:'sereno',style:'regateador',dream:'europa',fanClubId:'',mode:'Purista',environment:'migrante',publicImage:'mediatico',riskProfile:'aventurero',developmentPath:'mixta',roleClass:'cazagoles',strength:'tecnica',weakness:'presion'};
  for(const pos of ['POR','DFC','LI','MCD','MC','MI','MCO','EI','DC']){
   for(let step=0;step<STEPS.length;step++){const {content,aside}=creatorView({...draft,position:pos,roleClass:''},step);
-   assert.ok(content.length>800&&aside.includes('EFECTOS REALES'),`${pos} paso ${step}`);
+   assert.ok(content.length>800&&aside.includes('TUS DECISIONES'),`${pos} paso ${step}`);
    assert.ok(!/undefined|NaN|\[object/.test(content+aside),`${pos} paso ${step} contiene basura`);}
  }
  assert.equal(draftConsequences(draft,{}).length,13);

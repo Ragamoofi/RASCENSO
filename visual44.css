@@ -1,10 +1,12 @@
+/* Historical component structure; editorial.css owns current presentation. */
+@layer legacy {
 /* RASCENSO 4.4 · Renovación visual cinematográfica. Archivo independiente y reversible. */
 :root{--rv44-copper:#f5b880;--rv44-ice:#c6e4eb;--rv44-ink:#f7f5ef;--rv44-depth:#091b2c}
 .matchday-center{background:linear-gradient(160deg,#132a40 0%,#0b2238 100%);border-color:#648198;box-shadow:0 15px 38px #03101d66;gap:12px}
-.matchday-top{align-items:center!important}.matchday-top>span{color:#f2c29c!important;font-size:12px!important;letter-spacing:.18em!important}
-.matchday-top>div>b{color:#ffca98!important;font-size:14px!important}
+.matchday-top{align-items:center}.matchday-top>span{color:#f2c29c;font-size:12px;letter-spacing:.18em}
+.matchday-top>div>b{color:#ffca98;font-size:14px}
 .matchday-progress{height:6px;background:#071b2b}.matchday-progress span{background:linear-gradient(90deg,#3a9d9b,#f7b27e)}
-.matchday-feature{overflow:hidden;position:relative;background:linear-gradient(150deg,#102b3c,#091a2b)!important;border-color:#4b7982!important;padding:0 0 14px!important;gap:9px!important}
+.matchday-feature{overflow:hidden;position:relative;background:linear-gradient(150deg,#102b3c,#091a2b);border-color:#4b7982;padding:0 0 14px;gap:9px}
 .matchday-feature.defensive{--rv44-accent:#89d7df}.matchday-feature.offensive{--rv44-accent:#f2b484}
 .matchday-arena{height:116px;position:relative;overflow:hidden;background:
  radial-gradient(ellipse at 50% 95%,#3c7d6666,transparent 67%),
@@ -17,51 +19,51 @@
 .matchday-arena-heading b{color:#f2b184;margin-left:5px;border:1px solid #d49a6577;padding:2px 5px;border-radius:3px}
 .matchday-arena-pitch{position:absolute;bottom:-78px;left:50%;width:65%;height:138px;transform:translateX(-50%) perspective(170px) rotateX(42deg);border:2px solid #c5e2c377;background:repeating-linear-gradient(90deg,#0e62447d 0 34px,#1c755381 35px 69px);box-shadow:0 0 25px #1b795861;opacity:.66}
 .matchday-arena-pitch span{position:absolute;inset:0 42%;border:1px solid #e0f7df9c}.matchday-arena-pitch i{position:absolute;left:44%;top:34%;height:50px;width:50px;border:1px solid #e0f7df9c;border-radius:50%}.matchday-arena-pitch b{position:absolute;inset:15px;border:1px solid #e0f7df76}
-.matchday-context{position:relative;z-index:2;align-items:center;padding:0 16px;margin-top:-5px;font-size:10px!important}
+.matchday-context{position:relative;z-index:2;align-items:center;padding:0 16px;margin-top:-5px;font-size:10px}
 .matchday-context>span{background:#061d30e0;color:#f3c19a;padding:6px 9px;border:1px solid #a87e618a;border-radius:5px}
-.matchday-scoreboard{margin:0 14px;position:relative;z-index:2;gap:10px!important;min-height:92px!important;border:1px solid #75a6a450;border-radius:13px;padding:9px 10px;background:linear-gradient(90deg,#112f4194,#071b2bd4 45%,#112f4194);box-shadow:0 10px 30px #0005}
-.matchday-team{display:grid;justify-items:center;align-content:center;gap:5px;font-size:clamp(11px,1.12vw,15px)!important;font-weight:900;min-width:0}
+.matchday-scoreboard{margin:0 14px;position:relative;z-index:2;gap:10px;min-height:92px;border:1px solid #75a6a450;border-radius:13px;padding:9px 10px;background:linear-gradient(90deg,#112f4194,#071b2bd4 45%,#112f4194);box-shadow:0 10px 30px #0005}
+.matchday-team{display:grid;justify-items:center;align-content:center;gap:5px;font-size:clamp(11px,1.12vw,15px);font-weight:900;min-width:0}
 .matchday-team>span:last-child{display:block;max-width:100%;text-align:center;overflow-wrap:anywhere}
 .matchday-team-crest{height:35px;width:35px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 3px 6px #0008)}
 .matchday-team-crest img{width:33px;height:33px;object-fit:contain}
-.matchday-scoreboard>strong{display:flex;align-items:center;gap:7px;font:900 clamp(32px,3.2vw,52px)/1 'Barlow Condensed',sans-serif!important;letter-spacing:.02em}
+.matchday-scoreboard>strong{display:flex;align-items:center;gap:7px;font:900 clamp(32px,3.2vw,52px)/1 'Barlow Condensed',sans-serif;letter-spacing:.02em}
 .matchday-scoreboard>strong span{min-width:27px;text-align:center}.matchday-scoreboard>strong i{color:var(--rv44-accent);font-size:.7em}
-.matchday-rival{color:#9bc9ce!important;letter-spacing:.11em;font-weight:800}
+.matchday-rival{color:#9bc9ce;letter-spacing:.11em;font-weight:800}
 .matchday-situation{margin:4px 14px 1px;border-left:3px solid var(--rv44-accent);background:#173448bb;display:grid;gap:3px;padding:8px 11px}
 .matchday-situation b{font-size:10px;letter-spacing:.1em;color:var(--rv44-accent)}.matchday-situation span{font-size:12px;color:#e5eff4;line-height:1.4}
 .matchday-feature .matchday-identity{justify-self:start;margin-left:14px;letter-spacing:.06em}
-.matchday-feature h3{font:900 clamp(20px,1.85vw,28px)/1 'Barlow Condensed',sans-serif!important;margin:1px 14px!important;letter-spacing:.015em}
-.matchday-feature>p{margin:0 14px!important;font-size:12px;color:#d2e4ed}
-.matchday-indicators{margin:2px 14px!important;gap:7px!important}
-.matchday-indicators span{background:#092538;border-color:#536c7a;padding:7px 9px!important;border-radius:7px}
+.matchday-feature h3{font:900 clamp(20px,1.85vw,28px)/1 'Barlow Condensed',sans-serif;margin:1px 14px;letter-spacing:.015em}
+.matchday-feature>p{margin:0 14px;font-size:12px;color:#d2e4ed}
+.matchday-indicators{margin:2px 14px;gap:7px}
+.matchday-indicators span{background:#092538;border-color:#536c7a;padding:7px 9px;border-radius:7px}
 .matchday-indicators span b{color:#f6c198}
-.matchday-cta{margin:4px 14px 0!important}
+.matchday-cta{margin:4px 14px 0}
 .matchday-button.primary{min-height:43px;font-size:13px;letter-spacing:.03em;box-shadow:0 4px 14px #b97c4860}
 .matchday-button.secondary{min-height:43px}
-.matchday-calendar summary{font-size:12px!important;padding:5px 0}
-.matchday-fixture{position:relative;gap:10px;padding:11px!important;border-color:#3d5d75!important;background:linear-gradient(100deg,#132c40,#0c263a)!important}
-.matchday-fixture.up-next:not(.finished){border-color:#c29a6e!important;box-shadow:inset 3px 0 0 #deac77}
+.matchday-calendar summary{font-size:12px;padding:5px 0}
+.matchday-fixture{position:relative;gap:10px;padding:11px;border-color:#3d5d75;background:linear-gradient(100deg,#132c40,#0c263a)}
+.matchday-fixture.up-next:not(.finished){border-color:#c29a6e;box-shadow:inset 3px 0 0 #deac77}
 .matchday-fixture-number{font:900 22px 'Barlow Condensed',sans-serif;color:#64869e;flex-shrink:0;min-width:25px}
 .matchday-fixture-info{flex:1}.matchday-fixture-info strong{font-size:12px}
-.matchday-projection{border-left:3px solid #e0a676;background:linear-gradient(120deg,#1b3c46,#0e2a3d)!important}
+.matchday-projection{border-left:3px solid #e0a676;background:linear-gradient(120deg,#1b3c46,#0e2a3d)}
 
 /* PANTALLA FINAL — escenografía de estadio, tres actos y sala de recuerdos */
-.farewell-page{gap:18px!important}
+.farewell-page{gap:18px}
 .farewell-hero{min-height:340px;background:
  radial-gradient(ellipse 90% 88% at 50% 130%,#3c8c7566,transparent 67%),
  radial-gradient(ellipse at 95% 25%,#c3a47925,transparent 45%),
- linear-gradient(125deg,#071a2c,#174254 53%,#0d253c)!important;border:1px solid #b996726e!important}
-.farewell-hero:before{left:24%;right:-12%!important;top:-35%!important;width:105%!important;height:200%!important;border:1px solid #bce9e229!important;box-shadow:0 0 0 42px #ecf7e608,0 0 0 105px #e3f6e60b,0 0 0 190px #e6efe707!important}
-.farewell-hero:after{background:repeating-linear-gradient(90deg,transparent 0 67px,#b5dfbd0c 68px 70px)!important;mask-image:linear-gradient(0deg,#000 0%,transparent 62%)!important}
+ linear-gradient(125deg,#071a2c,#174254 53%,#0d253c);border:1px solid #b996726e}
+.farewell-hero:before{left:24%;right:-12%;top:-35%;width:105%;height:200%;border:1px solid #bce9e229;box-shadow:0 0 0 42px #ecf7e608,0 0 0 105px #e3f6e60b,0 0 0 190px #e6efe707}
+.farewell-hero:after{background:repeating-linear-gradient(90deg,transparent 0 67px,#b5dfbd0c 68px 70px);mask-image:linear-gradient(0deg,#000 0%,transparent 62%)}
 .farewell-hero-row{min-height:245px}
-.farewell-hero-text h1{font-size:clamp(48px,5vw,84px)!important;letter-spacing:-.01em;text-transform:uppercase}
+.farewell-hero-text h1{font-size:clamp(48px,5vw,84px);letter-spacing:-.01em;text-transform:uppercase}
 .farewell-hero-text h1 em{text-shadow:0 0 25px #e0a46d35}
-.farewell-hero .farewell-name{font-size:clamp(27px,2.8vw,42px);margin-top:15px!important;color:#fff}
+.farewell-hero .farewell-name{font-size:clamp(27px,2.8vw,42px);margin-top:15px;color:#fff}
 .farewell-signatures{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .farewell-signatures>span{background:#071d30ae;border:1px solid #81a6a280;color:#e1e9ea;font-size:10px;font-weight:800;padding:7px 10px;border-radius:5px}
-.farewell-hero-foot{min-height:55px!important;background:#071b2ee5!important;gap:15px!important}
-.farewell-medallion{width:180px!important;height:180px!important;transform:rotate(-7deg);border-color:#f2c38a!important;background:radial-gradient(circle,#274e5b,#092337 72%)!important}
-.farewell-medallion strong{font-size:71px!important}
+.farewell-hero-foot{min-height:55px;background:#071b2ee5;gap:15px}
+.farewell-medallion{width:180px;height:180px;transform:rotate(-7deg);border-color:#f2c38a;background:radial-gradient(circle,#274e5b,#092337 72%)}
+.farewell-medallion strong{font-size:71px}
 .farewell-acts{border:1px solid #45687b;border-radius:14px;background:linear-gradient(125deg,#112b3e,#122b40);padding:17px 18px;overflow:hidden}
 .legacy-act-heading{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px}
 .legacy-act-heading h2{font:900 clamp(24px,2.4vw,33px)/1 'Barlow Condensed',sans-serif;margin:6px 0 0}
@@ -78,40 +80,40 @@
 .legacy-act-metrics{display:flex;flex-wrap:wrap;gap:6px;padding-top:8px;border-top:1px solid #ffffff30}
 .legacy-act-metrics>span{font-size:10px;color:#eac4a7;background:#051a2d83;padding:5px 7px;border-radius:4px;font-weight:750}
 .legacy-act>small{font-size:10px;color:#adc2d2}
-.farewell-numbers{border-color:#8b796974;background:linear-gradient(130deg,#183d4b,#0b2338)!important}
+.farewell-numbers{border-color:#8b796974;background:linear-gradient(130deg,#183d4b,#0b2338)}
 .farewell-stats .farewell-stat{padding:16px 6px;background:radial-gradient(ellipse at 50% 0%,#51717346,transparent 80%),#0b2437;border-color:#577689}
 .farewell-stats .farewell-stat b{color:#f5d0aa;font-size:clamp(29px,2.7vw,43px)}
-.farewell-content{gap:18px!important}
-.farewell-section{background:linear-gradient(146deg,#193c4d,#0c263d)!important;border-color:#537284!important}
-.farewell-tribute{background:linear-gradient(130deg,#34404a,#153a49)!important;border-left:4px solid #edb17d!important}
-.farewell-trophy{background:linear-gradient(158deg,#31536a,#162f47)!important;min-height:127px;border-color:#708496!important}
+.farewell-content{gap:18px}
+.farewell-section{background:linear-gradient(146deg,#193c4d,#0c263d);border-color:#537284}
+.farewell-tribute{background:linear-gradient(130deg,#34404a,#153a49);border-left:4px solid #edb17d}
+.farewell-trophy{background:linear-gradient(158deg,#31536a,#162f47);min-height:127px;border-color:#708496}
 .farewell-trophy img{height:55px;filter:drop-shadow(0 5px 9px #0008)}
 .farewell-club{padding:12px 4px}
 .farewell-club:nth-child(even){background:#b4dff008}
-.farewell-best{background:linear-gradient(110deg,#344b53,#1b3b4d)!important;border-color:#d2a97d}
-.farewell-outro{padding:38px 22px!important;background:radial-gradient(ellipse at 50% 100%,#7ba48a45,transparent 60%),linear-gradient(145deg,#113549,#081e31)!important}
+.farewell-best{background:linear-gradient(110deg,#344b53,#1b3b4d);border-color:#d2a97d}
+.farewell-outro{padding:38px 22px;background:radial-gradient(ellipse at 50% 100%,#7ba48a45,transparent 60%),linear-gradient(145deg,#113549,#081e31)}
 .farewell-outro h2{font-size:clamp(34px,3.9vw,56px)}
 .play-overlay{backdrop-filter:blur(8px);background:rgba(2,11,19,.88)}
-.play-window{border:1px solid #8798a374!important;border-radius:15px;box-shadow:0 35px 95px #010912c9,0 0 38px #cb995023!important}
-.play-window header{background:linear-gradient(90deg,#163d4b,#091e32)!important;border-bottom:2px solid #bc906b}
-.play-window header strong{font-size:clamp(24px,2.2vw,31px)!important;letter-spacing:.02em}
-.play-window header small{color:#f1c198!important}
+.play-window{border:1px solid #8798a374;border-radius:15px;box-shadow:0 35px 95px #010912c9,0 0 38px #cb995023}
+.play-window header{background:linear-gradient(90deg,#163d4b,#091e32);border-bottom:2px solid #bc906b}
+.play-window header strong{font-size:clamp(24px,2.2vw,31px);letter-spacing:.02em}
+.play-window header small{color:#f1c198}
 .play-window footer{border-top:1px solid #547087;background:#0a2436;color:#c8e0e9;line-height:1.5}
 .play-stage{background:radial-gradient(ellipse at 50% 50%,#1e694b,#0b2033)}
 .play-stage canvas:focus-visible{outline:3px solid #ebbc93;outline-offset:-3px}
 @media(max-width:1020px){
- .farewell-medallion{width:130px!important;height:130px!important}.farewell-medallion strong{font-size:54px!important}
+ .farewell-medallion{width:130px;height:130px}.farewell-medallion strong{font-size:54px}
  .legacy-act{padding:12px}.legacy-act-metrics{gap:4px}
 }
 @media(max-width:700px){
- .matchday-arena{height:90px}.matchday-context{padding:0 10px}.matchday-scoreboard{margin:0 8px;padding:8px;min-height:80px!important}
+ .matchday-arena{height:90px}.matchday-context{padding:0 10px}.matchday-scoreboard{margin:0 8px;padding:8px;min-height:80px}
  .matchday-team-crest,.matchday-team-crest img{width:28px;height:28px}
- .matchday-situation,.matchday-feature .matchday-identity,.matchday-feature h3,.matchday-feature>p{margin-left:10px!important;margin-right:10px!important}
- .matchday-indicators,.matchday-cta{margin-left:10px!important;margin-right:10px!important}
- .farewell-hero-row{min-height:190px;padding:20px 15px!important}
- .farewell-hero-text h1{font-size:clamp(36px,9vw,59px)!important}
- .farewell-hero .farewell-name{font-size:clamp(24px,6vw,34px)!important}
- .farewell-medallion{width:86px!important;height:86px!important}.farewell-medallion strong{font-size:34px!important}
+ .matchday-situation,.matchday-feature .matchday-identity,.matchday-feature h3,.matchday-feature>p{margin-left:10px;margin-right:10px}
+ .matchday-indicators,.matchday-cta{margin-left:10px;margin-right:10px}
+ .farewell-hero-row{min-height:190px;padding:20px 15px}
+ .farewell-hero-text h1{font-size:clamp(36px,9vw,59px)}
+ .farewell-hero .farewell-name{font-size:clamp(24px,6vw,34px)}
+ .farewell-medallion{width:86px;height:86px}.farewell-medallion strong{font-size:34px}
  .farewell-acts{padding:13px 10px}
  .legacy-acts{grid-template-columns:1fr;gap:9px}.legacy-acts:before{display:none}
  .legacy-act{grid-template-columns:1fr auto;row-gap:4px}
@@ -119,23 +121,23 @@
  .legacy-act>p{grid-column:1/-1}
  .farewell-signatures{gap:5px}.farewell-signatures>span{padding:5px 7px;font-size:9px}
 }
-@media(max-width:420px){.matchday-team{font-size:11px!important}.matchday-scoreboard>strong{gap:4px!important;font-size:31px!important}.matchday-scoreboard>strong span{min-width:18px}.farewell-medallion{display:none}}
-@media(prefers-reduced-motion:reduce){.matchday-center *, .farewell-page *, .play-window *{animation:none!important;transition:none!important}}
+@media(max-width:420px){.matchday-team{font-size:11px}.matchday-scoreboard>strong{gap:4px;font-size:31px}.matchday-scoreboard>strong span{min-width:18px}.farewell-medallion{display:none}}
+@media(prefers-reduced-motion:reduce){.matchday-center *, .farewell-page *, .play-window *{animation:none;transition:none}}
 
 
 /* Identidad propia del overlay de cada jugada */
 .play-broadcast-tag{display:inline-flex;margin-top:5px;padding:3px 9px;color:#f3d6bc;font-size:10px;font-weight:850;letter-spacing:.12em;border:1px solid #bb916e88;background:#172f40;border-radius:4px}
-.play-visual-duelo{border-color:#e9ba86!important}
-.play-visual-vuelo{border-color:#82ced6!important}
-.play-visual-lectura{border-color:#9da9e8!important}
-.play-visual-presion{border-color:#e4a48f!important}
-.play-visual-velocidad{border-color:#8dcea7!important}
+.play-visual-duelo{border-color:#e9ba86}
+.play-visual-vuelo{border-color:#82ced6}
+.play-visual-lectura{border-color:#9da9e8}
+.play-visual-presion{border-color:#e4a48f}
+.play-visual-velocidad{border-color:#8dcea7}
 @media(max-height:680px){.play-window header{padding:6px 12px}.play-broadcast-tag{display:none}.play-window footer{padding:5px 10px;font-size:11px}}
 
 /* 4.4.1 · Las instrucciones Canvas a 960×540 se vuelven ilegibles en móvil vertical.
    Presentar un resumen HTML grande, con botón equivalente al de la cancha. */
 .play-mobile-brief{display:none}
-.play-mobile-brief[hidden]{display:none!important}
+.play-mobile-brief[hidden]{display:none}
 @media (max-width:700px) and (orientation:portrait){
  .play-window{overflow:hidden}
  .play-mobile-brief{display:grid;gap:5px;padding:11px 13px;max-height:min(34dvh,230px);overflow-y:auto;background:#122b40;border-top:1px solid #6993a0;border-bottom:1px solid #6993a0}
@@ -146,7 +148,7 @@
 }
 
 /* 4.5 · Vitrina compacta: mismo alto anterior, nombres visibles y copa identificable. */
-.right-rail .trophy-showcase{box-sizing:border-box;height:97px;max-height:97px;overflow:hidden;padding:7px 10px!important;background:linear-gradient(145deg,#142b44,#10253b)!important;border-color:#715e53!important}
+.right-rail .trophy-showcase{box-sizing:border-box;height:97px;max-height:97px;overflow:hidden;padding:7px 10px;background:linear-gradient(145deg,#142b44,#10253b);border-color:#715e53}
 .trophy-showcase .rail-heading{margin-bottom:4px;min-height:12px}
 .trophy-grid{min-height:0;height:64px;max-height:64px;align-items:stretch;gap:7px;scrollbar-width:thin;padding-bottom:3px}
 .trophy-unit{box-sizing:border-box;display:grid;grid-template-columns:33px minmax(0,1fr);align-items:center;flex:none;gap:5px;width:114px;height:60px;text-align:left;padding:4px 5px;background:linear-gradient(150deg,#30485e,#1a3247);border:1px solid #8b745a;border-radius:7px;color:#f7ede2;cursor:pointer;font:inherit;transition:border-color .15s,background .15s}
@@ -169,8 +171,8 @@
 .trophy-detail-facts>div{display:grid;gap:4px;background:#233d53;border:1px solid #567185;border-radius:8px;padding:10px 6px}
 .trophy-detail-facts small{font-size:9px;color:#e8b480;letter-spacing:.07em}
 .trophy-detail-facts strong{font-size:12px;color:#fff;overflow-wrap:anywhere}
-.farewell-trophies{max-height:370px!important;overflow-y:auto}
-.farewell-trophy{box-sizing:border-box;min-height:127px;gap:3px!important;padding:8px 5px!important}
+.farewell-trophies{max-height:370px;overflow-y:auto}
+.farewell-trophy{box-sizing:border-box;min-height:127px;gap:3px;padding:8px 5px}
 .farewell-trophy-art{height:63px;width:100%;display:grid;place-items:center;background:radial-gradient(ellipse,#b68d5040,transparent 70%)}
 .farewell-trophy-art img{display:block;width:auto;max-width:65px;height:61px;object-fit:contain;filter:drop-shadow(0 5px 9px #000a)}
 .farewell-trophy strong{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:10px;line-height:1.2;overflow-wrap:anywhere}
@@ -184,7 +186,7 @@
 .right-rail .trophy-showcase{
   height:97px;max-height:97px;min-height:97px;
   box-sizing:border-box;overflow:hidden;
-  padding:5px 9px!important;
+  padding:5px 9px;
 }
 .trophy-showcase .rail-heading{min-height:12px;line-height:12px;margin:0 0 3px}
 .trophy-showcase .trophy-grid{
@@ -227,25 +229,25 @@
   display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
   width:100%;min-width:0;max-height:23px;
   overflow:hidden;overflow-wrap:anywhere;
-  padding:0;margin:0;font-size:9px!important;line-height:11px;
+  padding:0;margin:0;font-size:9px;line-height:11px;
   font-weight:800;letter-spacing:0;color:#f5eadb;
   text-align:center;
 }
 @media(max-width:700px){
   .trophy-showcase .trophy-unit{flex-basis:91px;width:91px;min-width:91px}
   .trophy-showcase .trophy-unit-art{width:87px}
-  .trophy-showcase .trophy-unit-name{font-size:9px!important}
+  .trophy-showcase .trophy-unit-name{font-size:9px}
 }
 
 
 /* RASCENSO 4.6 · Historial sin bloques duplicados. Las copas viven junto al club. */
-.history-club-cell{display:flex!important;align-items:center;min-width:0;gap:6px;white-space:nowrap}
+.history-club-cell{display:flex;align-items:center;min-width:0;gap:6px;white-space:nowrap}
 .history-club-copy{min-width:0;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:750}
 .history-season-trophies{display:inline-flex;align-items:center;gap:3px;flex:none;margin-left:auto;padding-left:4px;max-width:124px}
 .history-mini-cup{width:24px;height:27px;display:grid;place-items:center;flex:none}
 .history-mini-cup img{display:block;max-width:22px;max-height:25px;width:auto;height:auto;object-fit:contain;filter:drop-shadow(0 2px 3px #0008)}
 .history-cup-more{font-size:10px;font-weight:800;color:#f2c08b}
-.history .history-head,.history .history-row{grid-template-columns:minmax(0,1fr) repeat(6,44px)!important}
+.history .history-head,.history .history-row{grid-template-columns:minmax(0,1fr) repeat(6,44px)}
 .history .history-table{max-height:min(36vh,345px)}
 .selection-report{background:linear-gradient(155deg,#183750,#112b42);border:1px solid #527088;border-radius:11px;padding:14px;margin:11px 0;display:grid;gap:10px}
 .selection-report-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
@@ -275,109 +277,109 @@
 .selection-footnote{font-size:9px;color:#90afc5;margin:0}
 
 /* No recortar el texto del palmarés: altura calculada para PNG, nombre y scroll. */
-.right-rail .trophy-showcase{height:135px!important;min-height:135px!important;max-height:135px!important;padding:7px 10px!important;overflow:hidden}
-.trophy-showcase .rail-heading{min-height:14px!important;line-height:14px!important;margin:0 0 5px!important}
-.trophy-showcase .trophy-grid{height:101px!important;min-height:101px!important;max-height:101px!important;align-items:flex-start!important;overflow-x:auto;overflow-y:hidden;padding:0 0 12px!important;gap:9px!important}
-.trophy-showcase .trophy-unit{box-sizing:border-box;flex:0 0 107px!important;width:107px!important;min-width:107px!important;height:89px!important;min-height:89px!important;gap:3px!important;padding:0 2px!important;overflow:visible!important;display:flex!important;flex-direction:column!important;align-items:center!important;background:transparent!important;border:none!important;box-shadow:none!important}
-.trophy-showcase .trophy-unit-art{flex:0 0 51px!important;width:102px!important;height:51px!important;min-height:51px!important;display:flex!important;align-items:center!important;justify-content:center!important}
-.trophy-showcase .trophy-unit-art img{height:50px!important;max-height:50px!important;max-width:79px!important;width:auto!important;object-fit:contain!important}
-.trophy-showcase .trophy-unit-name{display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:3!important;white-space:normal!important;overflow:hidden!important;max-height:33px!important;font-size:10px!important;line-height:11px!important;text-align:center!important;width:100%!important}
-@media(max-width:760px){.history .history-head,.history .history-row{grid-template-columns:minmax(0,1fr) repeat(6,32px)!important}.history-season-trophies{max-width:83px}.history-mini-cup{width:17px}.history-mini-cup img{max-width:16px;max-height:21px}.selection-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.selection-report-head{flex-wrap:wrap}.selection-competition{grid-template-columns:minmax(0,1fr) 32px 28px 28px}}
+.right-rail .trophy-showcase{height:135px;min-height:135px;max-height:135px;padding:7px 10px;overflow:hidden}
+.trophy-showcase .rail-heading{min-height:14px;line-height:14px;margin:0 0 5px}
+.trophy-showcase .trophy-grid{height:101px;min-height:101px;max-height:101px;align-items:flex-start;overflow-x:auto;overflow-y:hidden;padding:0 0 12px;gap:9px}
+.trophy-showcase .trophy-unit{box-sizing:border-box;flex:0 0 107px;width:107px;min-width:107px;height:89px;min-height:89px;gap:3px;padding:0 2px;overflow:visible;display:flex;flex-direction:column;align-items:center;background:transparent;border:none;box-shadow:none}
+.trophy-showcase .trophy-unit-art{flex:0 0 51px;width:102px;height:51px;min-height:51px;display:flex;align-items:center;justify-content:center}
+.trophy-showcase .trophy-unit-art img{height:50px;max-height:50px;max-width:79px;width:auto;object-fit:contain}
+.trophy-showcase .trophy-unit-name{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;white-space:normal;overflow:hidden;max-height:33px;font-size:10px;line-height:11px;text-align:center;width:100%}
+@media(max-width:760px){.history .history-head,.history .history-row{grid-template-columns:minmax(0,1fr) repeat(6,32px)}.history-season-trophies{max-width:83px}.history-mini-cup{width:17px}.history-mini-cup img{max-width:16px;max-height:21px}.selection-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.selection-report-head{flex-wrap:wrap}.selection-competition{grid-template-columns:minmax(0,1fr) 32px 28px 28px}}
 
 /* Legado 4.6 · La despedida debe aprovechar la pantalla 1920×1080. */
 @media(min-width:1200px) and (min-height:740px){
- .farewell-page{gap:9px!important;margin-bottom:8px!important;max-width:1740px}
- .farewell-hero{min-height:0!important;border-radius:11px}
+ .farewell-page{gap:9px;margin-bottom:8px;max-width:1740px}
+ .farewell-hero{min-height:0;border-radius:11px}
  .farewell-hero-top{padding:8px 18px 0;font-size:9px}
- .farewell-hero-row{padding:6px 20px!important;min-height:120px!important;gap:12px}
- .farewell-hero-text h1{font-size:clamp(35px,3.2vw,51px)!important;line-height:.91!important;display:block}
+ .farewell-hero-row{padding:6px 20px;min-height:120px;gap:12px}
+ .farewell-hero-text h1{font-size:clamp(35px,3.2vw,51px);line-height:.91;display:block}
  .farewell-hero-text h1 em{margin-left:9px}
- .farewell-hero .farewell-name{font-size:23px!important;margin-top:4px!important}
- .farewell-hero-text>p{font-size:11px!important;line-height:1.3!important}
- .farewell-hero-badges{margin-top:6px!important;gap:5px!important}
- .farewell-signatures{margin-top:5px!important;gap:5px!important}
+ .farewell-hero .farewell-name{font-size:23px;margin-top:4px}
+ .farewell-hero-text>p{font-size:11px;line-height:1.3}
+ .farewell-hero-badges{margin-top:6px;gap:5px}
+ .farewell-signatures{margin-top:5px;gap:5px}
  .farewell-signatures>span{font-size:9px;padding:3px 6px}
- .farewell-medallion{width:95px!important;height:95px!important;transform:none!important}
- .farewell-medallion strong{font-size:42px!important}
+ .farewell-medallion{width:95px;height:95px;transform:none}
+ .farewell-medallion strong{font-size:42px}
  .farewell-medallion small{font-size:8px}
- .farewell-hero-foot{padding:5px 16px!important;min-height:30px!important;gap:9px!important}
- .farewell-hero-foot .team-badge{width:24px!important;height:24px!important}
- .farewell-acts{padding:10px 12px!important}
- .legacy-act-heading{margin-bottom:6px!important}
- .legacy-act-heading h2{font-size:22px!important;margin:3px 0 0!important}
- .legacy-acts{gap:7px!important}
+ .farewell-hero-foot{padding:5px 16px;min-height:30px;gap:9px}
+ .farewell-hero-foot .team-badge{width:24px;height:24px}
+ .farewell-acts{padding:10px 12px}
+ .legacy-act-heading{margin-bottom:6px}
+ .legacy-act-heading h2{font-size:22px;margin:3px 0 0}
+ .legacy-acts{gap:7px}
  .legacy-acts:before{display:none}
- .legacy-act{padding:8px 11px!important;gap:3px!important;box-shadow:none!important}
+ .legacy-act{padding:8px 11px;gap:3px;box-shadow:none}
  .legacy-act-top{font-size:9px}
- .legacy-act-top>b{font-size:14px!important}
- .legacy-act-year{font-size:29px!important}
- .legacy-act>strong{font-size:15px!important}
- .legacy-act>p{min-height:0!important;font-size:10px}
- .legacy-act-metrics{padding-top:3px!important;gap:4px!important}
+ .legacy-act-top>b{font-size:14px}
+ .legacy-act-year{font-size:29px}
+ .legacy-act>strong{font-size:15px}
+ .legacy-act>p{min-height:0;font-size:10px}
+ .legacy-act-metrics{padding-top:3px;gap:4px}
  .legacy-act-metrics>span{font-size:9px;padding:3px 5px}
  .legacy-act>small{font-size:9px}
- .farewell-numbers{display:flex!important;align-items:center!important;gap:12px!important;padding:8px 10px!important}
- .farewell-numbers>div:first-child{display:grid!important;flex:0 0 168px;align-content:center;gap:2px}
- .farewell-numbers h2{font-size:19px!important;margin:2px 0!important}
- .farewell-stats{flex:1;gap:5px!important}
- .farewell-stat{padding:7px 3px!important;min-height:54px!important}
- .farewell-stats .farewell-stat b{font-size:26px!important}
- .farewell-stat small{font-size:9px!important}
- .farewell-content{gap:9px!important;grid-template-columns:1fr 1fr!important}
- .farewell-main,.farewell-side{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;align-items:start!important}
+ .farewell-numbers{display:flex;align-items:center;gap:12px;padding:8px 10px}
+ .farewell-numbers>div:first-child{display:grid;flex:0 0 168px;align-content:center;gap:2px}
+ .farewell-numbers h2{font-size:19px;margin:2px 0}
+ .farewell-stats{flex:1;gap:5px}
+ .farewell-stat{padding:7px 3px;min-height:54px}
+ .farewell-stats .farewell-stat b{font-size:26px}
+ .farewell-stat small{font-size:9px}
+ .farewell-content{gap:9px;grid-template-columns:1fr 1fr}
+ .farewell-main,.farewell-side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-items:start}
  .farewell-main>.farewell-tribute{grid-column:1/-1}
- .farewell-section{padding:10px 12px!important;border-radius:9px!important}
- .farewell-section h2{font-size:20px!important;margin:3px 0 7px!important}
- .farewell-tribute>p{font-size:11px!important;line-height:1.4!important}
- .farewell-dates{margin-top:8px!important;padding-top:7px!important}
- .farewell-dream{margin-top:6px!important;padding:5px!important}
- .farewell-clubs{max-height:185px!important}
- .farewell-club{padding:5px 3px!important;gap:6px!important}
- .farewell-curve svg{height:82px!important}
- .farewell-best{padding:6px!important;margin-top:6px!important}
- .farewell-trophies{max-height:170px!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important}
- .farewell-trophy{min-height:113px!important;padding:5px 3px!important;gap:2px!important}
- .farewell-trophy-art{height:54px!important}
- .farewell-trophy-art img{height:52px!important;max-width:60px!important}
+ .farewell-section{padding:10px 12px;border-radius:9px}
+ .farewell-section h2{font-size:20px;margin:3px 0 7px}
+ .farewell-tribute>p{font-size:11px;line-height:1.4}
+ .farewell-dates{margin-top:8px;padding-top:7px}
+ .farewell-dream{margin-top:6px;padding:5px}
+ .farewell-clubs{max-height:185px}
+ .farewell-club{padding:5px 3px;gap:6px}
+ .farewell-curve svg{height:82px}
+ .farewell-best{padding:6px;margin-top:6px}
+ .farewell-trophies{max-height:170px;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+ .farewell-trophy{min-height:113px;padding:5px 3px;gap:2px}
+ .farewell-trophy-art{height:54px}
+ .farewell-trophy-art img{height:52px;max-width:60px}
  .farewell-memories,.farewell-awards,.farewell-rivals{max-height:160px;overflow:auto}
- .farewell-outro{padding:10px 16px!important}
- .farewell-outro h2{font-size:25px!important;margin:2px 0!important}
- .farewell-outro p{font-size:11px!important;margin:4px 0!important}
- .farewell-actions{margin:7px 0!important;gap:6px!important}
- .farewell-actions button{min-height:30px!important;padding:3px 9px!important}
+ .farewell-outro{padding:10px 16px}
+ .farewell-outro h2{font-size:25px;margin:2px 0}
+ .farewell-outro p{font-size:11px;margin:4px 0}
+ .farewell-actions{margin:7px 0;gap:6px}
+ .farewell-actions button{min-height:30px;padding:3px 9px}
 }
 
 
 /* 4.6.1 · Segunda compactación de la portada y los tres actos, verificada a 1920x1080. */
 @media(min-width:1200px) and (min-height:740px){
- .farewell-hero-top{padding-top:6px!important}
- .farewell-hero-row{padding:4px 18px!important;min-height:96px!important}
- .farewell-hero-text h1{display:flex!important;flex-wrap:wrap!important;align-items:baseline!important;column-gap:10px!important;row-gap:0!important;font-size:36px!important;line-height:.88!important}
- .farewell-hero-text h1 em{display:inline!important;margin-left:0!important}
- .farewell-hero .farewell-name{font-size:19px!important;margin-top:2px!important}
- .farewell-hero-badges{margin-top:3px!important;gap:4px!important}
- .farewell-hero-badges>span{padding:3px 7px!important;font-size:9px!important}
- .farewell-hero .farewell-signatures{margin-top:3px!important}
- .farewell-hero-foot{min-height:27px!important;padding:3px 14px!important}
- .farewell-acts{padding:7px 10px!important}
- .legacy-act-heading{margin-bottom:4px!important}
- .legacy-act-heading h2{font-size:18px!important;margin:1px 0!important}
- .legacy-act{gap:1px!important;padding:6px 9px!important}
- .legacy-act-top{font-size:8px!important}
- .legacy-act-top>b{font-size:12px!important}
- .legacy-act-year{font-size:25px!important;line-height:1!important}
- .legacy-act>strong{font-size:14px!important}
- .legacy-act-metrics{padding-top:2px!important;gap:3px!important}
- .legacy-act-metrics>span{padding:2px 4px!important;font-size:8px!important}
- .legacy-act>small{display:none!important}
+ .farewell-hero-top{padding-top:6px}
+ .farewell-hero-row{padding:4px 18px;min-height:96px}
+ .farewell-hero-text h1{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:10px;row-gap:0;font-size:36px;line-height:.88}
+ .farewell-hero-text h1 em{display:inline;margin-left:0}
+ .farewell-hero .farewell-name{font-size:19px;margin-top:2px}
+ .farewell-hero-badges{margin-top:3px;gap:4px}
+ .farewell-hero-badges>span{padding:3px 7px;font-size:9px}
+ .farewell-hero .farewell-signatures{margin-top:3px}
+ .farewell-hero-foot{min-height:27px;padding:3px 14px}
+ .farewell-acts{padding:7px 10px}
+ .legacy-act-heading{margin-bottom:4px}
+ .legacy-act-heading h2{font-size:18px;margin:1px 0}
+ .legacy-act{gap:1px;padding:6px 9px}
+ .legacy-act-top{font-size:8px}
+ .legacy-act-top>b{font-size:12px}
+ .legacy-act-year{font-size:25px;line-height:1}
+ .legacy-act>strong{font-size:14px}
+ .legacy-act-metrics{padding-top:2px;gap:3px}
+ .legacy-act-metrics>span{padding:2px 4px;font-size:8px}
+ .legacy-act>small{display:none}
 }
 .history .v2-history-grid>.v2-panel:last-child:nth-child(odd){grid-column:1/-1}
 
 
 /* 4.6.2 · Las copas deben leerse junto al nombre del equipo, no junto al OVR. */
-.history .history-club-cell{justify-content:flex-start!important;gap:5px!important}
-.history .history-club-copy{flex:0 1 auto!important;max-width:calc(100% - 106px);margin:0!important}
-.history .history-season-trophies{margin-left:0!important;padding-left:0!important;flex:none!important;max-width:100px}
+.history .history-club-cell{justify-content:flex-start;gap:5px}
+.history .history-club-copy{flex:0 1 auto;max-width:calc(100% - 106px);margin:0}
+.history .history-season-trophies{margin-left:0;padding-left:0;flex:none;max-width:100px}
 .history .history-mini-cup{width:22px;height:25px}
 .history .history-mini-cup img{max-width:20px;max-height:23px}
 @media(max-width:760px){
@@ -420,3 +422,5 @@
 .fm-world-footnote{font-size:10px;color:#9ebcd0}
 .fm-world-status{display:block;font-size:11px;color:#f4bf8d;margin:8px 0;line-height:1.5}
 @media(max-width:680px){.fm-world-summary{display:grid}.fm-world-person{grid-template-columns:minmax(0,1fr) 50px}.fm-world-person small{display:none}}
+
+}

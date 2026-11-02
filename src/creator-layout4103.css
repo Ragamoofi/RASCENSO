@@ -1,5 +1,7 @@
+/* Historical component structure; editorial.css owns current presentation. */
+@layer legacy {
 /* RASCENSO 4.10.2 — Un tablero por etapa. Sin subpestañas ni tarjetas de elección. */
-.cr3 .cr-main.creator4102{padding:12px 18px 18px!important;scrollbar-gutter:stable;scrollbar-width:thin}
+.cr3 .cr-main.creator4102{padding:12px 18px 18px;scrollbar-gutter:stable;scrollbar-width:thin}
 .creator4102>.cr-head{margin:0 0 10px;padding:0 0 9px;border-bottom:1px solid #36516c66}
 .creator4102>.cr-head .section-label{font-size:9px;letter-spacing:.12em;color:#dfaa81}
 .creator4102>.cr-head h1{font-size:27px;line-height:1.04;margin:2px 0 3px}
@@ -22,7 +24,7 @@
 .creator4102 .cr4102-choice.on:before{background:#eeb783;border-color:#eeb783;box-shadow:0 0 0 2px #eeb78322}
 .creator4102 .cr4102-choice:focus-within{outline:2px solid #efba88;outline-offset:1px}
 .creator4102 .cr4102-choice input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;margin:0}
-.creator4102 .cr4102-choice .cr-ico,.creator4102 .cr4102-choice .cr-chips,.creator4102 .cr4102-choice .cr-body>small{display:none!important}
+.creator4102 .cr4102-choice .cr-ico,.creator4102 .cr4102-choice .cr-chips,.creator4102 .cr4102-choice .cr-body>small{display:none}
 .creator4102 .cr4102-choice .cr-body{display:block;min-width:0;width:100%}
 .creator4102 .cr4102-choice .cr-body strong{display:block;font-size:10.6px;font-weight:750;line-height:1.24;white-space:normal;padding:0;color:inherit;overflow-wrap:anywhere}
 .creator4102 .cr4102-choice .cr-rec{display:none}
@@ -108,7 +110,7 @@
  .creator4102 .cr4102-dream-board>.cr4102-decision:first-child .cr4102-options{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 @media(max-width:880px){
- .cr3 .cr-main.creator4102{padding:10px!important}
+ .cr3 .cr-main.creator4102{padding:10px}
  .creator4102 .cr4102-board,.creator4102 .cr4102-ident-layout,.creator4102 .cr4102-roots-intro,.creator4102 .cr4102-profile-intro{grid-template-columns:1fr}
  .creator4102 .cr4102-ident-layout .cr-pitch{height:255px}
  .creator4102 .cr4102-dream-board>.cr4102-decision:first-child .cr4102-options{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -293,11 +295,11 @@
  font-size:9px;line-height:1.25;padding:3px 6px;border-radius:7px;
 }
 /* Semántica visual: beneficios en ámbar, riesgos de la debilidad en terracota. */
-.creator4104 .cr4104-choice-1:before{background:#dc8175!important}
+.creator4104 .cr4104-choice-1:before{background:#dc8175}
 .creator4104 .cr4104-choice-1 .cr4102-detail{border-left-color:#d77d74}
-.creator4104 .cr4104-choice-2:before{background:#79addb!important}
+.creator4104 .cr4104-choice-2:before{background:#79addb}
 .creator4104 .cr4104-choice-2 .cr4102-detail{border-left-color:#77a9da}
-.creator4104 .cr4104-choice-3:before{background:#83c9a9!important}
+.creator4104 .cr4104-choice-3:before{background:#83c9a9}
 .creator4104 .cr4104-choice-3 .cr4102-detail{border-left-color:#82c7a5}
 
 @media(max-width:1650px){
@@ -315,4 +317,6 @@
  .creator4104 .cr4104-choice-section>.cr4102-options[data-count="5"],
  .creator4104 .cr4104-choice-section>.cr4102-options[data-count="9"]{grid-template-columns:repeat(2,minmax(0,1fr))}
  .creator4104 .cr4104-choice-section>.cr4102-detail{margin-top:2px}
+}
+
 }

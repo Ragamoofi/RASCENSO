@@ -1,6 +1,6 @@
 # RASCENSO — Premium compacto
 
-Estado: auditoría previa en curso. No hay cambios de producto todavía.
+Estado: implementación de composición realizada; validación visual y funcional en curso.
 
 - Base comprobada con `git fetch origin main`: `af565af8a36252c085ed7d9744823a06c5d5f57c`.
 - Rama: `ux/premium-compacto`. No fusionar automáticamente.
@@ -35,6 +35,21 @@ Hallazgos confirmados:
 
 ## Continuidad
 
-Último checkpoint: consultar `git log -1`. El producto sigue idéntico a la base. `docs/ux-compacto/antes.json` conserva mediciones. El servidor QA vive en `.preview` (ignorado); el arnés de medición está versionado en `tests/browser/ux-audit`. No sustituir datos de partida por ejemplos en el producto.
+Último checkpoint: consultar `git log -1`. La composición compacta está implementada; aún faltan las verificaciones finales y el informe comparativo completo. `docs/ux-compacto/antes.json` conserva mediciones. El servidor QA vive en `.preview` (ignorado); el arnés de medición está versionado en `tests/browser/ux-audit`. No sustituir datos de partida por ejemplos en el producto.
 
 El contenedor de la herramienta Chromium tuvo un límite de uso durante la primera sesión; acceso restablecido al continuar el 2 de noviembre. No se considera validado ningún resultado posterior hasta guardar capturas y repetir las medidas.
+
+## Implementado (checkpoint, no cierre)
+
+- Capas históricas aisladas en `@layer legacy`, sin `!important`; la presentación editorial gobierna la cascada.
+- Seis etapas originales con barra de acción persistente, opciones en rejillas y resumen lateral editable. Bonos conservados en categoría y Resumen.
+- Carrera: acciones arriba, partido y decisión en dos columnas desde 1200 px; todos los análisis y calendarios permanecen.
+- Legado: tres cartas comparables, familias en referencia común; ADN y contratos compactos.
+- Mundo: ambos buscadores al inicio; rankings en columnas y noticias con scroll local.
+- Verano: tres actividades sin altura mínima, servicios en rail secundario y descanso/resumen persistentes.
+- Minijuegos: ayuda HTML única, Canvas proporcional; sin modificar física ni dificultad.
+- Narrativa, balance, tablas, vestuario, retiro y ajustes comparten la escala compacta.
+
+Pruebas al checkpoint: `node --test --test-timeout=60000 tests/*.test.mjs`: **380/380**. `node tests/ui-smoke.mjs`: aprobado. Versionado actualizado en pruebas de carga; ninguna regla del motor modificada.
+
+Pendiente prioritario: terminar comparación responsive de mercado/verano/mundo/historial/vestuario/retiro/club/ajustes; verificar las 20 jugadas, filtros y flujo completo; comprobar JSON/PNG y restauración; consolidar reglas editoriales repetidas y emitir PR.
