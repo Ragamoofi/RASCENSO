@@ -46,6 +46,31 @@ jobs:
         run: |
           python3 -m http.server 8765 >/tmp/rascenso-ux-http.log 2>&1 &
           node tests/browser/ux-compact-review.cjs
+      - name: Preparar miniaturas para revisión visual
+        if: success()
+        run: |
+          python3 -m pip install -q pillow
+          python3 - <<'PY'
+          from PIL import Image
+          from pathlib import Path
+          import io,base64
+          root=Path('/tmp/rascenso-ux-review')
+          candidates=[
+             'identidad-1366x768-top.png','futbolista-1366x768-top.png',
+             'carrera-1366x768-top.png','verano-1366x768-top.png',
+             'identidad-390x844-top.png','futbolista-390x844-top.png',
+             'carrera-390x844-top.png','verano-390x844-top.png',
+             'carrera-1366x768-full.png','verano-390x844-full.png']
+          for name in candidates:
+           f=root/name
+           if not f.exists(): continue
+           im=Image.open(f).convert('RGB')
+           scale=min(1,940/im.width)
+           if scale<1:im.resize((round(im.width*scale),round(im.height*scale)),Image.Resampling.LANCZOS)
+           if scale<1:im=im.resize((round(im.width*scale),round(im.height*scale)),Image.Resampling.LANCZOS)
+           buf=io.BytesIO();im.save(buf,format='JPEG',quality=56,optimize=True)
+           print('VISUAL_CAPTURE:'+name+':'+base64.b64encode(buf.getvalue()).decode('ascii'),flush=True)
+          PY
       - name: Adjuntar capturas y mediciones
         if: always()
         uses: actions/upload-artifact@v4
