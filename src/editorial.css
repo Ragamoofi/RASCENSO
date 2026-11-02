@@ -406,3 +406,19 @@ html body [hidden],html body .hidden,.play-window .play-mobile-brief[hidden]{dis
 .spotlight4110-live>span{grid-column:1;grid-row:1}.spotlight4110-live>.spotlight4110-effect{grid-column:2}
 @media(max-width:767px){.spotlight4110-live>span{grid-column:1}.spotlight4110-live>.spotlight4110-effect{grid-column:1}}
 .play-mobile-start{border:1px solid var(--ed-copper);border-radius:8px;cursor:pointer}
+
+/* Ajustes finales de auditoría en móvil: el prólogo repite el capítulo de
+   cada etapa. Se conserva para lectores de pantalla pero no roba viewport. */
+@media(max-width:767px){
+ .ed-page-intro{display:block;margin:0 0 6px;padding:0 0 6px}
+ .ed-page-intro h1{font-size:23px;line-height:1.12;margin:0}
+ .ed-page-intro :is(.section-label,p){
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip-path:inset(50%);white-space:nowrap
+ }
+ .profile-card .player-economy{margin-top:2px;padding:4px 0;gap:4px}
+ .profile-card .player-club{padding:5px 8px}
+ .view.summer-view{scroll-padding-bottom:120px}
+ .summer-mode,.summer-service .summer-btn{scroll-margin-block-end:120px}
+ .summer-actions{box-shadow:0 -8px 18px #081321dd}
+}
