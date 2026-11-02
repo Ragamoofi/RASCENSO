@@ -24,6 +24,7 @@ jobs:
           node --check tests/browser/e2e.cjs
           node --check tests/browser/ux-compact-review.cjs
           node --check tests/browser/ux-compact-secondary.cjs
+          node --check tests/browser/ux-compact-panorama.cjs
       - name: Pruebas de motor, creador y verano
         run: node --test --test-timeout=60000 tests/*.test.mjs
       - name: Interfaz inicial y carreras completas
@@ -48,6 +49,7 @@ jobs:
           python3 -m http.server 8765 >/tmp/rascenso-ux-http.log 2>&1 &
           node tests/browser/ux-compact-review.cjs
           node tests/browser/ux-compact-secondary.cjs
+          node tests/browser/ux-compact-panorama.cjs
       - name: Preparar miniaturas para revisión visual
         if: success()
         run: |
@@ -62,7 +64,12 @@ jobs:
              'carrera-1366x768-top.png','verano-1366x768-top.png',
              'identidad-390x844-top.png','futbolista-390x844-top.png',
              'carrera-390x844-top.png','verano-390x844-top.png',
-             'carrera-1366x768-full.png','verano-390x844-full.png']
+             'carrera-1366x768-full.png','verano-390x844-full.png',
+             'legado-1366x768-panorama.png','contratos-1366x768-panorama.png',
+             'narrativa-1366x768-panorama.png','mercado-1366x768-panorama.png',
+             'mundo-1366x768-panorama.png','retiro-1366x768-panorama.png',
+             'legado-390x844-panorama.png','mercado-390x844-panorama.png',
+             'mundo-390x844-panorama.png','club-390x844-panorama.png']
           for name in candidates:
            f=root/name
            if not f.exists(): continue
