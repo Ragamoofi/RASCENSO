@@ -429,3 +429,24 @@ html body [hidden],html body .hidden,.play-window .play-mobile-brief[hidden]{dis
  .view:not(.playing)>.ed-page-intro{display:none}
  .view:not(.playing)>.creation-layout.cr3{margin-top:0}
 }
+
+/* Final usability review: real long player names must not collide with OVR.
+   Market, stories and research prioritize their own content on narrow phones;
+   the complete player card remains accessible afterwards. */
+.profile-card{column-gap:9px}
+.profile-card h2{
+ min-width:0;max-width:100%;
+ font-size:clamp(18px,1.45vw,23px);line-height:1.1;
+ overflow-wrap:anywhere;text-wrap:pretty
+}
+@media(min-width:768px) and (max-width:1399px){
+ .profile-card{grid-template-columns:46px minmax(0,1fr)}
+ .profile-card h2{font-size:19px}
+}
+@media(max-width:767px){
+ .playing-layout:has(
+  .focus-card.market,.focus-card.story,.focus-card.history,
+  .focus-card.v2-world,.focus-card.v2-vestuario
+ )>.left-rail>.profile-card{order:2}
+ .profile-card h2{font-size:clamp(19px,5.1vw,25px)}
+}
